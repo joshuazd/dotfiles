@@ -1,0 +1,208 @@
+set nocompatible
+filetype off
+execute pathogen#infect()
+filetype plugin indent on
+
+" Set 999 lines to the cursor - when moving vertically using j/k
+" Keeps cursor centered
+set so=999
+
+" Turn on the WiLd menu
+set wildmenu
+
+set wildmode=longest,list
+" Ignore compiled files
+set wildignore=*.o,*~,*.pyc
+
+"Always show current position
+set ruler
+
+" Height of the command bar
+set cmdheight=1
+
+" A buffer becomes hidden when it is abandoned
+set hid
+
+" Configure backspace so it acts as it should act
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+" Ignore case when searching
+set ignorecase
+
+" When searching try to be smart about cases
+set smartcase
+
+" Highlight search results
+set hlsearch
+
+" Makes search act like search in modern browsers
+set incsearch
+
+" Don't redraw while executing macros (good performance config)
+set lazyredraw
+
+" For regular expressions turn magic on
+set magic
+
+" Show matching brackets when text indicator is over them
+set showmatch
+" How many tenths of a second to blink when matching brackets
+set mat=2
+
+" No annoying sound on errors
+set noerrorbells
+set novisualbell
+set t_vb=
+set tm=500
+
+" Use 256 colors
+set t_Co=256
+
+" Make splits behave better
+set splitbelow
+set splitright
+
+" Make moving around splits easier
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
+" General options
+let python_hightlight_all=1
+set background=dark
+syntax on
+colorscheme hybrid_material
+set nu
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set autoindent
+set noshowmode
+set ruler
+set cindent
+set cinkeys-=0#
+set indentkeys-=0#
+"set nofoldenable
+
+" Change tabs to be 2 spaces for xml files
+autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab
+
+" Make enter create a new line
+nnoremap <CR> o<ESC>
+
+" make 0 work better
+nnoremap 0 ^
+nnoremap ^ 0
+
+" make leader a more sane keybinding
+let mapleader = "\<Space>"
+
+" Make <Leader>q clear highlighting from searches
+nnoremap <silent> <Leader>q :noh<return><esc>
+
+" emacs bindings
+" <c-a> don't work with tmux
+"inoremap <c-a> <esc>I
+inoremap <c-e> <esc>A
+"nnoremap <c-a> <home>
+nnoremap <c-e> <end>
+
+" make it easier to use buffers
+nnoremap <Leader>l :bn<CR>
+nnoremap <Leader>h :bp<CR>
+nnoremap <Leader>x :bd<CR>
+" more standard 'close tab' behavior
+nnoremap <C-w> :bd<CR>
+
+" treat wrapped lines as different lines
+noremap j gjzz
+noremap k gkzz
+noremap gj jzz
+noremap gk kzz
+
+" Set line number color as darkgray
+highlight LineNr ctermfg=8
+
+" Easier to save
+nnoremap <C-s> :w<CR>
+nnoremap <C-x> :q<CR>
+
+" Easier to exit insert mode
+inoremap jk <Esc>
+
+" keybinding to see whitespace
+nnoremap <Leader>z :set invlist<CR>
+set listchars=tab:>-,trail:~,extends:>,space:.
+
+" Set up easymotion
+map <Leader> <Plug>(easymotion-prefix)
+nmap s <Plug>(easymotion-overwin-f)
+
+" Airline setup {{{
+let g:airline#extensions#tabline#enabled = 1
+set laststatus=2
+let g:airline_theme='simple'
+
+let g:airline_left_sep=''
+let g:airline_right_sep=''
+let g:airline_section_c = '%f'
+let g:airline_section_x = ''
+let g:airline_section_y = '%y'
+let g:airline_section_z = '%3l:%2c'
+" }}}
+
+" Set up ctrlP
+set runtimepath^=~/.vim/bundle/ctrlp.vim
+
+" More Airline {{{
+let g:airline#themes#simple#palette = {}
+
+let s:bg_none = 'NONE'
+
+let s:guibg = '#080808'
+let s:guibg2 = '#1c1c1c'
+let s:termbg = s:bg_none
+let s:termbg2= 0
+
+let s:N1 = [ s:guibg , '#00dfff' , s:termbg2 , 247 ]
+let s:N2 = [ '#ff5f00' , s:guibg2, 'gray', s:termbg ]
+let s:N3 = [ '#767676' , s:guibg, 243 , s:termbg]
+let g:airline#themes#simple#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
+let g:airline#themes#simple#palette.normal_modified = {
+      \ 'airline_c': [ '#df0000' , s:guibg, 10, s:termbg   , ''     ] ,
+      \ }
+
+
+let s:I1 = [ s:guibg, '#5fff00' , s:termbg2 , 190 ]
+let s:I2 = [ '#ff5f00' , s:guibg2, 'gray', s:termbg ]
+let s:I3 = [ '#767676' , s:guibg, 243 , s:termbg ]
+let g:airline#themes#simple#palette.insert = airline#themes#generate_color_map(s:I1, s:I2, s:I3)
+let g:airline#themes#simple#palette.insert_modified = copy(g:airline#themes#simple#palette.normal_modified)
+let g:airline#themes#simple#palette.insert_paste = {
+      \ 'airline_a': [ s:I1[0]   , '#d78700' , s:I1[2] , 172     , ''     ] ,
+      \ }
+
+
+let g:airline#themes#simple#palette.replace = {
+      \ 'airline_a': [ s:I1[0]   , '#af0000' , s:I1[2] , 124     , ''     ] ,
+      \ }
+let g:airline#themes#simple#palette.replace_modified = copy(g:airline#themes#simple#palette.normal_modified)
+
+
+let s:V1 = [ s:guibg, '#dfdf00' , 'black', 2]
+let s:V2 = [ '#ff5f00' , s:guibg2, 'gray', s:termbg ]
+let s:V3 = [ '#767676' , s:guibg, 243 , s:termbg ]
+let g:airline#themes#simple#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
+let g:airline#themes#simple#palette.visual_modified = copy(g:airline#themes#simple#palette.normal_modified)
+
+
+let s:IA  = [ '#4e4e4e' , s:guibg  , 239 , s:termbg2 , '' ]
+let s:IA2 = [ '#4e4e4e' , s:guibg2 , 239 , s:termbg2, '' ]
+let g:airline#themes#simple#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA2, s:IA2)
+let g:airline#themes#simple#palette.inactive_modified = {
+      \ 'airline_c': [ '#df0000', '', 160, '', '' ] ,
+      \ }
+" }}}
