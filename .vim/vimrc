@@ -75,6 +75,8 @@ set background=dark
 syntax on
 colorscheme hybrid_material
 set nu
+set hlsearch
+set clipboard=unnamedplus
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
@@ -82,6 +84,8 @@ set expandtab
 set autoindent
 set noshowmode
 set ruler
+set showmatch
+set laststatus=2
 set cindent
 set cinkeys-=0#
 set indentkeys-=0#
@@ -109,6 +113,12 @@ nnoremap <silent> <Leader>q :noh<return><esc>
 inoremap <c-e> <esc>A
 "nnoremap <c-a> <home>
 nnoremap <c-e> <end>
+
+let g:flake8_show_in_gutter=1
+let g:autopep8_disable_show_diff=1
+autocmd BufWritePost *.py call Autopep8()
+autocmd BufWritePost *.py call Flake8()
+
 
 " make it easier to use buffers
 nnoremap <Leader>l :bn<CR>
@@ -147,10 +157,7 @@ nmap s <Plug>(easymotion-overwin-f)
 " Airline setup {{{
 let g:airline#extensions#tabline#enabled = 1
 set laststatus=2
-let g:airline_theme='simple'
 
-let g:airline_left_sep=''
-let g:airline_right_sep=''
 let g:airline_section_c = '%f'
 let g:airline_section_x = ''
 let g:airline_section_y = '%y'
@@ -160,7 +167,51 @@ let g:airline_section_z = '%3l:%2c'
 " Set up ctrlP
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 
+if has("gui_running")
+    set t_Co=256
+    colorscheme material-theme
+    set guifont=Liberation\ Mono\ for\ Powerline\ Regular\ 11
+    set guioptions-=T
+    set guioptions+=e
+    set guitablabel=%M\ %t
+    let g:airline_theme='hybrid'
+    set lines=35 columns=110
+else
+    set t_Co=256
+    set background=dark
+    let g:airline_theme='simple'
+endif
+
+let g:airline_powerline_fonts = 1
+
 " More Airline {{{
+if !exists('g:airline_symbols')
+    let g:airline_symbols = {}
+endif
+
+if has("gui_running")
+    " unicode symbols
+    " let g:airline_left_sep = '»'
+    "let g:airline_left_sep = '▶'
+    " let g:airline_right_sep = '«'
+    "let g:airline_right_sep = '◀'
+    " let g:airline_symbols.crypt = '🔒'
+    " let g:airline_symbols.linenr = '␊'
+    " let g:airline_symbols.linenr = '␤'
+    let g:airline_symbols.linenr = '¶'
+    let g:airline_symbols.maxlinenr = '☰'
+    " let g:airline_symbols.maxlinenr = ''
+    let g:airline_symbols.branch = '⎇'
+    " let g:airline_symbols.paste = 'ρ'
+    let g:airline_symbols.paste = 'Þ'
+    " let g:airline_symbols.paste = '∥'
+    let g:airline_symbols.spell = 'Ꞩ'
+    let g:airline_symbols.notexists = '∄'
+    let g:airline_symbols.whitespace = 'Ξ'
+else
+    let g:airline_right_sep = ''
+    let g:airline_left_sep = ''
+
 let g:airline#themes#simple#palette = {}
 
 let s:bg_none = 'NONE'
@@ -209,3 +260,6 @@ let g:airline#themes#simple#palette.inactive_modified = {
       \ 'airline_c': [ '#df0000', '', 160, '', '' ] ,
       \ }
 " }}}
+endif
+
+
