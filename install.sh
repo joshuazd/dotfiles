@@ -1,7 +1,7 @@
 # initialize submodules
 git submodule init
 git submodule update
-git submodule foreach git pull
+git submodule foreach git pull origin master
 
 if [ -d $HOME/.vim ]; then
     echo "Backing up exising vim config to .vim.old"
