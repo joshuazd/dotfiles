@@ -93,6 +93,11 @@ set indentkeys-=0#
 
 " Change tabs to be 2 spaces for xml files
 autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab
+" enable xml folding
+let g:xml_syntax_folding=1
+
+" fold based on syntax
+set foldmethod=syntax
 
 " Make enter create a new line
 nnoremap <CR> o<ESC>

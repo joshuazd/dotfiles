@@ -97,3 +97,15 @@ stty -ixon
 #bindkey -v
 #export KEYTIMEOUT=10
 #bindkey -M viins 'jk' vi-cmd-mode
+
+function ford() {
+    shopt -s expand_aliases
+    source ~/.zsh_aliases
+    for d in ./*
+    do
+        if [ -d "$d" ]; then
+            cd "$d" && echo "$d" && "$@"
+        fi
+    done
+}
+
