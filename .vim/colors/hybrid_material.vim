@@ -168,7 +168,7 @@ let s:palette.cterm.delbg      = { 'dark' : s:cterm_delbg      , 'light' : "224"
 let s:palette.cterm.darkblue   = { 'dark' : "17"               , 'light' : "194" }
 let s:palette.cterm.darkcyan   = { 'dark' : "24"               , 'light' : "22"  }
 let s:palette.cterm.darkred    = { 'dark' : "52"               , 'light' : "189" }
-let s:palette.cterm.darkpurple = { 'dark' : "53"               , 'light' : "53"  }
+let s:palette.cterm.darkpurple = { 'dark' : "5"               , 'light' : "5"  }
 
 "}}}
 " Formatting Options:"{{{
@@ -365,7 +365,7 @@ exe "hi! Statement"       .s:fg_blue        .s:bg_none        .s:fg_bold
 "   Conditional"
 "   Repeat"
 "   Label"
-exe "hi! Operator"        .s:fg_aqua        .s:bg_none        .s:fmt_none
+exe "hi! Operator"        .s:fg_purple        .s:bg_none        .s:fmt_none
 "   Keyword"
 "   Exception"
 

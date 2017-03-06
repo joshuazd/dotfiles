@@ -114,11 +114,8 @@ inoremap <c-e> <esc>A
 "nnoremap <c-a> <home>
 nnoremap <c-e> <end>
 
-let g:flake8_show_in_gutter=1
-let g:autopep8_disable_show_diff=1
-autocmd BufWritePost *.py call Autopep8()
-autocmd BufWritePost *.py call Flake8()
-
+"autocmd BufWritePost *.py :PymodeLintAuto
+set foldlevel=99
 
 " make it easier to use buffers
 nnoremap <Leader>l :bn<CR>
@@ -167,10 +164,14 @@ set runtimepath^=~/.vim/bundle/ctrlp.vim
 " Set up rainbow parens
 let g:rainbow_active = 1
 
+" Set up python-mode
+let g:pymode_python = 'python3'
+let g:pymode_lint_checkers = ['pyflakes', 'pep8']
+
 let g:rainbow_conf = {
-            \ 'ctermfgs': ['lightcyan','yellow','lightgreen','lightmagenta'],
-            \ 'operators': '_,\|+\|-\|*\|\/\|==\|!=\|=_',
-            \}
+            \ 'ctermfgs': ['lightcyan','yellow','lightgreen','lightmagenta']}
+          "  \ 'operators': '_,\|+\|-\|*\|\/\|==\|!=\|=_',
+            "\}
 
 
 if has("gui_running")
@@ -230,14 +231,14 @@ else
 
     let s:N1 = [ s:guibg , '#00dfff' , s:termbg2 , 247 ]
     let s:N2 = [ '#ff5f00' , s:guibg2, 'gray', s:termbg ]
-    let s:N3 = [ '#767676' , s:guibg, 243 , s:termbg]
+    let s:N3 = [ '#767676' , s:guibg, 10 , s:termbg]
     let g:airline#themes#simple#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
     let g:airline#themes#simple#palette.normal_modified = {
-          \ 'airline_c': [ '#df0000' , s:guibg, 10, s:termbg   , ''     ] ,
+          \ 'airline_c': [ '#df0000' , s:guibg, 11, s:termbg   , ''     ] ,
           \ }
 
 
-    let s:I1 = [ s:guibg, '#5fff00' , s:termbg2 , 190 ]
+    let s:I1 = [ s:guibg, '#5fff00' , s:termbg2 , 11 ]
     let s:I2 = [ '#ff5f00' , s:guibg2, 'gray', s:termbg ]
     let s:I3 = [ '#767676' , s:guibg, 243 , s:termbg ]
     let g:airline#themes#simple#palette.insert = airline#themes#generate_color_map(s:I1, s:I2, s:I3)
