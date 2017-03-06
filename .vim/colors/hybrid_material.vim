@@ -126,7 +126,7 @@ if exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:cterm_green      = "2"  " LightGreen
   let s:cterm_aqua       = "14"  " LightCyan
   let s:cterm_blue       = "4"  " LightBlue
-  let s:cterm_purple     = "13"  " LightMagenta
+  let s:cterm_purple     = "5"  " LightMagenta
   let s:cterm_cyan       = "6" " Cyan
   let s:cterm_delbg      = "9"   " LightRed
 else
@@ -140,7 +140,7 @@ else
   let s:cterm_green      = "2"
   let s:cterm_aqua       = "14"
   let s:cterm_blue       = "4"
-  let s:cterm_purple     = "13"
+  let s:cterm_purple     = "5"
   let s:cterm_cyan       = "6"
   let s:cterm_delbg      = "0"
 endif
@@ -168,7 +168,7 @@ let s:palette.cterm.delbg      = { 'dark' : s:cterm_delbg      , 'light' : "224"
 let s:palette.cterm.darkblue   = { 'dark' : "17"               , 'light' : "194" }
 let s:palette.cterm.darkcyan   = { 'dark' : "24"               , 'light' : "22"  }
 let s:palette.cterm.darkred    = { 'dark' : "52"               , 'light' : "189" }
-let s:palette.cterm.darkpurple = { 'dark' : "5"               , 'light' : "5"  }
+let s:palette.cterm.darkpurple = { 'dark' : "13"               , 'light' : "13"  }
 
 "}}}
 " Formatting Options:"{{{
@@ -366,7 +366,7 @@ exe "hi! Statement"       .s:fg_blue        .s:bg_none        .s:fg_bold
 "   Repeat"
 "   Label"
 exe "hi! Operator"        .s:fg_purple        .s:bg_none        .s:fmt_none
-"   Keyword"
+exe "hi!  Keyword"        .s:fg_purple        .s:bg_none        .s:fmt_none
 "   Exception"
 
 exe "hi! PreProc"         .s:fg_aqua        .s:bg_none        .s:fg_bold

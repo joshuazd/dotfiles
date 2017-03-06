@@ -169,9 +169,11 @@ let g:pymode_python = 'python3'
 let g:pymode_lint_checkers = ['pyflakes', 'pep8']
 
 let g:rainbow_conf = {
-            \ 'ctermfgs': ['lightcyan','yellow','lightgreen','lightmagenta']}
-          "  \ 'operators': '_,\|+\|-\|*\|\/\|==\|!=\|=_',
-            "\}
+            \ 'ctermfgs': ['lightcyan','yellow','lightgreen','lightmagenta'],
+            \ 'separately': {
+            \   'xml': 0
+            \  }
+            \}
 
 
 if has("gui_running")
