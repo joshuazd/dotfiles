@@ -91,6 +91,9 @@ set cinkeys-=0#
 set indentkeys-=0#
 "set nofoldenable
 
+" make leader a more sane keybinding
+let mapleader = "\<Space>"
+
 " Change tabs to be 2 spaces for xml files
 autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab
 " enable xml folding
@@ -106,8 +109,8 @@ nnoremap <CR> o<ESC>
 nnoremap 0 ^
 nnoremap ^ 0
 
-" make leader a more sane keybinding
-let mapleader = "\<Space>"
+" Fold toggle keybind
+nnoremap <Leader>a za
 
 " Make <Leader>q clear highlighting from searches
 nnoremap <silent> <Leader>q :noh<return><esc>
