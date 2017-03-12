@@ -109,3 +109,4 @@ function ford() {
     done
 }
 
+export PATH=~/pebble-dev/pebble-sdk-4.5-linux64/bin:$PATH
