@@ -17,6 +17,7 @@ alias documents='cd /c/Users/jzinkduda/Documents'
 alias downloads='cd /c/Users/jzinkduda/Downloads'
 alias repo='cd /c/GITRepo'
 alias apps='cd /c/apps'
+alias promote='cd /i/Public/WSO2_ESBSetup/promote'
 
 alias wls='cd /c/apps/wls12120/user_projects/domains/mydomain/servers/myserver/logs'
 alias wso='cd /c/apps/wso2esb-4.8.1/bin'
