@@ -193,9 +193,10 @@ if has("gui_running")
     set guifont=Liberation\ Mono\ for\ Powerline\ Regular\ 11
     set guioptions-=T
     set guioptions+=e
+    set guioptions-=m
     set guitablabel=%M\ %t
     let g:airline_theme='hybrid'
-    set lines=35 columns=110
+    " set lines=35 columns=110
 else
     " Set line number color as darkgray
     highlight LineNr ctermfg=8
