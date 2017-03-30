@@ -25,6 +25,8 @@ alias lessf='less +FG -N'
 
 alias python='python3'
 
+alias car='cp *_Deployment/target/*.car /h/car-files/'
+
 alias esb='sh /c/apps/wso2esb-4.8.1/bin/wso2server.sh'
 alias esblog='less +F /c/apps/wso2esb-4.8.1/repository/logs/wso2carbon.log'
 
