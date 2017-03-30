@@ -94,6 +94,9 @@ set indentkeys-=0#
 " make leader a more sane keybinding
 let mapleader = "\<Space>"
 
+" remap localleader
+let maplocalleader = ","
+
 " Change tabs to be 2 spaces for xml files
 autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab
 " enable xml folding
