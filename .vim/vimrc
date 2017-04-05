@@ -75,6 +75,7 @@ set background=dark
 syntax on
 colorscheme hybrid_material
 set nu
+set relativenumber
 set hlsearch
 set clipboard=unnamedplus
 set tabstop=4
