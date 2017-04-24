@@ -142,6 +142,11 @@ noremap k gk
 noremap gj j
 noremap gk k
 
+" easier to go to end/beginning of lines
+noremap L $
+noremap H ^
+
+
 " Easier to save
 nnoremap <C-s> :w<CR>
 nnoremap <C-x> :q<CR>

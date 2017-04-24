@@ -98,6 +98,27 @@ stty -ixon
 #export KEYTIMEOUT=10
 #bindkey -M viins 'jk' vi-cmd-mode
 
+function git_update() {
+    if ! git diff-index --quiet HEAD --; then
+        return true
+    else
+        return false
+    fi
+}
+
+function check_repos() {
+    for d in ./*/
+    do
+        cd "$d"
+        git update-index -q --refresh
+        if [[ `git status --porcelain` ]]; then
+            echo "$d"
+            git status --short -u
+        fi
+        cd ..
+    done
+}
+
 function ford() {
     for d in ./*
     do
@@ -105,6 +126,10 @@ function ford() {
             cd "$d" && echo "$d" && "$@"
         fi
     done
+}
+
+fuction mcar() {
+    cp *_Deployment/target/*.car /h/car-files/
 }
 
 export PATH=~/pebble-dev/pebble-sdk-4.5-linux64/bin:$PATH
