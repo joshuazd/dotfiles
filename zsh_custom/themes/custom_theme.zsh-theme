@@ -33,8 +33,8 @@ function custom_git_status {
         count=(${(ps:\t:)count})
         local arrows left=${count[1]} right=${count[2]}
 
-        (( ${right:-0} > 0 )) && arrows+="↓"
-        (( ${left:-0} > 0 )) && arrows+="↑"
+        (( ${right:-0} > 0 )) && arrows+="${right:-0}↓"
+        (( ${left:-0} > 0 )) && arrows+="${left:-0}↑"
 
         indicators+="$arrows"
 
