@@ -186,8 +186,8 @@ set runtimepath^=~/.vim/bundle/ctrlp.vim
 let g:rainbow_active = 1
 
 " Set up python-mode
-let g:pymode_python = 'python3'
-let g:pymode_lint_checkers = ['pyflakes', 'pep8']
+" let g:pymode_python = 'python3'
+" let g:pymode_lint_checkers = ['pyflakes', 'pep8']
 
 let g:rainbow_conf = {
             \ 'ctermfgs': ['lightcyan','yellow','lightgreen','lightmagenta'],

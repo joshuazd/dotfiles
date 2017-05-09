@@ -30,6 +30,6 @@ alias car='cp *_Deployment/target/*.car /h/car-files/'
 alias esb='sh /c/apps/wso2esb-4.8.1/bin/wso2server.sh'
 alias esblog='less +F /c/apps/wso2esb-4.8.1/repository/logs/wso2carbon.log'
 
-alias find='find . -type f -name'
+alias search='find . -type f -name'
 
 alias vi='vim'
