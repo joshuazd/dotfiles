@@ -56,7 +56,7 @@ ZSH_TMUX_AUTOSTART="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git tmux vi-mode)
+plugins=(git tmux vi-mode vagrant)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -94,9 +94,9 @@ if [ -f "${HOME}/.zsh_aliases" ]; then
 fi
 
 stty -ixon
-#bindkey -v
-#export KEYTIMEOUT=10
-#bindkey -M viins 'jk' vi-cmd-mode
+bindkey -v
+export KEYTIMEOUT=10
+bindkey -M viins 'jk' vi-cmd-mode
 
 export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
 setopt INC_APPEND_HISTORY

@@ -22,7 +22,7 @@
 # a patch to the cygwin mailing list.
 
 # User dependent .bashrc file
-# /bin/zsh; exit
+/bin/zsh; exit
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
