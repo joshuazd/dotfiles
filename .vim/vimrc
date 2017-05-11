@@ -176,7 +176,7 @@ set laststatus=2
 let g:airline_section_c = '%f'
 let g:airline_section_x = ''
 let g:airline_section_y = '%y'
-let g:airline_section_z = '%3l:%2c'
+let g:airline_section_z = '%{&ff} %3l:%2c'
 " }}}
 
 " Set up ctrlP
