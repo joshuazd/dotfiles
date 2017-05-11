@@ -98,6 +98,13 @@ stty -ixon
 #export KEYTIMEOUT=10
 #bindkey -M viins 'jk' vi-cmd-mode
 
+export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
+setopt INC_APPEND_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_REDUCE_BLANKS
+setopt HIST_VERIFY
+
 function git_update() {
     if ! git diff-index --quiet HEAD --; then
         return true

@@ -121,9 +121,9 @@ nnoremap <silent> <Leader>q :noh<return><esc>
 
 " emacs bindings
 " <c-a> don't work with tmux
-"inoremap <c-a> <esc>I
+" inoremap <c-a> <esc>I
 inoremap <c-e> <esc>A
-"nnoremap <c-a> <home>
+" nnoremap <c-a> <home>
 nnoremap <c-e> <end>
 
 "autocmd BufWritePost *.py :PymodeLintAuto
@@ -132,9 +132,9 @@ set foldlevel=99
 " make it easier to use buffers
 nnoremap <Leader>l :bn<CR>
 nnoremap <Leader>h :bp<CR>
-nnoremap <Leader>x :bd<CR>
+
 " more standard 'close tab' behavior
-nnoremap <C-w> :bd<CR>
+nnoremap <C-x> :bd<CR>
 
 " treat wrapped lines as different lines
 noremap j gj
@@ -149,7 +149,9 @@ noremap H ^
 
 " Easier to save
 nnoremap <C-s> :w<CR>
-nnoremap <C-x> :q<CR>
+nnoremap q :q<CR>
+imap <C-s> <Esc>:w<CR>i
+nnoremap <Leader>x :q<CR>
 
 " Easier to exit insert mode
 inoremap jk <Esc>
@@ -173,7 +175,7 @@ nmap s <Plug>(easymotion-overwin-f)
 let g:airline#extensions#tabline#enabled = 1
 set laststatus=2
 
-let g:airline_section_c = '%f'
+let g:airline_section_c = ''
 let g:airline_section_x = ''
 let g:airline_section_y = '%y'
 let g:airline_section_z = '%{&ff} %3l:%2c'
