@@ -158,7 +158,7 @@ inoremap jk <Esc>
 
 " keybinding to see whitespace
 nnoremap <Leader>z :set invlist<CR>
-set listchars=tab:>-,trail:~,extends:>,space:.
+set listchars=tab:>-,trail:~,extends:> ",space:.
 
 "make folding work better with insert mode
 autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif

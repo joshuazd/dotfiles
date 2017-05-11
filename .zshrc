@@ -51,12 +51,12 @@ HYPHEN_INSENSITIVE="true"
 # Would you like to use another custom folder than $ZSH/custom?
 ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 
-ZSH_TMUX_AUTOSTART="true"
+#ZSH_TMUX_AUTOSTART="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git tmux vi-mode vagrant)
+plugins=(git tmux vi-mode vagrant ansible)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -118,7 +118,7 @@ function check_repos() {
     do
         cd "$d"
         git update-index -q --refresh
-        if [[ `git status --porcelain` ]]; then
+        if [[ -n `git status --porcelain` ]]; then
             echo "$d"
             git status --short -u
         fi
