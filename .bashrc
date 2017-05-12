@@ -28,7 +28,7 @@
 
 # Shell Options
 #
-#  See man bash for more options...
+# See man bash for more options...
 #
 # Don't wait for job termination notification
 # set -o notify
