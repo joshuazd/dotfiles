@@ -1,4 +1,4 @@
-syn match callTemplate 'call-template\|makefault\|template\|log'
+syn match callTemplate 'call-template\|makefault\|template\( \|>\)\@=\|log'
 syn match db 'dblookup\|dbreport'
 syn match filter '\(filter\|then\|send\|else\|drop\|call\(>\)\@=\|respond\|store\|choose\|when\|otherwise\)'
 syn match property '\(property\|address\|header\|endpoint\|attribute\|reason\)\( \|>\)\@='
