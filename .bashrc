@@ -26,7 +26,7 @@
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
-#  Shell Options
+# Shell Options
 #
 # See man bash for more options...
 #
