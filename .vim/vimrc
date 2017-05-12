@@ -99,7 +99,7 @@ let mapleader = "\<Space>"
 let maplocalleader = ","
 
 " Change tabs to be 2 spaces for xml files
-autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab
+autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 "noexpandtab
 " enable xml folding
 let g:xml_syntax_folding=1
 
@@ -158,7 +158,7 @@ inoremap jk <Esc>
 
 " keybinding to see whitespace
 nnoremap <Leader>z :set invlist<CR>
-set listchars=tab:>-,trail:~,extends:> ",space:.
+set listchars=tab:>-,trail:~,extends:>,space:.
 
 "make folding work better with insert mode
 autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
