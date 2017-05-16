@@ -113,6 +113,11 @@ nnoremap <CR> o<ESC>
 nnoremap 0 ^
 nnoremap ^ 0
 
+" Better backups
+" set nobackup
+set backupdir=/tmp
+set noswapfile
+
 " Fold toggle keybind
 nnoremap <Leader>a za
 
@@ -146,6 +151,17 @@ noremap gk k
 noremap L $
 noremap H ^
 
+" Buffer keymappings
+nnoremap <Leader>1 :1b<CR>
+nnoremap <Leader>2 :2b<CR>
+nnoremap <Leader>3 :3b<CR>
+nnoremap <Leader>4 :4b<CR>
+nnoremap <Leader>5 :5b<CR>
+nnoremap <Leader>6 :6b<CR>
+nnoremap <Leader>7 :7b<CR>
+nnoremap <Leader>8 :8b<CR>
+nnoremap <Leader>9 :9b<CR>
+nnoremap <Leader>0 :10b<CR>
 
 " Easier to save
 nnoremap <C-s> :w<CR>
@@ -173,6 +189,7 @@ nmap s <Plug>(easymotion-overwin-f)
 
 " Airline setup {{{
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
 set laststatus=2
 
 let g:airline_section_c = ''
