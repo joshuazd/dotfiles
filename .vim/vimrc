@@ -3,6 +3,8 @@ filetype off
 execute pathogen#infect()
 filetype plugin indent on
 
+
+
 " Set 999 lines to the cursor - when moving vertically using j/k
 " Keeps cursor centered
 set so=999
@@ -90,6 +92,7 @@ set laststatus=2
 set cindent
 set cinkeys-=0#
 set indentkeys-=0#
+let g:is_posix = 1
 "set nofoldenable
 
 " make leader a more sane keybinding
@@ -103,6 +106,8 @@ autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2
 " enable xml folding
 let g:xml_syntax_folding=1
 
+autocmd BufNewFile,BufRead *.zsh-theme set syntax=zsh
+
 " fold based on syntax
 set foldmethod=syntax
 
@@ -112,6 +117,11 @@ nnoremap <CR> o<ESC>
 " make 0 work better
 nnoremap 0 ^
 nnoremap ^ 0
+
+" Better backups
+" set nobackup
+set backupdir=/tmp
+set noswapfile
 
 " Fold toggle keybind
 nnoremap <Leader>a za
@@ -146,6 +156,17 @@ noremap gk k
 noremap L $
 noremap H ^
 
+" Buffer keymappings
+nnoremap <Leader>1 :1b<CR>
+nnoremap <Leader>2 :2b<CR>
+nnoremap <Leader>3 :3b<CR>
+nnoremap <Leader>4 :4b<CR>
+nnoremap <Leader>5 :5b<CR>
+nnoremap <Leader>6 :6b<CR>
+nnoremap <Leader>7 :7b<CR>
+nnoremap <Leader>8 :8b<CR>
+nnoremap <Leader>9 :9b<CR>
+nnoremap <Leader>0 :10b<CR>
 
 " Easier to save
 nnoremap <C-s> :w<CR>
@@ -167,12 +188,18 @@ autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:las
 " Set up supertab
 let g:SuperTabDefaultCompletionType = "context"
 
-" Set up easymotion
+" Easymotion setup {{{
 map <Leader> <Plug>(easymotion-prefix)
 nmap s <Plug>(easymotion-overwin-f)
+map / <Plug>(easymotion-sn)
+omap / <Plug><easymotion-tn)
+let g:EasyMotion_startofline = 0
+
+" }}}
 
 " Airline setup {{{
 let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#buffer_nr_show = 1
 set laststatus=2
 
 let g:airline_section_c = ''
