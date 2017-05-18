@@ -14,7 +14,8 @@ set wildmenu
 
 set wildmode=longest,list
 " Ignore compiled files
-set wildignore=*.o,*~,*.pyc
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup
+set wildignore+=*/target/*
 
 "Always show current position
 set ruler
@@ -79,7 +80,7 @@ colorscheme hybrid_material
 set nu
 set relativenumber
 set hlsearch
-set clipboard=unnamedplus
+set clipboard=unnamed
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
