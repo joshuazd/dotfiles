@@ -29,7 +29,7 @@ function custom_git_status {
         local count
         count="$(command git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null)"
         # exit if the command failed
-        (( !$? )) || return
+        # (( !$? )) || return
         count=(${(ps:\t:)count})
         local arrows left=${count[1]} right=${count[2]}
 
