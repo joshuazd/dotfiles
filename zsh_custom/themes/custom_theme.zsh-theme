@@ -40,17 +40,19 @@ function custom_git_status {
 
         indicators+="$arrows"
 
+        local repo=$(current_repository)
+        local temp=$(echo $repo | grep -oPm1 "(?<=/)[a-zA-Z0-9\-]+(?=\.git \(push\))")
 
         #[ -n "${indicators}" ] && indicators=" [${indicators}]";
 
-        echo -n "${CUSTOM_THEME_GIT_PROMPT_PREFIX}$(git_current_branch)$indicators${CUSTOM_THEME_GIT_PROMPT_SUFFIX}"
+        echo -n "${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp:$(git_current_branch)$indicators${CUSTOM_THEME_GIT_PROMPT_SUFFIX}"
     fi
 
 }
 
-PROMPT='%{$fg[green]%}%n %{$fg[blue]%}%1~ %{$fg[red]%}$(custom_git_status)% %{$fg[yellow]%}$(prompt_char)%{$reset_color%} '
+PROMPT='%{$fg[green]%}%n %{$fg[blue]%}%1~ %{$fg[yellow]%}$(prompt_char)%{$reset_color%} '
 
-RPS1='$(vi_mode_prompt_info)'
+RPS1='%{$fg[red]%}$(custom_git_status)%{$reset_color%}'
 
 MODE_INDICATOR="%{$fg_bold[green]%}<%{$reset_color%}%{$fg[green]%}<<%{$reset_color%}"
 

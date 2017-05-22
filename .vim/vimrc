@@ -14,7 +14,11 @@ set wildmenu
 
 set wildmode=longest,list
 " Ignore compiled files
-set wildignore=*.o,*~,*.pyc
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup
+set wildignore+=*/target/*
+
+" Don't insert comment when using 'o'
+au FileType * set fo-=o
 
 "Always show current position
 set ruler
@@ -79,7 +83,7 @@ colorscheme hybrid_material
 set nu
 set relativenumber
 set hlsearch
-set clipboard=unnamedplus
+set clipboard=unnamed
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
@@ -171,6 +175,7 @@ nnoremap <Leader>0 :10b<CR>
 " Easier to save
 nnoremap <C-s> :w<CR>
 nnoremap q :q<CR>
+nnoremap Q q
 imap <C-s> <Esc>:w<CR>i
 nnoremap <Leader>x :q<CR>
 
@@ -187,6 +192,12 @@ autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:las
 
 " Set up supertab
 let g:SuperTabDefaultCompletionType = "context"
+
+" Ansible setup {{{
+let g:ansible_unindent_after_newline = 1
+let g:ansible_attribute_highlight = "a"
+" let g:ansible_name_highlight = 'd'
+let g:ansible_extra_keywords_highlight = 1
 
 " Easymotion setup {{{
 map <Leader> <Plug>(easymotion-prefix)
