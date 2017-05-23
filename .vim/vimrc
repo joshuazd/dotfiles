@@ -92,6 +92,7 @@ set autoindent
 set noshowmode
 set ruler
 set showmatch
+set nowrap
 set laststatus=2
 set cindent
 set cinkeys-=0#
