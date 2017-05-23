@@ -61,6 +61,8 @@ plugins=(git tmux)
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
+source $ZSH_CUSTOM/mvncolor.sh
+alias mvn='mvn-color'
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
