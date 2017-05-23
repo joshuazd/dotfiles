@@ -43,3 +43,9 @@
 [submodule ".vim/bundle/ansible-vim"]
 	path = .vim/bundle/ansible-vim
 	url = https://github.com/pearofducks/ansible-vim
+[submodule ".vim/bundle/ale"]
+	path = .vim/bundle/ale
+	url = https://github.com/w0rp/ale
+[submodule ".vim/bundle/jedi-vim"]
+	path = .vim/bundle/jedi-vim
+	url = https://github.com/davidhalter/jedi-vim
