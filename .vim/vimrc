@@ -8,7 +8,8 @@ filetype plugin indent on
 " Set 999 lines to the cursor - when moving vertically using j/k
 " Keeps cursor centered
 set so=999
-set sidescrolloff=999
+set sidescroll=1
+set sidescrolloff=15
 
 " Turn on the WiLd menu
 set wildmenu
@@ -28,7 +29,7 @@ set ruler
 set cmdheight=1
 
 " A buffer becomes hidden when it is abandoned
-set hid
+set hidden
 
 " Configure backspace so it acts as it should act
 set backspace=eol,start,indent
@@ -113,6 +114,7 @@ autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2
 let g:xml_syntax_folding=1
 
 autocmd BufNewFile,BufRead *.zsh-theme set syntax=zsh
+autocmd BufNewFile,BufRead *.dbs set syntax=xml
 
 " fold based on syntax
 set foldmethod=syntax
@@ -148,6 +150,8 @@ set foldlevel=99
 " make it easier to use buffers
 nnoremap <Leader>l :bn<CR>
 nnoremap <Leader>h :bp<CR>
+map <Leader><Leader> :b#<CR>
+map <Leader>p :bp<CR>
 
 " more standard 'close tab' behavior
 nnoremap <C-x> :bd<CR>
@@ -176,6 +180,16 @@ nnoremap <Leader>0 :10b<CR>
 
 map <Leader>o :only<CR>
 
+
+" netrw setup {{{
+let g:netrw_winsize = -28
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+
+
+" }}}
+
 " Easier to save
 nnoremap <C-s> :w<CR>
 nnoremap q :q<CR>
@@ -196,6 +210,7 @@ autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:las
 
 " Set up supertab
 let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
 
 " Ansible setup {{{
 let g:ansible_unindent_after_newline = 1
@@ -208,7 +223,7 @@ nmap <silent> ]e <Plug>(ale_next_wrap)
 nmap <silent> [e <Plug>(ale_previous_wrap)
 let g:ale_python_flake8_options = '--max-line-length 99'
 let g:ale_virtualenv_dir_names = []
-let g:ale_lint_on_text_changed = 'normal'
+let g:ale_lint_on_text_changed = 'never'
 " }}}
 
 " Easymotion setup {{{
@@ -225,7 +240,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
 set laststatus=2
 
-let g:airline_section_c = ''
+let g:airline_section_c = '%t'
 let g:airline_section_x = ''
 let g:airline_section_y = '%y'
 let g:airline_section_z = '%{&ff} %3l:%2c'
