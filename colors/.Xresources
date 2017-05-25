@@ -1,5 +1,5 @@
 ! special
-*.foreground:   #eeffff
+*.foreground:   #bbbbbb
 *.background:   #263238
 *.cursorColor:  #eeffff
 
@@ -20,17 +20,17 @@
 *.color11:      #ffcb6b
 
 ! blue
-*.color4:       #6182b8
-*.color12:      #82aaff
+*.color4:      #82aaff
+*.color12:     #6182b8
 
 ! magenta
-*.color5:       #945eb8
-*.color13:      #bb80b3
+*.color5:       #c792ea
+*.color13:      #945eb8
 
 ! cyan
 *.color6:       #39adb5
 *.color14:      #89ddff
 
 ! white
-*.color7:       #707880
-*.color15:      #c5c8c6
+*.color7:       #bbbbbb
+*.color15:      #ffffff
