@@ -279,8 +279,8 @@ else
 endif
 
 if has("win32unix")
-    let g:airline_symbols_ascii = 1
-else
+""    let g:airline_symbols_ascii = 1
+""else
     let g:airline_powerline_fonts = 1
 end
 
@@ -314,7 +314,8 @@ else
     let g:airline_symbols.linenr = '¶'
     let g:airline_symbols.maxlinenr = '☰'
     " let g:airline_symbols.maxlinenr = ''
-    let g:airline_symbols.branch = '⎇'
+    " let g:airline_symbols.branch = '⎇'
+    let g:airline_symbols.branch = ''
     "let g:airline_symbols.branch = '⌥'
     " let g:airline_symbols.paste = 'ρ'
     let g:airline_symbols.paste = 'Þ'
