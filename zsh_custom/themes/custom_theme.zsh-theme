@@ -41,7 +41,7 @@ function custom_git_status {
         indicators+="$arrows"
 
         local repo=$(current_repository)
-        local temp=$(echo $repo | grep -oPm1 "(?<=/)[a-zA-Z0-9\-]+(?=\.git \(push\))")
+        local temp=$(echo $repo | grep -oPm1 "(?<=/)[a-zA-Z\.0-9_\-]+(?=\.git \(push\))")
 
         #[ -n "${indicators}" ] && indicators=" [${indicators}]";
 
