@@ -80,7 +80,7 @@ endif
     syn keyword pythonStatement with as
 
     syn keyword pythonCoding def nextgroup=pythonMagic skipwhite
-syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|call\|cmp\|coerce\|complex\|contains\|del\|delattr\|delete\|delitem\|delslice\|div\|divmod\|enter\|eq\|exit\|float\|floordiv\|ge\|get\|getattr\|getattribute\|getitem\|getslice\|gt\|hash\|hex\|iadd\|iand\|idiv\|ifloordiv\|ilshift\|imod\|imul\|init\|int\|invert\|ior\|ipow\|irshift\|isub\|iter\|itruediv\|ixor\|le\|len\|long\|lshift\|lt\|mod\|mul\|ne\|neg\|new\|nonzero\|oct\|or\|pos\|pow\|radd\|rand\|rdiv\|rdivmod\|repr\|rfloordiv\|rlshift\|rmod\|rmul\|ror\|rpow\|rrshift\|rshift\|rsub\|rtruediv\|rxor\|set\|setattr\|setitem\|setslice\|str\|sub\|truediv\|unicode\|xor\)__"
+    syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|call\|cmp\|coerce\|complex\|contains\|del\|delattr\|delete\|delitem\|delslice\|div\|divmod\|enter\|eq\|exit\|float\|floordiv\|ge\|get\|getattr\|getattribute\|getitem\|getslice\|gt\|hash\|hex\|iadd\|iand\|idiv\|ifloordiv\|ilshift\|imod\|imul\|init\|int\|invert\|ior\|ipow\|irshift\|isub\|iter\|itruediv\|ixor\|le\|len\|long\|lshift\|lt\|mod\|mul\|ne\|neg\|new\|nonzero\|oct\|or\|pos\|pow\|radd\|rand\|rdiv\|rdivmod\|repr\|rfloordiv\|rlshift\|rmod\|rmul\|ror\|rpow\|rrshift\|rshift\|rsub\|rtruediv\|rxor\|set\|setattr\|setitem\|setslice\|str\|sub\|truediv\|unicode\|xor\)__"
     syn match pythonFunction "\%(\%(def\s\|@\)\s*\)\@<=\h\%(\w\|\.\)*" contained nextgroup=pythonVars
     syn region pythonVars start="(" skip=+\(".*"\|'.*'\)+ end=")" contained contains=pythonParameters transparent keepend
     syn match pythonParameters "[^,]*" contained contains=pythonParam skipwhite
@@ -102,10 +102,12 @@ syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|ca
     syn match pythonExtraOperator "\%([~!^&|/%+-]\|\%(class\s*\)\@<!<<\|<=>\|<=\|\%(<\|\<class\s\+\u\w*\s*\)\@<!<[^<]\@=\|===\|==\|=\~\|>>\|>=\|=\@<!>\|\.\.\.\|\.\.\|::\)"
     syn match pythonExtraPseudoOperator "\%(-=\|/=\|\*\*=\|\*=\|&&=\|&=\|&&\|||=\||=\|||\|%=\|+=\|!\~\|!=\)"
 
+
     " item access
     syn match pythonItemAccess "\(\w\)*\[\@="
 
     syn match pythonPreProc ":"
+    syn match pythonPreProc ","
 
     " if !g:pymode_syntax_print_as_function
         syn keyword pythonFunction print
@@ -174,7 +176,6 @@ syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|ca
     " endif
 
 " }}}
-
 
 " Strings {{{
 " ===========
@@ -422,5 +423,6 @@ syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|ca
     highlight pythonField ctermfg=250
 
     hi link  pythonExClass      Structure
+    hi link  pythonJedi         Type
 
 " }}}

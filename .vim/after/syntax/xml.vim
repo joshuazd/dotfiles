@@ -8,11 +8,23 @@ syn match connection 'connection\|statement\|resource\|stylesheet'
 syn match xmlFunction 'payloadFactory'
 syn match xmlType 'args'
 syn match xmlEnrich 'enrich\|xslt\|value-of'
+syn match xmlSqlTag 'sql'
+
+let cur_syntax = b:current_syntax
+unlet! b:current_syntax
+syn include @xmlSQL syntax/sql.vim
+syn region xmlSqlRegion
+    \ start=+\(<sql>\)\@<=+
+    \ keepend
+    \ end=+\(</sql>\)\@=+
+    \ contained
+    \ contains=@xmlSQL
+let b:current_syntax = cur_syntax
 
 syn keyword xmlNs ns0
 syn keyword xmlXsl xsl
 
-syn cluster xmlTagHook add=callTemplate,db,filter,property,sequence,connection,param,xmlFunction,xmlType,xmlEnrich
+syn cluster xmlTagHook add=callTemplate,db,filter,property,sequence,connection,param,xmlFunction,xmlType,xmlEnrich,xmlSqlTag
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
 
 highlight link xmlNs Function
@@ -28,4 +40,5 @@ highlight sequence ctermfg=10
 highlight link callTemplate Statement
 highlight link db Function
 highlight link filter Operator
-highlight xmlAttrib ctermfg=7
+highlight xmlAttrib ctermfg=152
+highlight xmlSqlTag ctermfg=202
