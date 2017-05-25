@@ -56,7 +56,7 @@ RIGHT_SEP=$'\ue0b2'
 
 PROMPT='%{$fg[green]%}%n %{$bg[blue]%}%{$fg[black]%}$SEP %1~ $BG[013]%{$fg[blue]%}$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
 
-RPS1='%{$fg[red]%}$(custom_git_status)%{$reset_color%}'
+RPS1='$(custom_git_status)%{$reset_color%}'
 
 MODE_INDICATOR="%{$fg_bold[green]%}<%{$reset_color%}%{$fg[green]%}<<%{$reset_color%}"
 
