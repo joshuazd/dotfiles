@@ -131,7 +131,7 @@ endif
     " if g:pymode_syntax_highlight_self
         syn keyword pythonSelf self cls
     " endif
-    syn match pythonField "\(\.\)\@<=\(\w\|\d\|_\)\+\([^a-zA-Z0-9(\[]\|$\)\@="
+    syn match pythonField "\(\.\)\@<=\w\+\([^\.a-zA-Z0-9(\[]\|$\)\@="
 
 " }}}
 
@@ -350,7 +350,7 @@ endif
     hi link  pythonLambdaExpr   Statement
     hi link  pythonInclude      Include
     hi link  pythonConstant     Constant
-    hi link  pythonFunction     Statement
+    hi link  pythonFunction     Function
     hi link  pythonClass        Type
     hi link  pythonParameters   Normal
     hi link  pythonParam        Normal
@@ -364,8 +364,7 @@ endif
     hi link  pythonConditional  Conditional
     hi link  pythonRepeat       Repeat
     hi link  pythonException    Exception
-    " hi link  pythonOperator     Operator
-    highlight pythonOperator ctermfg=137
+    hi link  pythonOperator     Operator
     hi link  pythonExtraOperator        pythonOperator
     hi link  pythonExtraPseudoOperator  pythonOperator
 

@@ -103,6 +103,7 @@ let s:palette.gui.aqua       = { 'dark' : "#8abeb7"        , 'light' : "#005f5f"
 let s:palette.gui.blue       = { 'dark' : "#81a2be"        , 'light' : "#00005f" }
 let s:palette.gui.purple     = { 'dark' : "#b294bb"        , 'light' : "#5f005f" }
 let s:palette.gui.cyan       = { 'dark' : "#89ddff"        , 'light' : "#39adb5" }
+let s:palette.gui.brown      = { 'dark' : "#ab7967"        , 'light' : "#ab7967" }
 let s:palette.gui.window     = { 'dark' : "#303030"        , 'light' : "#9e9e9e" }
 let s:palette.gui.darkcolumn = { 'dark' : "#1c1c1c"        , 'light' : "#808080" }
 let s:palette.gui.addbg      = { 'dark' : "#5F875F"        , 'light' : "#d7ffd7" }
@@ -128,6 +129,7 @@ if exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:cterm_blue       = "4"  " LightBlue
   let s:cterm_purple     = "5"  " LightMagenta
   let s:cterm_cyan       = "6" " Cyan
+  let s:cterm_brown      = "137" " Brown
   let s:cterm_delbg      = "9"   " LightRed
 else
   let s:cterm_foreground = "15"
@@ -142,6 +144,7 @@ else
   let s:cterm_blue       = "4"
   let s:cterm_purple     = "5"
   let s:cterm_cyan       = "6"
+  let s:cterm_brown      = "137"
   let s:cterm_delbg      = "0"
 endif
 
@@ -159,6 +162,7 @@ let s:palette.cterm.aqua       = { 'dark' : s:cterm_aqua       , 'light' : "23" 
 let s:palette.cterm.blue       = { 'dark' : s:cterm_blue       , 'light' : "17"  }
 let s:palette.cterm.purple     = { 'dark' : s:cterm_purple     , 'light' : "53"  }
 let s:palette.cterm.cyan       = { 'dark' : s:cterm_cyan       , 'light' : "14"  }
+let s:palette.cterm.brown      = { 'dark' : s:cterm_brown      , 'light' : "137"  }
 let s:palette.cterm.darkcolumn = { 'dark' : "234"              , 'light' : "244" }
 let s:palette.cterm.addbg      = { 'dark' : "65"               , 'light' : "194" }
 let s:palette.cterm.addfg      = { 'dark' : "193"              , 'light' : "22"  }
@@ -233,6 +237,7 @@ call s:build_prim('fg', 'aqua')
 call s:build_prim('fg', 'blue')
 call s:build_prim('fg', 'purple')
 call s:build_prim('fg', 'cyan')
+call s:build_prim('fg', 'brown')
 call s:build_prim('fg', 'window')
 call s:build_prim('fg', 'darkcolumn')
 call s:build_prim('fg', 'addbg')
@@ -269,7 +274,8 @@ exe "let s:sp_green      = ' guisp=". s:palette.gui.green[s:style]      ."'"
 exe "let s:sp_aqua       = ' guisp=". s:palette.gui.aqua[s:style]       ."'"
 exe "let s:sp_blue       = ' guisp=". s:palette.gui.blue[s:style]       ."'"
 exe "let s:sp_purple     = ' guisp=". s:palette.gui.purple[s:style]     ."'"
-exe "let s:sp_cyan       = ' guisp=". s:palette.gui.cyan[s:style]     ."'"
+exe "let s:sp_cyan       = ' guisp=". s:palette.gui.cyan[s:style]       ."'"
+exe "let s:sp_brown      = ' guisp=". s:palette.gui.brown[s:style]      ."'"
 exe "let s:sp_window     = ' guisp=". s:palette.gui.window[s:style]     ."'"
 exe "let s:sp_addbg      = ' guisp=". s:palette.gui.addbg[s:style]      ."'"
 exe "let s:sp_addfg      = ' guisp=". s:palette.gui.addfg[s:style]      ."'"
@@ -358,14 +364,14 @@ exe "hi! String"          .s:fg_green       .s:bg_none        .s:fmt_none
 "   Boolean"
 "   Float"
 
-exe "hi! Identifier"      .s:fg_red          .s:bg_none       .s:fmt_none
-exe "hi! Function"        .s:fg_yellow      .s:bg_none        .s:fg_bold
+exe "hi! Identifier"      .s:fg_yellow      .s:bg_none       .s:fmt_none
+exe "hi! Function"        .s:fg_blue        .s:bg_none        .s:fg_bold
 
-exe "hi! Statement"       .s:fg_blue        .s:bg_none        .s:fg_bold
+exe "hi! Statement"       .s:fg_purple        .s:bg_none        .s:fg_bold
 "   Conditional"
 "   Repeat"
 "   Label"
-exe "hi! Operator"        .s:fg_purple        .s:bg_none        .s:fmt_none
+exe "hi! Operator"        .s:fg_brown        .s:bg_none        .s:fmt_none
 exe "hi!  Keyword"        .s:fg_purple        .s:bg_none        .s:fmt_none
 "   Exception"
 

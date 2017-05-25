@@ -26,9 +26,9 @@ syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+
 
 highlight xpathQuote ctermfg=156
 hi def link xpathString String
-hi def link xpathFunction Statement
+hi def link xpathFunction Function
 hi def link xpathNumber Constant
-hi def link xpathParam Function
+hi def link xpathParam Identifier
 hi def link xpathPunct PreProc
 hi def link xpathLangVar Type
 highlight xpathReference ctermfg=156

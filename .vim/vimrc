@@ -255,7 +255,8 @@ let g:rainbow_active = 1
 let g:rainbow_conf = {
             \ 'ctermfgs': ['lightcyan','yellow','lightgreen','lightmagenta'],
             \ 'separately': {
-            \   'xml': 0
+            \   'xml': 0,
+            \   'vim': 0
             \  }
             \}
 
