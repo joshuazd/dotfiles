@@ -3,11 +3,11 @@ alias df='df -h'
 alias du='du -h -c'
 alias reload='source ~/.bashrc'
 alias back='cd $OLDPWD'
-alias ..="cd .."
-alias ...="cd ../.."
-alias ....="cd ../../.."
-alias .....="cd ../../../.."
-alias ......="cd ../../../../.."
+alias ..="cd ..; ls"
+alias ...="cd ../..; ls"
+alias ....="cd ../../..; ls"
+alias .....="cd ../../../..; ls"
+alias ......="cd ../../../../..; ls"
 alias lt='ls -lrt'
 unalias l
 alias l='ls -lF'
