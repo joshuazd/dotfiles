@@ -41,6 +41,8 @@ syn region xmlXpathRegion
     \ contained
     \ contains=xmlAttrib,@xmlXpath
 let b:current_syntax = cur_syntax
+highlight! xmlXpathRegion cterm=italic
+
 
 syn keyword xmlNs ns0
 syn keyword xmlXsl xsl

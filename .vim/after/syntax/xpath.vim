@@ -23,13 +23,18 @@ syn match xpathFunction "\(subsequence\|count\|avg\|max\|min\|sum\|id\|position\
 syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+
 
 
-
-highlight xpathQuote ctermfg=156
+highlight xpathQuote ctermfg=156 cterm=italic
 hi def link xpathString String
+highlight xpathString ctermfg=2 cterm=italic
 hi def link xpathFunction Function
+highlight xpathFunction ctermfg=4 cterm=italic
 hi def link xpathNumber Constant
-hi def link xpathParam Identifier
+highlight xpathNumber ctermfg=6 cterm=italic
+" hi def link xpathParam Identifier
+highlight xpathParam ctermfg=11 cterm=italic
 hi def link xpathPunct PreProc
+highlight xpathPunct ctermfg=14 cterm=italic
 hi def link xpathLangVar Type
-highlight xpathReference ctermfg=156
-highlight xpathOperator ctermfg=137
+highlight xpathLangVar ctermfg=3 cterm=italic
+highlight xpathReference ctermfg=156 cterm=italic
+highlight xpathOperator ctermfg=137 cterm=italic
