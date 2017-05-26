@@ -54,7 +54,7 @@ function custom_git_status {
 SEP=$'\ue0b0'
 RIGHT_SEP=$'\ue0b2'
 
-PROMPT='%{$bg[black]%}%{$fg[green]%}%n %{$bg[blue]%}%{$fg[black]%}$SEP%{$fg[black]%} %1~ $BG[013]%{$fg[blue]%}$SEP%{$fg[black]%}$(prompt_char)$FG[013]%{$bg[black]%}$SEP%{$reset_color%} '
+PROMPT='%{$fg[green]%}%n %{$bg[blue]%}%{$fg[black]%}$SEP %1~ $BG[013]%{$fg[blue]%}$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
 
 RPS1='$(custom_git_status)%{$reset_color%}'
 
