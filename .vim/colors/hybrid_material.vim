@@ -389,7 +389,7 @@ exe "hi! Structure"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 exe "hi! Special"         .s:fg_red         .s:bg_none        .s:fmt_none
 "   SpecialChar"
 "   Tag"
-"   Delimiter"
+exe "hi! Delimiter"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 "   SpecialComment"
 "   Debug"
 "

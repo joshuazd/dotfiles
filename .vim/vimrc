@@ -204,15 +204,16 @@ inoremap jk <Esc>
 
 " keybinding to see whitespace
 nnoremap <Leader>z :set invlist<CR>
-set listchars=tab:>-,trail:~,extends:>,space:.
+set listchars=tab:>-,trail:~,extends:>,space:.,eol:$
 
 "make folding work better with insert mode
 autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
 autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
 
-" Set up supertab
+" Supertab setup {{{
 let g:SuperTabDefaultCompletionType = "context"
 let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
+" }}}
 
 " Ansible setup {{{
 let g:ansible_unindent_after_newline = 1
@@ -340,7 +341,7 @@ else
     let s:N3 = [ '#767676' , s:guibg, 10 , s:termbg2]
     let g:airline#themes#simple#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
     let g:airline#themes#simple#palette.normal_modified = {
-          \ 'airline_c': [ '#df0000' , s:guibg, 11, s:termbg   , ''     ] ,
+          \ 'airline_c': [ '#df0000' , s:guibg, 11, s:termbg2   , ''     ] ,
           \ }
 
 
