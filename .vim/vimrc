@@ -4,7 +4,6 @@ execute pathogen#infect()
 filetype plugin indent on
 
 
-
 " Set 999 lines to the cursor - when moving vertically using j/k
 " Keeps cursor centered
 set so=999
@@ -91,11 +90,9 @@ set clipboard=unnamed
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set expandtab
+" set expandtab
 set autoindent
 set noshowmode
-set ruler
-set showmatch
 set nowrap
 set laststatus=2
 set cindent
@@ -241,12 +238,27 @@ let g:EasyMotion_startofline = 0
 " Airline setup {{{
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#buffer_nr_show = 1
-set laststatus=2
+let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+let g:airline#extensions#tabline#buffer_min_count = 2
+"set laststatus=2
 
-let g:airline_section_c = '%t'
-let g:airline_section_x = ' '
+"let g:airline_section_c = '%t'
+let g:airline_section_x = ''
 let g:airline_section_y = '%y %{&ff}'
 let g:airline_section_z = '%3l:%2c'
+"let g:airline_section_error = ''
+"let g:airline_section_warning = ''
+
+let g:airline#extensions#default#section_truncate_width = {
+       \ 'a': 10,
+       \ 'b': 50,
+       \ 'c': 80,
+       \ 'x': 80,
+       \ 'y': 65,
+       \ 'z': 45,
+       \ 'warning': 50,
+       \ 'error': 50,
+       \ }
 " }}}
 
 " Set up ctrlP
@@ -341,12 +353,12 @@ else
     let s:N3 = [ '#767676' , s:guibg, 10 , s:termbg2]
     let g:airline#themes#simple#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
     let g:airline#themes#simple#palette.normal_modified = {
-          \ 'airline_c': [ '#df0000' , s:guibg, 11, s:termbg2   , ''     ] ,
+          \ 'airline_c': [ '#df0000' , s:guibg, 3, s:termbg2   , ''     ] ,
           \ }
 
 
-    let s:I1 = [ s:guibg, '#5fff00' , s:termbg2 , 11 ]
-    let s:I2 = [ '#ff5f00' , s:guibg2, 'black', 172 ]
+    let s:I1 = [ s:guibg, '#5fff00' , s:termbg2 , 3 ]
+    let s:I2 = [ '#ff5f00' , s:guibg2, 'gray', 8 ]
     let s:I3 = [ '#767676' , s:guibg, 243 , 8 ]
     let g:airline#themes#simple#palette.insert = airline#themes#generate_color_map(s:I1, s:I2, s:I3)
     let g:airline#themes#simple#palette.insert_modified = copy(g:airline#themes#simple#palette.normal_modified)
@@ -361,8 +373,8 @@ else
     let g:airline#themes#simple#palette.replace_modified = copy(g:airline#themes#simple#palette.normal_modified)
 
 
-    let s:V1 = [ s:guibg, '#dfdf00' , 'black', 2]
-    let s:V2 = [ '#ff5f00' , s:guibg2, 'gray', 28 ]
+    let s:V1 = [ s:guibg, '#dfdf00' , s:termbg2, 2]
+    let s:V2 = [ '#ff5f00' , s:guibg2, 'gray', 8 ]
     let s:V3 = [ '#767676' , s:guibg, 243 , 8 ]
     let g:airline#themes#simple#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
     let g:airline#themes#simple#palette.visual_modified = copy(g:airline#themes#simple#palette.normal_modified)
@@ -428,7 +440,7 @@ else
 
     let g:airline#themes#simple#palette.replace_modified.airline_error =
                 \ g:airline#themes#simple#palette.normal.airline_error
-    let g:airline_skip_empty_sections = 1
+   let g:airline_skip_empty_sections = 1
 endif
 " }}}
 
