@@ -30,7 +30,7 @@ set ruler
 set cmdheight=1
 
 " A buffer becomes hidden when it is abandoned
-" set hidden
+set hidden
 
 " Configure backspace so it acts as it should act
 set backspace=eol,start,indent
@@ -153,7 +153,7 @@ map <Leader><Leader> :b#<CR>
 map <Leader>p :bp<CR>
 
 " more standard 'close tab' behavior
-nnoremap <C-x> :b#\|bd #<CR>
+nnoremap <C-x> :bn\|bd #<CR>
 
 " treat wrapped lines as different lines
 noremap j gj
@@ -250,14 +250,12 @@ let g:airline_section_z = '%3l:%2c'
 "let g:airline_section_warning = ''
 
 let g:airline#extensions#default#section_truncate_width = {
-       \ 'a': 10,
-       \ 'b': 50,
-       \ 'c': 80,
-       \ 'x': 80,
-       \ 'y': 65,
-       \ 'z': 45,
-       \ 'warning': 50,
-       \ 'error': 50,
+       \ 'b': 59,
+       \ 'x': 79,
+       \ 'y': 69,
+       \ 'z': 39,
+       \ 'warning': 69,
+       \ 'error': 69,
        \ }
 " }}}
 
@@ -294,11 +292,11 @@ else
     let g:airline_theme='simple'
 endif
 
-if has("win32unix")
+"if has("win32unix")
 ""    let g:airline_symbols_ascii = 1
 ""else
     let g:airline_powerline_fonts = 1
-end
+"end
 
 " More Airline {{{
 if !exists('g:airline_symbols')
@@ -349,18 +347,18 @@ else
     let s:termbg = s:bg_none
     let s:termbg2= 0
 
-    let s:N1 = [ s:guibg , '#00dfff' , s:termbg2 , 247 ]
-    let s:N2 = [ '#ff5f00' , s:guibg2, 7, 8 ]
-    let s:N3 = [ '#767676' , s:guibg, 10 , s:termbg2]
+    let s:N1 = [ s:guibg , '#00dfff' , 0 , 12 ]
+    let s:N2 = [ '#ff5f00' , s:guibg2, s:termbg2, 247 ]
+    let s:N3 = [ '#767676' , s:guibg, 4 , 8]
     let g:airline#themes#simple#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
     let g:airline#themes#simple#palette.normal_modified = {
-          \ 'airline_c': [ '#df0000' , s:guibg, 3, s:termbg2   , ''     ] ,
+          \ 'airline_c': [ '#df0000' , s:guibg, 3, 8   , ''     ] ,
           \ }
 
 
     let s:I1 = [ s:guibg, '#5fff00' , s:termbg2 , 3 ]
-    let s:I2 = [ '#ff5f00' , s:guibg2, 7, 8 ]
-    let s:I3 = [ '#767676' , s:guibg, 243 , 8 ]
+    let s:I2 = [ '#ff5f00' , s:guibg2, 0, 247 ]
+    let s:I3 = [ '#767676' , s:guibg, 11 , 8 ]
     let g:airline#themes#simple#palette.insert = airline#themes#generate_color_map(s:I1, s:I2, s:I3)
     let g:airline#themes#simple#palette.insert_modified = copy(g:airline#themes#simple#palette.normal_modified)
     let g:airline#themes#simple#palette.insert_paste = {
@@ -369,20 +367,20 @@ else
 
 
     let g:airline#themes#simple#palette.replace = {
-          \ 'airline_a': [ s:I1[0]   , '#af0000' , s:I1[2] , 124     , ''     ] ,
+          \ 'airline_a': [ s:I1[0]   , '#af0000' , s:I1[2] , 1     , ''     ] ,
           \ }
     let g:airline#themes#simple#palette.replace_modified = copy(g:airline#themes#simple#palette.normal_modified)
 
 
     let s:V1 = [ s:guibg, '#dfdf00' , s:termbg2, 2]
-    let s:V2 = [ '#ff5f00' , s:guibg2, 7, 8 ]
-    let s:V3 = [ '#767676' , s:guibg, 243 , 8 ]
+    let s:V2 = [ '#ff5f00' , s:guibg2, 0, 247 ]
+    let s:V3 = [ '#767676' , s:guibg, 10 , 8 ]
     let g:airline#themes#simple#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
     let g:airline#themes#simple#palette.visual_modified = copy(g:airline#themes#simple#palette.normal_modified)
 
 
-    let s:IA  = [ '#4e4e4e' , s:guibg  , 239 , s:termbg2 , '' ]
-    let s:IA2 = [ '#4e4e4e' , s:guibg2 , 239 , s:termbg2, '' ]
+    let s:IA  = [ '#4e4e4e' , s:guibg  , 167 , s:termbg2 , '' ]
+    let s:IA2 = [ '#4e4e4e' , s:guibg2 , 12 , s:termbg2, '' ]
     let g:airline#themes#simple#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA2, s:IA2)
     let g:airline#themes#simple#palette.inactive_modified = {
           \ 'airline_c': [ '#df0000', '', 160, '', '' ] ,
