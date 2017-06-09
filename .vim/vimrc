@@ -30,7 +30,7 @@ set ruler
 set cmdheight=1
 
 " A buffer becomes hidden when it is abandoned
-set hidden
+" set hidden
 
 " Configure backspace so it acts as it should act
 set backspace=eol,start,indent
@@ -90,7 +90,7 @@ set clipboard=unnamed
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-" set expandtab
+set expandtab
 set autoindent
 set noshowmode
 set nowrap
@@ -108,7 +108,7 @@ let mapleader = "\<Space>"
 let maplocalleader = ","
 
 " Change tabs to be 2 spaces for xml files
-autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2
+autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab
 " enable xml folding
 let g:xml_syntax_folding=1
 
@@ -153,7 +153,7 @@ map <Leader><Leader> :b#<CR>
 map <Leader>p :bp<CR>
 
 " more standard 'close tab' behavior
-nnoremap <C-x> :bd<CR>
+nnoremap <C-x> :b#\|bd #<CR>
 
 " treat wrapped lines as different lines
 noremap j gj
@@ -271,7 +271,8 @@ let g:rainbow_conf = {
             \ 'ctermfgs': ['lightcyan','yellow','lightgreen','lightmagenta'],
             \ 'separately': {
             \   'xml': 0,
-            \   'vim': 0
+            \   'vim': 0,
+            \   'python': 0
             \  }
             \}
 
@@ -349,7 +350,7 @@ else
     let s:termbg2= 0
 
     let s:N1 = [ s:guibg , '#00dfff' , s:termbg2 , 247 ]
-    let s:N2 = [ '#ff5f00' , s:guibg2, 'gray', 8 ]
+    let s:N2 = [ '#ff5f00' , s:guibg2, 7, 8 ]
     let s:N3 = [ '#767676' , s:guibg, 10 , s:termbg2]
     let g:airline#themes#simple#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
     let g:airline#themes#simple#palette.normal_modified = {
@@ -358,7 +359,7 @@ else
 
 
     let s:I1 = [ s:guibg, '#5fff00' , s:termbg2 , 3 ]
-    let s:I2 = [ '#ff5f00' , s:guibg2, 'gray', 8 ]
+    let s:I2 = [ '#ff5f00' , s:guibg2, 7, 8 ]
     let s:I3 = [ '#767676' , s:guibg, 243 , 8 ]
     let g:airline#themes#simple#palette.insert = airline#themes#generate_color_map(s:I1, s:I2, s:I3)
     let g:airline#themes#simple#palette.insert_modified = copy(g:airline#themes#simple#palette.normal_modified)
@@ -374,7 +375,7 @@ else
 
 
     let s:V1 = [ s:guibg, '#dfdf00' , s:termbg2, 2]
-    let s:V2 = [ '#ff5f00' , s:guibg2, 'gray', 8 ]
+    let s:V2 = [ '#ff5f00' , s:guibg2, 7, 8 ]
     let s:V3 = [ '#767676' , s:guibg, 243 , 8 ]
     let g:airline#themes#simple#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
     let g:airline#themes#simple#palette.visual_modified = copy(g:airline#themes#simple#palette.normal_modified)
