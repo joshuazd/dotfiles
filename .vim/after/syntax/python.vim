@@ -79,19 +79,32 @@ endif
     syn keyword pythonLambdaExpr lambda
     syn keyword pythonStatement with as
 
-    syn keyword pythonCoding def nextgroup=pythonMagic skipwhite
-    syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|call\|cmp\|coerce\|complex\|contains\|del\|delattr\|delete\|delitem\|delslice\|div\|divmod\|enter\|eq\|exit\|float\|floordiv\|ge\|get\|getattr\|getattribute\|getitem\|getslice\|gt\|hash\|hex\|iadd\|iand\|idiv\|ifloordiv\|ilshift\|imod\|imul\|init\|int\|invert\|ior\|ipow\|irshift\|isub\|iter\|itruediv\|ixor\|le\|len\|long\|lshift\|lt\|mod\|mul\|ne\|neg\|new\|nonzero\|oct\|or\|pos\|pow\|radd\|rand\|rdiv\|rdivmod\|repr\|rfloordiv\|rlshift\|rmod\|rmul\|ror\|rpow\|rrshift\|rshift\|rsub\|rtruediv\|rxor\|set\|setattr\|setitem\|setslice\|str\|sub\|truediv\|unicode\|xor\)__"
-    syn match pythonFunction "\%(\%(def\s\|@\)\s*\)\@<=\h\%(\w\|\.\)*" contained nextgroup=pythonVars
-    syn region pythonVars start="(" skip=+\(".*"\|'.*'\)+ end=")" contained contains=pythonParameters transparent keepend
-    syn match pythonParameters "[^,]*" contained contains=pythonParam skipwhite
-    syn match pythonParam "[^,]*" contained contains=pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonString,pythonNumber,pythonBrackets,pythonSelf,pythonComment skipwhite
-    syn match pythonBrackets "{[(|)]}" contained skipwhite
-    syn match pythonFunction "\(\w\)*(\@="
+    syn match pythonIdentifier "\h\w*" contained
+    syn region pythonGroup matchgroup=pythonBrackets start="(" end=")" contains=pythonGroupParam
+    syn match pythonGroupParam "[^)]*" contained contains=pythonIdentifier,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup skipwhite
 
-    syn keyword pythonStatement class nextgroup=pythonClass skipwhite
+    syn keyword pythonCoding def skipwhite
+    syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|call\|cmp\|coerce\|complex\|contains\|del\|delattr\|delete\|delitem\|delslice\|div\|divmod\|enter\|eq\|exit\|float\|floordiv\|ge\|get\|getattr\|getattribute\|getitem\|getslice\|gt\|hash\|hex\|iadd\|iand\|idiv\|ifloordiv\|ilshift\|imod\|imul\|init\|int\|invert\|ior\|ipow\|irshift\|isub\|iter\|itruediv\|ixor\|le\|len\|long\|lshift\|lt\|mod\|mul\|ne\|neg\|new\|nonzero\|oct\|or\|pos\|pow\|radd\|rand\|rdiv\|rdivmod\|repr\|rfloordiv\|rlshift\|rmod\|rmul\|ror\|rpow\|rrshift\|rshift\|rsub\|rtruediv\|rxor\|set\|setattr\|setitem\|setslice\|str\|sub\|truediv\|unicode\|xor\)__" contained
+
+    syn match pythonFunctionCall "\h\(\w\)*(\@=" contains=@pythonBuiltinFuncC nextgroup=pythonFuncParams
+    syn cluster pythonBuiltinFuncC add=pythonBuiltinFunc,pythonPrint,pythonMagic
+    syn region pythonFuncParams matchgroup=pythonBrackets start="(" end=")" contained contains=pythonFuncParam,pythonPunct
+    syn match pythonFuncParam "[^,)]*" contained contains=pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup skipwhite
+
+
+    syn match pythonFunction "\(\(def\s\|@\)\s*\)\@<=\h\(\w\|\.\)*" contains=@pythonFuncC nextgroup=pythonVars
+    syn cluster pythonFuncC add=pythonMagic
+    syn region pythonVars matchgroup=pythonBrackets start="(" skip=+\(".*"\|'.*'\)+ end=")" contained contains=pythonParameters,pythonPunct keepend
+    syn match pythonParameters "[^,]*" contained contains=pythonParam skipwhite
+    syn match pythonParam "[^,]*" contained contains=pythonPunct,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonItemAccess,pythonConstant,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField skipwhite
+
+    syn match pythonBrackets "{[(|)]}" contained skipwhite
+    syn match pythonBrackets "{\|}" contained skipwhite
+
+    syn keyword pythonSelf class nextgroup=pythonClass skipwhite
     syn match pythonClass "\%(\%(class\s\)\s*\)\@<=\h\%(\w\|\.\)*" contained nextgroup=pythonClassVars
-    syn region pythonClassVars start="(" end=")" contained contains=pythonClassParameters transparent keepend
-    syn match pythonClassParameters "[^,\*]*" contained contains=pythonBuiltin,pythonBuiltinObj,pythonBuiltinType,pythonExtraOperatorpythonStatement,pythonBrackets,pythonString,pythonComment skipwhite
+    syn region pythonClassVars matchgroup=pythonBrackets start="(" end=")" contained contains=pythonClassParameters transparent keepend
+    syn match pythonClassParameters "[^,\*]*" contained contains=pythonBuiltinObj,pythonBuiltinType,pythonExtraOperator,pythonStatement,pythonBrackets,pythonString,pythonComment skipwhite
 
     syn keyword pythonKeyword   for while
     syn keyword pythonKeyword   if elif else
@@ -104,13 +117,18 @@ endif
 
 
     " item access
-    syn match pythonItemAccess "\(\w\)*\[\@="
+    syn region pythonAccess matchgroup=pythonBrackets start="\[" end="\]" contained contains=pythonAccessParam
+    syn match pythonAccessParam "[^\]]*" contained contains=pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonList skipwhite
+    syn match pythonItemAccess "\h\(\w\)*\[\@=" nextgroup=pythonAccess
 
-    syn match pythonPreProc ":"
-    syn match pythonPreProc ","
+    syn region pythonList matchgroup=pythonBrackets start="\[" end="\]" contains=pythonListParam
+    syn match pythonListParam "[^\]]*" contained contains=pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup skipwhite
+
+    syn match pythonPunct ":"
+    syn match pythonPunct ","
 
     " if !g:pymode_syntax_print_as_function
-        syn keyword pythonFunction print
+        " syn keyword pythonFunction print
     " endif
 
     " if g:pymode_syntax_highlight_async_await
@@ -131,7 +149,8 @@ endif
     " if g:pymode_syntax_highlight_self
         syn keyword pythonSelf self cls
     " endif
-    syn match pythonField "\(\.\)\@<=\w\+\([^\.a-zA-Z0-9(\[]\|$\)\@="
+    syn match pythonField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9(\[]\|$\)\@="
+    syn match pythonField "\(\.\)\@<=\h\w*\(\.\h\w*[(\[]\)\@="
 
 " }}}
 
@@ -172,7 +191,7 @@ endif
 
     " Trailing space errors
     " if g:pymode_syntax_space_errors
-        syn match pythonSpaceError  "\s\+$" display
+    "    syn match pythonSpaceError  "\s\+$" display
     " endif
 
 " }}}
@@ -180,10 +199,10 @@ endif
 " Strings {{{
 " ===========
 
-    syn region pythonString     start=+[bB]\='+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonEscape,pythonEscapeError,@Spell
-    syn region pythonString     start=+[bB]\="+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonEscape,pythonEscapeError,@Spell
-    syn region pythonString     start=+[bB]\="""+ end=+"""+ keepend contains=pythonEscape,pythonEscapeError,pythonDocTest2,pythonSpaceError,@Spell
-    syn region pythonString     start=+[bB]\='''+ end=+'''+ keepend contains=pythonEscape,pythonEscapeError,pythonDocTest,pythonSpaceError,@Spell
+    syn region pythonString  matchgroup=pythonStringPunc   start=+[bB]\='+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonEscape,pythonEscapeError,@Spell
+    syn region pythonString  matchgroup=pythonStringPunc   start=+[bB]\="+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonEscape,pythonEscapeError,@Spell
+    syn region pythonString  matchgroup=pythonStringPunc   start=+[bB]\="""+ end=+"""+ keepend contains=pythonEscape,pythonEscapeError,pythonDocTest2,pythonSpaceError,@Spell
+    syn region pythonString  matchgroup=pythonStringPunc   start=+[bB]\='''+ end=+'''+ keepend contains=pythonEscape,pythonEscapeError,pythonDocTest,pythonSpaceError,@Spell
 
     syn match  pythonEscape     +\\[abfnrtv'"\\]+ display contained
     syn match  pythonEscape     "\\\o\o\=\o\=" display contained
@@ -193,10 +212,10 @@ endif
     syn match  pythonEscape     "\\$"
 
     " Unicode
-    syn region pythonUniString  start=+[uU]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,@Spell
-    syn region pythonUniString  start=+[uU]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,@Spell
-    syn region pythonUniString  start=+[uU]"""+ end=+"""+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,pythonDocTest2,pythonSpaceError,@Spell
-    syn region pythonUniString  start=+[uU]'''+ end=+'''+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,pythonDocTest,pythonSpaceError,@Spell
+    syn region pythonUniString matchgroup=pythonStringPunc start=+[uU]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,@Spell
+    syn region pythonUniString matchgroup=pythonStringPunc start=+[uU]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,@Spell
+    syn region pythonUniString matchgroup=pythonStringPunc start=+[uU]"""+ end=+"""+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,pythonDocTest2,pythonSpaceError,@Spell
+    syn region pythonUniString matchgroup=pythonStringPunc start=+[uU]'''+ end=+'''+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,pythonDocTest,pythonSpaceError,@Spell
 
     syn match  pythonUniEscape          "\\u\x\{4}" display contained
     syn match  pythonUniEscapeError     "\\u\x\{,3}\X" display contained
@@ -206,18 +225,18 @@ endif
     syn match  pythonUniEscapeError "\\N{[^A-Z ]\+}" display contained
 
     " Raw strings
-    syn region pythonRawString  start=+[rR]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonRawEscape,@Spell
-    syn region pythonRawString  start=+[rR]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonRawEscape,@Spell
-    syn region pythonRawString  start=+[rR]"""+ end=+"""+ keepend contains=pythonDocTest2,pythonSpaceError,@Spell
-    syn region pythonRawString  start=+[rR]'''+ end=+'''+ keepend contains=pythonDocTest,pythonSpaceError,@Spell
+    syn region pythonRawString matchgroup=pythonStringPunc start=+[rR]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonRawEscape,@Spell
+    syn region pythonRawString matchgroup=pythonStringPunc start=+[rR]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonRawEscape,@Spell
+    syn region pythonRawString matchgroup=pythonStringPunc start=+[rR]"""+ end=+"""+ keepend contains=pythonDocTest2,pythonSpaceError,@Spell
+    syn region pythonRawString matchgroup=pythonStringPunc start=+[rR]'''+ end=+'''+ keepend contains=pythonDocTest,pythonSpaceError,@Spell
 
     syn match pythonRawEscape           +\\['"]+ display transparent contained
 
     " Unicode raw strings
-    syn region pythonUniRawString   start=+[uU][rR]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonRawEscape,pythonUniRawEscape,pythonUniRawEscapeError,@Spell
-    syn region pythonUniRawString   start=+[uU][rR]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonRawEscape,pythonUniRawEscape,pythonUniRawEscapeError,@Spell
-    syn region pythonUniRawString   start=+[uU][rR]"""+ end=+"""+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest2,pythonSpaceError,@Spell
-    syn region pythonUniRawString   start=+[uU][rR]'''+ end=+'''+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest,pythonSpaceError,@Spell
+    syn region pythonUniRawString matchgroup=pythonStringPunc start=+[uU][rR]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonRawEscape,pythonUniRawEscape,pythonUniRawEscapeError,@Spell
+    syn region pythonUniRawString matchgroup=pythonStringPunc start=+[uU][rR]"+ skip=+\\\\\|\\"\|\\$+ excludenl end=+"+ end=+$+ keepend contains=pythonRawEscape,pythonUniRawEscape,pythonUniRawEscapeError,@Spell
+    syn region pythonUniRawString matchgroup=pythonStringPunc start=+[uU][rR]"""+ end=+"""+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest2,pythonSpaceError,@Spell
+    syn region pythonUniRawString matchgroup=pythonStringPunc start=+[uU][rR]'''+ end=+'''+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest,pythonSpaceError,@Spell
 
     syn match  pythonUniRawEscape   "\([^\\]\(\\\\\)*\)\@<=\\u\x\{4}" display contained
     syn match  pythonUniRawEscapeError  "\([^\\]\(\\\\\)*\)\@<=\\u\x\{,3}\X" display contained
@@ -278,6 +297,7 @@ endif
     " Builtin objects and types
     " if g:pymode_syntax_builtin_objs
         syn keyword pythonConstant True False Ellipsis None NotImplemented
+        syn match pythonConstant '\<[A-Z_][A-Z_0-9]\+\>'
         syn keyword pythonBuiltinObj __debug__ __doc__ __file__ __name__ __package__
     " endif
 
@@ -290,17 +310,17 @@ endif
 
     " Builtin functions
     " if g:pymode_syntax_builtin_funcs
-        syn keyword pythonBuiltinFunc   __import__ abs all any apply
-        syn keyword pythonBuiltinFunc   bin callable classmethod cmp coerce compile
-        syn keyword pythonBuiltinFunc   delattr dir divmod enumerate eval execfile filter
-        syn keyword pythonBuiltinFunc   format getattr globals locals hasattr hash help hex id
-        syn keyword pythonBuiltinFunc   input intern isinstance issubclass iter len map max min
-        syn keyword pythonBuiltinFunc   next oct open ord pow property range xrange
-        syn keyword pythonBuiltinFunc   raw_input reduce reload repr reversed round setattr
-        syn keyword pythonBuiltinFunc   slice sorted staticmethod sum vars zip
+        syn keyword pythonBuiltinFunc contained   __import__ abs all any apply
+        syn keyword pythonBuiltinFunc contained   bin callable classmethod cmp coerce compile
+        syn keyword pythonBuiltinFunc contained   delattr dir divmod enumerate eval execfile filter
+        syn keyword pythonBuiltinFunc contained   format getattr globals locals hasattr hash help hex id
+        syn keyword pythonBuiltinFunc contained   input intern isinstance issubclass iter len map max min
+        syn keyword pythonBuiltinFunc contained   next oct open ord pow property range xrange
+        syn keyword pythonBuiltinFunc contained   raw_input reduce reload repr reversed round setattr
+        syn keyword pythonBuiltinFunc contained   slice sorted staticmethod sum vars zip len
 
         " if g:pymode_syntax_print_as_function
-            syn keyword pythonKeyword   print
+            syn keyword pythonPrint contained  print
         " endif
 
     " endif
@@ -329,6 +349,8 @@ endif
         syn keyword pythonExClass   ImportWarning UnicodeWarning
     " endif
 
+    syn region pythonJedi matchgroup=Type start="?!?" end="?!?"
+
 " }}}
 
 
@@ -351,13 +373,15 @@ endif
     hi link  pythonInclude      Include
     hi link  pythonConstant     Constant
     hi link  pythonFunction     Function
-    hi link  pythonClass        Type
+    hi link  pythonFunctionCall Function
+    hi link  pythonClass        Function
+    highlight pythonClass ctermfg=4 cterm=bold
     hi link  pythonParameters   Normal
-    hi link  pythonParam        Normal
-    hi link  pythonBrackets     Normal
+    hi link  pythonParam        Identifier
+    hi link  pythonBrackets     PreProc
     hi link  pythonClassParameters Normal
     hi link  pythonSelf         Identifier
-    highlight pythonSelf ctermfg=3
+    highlight pythonSelf ctermfg=3 cterm=italic
 
     highlight pythonMagic ctermfg=210
 
@@ -374,7 +398,7 @@ endif
 
     hi link  pythonComment      Comment
     hi link  pythonCoding       Special
-    highlight pythonCoding ctermfg=1
+    highlight pythonCoding ctermfg=1 cterm=italic
     hi link  pythonRun          Special
     hi link  pythonTodo         Todo
 
@@ -383,12 +407,14 @@ endif
     hi link  pythonSpaceError   Error
 
     hi link  pythonString       String
-    hi link  pythonDocstring    String
+    highlight pythonStringPunc ctermfg=156
+    hi link  pythonDocstring    Comment
     hi link  pythonUniString    String
     hi link  pythonRawString    String
     hi link  pythonUniRawString String
 
     hi link  pythonEscape       PreProc
+    highlight pythonEscape ctermfg=14 cterm=bold
     hi link  pythonEscapeError  Error
     hi link  pythonUniEscape    PreProc
     hi link  pythonUniEscapeError Error
@@ -423,5 +449,8 @@ endif
 
     hi link  pythonExClass      Structure
     hi link  pythonJedi         Type
+    hi link  pythonPunct        PreProc
+    hi link  pythonIdentifier   Identifier
+    hi link  pythonPrint        Keyword
 
 " }}}
