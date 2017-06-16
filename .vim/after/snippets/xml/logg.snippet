@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template xmlns="http://ws.apache.org/ns/synapse" name="${1:Logger Name}">
+	<parameter name="message"/>
+	<sequence>
+		<filter xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" xpath="fn:boolean(\$ctx:messageId)">
+			<then/>
+			<else>
+				<filter xmlns:pan="http://panera.wso2.esb" xpath="\$trp:messageId">
+					<then>
+						<property name="messageId" expression="get-property('transport', 'messageId')" scope="default" type="STRING"/>
+					</then>
+					<else>
+						<property name="messageId" expression="get-property('MessageID')" scope="default" type="STRING"/>
+						<header name="messageId" scope="transport" expression="get-property('messageId')"/>
+					</else>
+				</filter>
+			</else>
+		</filter>
+		<log level="custom">
+			<property xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" name="message" expression="\$func:message"/>
+			<property name="serviceName" value="${2:Service Name}"/>
+			<property xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" name="messageId" expression="get-property('messageId')"/>
+		</log>
+	</sequence>
+</template>
