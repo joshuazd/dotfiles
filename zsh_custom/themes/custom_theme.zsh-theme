@@ -2,6 +2,15 @@ function prompt_char {
     if [ $UID -eq 0 ]; then echo "#"; else echo ''; fi
 }
 
+function virtualenv_info {
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        venv="${VIRTUAL_ENV##*/}"
+    else
+        venv=''
+    fi
+    [[ -n "$venv" ]] && echo "$BG[003] $FG[000]$venv%{$reset_color%}$FG[003]$BG[008]$SEP"
+}
+
 
 function custom_git_status {
     command git rev-parse --is-inside-work-tree &>/dev/null || return
@@ -46,7 +55,7 @@ function custom_git_status {
         BRANCH=$'\ue0a0'
         CUSTOM_THEME_GIT_PROMPT_PREFIX=""
         CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
-        echo -n "%{$bg[black]%}%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators${CUSTOM_THEME_GIT_PROMPT_SUFFIX}"
+        echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators${CUSTOM_THEME_GIT_PROMPT_SUFFIX}"
     fi
 
 }
@@ -54,7 +63,7 @@ function custom_git_status {
 SEP=$'\ue0b0'
 RIGHT_SEP=$'\ue0b2'
 
-PROMPT='%{$fg[green]%}%n %{$bg[blue]%}%{$fg[black]%}$SEP %1~ $BG[013]%{$fg[blue]%}$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
+PROMPT='$(virtualenv_info)$BG[008] %{$fg[green]%}%n %{$bg[blue]%}$FG[008]$SEP %1~ $BG[013]%{$fg[blue]%}$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
 
 RPS1='$(custom_git_status)%{$reset_color%}'
 
