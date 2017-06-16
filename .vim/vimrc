@@ -36,6 +36,9 @@ set hidden
 set backspace=eol,start,indent
 set whichwrap+=<,>,h,l
 
+set breakindent
+set breakindentopt=shift:2
+
 " Ignore case when searching
 set ignorecase
 
@@ -72,12 +75,6 @@ set t_Co=256
 set splitbelow
 set splitright
 
-" Make moving around splits easier
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
-
 " General options
 let python_hightlight_all=1
 set background=dark
@@ -85,6 +82,7 @@ syntax on
 colorscheme hybrid_material
 set nu
 set relativenumber
+set numberwidth=1
 set hlsearch
 set clipboard=unnamed
 set tabstop=4
@@ -118,6 +116,8 @@ autocmd BufNewFile,BufRead *.dbs set filetype=xml
 " fold based on syntax
 set foldmethod=syntax
 
+autocmd FileType python setlocal foldmethod=indent
+
 " Make enter create a new line
 nnoremap <CR> o<ESC>
 
@@ -129,6 +129,13 @@ nnoremap ^ 0
 " set nobackup
 set backupdir=/tmp
 set noswapfile
+
+" Make moving around splits easier
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+nnoremap <Leader>v :vs\|bn<CR>
 
 " Fold toggle keybind
 nnoremap <Leader>a za
@@ -194,7 +201,7 @@ nnoremap <C-s> :w<CR>
 nnoremap q :q<CR>
 nnoremap Q q
 imap <C-s> <Esc>:w<CR>i
-nnoremap <Leader>x :q<CR>
+"nnoremap <Leader>x :q<CR>
 
 " Easier to exit insert mode
 inoremap jk <Esc>
@@ -210,6 +217,8 @@ autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:las
 " Supertab setup {{{
 let g:SuperTabDefaultCompletionType = "context"
 let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
+let g:SuperTabLongestHighlight = 1
+let g:SuperTabCrMapping = 1
 " }}}
 
 " Ansible setup {{{
@@ -224,6 +233,17 @@ nmap <silent> [e <Plug>(ale_previous_wrap)
 let g:ale_python_flake8_options = '--max-line-length 99'
 let g:ale_virtualenv_dir_names = []
 let g:ale_lint_on_text_changed = 'never'
+" }}}
+
+" Jedi setup {{{
+let g:jedi#show_call_signatures = 2
+
+" }}}
+
+" SnipMate setup {{{
+let g:snipMate = {}
+let g:snipMate.snippet_version = 1
+
 " }}}
 
 " Easymotion setup {{{
@@ -266,7 +286,7 @@ set runtimepath^=~/.vim/bundle/ctrlp.vim
 let g:rainbow_active = 1
 
 let g:rainbow_conf = {
-            \ 'ctermfgs': ['lightcyan','yellow','lightgreen','lightmagenta'],
+            \ 'ctermfgs': ['cyan','yellow', 'magenta', 'lightcyan', 'red', 'lightblue', 'green'],
             \ 'separately': {
             \   'xml': 0,
             \   'vim': 0,
@@ -379,8 +399,8 @@ else
     let g:airline#themes#simple#palette.visual_modified = copy(g:airline#themes#simple#palette.normal_modified)
 
 
-    let s:IA  = [ '#4e4e4e' , s:guibg  , 167 , s:termbg2 , '' ]
-    let s:IA2 = [ '#4e4e4e' , s:guibg2 , 12 , s:termbg2, '' ]
+    let s:IA  = [ '#4e4e4e' , s:guibg  , 167 , 8 , '' ]
+    let s:IA2 = [ '#4e4e4e' , s:guibg2 , 4 , 8, '' ]
     let g:airline#themes#simple#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA2, s:IA2)
     let g:airline#themes#simple#palette.inactive_modified = {
           \ 'airline_c': [ '#df0000', '', 160, '', '' ] ,
