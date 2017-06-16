@@ -62,6 +62,9 @@
 
 " }}}
 
+if exists("b:current_syntax")
+  finish
+endif
 
 " For version 5.x: Clear all syntax items
 if version < 600
@@ -452,5 +455,7 @@ endif
     hi link  pythonPunct        PreProc
     hi link  pythonIdentifier   Identifier
     hi link  pythonPrint        Keyword
+
+let b:current_syntax = "python"
 
 " }}}

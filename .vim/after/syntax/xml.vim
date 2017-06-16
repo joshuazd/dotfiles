@@ -1,12 +1,12 @@
-syn match xmlFunction 'call-template\|makefault\|template\( \|>\)\@=\|log'
+syn match xmlFunction 'call-template\|makefault\|template\( \|>\)\@=\|log\|validate'
 syn match db 'dblookup\|dbreport\|class\|payloadFactory'
-syn match filter '\(filter\|then\|send\|else\|drop\|call\(>\)\@=\|respond\|store\|choose\|when\|otherwise\)'
-syn match property '\(property\|address\|header\|endpoint\|attribute\|reason\)\( \|>\)\@='
+syn match filter '\(filter\|then\|send\|else\|on-fail\|drop\|call\(>\)\@=\|respond\|store\|choose\|when\|otherwise\)'
+syn match property '\(property\|address\|header\|endpoint\|attribute\|reason\|detail\)\( \|>\)\@='
 syn match sequence '\(</\?\)\@<=sequence'
 syn match param 'parameter\|result\|dsName\|target\|with-param\|format\|source\|param'
 syn match connection 'connection\|statement\|resource\|stylesheet'
 syn match xmlType 'args'
-syn match xmlEnrich 'enrich\|xslt\|value-of'
+syn match xmlEnrich 'enrich\|xslt\|value-of\|schema'
 syn match xmlSqlTag '\<\(sql\|script\)\>'
 
 let cur_syntax = b:current_syntax
@@ -18,6 +18,17 @@ syn region xmlSqlRegion
     \ end=+\(</sql>\)\@=+
     \ contained
     \ contains=@xmlSQL
+let b:current_syntax = cur_syntax
+
+let cur_syntax = b:current_syntax
+unlet! b:current_syntax
+syn include @xmlJavaScript syntax/javascript.vim
+syn region xmlJavaScriptRegion
+    \ start=+\(<script language="js">\)\@<=+
+    \ keepend
+    \ end=+\(</script>\)\@=+
+    \ contained
+    \ contains=@xmlJavaScript
 let b:current_syntax = cur_syntax
 
 let cur_syntax = b:current_syntax
