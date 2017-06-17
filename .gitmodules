@@ -28,9 +28,6 @@
 [submodule ".vim/bundle/vim-fugitive"]
 	path = .vim/bundle/vim-fugitive
 	url = git://github.com/tpope/vim-fugitive.git
-[submodule ".vim/bundle/gitsessions.vim"]
-	path = .vim/bundle/gitsessions.vim
-	url = https://github.com/wting/gitsessions.vim.git
 [submodule ".vim/bundle/vim-HiLinkTrace"]
 	path = .vim/bundle/vim-HiLinkTrace
 	url = https://github.com/gerw/vim-HiLinkTrace.git
