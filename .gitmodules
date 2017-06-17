@@ -19,9 +19,6 @@
 [submodule ".vim/bundle/vim-gitgutter"]
 	path = .vim/bundle/vim-gitgutter
 	url = https://github.com/airblade/vim-gitgutter.git
-[submodule ".vim/bundle/rainbow"]
-	path = .vim/bundle/rainbow
-	url = https://github.com/luochen1990/rainbow.git
 [submodule ".vim/bundle/vim-orgmode"]
 	path = .vim/bundle/vim-orgmode
 	url = https://github.com/jceb/vim-orgmode.git
