@@ -22,9 +22,6 @@
 [submodule ".vim/bundle/rainbow"]
 	path = .vim/bundle/rainbow
 	url = https://github.com/luochen1990/rainbow.git
-[submodule ".vim/bundle/goyo.vim"]
-	path = .vim/bundle/goyo.vim
-	url = https://github.com/junegunn/goyo.vim.git
 [submodule ".vim/bundle/vim-orgmode"]
 	path = .vim/bundle/vim-orgmode
 	url = https://github.com/jceb/vim-orgmode.git
