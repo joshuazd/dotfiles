@@ -34,9 +34,6 @@
 [submodule ".vim/bundle/vim-HiLinkTrace"]
 	path = .vim/bundle/vim-HiLinkTrace
 	url = https://github.com/gerw/vim-HiLinkTrace.git
-[submodule ".vim/bundle/ansible-vim"]
-	path = .vim/bundle/ansible-vim
-	url = https://github.com/pearofducks/ansible-vim.git
 [submodule ".vim/bundle/tlib_vim"]
 	path = .vim/bundle/tlib_vim
 	url = https://github.com/tomtom/tlib_vim.git
