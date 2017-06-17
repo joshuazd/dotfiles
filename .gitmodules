@@ -4,9 +4,6 @@
 [submodule ".vim/fonts"]
 	path = .vim/fonts
 	url = https://github.com/powerline/fonts.git
-[submodule ".vim/bundle/vim-gitgutter"]
-	path = .vim/bundle/vim-gitgutter
-	url = https://github.com/airblade/vim-gitgutter.git
 [submodule ".vim/bundle/vim-orgmode"]
 	path = .vim/bundle/vim-orgmode
 	url = https://github.com/jceb/vim-orgmode.git
