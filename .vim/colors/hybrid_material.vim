@@ -90,8 +90,8 @@ let s:gui_selection  = "#455A64"
 let s:gui_line       = "#212D32"
 let s:gui_comment    = "#707880"
 
-let s:palette.gui.background = { 'dark' : s:gui_background , 'light' : "#e4e4e4" }
-let s:palette.gui.foreground = { 'dark' : "#c5c8c6"        , 'light' : "#000000" }
+let s:palette.gui.background = { 'dark' : s:gui_background , 'light' : "#000000" }
+let s:palette.gui.foreground = { 'dark' : "#fefefe"        , 'light' : "#000000" }
 let s:palette.gui.selection  = { 'dark' : s:gui_selection  , 'light' : "#bcbcbc" }
 let s:palette.gui.line       = { 'dark' : s:gui_line       , 'light' : "#d0d0d0" }
 let s:palette.gui.comment    = { 'dark' : s:gui_comment    , 'light' : "#5f5f5f" }
@@ -99,10 +99,12 @@ let s:palette.gui.red        = { 'dark' : "#cc6666"        , 'light' : "#5f0000"
 let s:palette.gui.orange     = { 'dark' : "#de935f"        , 'light' : "#875f00" }
 let s:palette.gui.yellow     = { 'dark' : "#f0c674"        , 'light' : "#5f5f00" }
 let s:palette.gui.green      = { 'dark' : "#b5bd68"        , 'light' : "#005f00" }
-let s:palette.gui.aqua       = { 'dark' : "#8abeb7"        , 'light' : "#005f5f" }
-let s:palette.gui.blue       = { 'dark' : "#81a2be"        , 'light' : "#00005f" }
+let s:palette.gui.lightgreen = { 'dark' : "#C3E88D"        , 'light' : "#C3E88D" }
+let s:palette.gui.pink       = { 'dark' : "#f07178"        , 'light' : "#f07178" }
+let s:palette.gui.aqua       = { 'dark' : "#89DDFF"        , 'light' : "#005f5f" }
+let s:palette.gui.blue       = { 'dark' : "#82aaff"        , 'light' : "#00005f" }
 let s:palette.gui.purple     = { 'dark' : "#b294bb"        , 'light' : "#5f005f" }
-let s:palette.gui.cyan       = { 'dark' : "#89ddff"        , 'light' : "#39adb5" }
+let s:palette.gui.cyan       = { 'dark' : "#39ADB5"        , 'light' : "#39adb5" }
 let s:palette.gui.brown      = { 'dark' : "#ab7967"        , 'light' : "#ab7967" }
 let s:palette.gui.window     = { 'dark' : "#303030"        , 'light' : "#9e9e9e" }
 let s:palette.gui.darkcolumn = { 'dark' : "#1c1c1c"        , 'light' : "#808080" }
@@ -124,9 +126,11 @@ if exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:cterm_red        = "9"   " LightRed
   let s:cterm_orange     = "3"   " DarkYellow
   let s:cterm_yellow     = "11"  " LightYellow
-  let s:cterm_green      = "2"  " LightGreen
+  let s:cterm_green      = "10"  " Green
+  let s:cterm_lightgreen = "2"   " LightGreen
+  let s:cterm_pink       = "210" " Pink
   let s:cterm_aqua       = "14"  " LightCyan
-  let s:cterm_blue       = "4"  " LightBlue
+  let s:cterm_blue       = "12"  " LightBlue
   let s:cterm_purple     = "5"  " LightMagenta
   let s:cterm_cyan       = "6" " Cyan
   let s:cterm_brown      = "137" " Brown
@@ -139,16 +143,18 @@ else
   let s:cterm_red        = "9"
   let s:cterm_orange     = "3"
   let s:cterm_yellow     = "11"
-  let s:cterm_green      = "2"
+  let s:cterm_green      = "10"
+  let s:cterm_lightgreen = "2"
+  let s:cterm_pink       = "210" " Pink
   let s:cterm_aqua       = "14"
-  let s:cterm_blue       = "4"
+  let s:cterm_blue       = "12"
   let s:cterm_purple     = "5"
   let s:cterm_cyan       = "6"
   let s:cterm_brown      = "137"
   let s:cterm_delbg      = "0"
 endif
 
-let s:palette.cterm.background = { 'dark' : "234"              , 'light' : "254" }
+let s:palette.cterm.background = { 'dark' : "0"              , 'light' : "254" }
 let s:palette.cterm.foreground = { 'dark' : s:cterm_foreground , 'light' : "16"  }
 let s:palette.cterm.window     = { 'dark' : "236"              , 'light' : "247" }
 let s:palette.cterm.selection  = { 'dark' : s:cterm_selection  , 'light' : "250" }
@@ -158,6 +164,8 @@ let s:palette.cterm.red        = { 'dark' : s:cterm_red        , 'light' : "52" 
 let s:palette.cterm.orange     = { 'dark' : s:cterm_orange     , 'light' : "94"  }
 let s:palette.cterm.yellow     = { 'dark' : s:cterm_yellow     , 'light' : "58"  }
 let s:palette.cterm.green      = { 'dark' : s:cterm_green      , 'light' : "22"  }
+let s:palette.cterm.lightgreen = { 'dark' : s:cterm_lightgreen , 'light' : s:cterm_lightgreen }
+let s:palette.cterm.pink       = { 'dark' : s:cterm_pink       , 'light' : s:cterm_pink  }
 let s:palette.cterm.aqua       = { 'dark' : s:cterm_aqua       , 'light' : "23"  }
 let s:palette.cterm.blue       = { 'dark' : s:cterm_blue       , 'light' : "17"  }
 let s:palette.cterm.purple     = { 'dark' : s:cterm_purple     , 'light' : "53"  }
@@ -208,6 +216,8 @@ call s:build_prim('bg', 'red')
 call s:build_prim('bg', 'orange')
 call s:build_prim('bg', 'yellow')
 call s:build_prim('bg', 'green')
+call s:build_prim('bg', 'lightgreen')
+call s:build_prim('bg', 'pink')
 call s:build_prim('bg', 'aqua')
 call s:build_prim('bg', 'blue')
 call s:build_prim('bg', 'purple')
@@ -233,6 +243,8 @@ call s:build_prim('fg', 'red')
 call s:build_prim('fg', 'orange')
 call s:build_prim('fg', 'yellow')
 call s:build_prim('fg', 'green')
+call s:build_prim('fg', 'lightgreen')
+call s:build_prim('fg', 'pink')
 call s:build_prim('fg', 'aqua')
 call s:build_prim('fg', 'blue')
 call s:build_prim('fg', 'purple')
@@ -271,6 +283,8 @@ exe "let s:sp_red        = ' guisp=". s:palette.gui.red[s:style]        ."'"
 exe "let s:sp_orange     = ' guisp=". s:palette.gui.orange[s:style]     ."'"
 exe "let s:sp_yellow     = ' guisp=". s:palette.gui.yellow[s:style]     ."'"
 exe "let s:sp_green      = ' guisp=". s:palette.gui.green[s:style]      ."'"
+exe "let s:sp_lightgreen = ' guisp=". s:palette.gui.lightgreen[s:style] ."'"
+exe "let s:sp_pink       = ' guisp=". s:palette.gui.pink[s:style]       ."'"
 exe "let s:sp_aqua       = ' guisp=". s:palette.gui.aqua[s:style]       ."'"
 exe "let s:sp_blue       = ' guisp=". s:palette.gui.blue[s:style]       ."'"
 exe "let s:sp_purple     = ' guisp=". s:palette.gui.purple[s:style]     ."'"
@@ -350,7 +364,7 @@ if !has('gui_running') && exists("g:hybrid_custom_term_colors") && g:hybrid_cust
 else
   let s:bg_normal = s:bg_none
 endif
-exe "hi! Normal"        .s:fg_foreground  .s:bg_normal      .s:fmt_none
+exe "hi! Normal"        .s:fg_foreground  .s:bg_background      .s:fmt_none
 
 "}}}
 " Generic Syntax Highlighting: (see :help group-name)"{{{
@@ -359,6 +373,7 @@ exe "hi! Comment"         .s:fg_comment     .s:bg_none        .s:fmt_none
 
 exe "hi! Constant"        .s:fg_cyan        .s:bg_none        .s:fmt_none
 exe "hi! String"          .s:fg_green       .s:bg_none        .s:fmt_none
+exe "hi! StringPunct"     .s:fg_lightgreen  .s:bg_none        .s:fmt_none
 "   Character"
 "   Number"
 "   Boolean"
@@ -372,7 +387,7 @@ exe "hi! Statement"       .s:fg_purple        .s:bg_none        .s:fg_bold
 "   Repeat"
 "   Label"
 exe "hi! Operator"        .s:fg_brown        .s:bg_none        .s:fmt_none
-exe "hi!  Keyword"        .s:fg_purple        .s:bg_none        .s:fmt_none
+exe "hi! Keyword"        .s:fg_purple        .s:bg_none        .s:fmt_none
 "   Exception"
 
 exe "hi! PreProc"         .s:fg_aqua        .s:bg_none        .s:fg_bold
@@ -381,6 +396,7 @@ exe "hi! PreProc"         .s:fg_aqua        .s:bg_none        .s:fg_bold
 "   Macro"
 "   PreCondit"
 
+exe "hi! Language"        .s:fg_pink        .s:bg_none        .s:fmt_none
 exe "hi! Type"            .s:fg_orange      .s:bg_none        .s:fg_bold
 "   StorageClass"
 exe "hi! Structure"       .s:fg_aqua        .s:bg_none        .s:fmt_none
@@ -403,6 +419,7 @@ exe "hi! Todo"            .s:fg_addfg       .s:bg_none        .s:fg_bold
 
 " Quickfix window highlighting
 exe "hi! qfLineNr"        .s:fg_yellow      .s:bg_none        .s:fmt_none
+exe "hi! CursorLineNR ctermfg=158 guifg=#80cbc4" .s:bg_none        .s:fmt_none
 "   qfFileName"
 "   qfLineNr"
 "   qfError"
@@ -421,9 +438,9 @@ exe "hi! qfLineNr"        .s:fg_yellow      .s:bg_none        .s:fmt_none
 "   diffIsA
 "   diffNoEOL
 "   diffCommon
-hi! link diffRemoved Constant
+hi! link diffRemoved Special
 "   diffChanged
-hi! link diffAdded Special
+hi! link diffAdded String
 "   diffLine
 "   diffSubname
 "   diffComment

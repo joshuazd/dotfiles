@@ -62,9 +62,9 @@
 
 " }}}
 
-if exists("b:current_syntax")
-  finish
-endif
+""if exists("b:current_syntax")
+"  finish
+"endif
 
 " For version 5.x: Clear all syntax items
 if version < 600
@@ -378,15 +378,15 @@ endif
     hi link  pythonFunction     Function
     hi link  pythonFunctionCall Function
     hi link  pythonClass        Function
-    highlight pythonClass ctermfg=4 cterm=bold
+    highlight pythonClass ctermfg=4 guifg=#82aaff cterm=bold gui=bold
     hi link  pythonParameters   Normal
     hi link  pythonParam        Identifier
     hi link  pythonBrackets     PreProc
     hi link  pythonClassParameters Normal
     hi link  pythonSelf         Identifier
-    highlight pythonSelf ctermfg=3 cterm=italic
+    highlight pythonSelf ctermfg=3 guifg=#ffb62c cterm=italic gui=italic
 
-    highlight pythonMagic ctermfg=210
+    hi link  pythonMagic        Language
 
     hi link  pythonConditional  Conditional
     hi link  pythonRepeat       Repeat
@@ -400,8 +400,8 @@ endif
     hi link  pythonDot          PreProc
 
     hi link  pythonComment      Comment
-    hi link  pythonCoding       Special
-    highlight pythonCoding ctermfg=1 cterm=italic
+    hi! link  pythonCoding       Special
+    highlight pythonCoding ctermfg=1 guifg=#e53935 cterm=italic gui=italic
     hi link  pythonRun          Special
     hi link  pythonTodo         Todo
 
@@ -410,7 +410,7 @@ endif
     hi link  pythonSpaceError   Error
 
     hi link  pythonString       String
-    highlight pythonStringPunc ctermfg=156
+    hi link  pythonStringPunc   StringPunct
     hi link  pythonDocstring    Comment
     hi link  pythonUniString    String
     hi link  pythonRawString    String
@@ -448,7 +448,7 @@ endif
 
     hi link  pythonPreProc      PreProc
     hi link  pythonItemAccess   Special
-    highlight pythonField ctermfg=250
+    highlight pythonField ctermfg=250 guifg=#bcbcbc
 
     hi link  pythonExClass      Structure
     hi link  pythonJedi         Type

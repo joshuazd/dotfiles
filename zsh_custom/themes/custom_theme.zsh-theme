@@ -63,7 +63,7 @@ function custom_git_status {
 SEP=$'\ue0b0'
 RIGHT_SEP=$'\ue0b2'
 
-PROMPT='$(virtualenv_info)$BG[008] %{$fg[green]%}%n %{$bg[blue]%}$FG[008]$SEP %1~ $BG[013]%{$fg[blue]%}$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
+PROMPT='$(virtualenv_info)$BG[008] %{$fg[green]%}%n $BG[012]$FG[008]$SEP %1~ $BG[013]$FG[012]$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
 
 RPS1='$(custom_git_status)%{$reset_color%}'
 
