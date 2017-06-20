@@ -1,6 +1,27 @@
 set nocompatible
 filetype off
+set runtimepath+=~/.vim/bundle/vundle
 execute pathogen#infect()
+call vundle#rc()
+
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'w0rp/ale'
+Plugin 'kien/ctrlp.vim'
+Plugin 'vim-scripts/c.vim'
+Plugin 'raimondi/delimitmate'
+Plugin 'junegunn/goyo.vim'
+Plugin 'davidhalter/jedi-vim'
+Plugin 'wting/gitsessions.vim'
+Plugin 'luochen1990/rainbow'
+Plugin 'ervandew/supertab'
+Plugin 'gerw/vim-HiLinkTrace'
+Plugin 'vim-airline/vim-airline'
+Plugin 'easymotion/vim-easymotion'
+Plugin 'tpope/vim-fugitive'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'tmux-plugins/vim-tmux'
+Plugin 'vim-airline/vim-airline-themes'
+
 filetype plugin indent on
 
 
@@ -20,7 +41,9 @@ set wildignore+=*/target/*
 
 " Don't insert comment when using 'o'
 au FileType * set fo-=o
-
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
 set sessionoptions-=options
 
 "Always show current position
@@ -290,38 +313,37 @@ let g:rainbow_conf = {
             \ 'separately': {
             \   'xml': 0,
             \   'vim': 0,
-            \   'python': 0
+            \   'python': 0,
+            \   'sh': 0
             \  }
             \}
 
 
 if has("gui_running")
-    colorscheme material-theme
     set guifont=Liberation\ Mono\ for\ Powerline\ Regular\ 11
     set guioptions-=T
     set guioptions+=e
     set guioptions-=m
     set guitablabel=%M\ %t
-    let g:airline_theme='hybrid'
-    " set lines=35 columns=110
 else
     " Set line number color as darkgray
     highlight LineNr ctermfg=8
     let g:hybrid_custom_term_colors=1
-    set background=dark
-    let g:airline_theme='simple'
 endif
 
+" More Airline {{{
+
 "if has("win32unix")
-""    let g:airline_symbols_ascii = 1
-""else
+"    let g:airline_symbols_ascii = 1
+"else
     let g:airline_powerline_fonts = 1
 "end
 
-" More Airline {{{
 if !exists('g:airline_symbols')
     let g:airline_symbols = {}
 endif
+let g:airline_skip_empty_sections = 1
+let g:airline_theme='simple'
 
 if has("gui_running")
     " unicode symbols
@@ -357,28 +379,29 @@ else
     let g:airline_symbols.spell = 'Ꞩ'
     let g:airline_symbols.notexists = '∄'
     let g:airline_symbols.whitespace = 'Ξ'
+endif
 
     let g:airline#themes#simple#palette = {}
 
     let s:bg_none = 'NONE'
 
     let s:guibg = '#080808'
-    let s:guibg2 = '#1c1c1c'
+    let s:guibg2 = '#3e515b'
     let s:termbg = s:bg_none
     let s:termbg2= 0
 
-    let s:N1 = [ s:guibg , '#00dfff' , 0 , 12 ]
-    let s:N2 = [ '#ff5f00' , s:guibg2, s:termbg2, 247 ]
-    let s:N3 = [ '#767676' , s:guibg, 4 , 8]
+    let s:N1 = [ s:guibg , '#6182b8' , 232 , 4 ]
+    let s:N2 = [ '#263238' , '#9e9e9e', s:termbg2, 247 ]
+    let s:N3 = [ '#82aaff' , s:guibg2, 12 , 8]
     let g:airline#themes#simple#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
     let g:airline#themes#simple#palette.normal_modified = {
-          \ 'airline_c': [ '#df0000' , s:guibg, 3, 8   , ''     ] ,
+          \ 'airline_c': [ '#ffb62c' , '#3e515b', 3, 8   , ''     ] ,
           \ }
 
 
-    let s:I1 = [ s:guibg, '#5fff00' , s:termbg2 , 3 ]
-    let s:I2 = [ '#ff5f00' , s:guibg2, 0, 247 ]
-    let s:I3 = [ '#767676' , s:guibg, 11 , 8 ]
+    let s:I1 = [ s:guibg, '#ffb62c' , 232 , 3 ]
+    let s:I2 = s:N2
+    let s:I3 = [ '#ffcb6b' , s:guibg2, 11 , 8 ]
     let g:airline#themes#simple#palette.insert = airline#themes#generate_color_map(s:I1, s:I2, s:I3)
     let g:airline#themes#simple#palette.insert_modified = copy(g:airline#themes#simple#palette.normal_modified)
     let g:airline#themes#simple#palette.insert_paste = {
@@ -392,18 +415,18 @@ else
     let g:airline#themes#simple#palette.replace_modified = copy(g:airline#themes#simple#palette.normal_modified)
 
 
-    let s:V1 = [ s:guibg, '#dfdf00' , s:termbg2, 2]
-    let s:V2 = [ '#ff5f00' , s:guibg2, 0, 247 ]
-    let s:V3 = [ '#767676' , s:guibg, 10 , 8 ]
+    let s:V1 = [ s:guibg, '#91b859' , 232, 10]
+    let s:V2 = s:N2
+    let s:V3 = [ '#c3e88d' , s:guibg2, 2 , 8 ]
     let g:airline#themes#simple#palette.visual = airline#themes#generate_color_map(s:V1, s:V2, s:V3)
     let g:airline#themes#simple#palette.visual_modified = copy(g:airline#themes#simple#palette.normal_modified)
 
 
-    let s:IA  = [ '#4e4e4e' , s:guibg  , 167 , 8 , '' ]
-    let s:IA2 = [ '#4e4e4e' , s:guibg2 , 4 , 8, '' ]
+    let s:IA  = [ '#d75f5f' , s:guibg2  , 167 , 8 , '' ]
+    let s:IA2 = [ '#6182b8' , s:guibg2 , 4 , 8, '' ]
     let g:airline#themes#simple#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA2, s:IA2)
     let g:airline#themes#simple#palette.inactive_modified = {
-          \ 'airline_c': [ '#df0000', '', 160, '', '' ] ,
+          \ 'airline_c': [ '#ffcb6b', '', 3, '', '' ] ,
           \ }
 
     " Warnings
@@ -459,7 +482,5 @@ else
 
     let g:airline#themes#simple#palette.replace_modified.airline_error =
                 \ g:airline#themes#simple#palette.normal.airline_error
-   let g:airline_skip_empty_sections = 1
-endif
 " }}}
 
