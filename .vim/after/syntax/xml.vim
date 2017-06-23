@@ -1,7 +1,7 @@
 syn match xmlFunction 'call-template\|makefault\|template\( \|>\)\@=\|log\|validate'
 syn match db 'dblookup\|dbreport\|class\|payloadFactory'
 syn match filter '\(filter\|then\|send\|else\|on-fail\|drop\|call\(>\)\@=\|respond\|store\|choose\|when\|otherwise\)'
-syn match property '\(property\|address\|header\|endpoint\|attribute\|reason\|detail\)\( \|>\)\@='
+syn match property '\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@='
 syn match sequence '\(</\?\)\@<=sequence'
 syn match param 'parameter\|result\|dsName\|target\|with-param\|format\|source\|param'
 syn match connection 'connection\|statement\|resource\|stylesheet'
@@ -67,10 +67,10 @@ highlight xmlXsl ctermfg=1
 hi def link xmlEnrich Operator
 hi def link xmlType Type
 hi def link xmlFunction Function
-highlight param ctermfg=10
+hi def link param StringPunct
 highlight connection ctermfg=13
 highlight link property Constant
-highlight sequence ctermfg=10
+hi def link sequence StringPunct
 highlight link db Identifier
 highlight link filter Keyword
 highlight xmlAttrib ctermfg=152

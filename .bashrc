@@ -22,10 +22,12 @@
 # a patch to the cygwin mailing list.
 
 # User dependent .bashrc file
-# /bin/zsh; exit
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
+if [[ $(uname -s) == CYGWIN* ]]; then
+    /bin/zsh; exit
+fi
 # Shell Options
 #
 # See man bash for more options...

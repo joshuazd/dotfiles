@@ -138,8 +138,8 @@ if exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
 else
   let s:cterm_foreground = "15"
   let s:cterm_selection  = "8"
-  let s:cterm_line       = "235"
-  let s:cterm_comment    = "242"
+  let s:cterm_line       = "0"
+  let s:cterm_comment    = "8"
   let s:cterm_red        = "9"
   let s:cterm_orange     = "3"
   let s:cterm_yellow     = "11"
@@ -151,14 +151,14 @@ else
   let s:cterm_purple     = "5"
   let s:cterm_cyan       = "6"
   let s:cterm_brown      = "137"
-  let s:cterm_delbg      = "0"
+  let s:cterm_delbg      = "9"
 endif
 
 let s:palette.cterm.background = { 'dark' : "0"              , 'light' : "254" }
 let s:palette.cterm.foreground = { 'dark' : s:cterm_foreground , 'light' : "16"  }
 let s:palette.cterm.window     = { 'dark' : "236"              , 'light' : "247" }
 let s:palette.cterm.selection  = { 'dark' : s:cterm_selection  , 'light' : "250" }
-let s:palette.cterm.line       = { 'dark' : s:cterm_line       , 'light' : "252" }
+let s:palette.cterm.line       = { 'dark' : s:cterm_line       , 'light' : s:cterm_line }
 let s:palette.cterm.comment    = { 'dark' : s:cterm_comment    , 'light' : "59"  }
 let s:palette.cterm.red        = { 'dark' : s:cterm_red        , 'light' : "52"  }
 let s:palette.cterm.orange     = { 'dark' : s:cterm_orange     , 'light' : "94"  }
@@ -305,18 +305,19 @@ exe "let s:sp_darkpurple = ' guisp=". s:palette.gui.darkpurple[s:style] ."'"
 if exists("g:enable_bold_font") && g:enable_bold_font == 1
     let s:fg_bold = s:fmt_bold
 else
-    let s:fg_bold = s:fmt_none
+    let s:fg_bold = s:fmt_bold
 endif
 
 "}}}
 " Vim Highlighting: (see :help highlight-groups)"{{{
 " ----------------------------------------------------------------------------
-exe "hi! ColorColumn"   .s:fg_none        .s:bg_line        .s:fmt_none
+exe "hi! ColorColumn"   .s:fg_none        .s:bg_none        .s:fmt_none
 "   Conceal"
 "   Cursor"
+exe "hi! Cursor cterm=reverse"
 "   CursorIM"
-exe "hi! CursorColumn"  .s:fg_none        .s:bg_line        .s:fmt_none
-exe "hi! CursorLine"    .s:fg_none        .s:bg_line        .s:fmt_none
+exe "hi! CursorColumn"  .s:fg_none        .s:bg_none        .s:fmt_none
+exe "hi! CursorLine"    .s:fg_none        .s:bg_none        .s:fmt_none
 exe "hi! Directory"     .s:fg_blue        .s:bg_none        .s:fmt_none
 exe "hi! DiffAdd"       .s:fg_addfg       .s:bg_addbg       .s:fmt_none
 exe "hi! DiffChange"    .s:fg_changefg    .s:bg_changebg    .s:fmt_none
@@ -362,9 +363,9 @@ hi LongLineWarning  guifg=NONE        guibg=#371F1C     gui=underline ctermfg=NO
 if !has('gui_running') && exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:bg_normal = s:bg_none
 else
-  let s:bg_normal = s:bg_none
+  let s:bg_normal = s:bg_background
 endif
-exe "hi! Normal"        .s:fg_foreground  .s:bg_background      .s:fmt_none
+exe "hi! Normal"        .s:fg_foreground  .s:bg_none      .s:fmt_none
 
 "}}}
 " Generic Syntax Highlighting: (see :help group-name)"{{{
@@ -380,9 +381,9 @@ exe "hi! StringPunct"     .s:fg_lightgreen  .s:bg_none        .s:fmt_none
 "   Float"
 
 exe "hi! Identifier"      .s:fg_yellow      .s:bg_none       .s:fmt_none
-exe "hi! Function"        .s:fg_blue        .s:bg_none        .s:fg_bold
+exe "hi! Function"        .s:fg_blue        .s:bg_none        .s:fmt_none
 
-exe "hi! Statement"       .s:fg_purple        .s:bg_none        .s:fg_bold
+exe "hi! Statement"       .s:fg_purple        .s:bg_none        .s:fmt_none
 "   Conditional"
 "   Repeat"
 "   Label"
@@ -390,20 +391,20 @@ exe "hi! Operator"        .s:fg_brown        .s:bg_none        .s:fmt_none
 exe "hi! Keyword"        .s:fg_purple        .s:bg_none        .s:fmt_none
 "   Exception"
 
-exe "hi! PreProc"         .s:fg_aqua        .s:bg_none        .s:fg_bold
-"   Include"
+exe "hi! PreProc"         .s:fg_aqua        .s:bg_none        .s:fmt_none
+exe "hi! Include"         .s:fg_purple      .s:bg_none        .s:fmt_none
 "   Define"
 "   Macro"
 "   PreCondit"
 
 exe "hi! Language"        .s:fg_pink        .s:bg_none        .s:fmt_none
-exe "hi! Type"            .s:fg_orange      .s:bg_none        .s:fg_bold
+exe "hi! Type"            .s:fg_yellow      .s:bg_none        .s:fmt_ital
 "   StorageClass"
 exe "hi! Structure"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 "   Typedef"
 
 exe "hi! Special"         .s:fg_red         .s:bg_none        .s:fmt_none
-"   SpecialChar"
+exe "hi! SpecialChar"     .s:fg_aqua        .s:bg_none        .s:fg_bold
 "   Tag"
 exe "hi! Delimiter"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 "   SpecialComment"
