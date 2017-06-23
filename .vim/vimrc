@@ -1,7 +1,6 @@
 set nocompatible
 filetype off
-set runtimepath+=~/.vim/bundle/vundle
-execute pathogen#infect()
+set runtimepath+=~/.vim/bundle/Vundle.vim
 call vundle#rc()
 
 Plugin 'VundleVim/Vundle.vim'
@@ -13,7 +12,6 @@ Plugin 'junegunn/goyo.vim'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'wting/gitsessions.vim'
 Plugin 'luochen1990/rainbow'
-Plugin 'ervandew/supertab'
 Plugin 'gerw/vim-HiLinkTrace'
 Plugin 'vim-airline/vim-airline'
 Plugin 'easymotion/vim-easymotion'
@@ -21,7 +19,17 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'airblade/vim-gitgutter'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'vim-airline/vim-airline-themes'
+Plugin 'MarcWeber/vim-addon-mw-utils'
+Plugin 'tomtom/tlib_vim'
+"Plugin 'garbas/vim-snipmate'
+Plugin 'Shougo/neosnippet'
+Plugin 'Shougo/neosnippet-snippets'
+Plugin 'justmao945/vim-clang'
+Plugin 'shougo/neocomplete.vim'
+"Plugin 'ervandew/supertab'
+"Plugin 'valloric/youcompleteme'
 
+call vundle#end()
 filetype plugin indent on
 
 
@@ -30,6 +38,8 @@ filetype plugin indent on
 set so=999
 set sidescroll=1
 set sidescrolloff=15
+
+runtime macros/matchit.vim
 
 " Turn on the WiLd menu
 set wildmenu
@@ -144,6 +154,8 @@ autocmd FileType python setlocal foldmethod=indent
 " Make enter create a new line
 nnoremap <CR> o<ESC>
 
+let g:ycm_key_invoke_completion = "<Leader>i"
+
 " make 0 work better
 nnoremap 0 ^
 nnoremap ^ 0
@@ -209,6 +221,8 @@ nnoremap <Leader>0 :10b<CR>
 
 map <Leader>o :only<CR>
 
+" Close preview window when leaving insert mode
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 
 " netrw setup {{{
 let g:netrw_winsize = -28
@@ -237,12 +251,61 @@ set listchars=tab:>-,trail:~,extends:>,space:.,eol:$
 autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
 autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
 
-" Supertab setup {{{
-let g:SuperTabDefaultCompletionType = "context"
-let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
-let g:SuperTabLongestHighlight = 1
-let g:SuperTabCrMapping = 1
+" neocomplete setup {{{
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_smart_case = 1
+let g:neocomplete#enable_auto_select = 1
+"inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+            \ "\<Plug>(neosnippet_expand_or_jump)"
+            \: pumvisible() ? "\<C-n>" : "\<TAB>"
+smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
+            \ "\<Plug>(neosnippet_expand_or_jump)"
+            \: "\<TAB>"
+let g:neosnippet#enable_snipmate_compatibility = 1
+
+if !exists('g:neocomplete#force_omni_input_patterns')
+    let g:neocomplete#force_omni_input_patterns = {}
+endif
+
+" python setup
+autocmd FileType python setlocal omnifunc=jedi#completions
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#smart_auto_mappings = 0
+let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+
+
+" clang setup
+" disable auto completion for vim-clang
+let g:clang_auto = 0
+" default 'longest' can not work with neocomplete
+let g:clang_c_completeopt = 'menuone,preview'
+let g:clang_cpp_completeopt = 'menuone,preview'
+"let g:clang_library_path='/usr/lib'
+autocmd FileType c setlocal omnifunc=ClangComplete
+let g:neocomplete#force_omni_input_patterns.c =
+      \ '\h\w*\%(\.\|->\)\w*'
+let g:neocomplete#force_omni_input_patterns.cpp =
+      \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
+let g:neocomplete#force_omni_input_patterns.objc =
+      \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
+let g:neocomplete#force_omni_input_patterns.objcpp =
+      \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)\|\h\w*::\w*'
+let g:clang_verbose_pmenu = 1
+"let g:clang_complete_auto = 0
+"let g:clang_auto_select = 0
+"let g:clang_omnicppcomplete_compliance = 0
+"let g:clang_make_default_keymappings = 0
+
 " }}}
+
+"" Supertab setup {{{
+"let g:SuperTabDefaultCompletionType = "context"
+"let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
+"" let g:SuperTabLongestHighlight = 1
+"let g:SuperTabCrMapping = 1
+"" }}}
 
 " Ansible setup {{{
 let g:ansible_unindent_after_newline = 1
@@ -266,6 +329,8 @@ let g:jedi#show_call_signatures = 2
 " SnipMate setup {{{
 let g:snipMate = {}
 let g:snipMate.snippet_version = 1
+"imap <TAB> <Plug>snipMateTrigger
+"imap <TAB> <Plug>snipMateNextOrTrigger
 
 " }}}
 
@@ -314,7 +379,8 @@ let g:rainbow_conf = {
             \   'xml': 0,
             \   'vim': 0,
             \   'python': 0,
-            \   'sh': 0
+            \   'sh': 0,
+            \   'c': 0
             \  }
             \}
 
@@ -328,6 +394,7 @@ if has("gui_running")
 else
     " Set line number color as darkgray
     highlight LineNr ctermfg=8
+    highlight Cursor cterm=reverse
     let g:hybrid_custom_term_colors=1
 endif
 
