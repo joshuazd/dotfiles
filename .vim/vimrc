@@ -490,7 +490,7 @@ endif
 
 
     let s:IA  = [ '#d75f5f' , s:guibg2  , 167 , 8 , '' ]
-    let s:IA2 = [ '#6182b8' , s:guibg2 , 4 , 8, '' ]
+    let s:IA2 = [ '#6182b8' , s:guibg2 , 12 , 8, '' ]
     let g:airline#themes#simple#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA2, s:IA2)
     let g:airline#themes#simple#palette.inactive_modified = {
           \ 'airline_c': [ '#ffcb6b', '', 3, '', '' ] ,
