@@ -84,7 +84,7 @@ endif
 
     syn match pythonIdentifier "\h\w*" contained
     syn region pythonGroup matchgroup=pythonBrackets start="(" end=")" contains=pythonGroupParam
-    syn match pythonGroupParam "[^)]*" contained contains=pythonIdentifier,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup skipwhite
+    syn match pythonGroupParam "[^)]*" contained contains=pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup skipwhite
 
     syn keyword pythonCoding def skipwhite
     syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|call\|cmp\|coerce\|complex\|contains\|del\|delattr\|delete\|delitem\|delslice\|div\|divmod\|enter\|eq\|exit\|float\|floordiv\|ge\|get\|getattr\|getattribute\|getitem\|getslice\|gt\|hash\|hex\|iadd\|iand\|idiv\|ifloordiv\|ilshift\|imod\|imul\|init\|int\|invert\|ior\|ipow\|irshift\|isub\|iter\|itruediv\|ixor\|le\|len\|long\|lshift\|lt\|mod\|mul\|ne\|neg\|new\|nonzero\|oct\|or\|pos\|pow\|radd\|rand\|rdiv\|rdivmod\|repr\|rfloordiv\|rlshift\|rmod\|rmul\|ror\|rpow\|rrshift\|rshift\|rsub\|rtruediv\|rxor\|set\|setattr\|setitem\|setslice\|str\|sub\|truediv\|unicode\|xor\)__" contained
@@ -92,7 +92,8 @@ endif
     syn match pythonFunctionCall "\h\(\w\)*(\@=" contains=@pythonBuiltinFuncC nextgroup=pythonFuncParams
     syn cluster pythonBuiltinFuncC add=pythonBuiltinFunc,pythonPrint,pythonMagic
     syn region pythonFuncParams matchgroup=pythonBrackets start="(" end=")" contained contains=pythonFuncParam,pythonPunct
-    syn match pythonFuncParam "[^,)]*" contained contains=pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup skipwhite
+    syn match pythonKeywordParam "\(=\s*\)\@<=\h\w*" contained
+    syn match pythonFuncParam "[^,)]*" contained contains=pythonKeywordParam,pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup skipwhite
 
 
     syn match pythonFunction "\(\(def\s\|@\)\s*\)\@<=\h\(\w\|\.\)*" contains=@pythonFuncC nextgroup=pythonVars
@@ -125,7 +126,7 @@ endif
     syn match pythonItemAccess "\h\(\w\)*\[\@=" nextgroup=pythonAccess
 
     syn region pythonList matchgroup=pythonBrackets start="\[" end="\]" contains=pythonListParam
-    syn match pythonListParam "[^\]]*" contained contains=pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup skipwhite
+    syn match pythonListParam "[^\]]*" contained contains=pythonIdentifier,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup skipwhite
 
     syn match pythonPunct ":"
     syn match pythonPunct ","
@@ -305,10 +306,10 @@ endif
     " endif
 
     " if g:pymode_syntax_builtin_types
-        syn keyword pythonBuiltinType type object
-        syn keyword pythonBuiltinType str basestring unicode buffer bytearray bytes chr unichr
-        syn keyword pythonBuiltinType dict int long bool float complex set frozenset list tuple
-        syn keyword pythonBuiltinType file super
+        syn keyword pythonBuiltinType nextgroup=pythonFuncParams type object
+        syn keyword pythonBuiltinType nextgroup=pythonFuncParams str basestring unicode buffer bytearray bytes chr unichr
+        syn keyword pythonBuiltinType nextgroup=pythonFuncParams dict int long bool float complex set frozenset list tuple
+        syn keyword pythonBuiltinType nextgroup=pythonFuncParams file super
     " endif
 
     " Builtin functions
@@ -397,7 +398,7 @@ endif
 
     hi link  pythonDecorator    Define
     hi link  pythonDottedName   Function
-    hi link  pythonDot          PreProc
+    hi link  pythonDot          Comment
 
     hi link  pythonComment      Comment
     hi! link  pythonCoding       Special
@@ -416,8 +417,7 @@ endif
     hi link  pythonRawString    String
     hi link  pythonUniRawString String
 
-    hi link  pythonEscape       PreProc
-    highlight pythonEscape ctermfg=14 cterm=bold
+    hi link  pythonEscape       SpecialChar
     hi link  pythonEscapeError  Error
     hi link  pythonUniEscape    PreProc
     hi link  pythonUniEscapeError Error
@@ -440,11 +440,11 @@ endif
     hi link  pythonHexError     Error
     hi link  pythonBinError     Error
 
-    hi link  pythonBuiltinType  Type
-    highlight pythonBuiltinType ctermfg=156
+    hi link  pythonBuiltinType  StringPunct
+    "highlight pythonBuiltinType ctermfg=156
     hi link  pythonBuiltinObj   Structure
     hi link  pythonBuiltinFunc  Function
-    highlight pythonBuiltinFunc ctermfg=202
+    highlight pythonBuiltinFunc ctermfg=208
 
     hi link  pythonPreProc      PreProc
     hi link  pythonItemAccess   Special
@@ -455,6 +455,7 @@ endif
     hi link  pythonPunct        PreProc
     hi link  pythonIdentifier   Identifier
     hi link  pythonPrint        Keyword
+    hi link  pythonKeywordParam pythonField
 
 let b:current_syntax = "python"
 
