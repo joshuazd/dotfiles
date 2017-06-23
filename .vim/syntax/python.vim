@@ -62,9 +62,9 @@
 
 " }}}
 
-""if exists("b:current_syntax")
-"  finish
-"endif
+if exists("b:current_syntax")
+  finish
+endif
 
 " For version 5.x: Clear all syntax items
 if version < 600
