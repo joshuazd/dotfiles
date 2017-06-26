@@ -28,6 +28,7 @@ Plugin 'justmao945/vim-clang'
 Plugin 'shougo/neocomplete.vim'
 "Plugin 'ervandew/supertab'
 "Plugin 'valloric/youcompleteme'
+Plugin 'christoomey/vim-tmux-navigator'
 
 call vundle#end()
 filetype plugin indent on
@@ -130,6 +131,7 @@ set cindent
 set cinkeys-=0#
 set indentkeys-=0#
 let g:is_posix = 1
+set term=xterm-256color
 "set nofoldenable
 
 " make leader a more sane keybinding
@@ -166,10 +168,6 @@ set backupdir=/tmp
 set noswapfile
 
 " Make moving around splits easier
-nnoremap <C-J> <C-W><C-J>
-nnoremap <C-K> <C-W><C-K>
-nnoremap <C-L> <C-W><C-L>
-nnoremap <C-H> <C-W><C-H>
 nnoremap <Leader>v :vs\|bn<CR>
 
 " Fold toggle keybind
@@ -280,12 +278,12 @@ let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*f
 " disable auto completion for vim-clang
 let g:clang_auto = 0
 " default 'longest' can not work with neocomplete
-let g:clang_c_completeopt = 'menuone,preview'
-let g:clang_cpp_completeopt = 'menuone,preview'
+let g:clang_c_completeopt = 'longest,menuone,preview'
+let g:clang_cpp_completeopt = 'longest,menuone,preview'
 "let g:clang_library_path='/usr/lib'
 autocmd FileType c setlocal omnifunc=ClangComplete
 let g:neocomplete#force_omni_input_patterns.c =
-      \ '\h\w*\%(\.\|->\)\w*'
+      \ '\h\%(\w\|\.\|->\)*'
 let g:neocomplete#force_omni_input_patterns.cpp =
       \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
 let g:neocomplete#force_omni_input_patterns.objc =
@@ -374,7 +372,7 @@ set runtimepath^=~/.vim/bundle/ctrlp.vim
 let g:rainbow_active = 1
 
 let g:rainbow_conf = {
-            \ 'ctermfgs': ['cyan','yellow', 'magenta', 'lightcyan', 'red', 'lightblue', 'green'],
+            \ 'ctermfgs': [14, 11, 10, 9, 6, 5],
             \ 'separately': {
             \   'xml': 0,
             \   'vim': 0,
