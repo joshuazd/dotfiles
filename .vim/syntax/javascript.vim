@@ -42,7 +42,7 @@ syn match javaScriptDeref "\."
 
 syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams
 syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptFuncParam
-syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS skipwhite
+syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS skipwhite
 
 syn match javaScriptItemAccess "\h\w*\[\@="
 
@@ -55,7 +55,7 @@ syn keyword javaScriptConditional	else switch
 syn keyword javaScriptRepeat		while for do in
 syn keyword javaScriptBranch		break continue
 syn keyword javaScriptOperator		instanceof typeof
-syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/"
+syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&"
 syn keyword javaScriptType		Array Boolean Date Function Number Object String RegExp nextgroup=javaScriptFuncParams
 syn keyword javaScriptStatement		return with
 syn keyword javaScriptBoolean		true false
