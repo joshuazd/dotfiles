@@ -29,6 +29,9 @@ Plugin 'shougo/neocomplete.vim'
 "Plugin 'ervandew/supertab'
 "Plugin 'valloric/youcompleteme'
 Plugin 'christoomey/vim-tmux-navigator'
+if has("win32unix")
+    Plugin 'pearofducks/ansible-vim'
+endif
 
 call vundle#end()
 filetype plugin indent on
@@ -156,8 +159,6 @@ autocmd FileType python setlocal foldmethod=indent
 " Make enter create a new line
 nnoremap <CR> o<ESC>
 
-let g:ycm_key_invoke_completion = "<Leader>i"
-
 " make 0 work better
 nnoremap 0 ^
 nnoremap ^ 0
@@ -183,8 +184,7 @@ inoremap <c-e> <esc>A
 " nnoremap <c-a> <home>
 nnoremap <c-e> <end>
 
-"autocmd BufWritePost *.py :PymodeLintAuto
-set foldlevel=99
+set foldlevel=12
 
 " make it easier to use buffers
 nnoremap <Leader>l :bn<CR>
@@ -260,7 +260,11 @@ imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
 smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
             \ "\<Plug>(neosnippet_expand_or_jump)"
             \: "\<TAB>"
-let g:neosnippet#enable_snipmate_compatibility = 1
+imap <expr><CR>
+            \ (pumvisible() && neosnippet#expandable()) ?
+            \ "\<Plug>(neosnippet_expand)" : "\<CR>"
+let g:neosnippet#enable_snipmate_compatibility = 0
+let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
 
 if !exists('g:neocomplete#force_omni_input_patterns')
     let g:neocomplete#force_omni_input_patterns = {}
@@ -391,8 +395,7 @@ if has("gui_running")
     set guitablabel=%M\ %t
 else
     " Set line number color as darkgray
-    highlight LineNr ctermfg=8
-    highlight Cursor cterm=reverse
+    " highlight LineNr ctermfg=8
     let g:hybrid_custom_term_colors=1
 endif
 
