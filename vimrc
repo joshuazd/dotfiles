@@ -26,6 +26,7 @@ Plugin 'Shougo/neosnippet-snippets'
 Plugin 'justmao945/vim-clang'
 Plugin 'shougo/neocomplete.vim'
 Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'godlygeek/tabular'
 if has("win32unix") || $USER ==? "vagrant"
     Plugin 'pearofducks/ansible-vim'
 endif
@@ -58,7 +59,6 @@ set noerrorbells                " No annoying sound on errors
 set novisualbell
 set t_vb=
 set tm=500
-set t_Co=256                    " Use 256 colors
 set splitbelow                  " Make splits behave better
 set splitright
 set background=dark             " dark background
