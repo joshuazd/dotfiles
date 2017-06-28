@@ -7,11 +7,11 @@ git submodule foreach git pull origin master
 # install Vundle
 echo "Cloning Vundle"
 mkdir -p .vim/bundle
-git clone https://github.com/VundleVim/Vundle.vim.git .vim/bundle/Vundle.vim
+git clone https://github.com/VundleVim/Vundle.vim.git vim/bundle/Vundle.vim
 
 # install oh my zsh
 echo "Installing oh my zsh"
-if [ -f /bin/zsh -o -f /usr/bin/zsh -o -f /bin/zsh.exe -o -f /usr/bin/zsh.exe]; then
+if [ -f /bin/zsh -o -f /usr/bin/zsh -o -f /bin/zsh.exe -o -f /usr/bin/zsh.exe ]; then
     if [[ ! -d $HOME/.oh-my-zsh/ ]]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     fi
