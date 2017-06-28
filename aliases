@@ -11,6 +11,10 @@ alias lt='ls -lrt'
 unalias l
 alias l='ls -lF'
 
+alias mv='mv -i'
+alias cp='cp -i'
+alias j=jobs
+
 alias python='python3'
 alias search='find . -type f -name'
 alias vi='vim'

@@ -8,7 +8,19 @@ function virtualenv_info {
     else
         venv=''
     fi
-    [[ -n "$venv" ]] && echo "$BG[003] $FG[000]$venv%{$reset_color%}$FG[003]$BG[008]$SEP"
+    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        [[ -n "$venv" ]] && echo "$BG[003] $FG[000]$venv%{$reset_color%}$FG[003]$BG[008]$SEP"
+    else
+        [[ -n "$venv" ]] && echo "$BG[003] $FG[000]$venv%{$reset_color%}$FG[003]$BG[012]$SEP"
+    fi
+}
+
+function user {
+    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        echo -n "$BG[008] %{$fg[green]%}%n $BG[012]$FG[008]$SEP"
+    else
+        echo -n ""
+    fi
 }
 
 
@@ -27,7 +39,8 @@ function custom_git_status {
         if ! $(git diff-files --quiet --ignore-submodules --); then
             # unstaged changes
 
-            indicators+=$'\u26a1'
+            # indicators+=$'\u26a1'
+            indicators+='*'
         fi
         if [ -n "$(git ls-files --others --exclude-standard)" ]; then
             # untracked files
@@ -63,7 +76,7 @@ function custom_git_status {
 SEP=$'\ue0b0'
 RIGHT_SEP=$'\ue0b2'
 
-PROMPT='$(virtualenv_info)$BG[008] %{$fg[green]%}%n $BG[012]$FG[008]$SEP %1~ $BG[013]$FG[012]$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
+PROMPT='$(virtualenv_info)$(user)$BG[012]$FG[008] %2~ $BG[013]$FG[012]$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
 
 RPS1='$(custom_git_status)%{$reset_color%}'
 
