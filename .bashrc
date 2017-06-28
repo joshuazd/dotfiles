@@ -130,8 +130,8 @@ export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls:l' # Ignore the ls command as well
 # Aliases
 #
 # Some people use a different file for aliases
-if [ -f "${HOME}/.bash_aliases" ]; then
-  source "${HOME}/.bash_aliases"
+if [ -f "${HOME}/.aliases" ]; then
+  source "${HOME}/.aliases"
 fi
 #
 # Some example alias instructions

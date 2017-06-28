@@ -93,8 +93,8 @@ alias mvnc='source $ZSH_CUSTOM/mvncolor.sh'
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-if [ -f "${HOME}/.zsh_aliases" ]; then
-      source "${HOME}/.zsh_aliases"
+if [ -f "${HOME}/.aliases" ]; then
+      source "${HOME}/.aliases"
 fi
 
 stty -ixon
