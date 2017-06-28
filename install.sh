@@ -27,7 +27,7 @@ if [ -f $HOME/.vimrc ]; then
     echo "Backing up existing vimrc to .vimrc.old"
     mv $HOME/.vimrc $HOME/.vimrc.old
 fi
-ln -s $PWD/vim/vimrc $HOME/.vimrc
+ln -s $PWD/vimrc $HOME/.vimrc
 
 if [ -f $HOME/.bashrc ]; then
     echo "Backing up existing bashrc to .bashrc.old"

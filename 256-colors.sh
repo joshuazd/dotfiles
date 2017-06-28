@@ -1,11 +1,18 @@
 for fgbg in 38 48 ; do #Foreground/Background
-    for color in {0..256} ; do #Colors
+    for color in {0..15} ; do #Colors
         #Display the color
-        echo -en "\e[${fgbg};5;${color}m ${color}\t\e[0m"
+        echo -en "\e[${fgbg};5;${color}m ${color} \t\e[0m"
         #Display 10 colors per lines
         if [ $((($color + 1) % 8)) == 0 ] ; then
             echo #New line
-            echo
+        fi
+    done
+    for color in {16..255} ; do #Colors
+        #Display the color
+        echo -en "\e[${fgbg};5;${color}m ${color} \t\e[0m"
+        #Display 10 colors per lines
+        if [ $((($color - 15) % 6)) == 0 ] ; then
+            echo #New line
         fi
     done
     echo #New line
