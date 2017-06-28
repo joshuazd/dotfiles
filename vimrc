@@ -29,7 +29,7 @@ Plugin 'shougo/neocomplete.vim'
 "Plugin 'ervandew/supertab'
 "Plugin 'valloric/youcompleteme'
 Plugin 'christoomey/vim-tmux-navigator'
-if has("win32unix")
+if has("win32unix") || $USER ==? "vagrant"
     Plugin 'pearofducks/ansible-vim'
 endif
 
