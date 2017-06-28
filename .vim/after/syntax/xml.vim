@@ -13,9 +13,9 @@ let cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlSQL syntax/sql.vim
 syn region xmlSqlRegion
-    \ start=+\(<sql>\)\@<=+
+    \ start=+\%(<sql>\)\@<=+
     \ keepend
-    \ end=+\(</sql>\)\@=+
+    \ end=+\%(</sql>\)\@=+
     \ contained
     \ contains=@xmlSQL
 let b:current_syntax = cur_syntax
@@ -73,5 +73,4 @@ highlight link property Constant
 hi def link sequence StringPunct
 highlight link db Identifier
 highlight link filter Keyword
-highlight xmlAttrib ctermfg=152
 highlight xmlSqlTag ctermfg=202

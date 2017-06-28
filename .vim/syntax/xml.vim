@@ -296,16 +296,16 @@ unlet b:current_syntax
 " synchronizing
 " TODO !!! to be improved !!!
 
-syn sync match xmlSyncDT grouphere  xmlDocType +\_.\(<!DOCTYPE\)\@=+
-" syn sync match xmlSyncDT groupthere  NONE       +]>+
-
-if exists('g:xml_syntax_folding')
-    syn sync match xmlSync grouphere   xmlRegion  +\_.\(<[^ /!?<>"']\+\)\@=+
-    " syn sync match xmlSync grouphere  xmlRegion "<[^ /!?<>"']*>"
-    syn sync match xmlSync groupthere  xmlRegion  +</[^ /!?<>"']\+>+
-endif
-
-syn sync minlines=100
+"syn sync match xmlSyncDT grouphere  xmlDocType +\_.\(<!DOCTYPE\)\@=+
+"" syn sync match xmlSyncDT groupthere  NONE       +]>+
+"
+"if exists('g:xml_syntax_folding')
+"    syn sync match xmlSync grouphere   xmlRegion  +\_.\(<[^ /!?<>"']\+\)\@=+
+"    " syn sync match xmlSync grouphere  xmlRegion "<[^ /!?<>"']*>"
+"    syn sync match xmlSync groupthere  xmlRegion  +</[^ /!?<>"']\+>+
+"endif
+"
+"syn sync minlines=100
 
 
 " The default highlighting.
@@ -325,6 +325,7 @@ hi def link xmlOperator         PreProc
 
 hi def link xmlAttribPunct	Comment
 hi def link xmlAttrib		Type
+highlight xmlAttrib ctermfg=152
 
 hi def link xmlString		String
 hi def link xmlComment		Comment

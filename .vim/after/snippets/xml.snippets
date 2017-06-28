@@ -1,0 +1,142 @@
+snippet     api
+abbr        api
+	<api xmlns="http://ws.apache.org/ns/synapse" name="${1:api_name}" context="/${2:context}">
+		<resource methods="${3:method}">
+		</resource>
+	</api>
+
+snippet     ct
+abbr        call-template
+	<call-template target="${1:Logger Name}">
+		<with-param name="message" value="${2:Log Message}"/>
+	</call-template>
+
+snippet     dbl
+abbr        dblookup
+	<dblookup>
+		<connection>
+			<pool>
+				<dsName>jdbc/${1:db name}</dsName>
+			</pool>
+		</connection>
+		<statement>
+			<sql>${2:SQL Statement}</sql>
+			<parameter expression="${3:param expression}" type="${4:STRING}"/>
+			<result name="${5:result}" column="${6:column}"/>
+		</statement>
+	</dblookup>
+
+snippet     ep
+abbr        endpoint
+	<endpoint xmlns="http://ws.apache.org/ns/synapse" name="conf/${1}">
+		<http method="${2:get}" uri-template="${3}"/>
+	</endpoint>
+
+snippet     enr
+abbr        enrich
+	<enrich>
+		<source type="${1:source type}" $3/>
+		<target type="${2:target type}" $4/>
+	</enrich>
+
+snippet     fault
+abbr        makefault
+	<makefault version="pox">
+		<reason value="${1:reason}" />
+		<detail ${2:expression="${3:detail}"} />
+	</makefault>
+
+snippet     fil
+abbr        filter
+	<filter xpath="${1:xpath expression}">
+		<then>
+			${0}
+		</then>
+		<else>
+			${0}
+		</else>
+	</filter>
+
+snippet     header
+abbr        header
+	<header name="${1:name}" scope="transport" value="${2:value}" />
+
+snippet     logg
+abbr        logging template
+	<?xml version="1.0" encoding="UTF-8"?>
+	<template xmlns="http://ws.apache.org/ns/synapse" name="${1:Logger Name}">
+		<parameter name="message"/>
+		<sequence>
+			<filter xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" xpath="fn:boolean(\$ctx:messageId)">
+				<then/>
+				<else>
+					<filter xmlns:pan="http://panera.wso2.esb" xpath="\$trp:messageId">
+						<then>
+							<property name="messageId" expression="get-property('transport', 'messageId')" scope="default" type="STRING"/>
+						</then>
+						<else>
+							<property name="messageId" expression="get-property('MessageID')" scope="default" type="STRING"/>
+							<header name="messageId" scope="transport" expression="get-property('messageId')"/>
+						</else>
+					</filter>
+				</else>
+			</filter>
+			<log level="custom">
+				<property xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" name="message" expression="\$func:message"/>
+				<property name="serviceName" value="${2:Service Name}"/>
+				<property xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" name="messageId" expression="get-property('messageId')"/>
+			</log>
+		</sequence>
+	</template>
+
+snippet     nil
+abbr        nilElement
+	<xsl:template name="nilElement">
+		<xsl:param name="value" />
+		<xsl:choose>
+			<xsl:when test="string(\$value)">
+				<xsl:value-of select="\$value" />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:attribute name="xsi:nil" namespace="http://www.w3.org/2001/XMLSchema-instance">true</xsl:attribute>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+snippet     pay
+abbr        payloadFactory
+	<payloadFactory media-type="${1:xml}">
+		<format>
+			${2:<Success xmlns="">Thank you. Your file has been submitted.</Success>}
+		</format>
+		<args/>
+	</payloadFactory>
+
+snippet     prop
+abbr        property
+	<property name="${1:name}" ${2:value="${3:value\}"}${4: scope="${5:default\}"} />
+
+snippet     valof
+abbr        value-of
+	<xsl:value-of select="$1" />
+
+snippet     xct
+abbr        xsl call-template
+	<xsl:call-template name="nilElement">
+		<xsl:with-param name="value" select="$1" />
+	</xsl:call-template>
+
+snippet     xslt
+abbr        xslt
+	<xslt key="${1:XSLT Name}">
+		${2:<property name="BATCH_ID" expression="get-property('MessageID')"/>}
+	</xslt>
+
+snippet     xsl
+abbr        xslt file
+	<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns0="http://ws.wso2.org/dataservice" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" exclude-result-prefixes="xsi xsl xsd ns0">
+		${1:<xsl:param name="BATCH_ID" />}
+		<xsl:template match="/">
+			$2
+		</xsl:template>
+	</xsl:stylesheet>
