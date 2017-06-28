@@ -35,10 +35,6 @@ filetype plugin indent on
 runtime macros/matchit.vim
 " }}}
 
-if has("autocmd")
-  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-endif
-
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -175,10 +171,13 @@ autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab "
 autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
 autocmd BufNewFile,BufRead *.dbs set filetype=xml
 autocmd FileType python setlocal foldmethod=indent
-autocmd FileType vim setlocal foldmethod=marker
+autocmd FileType vim setlocal foldmethod=marker foldlevel=0
 "make folding work better with insert mode
 autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
 autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
 " }}}
 
 
