@@ -160,6 +160,8 @@ nnoremap Q q
 inoremap jk <Esc>
 " keybinding to see whitespace
 nnoremap <Leader>z :set invlist<CR>
+" easier completion
+inoremap <C-@> <C-x><C-o>
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -229,7 +231,7 @@ endfunction
         let g:clang_cpp_completeopt = 'longest,menuone,preview'
         autocmd FileType c setlocal omnifunc=ClangComplete
         let g:neocomplete#force_omni_input_patterns.c =
-              \ '\h\%(\w\|\.\|->\)*'
+              \ '\h\w*\%(\.\|->\)\w*'
         let g:neocomplete#force_omni_input_patterns.cpp =
               \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
         let g:neocomplete#force_omni_input_patterns.objc =
@@ -260,7 +262,7 @@ endfunction
 
 " Easymotion setup {{{
     map <Leader> <Plug>(easymotion-prefix)
-    nmap s <Plug>(easymotion-overwin-f)
+"    nmap s <Plug>(easymotion-overwin-f)
     map / <Plug>(easymotion-sn)
     omap / <Plug><easymotion-tn)
     let g:EasyMotion_startofline = 0
