@@ -175,9 +175,11 @@ autocmd FileType vim setlocal foldmethod=marker foldlevel=0
 "make folding work better with insert mode
 autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
 autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
-if has("autocmd")
-  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-endif
+autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+function TrimWhiteSpace()
+    %s/\s\+$//e
+    ''
+endfunction
 " }}}
 
 
