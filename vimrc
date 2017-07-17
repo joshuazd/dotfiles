@@ -268,8 +268,10 @@ endfunction
     let g:EasyMotion_startofline = 0
 " }}}
 
-" Set up ctrlP
+" ctrlP setup {{{
 set runtimepath^=~/.vim/bundle/ctrlp.vim
+let g:ctrlp_open_multiple_files = 'ri'
+" }}}
 
 " rainbow parens {{{
 let g:rainbow_active = 1
