@@ -30,8 +30,9 @@ if [[ $(uname -s) == CYGWIN* ]]; then
     alias wls='cd /c/apps/wls12120/user_projects/domains/mydomain/servers/myserver/logs'
     alias wso='cd /c/apps/wso2esb-4.8.1/bin'
 
-    alias mcar='cp *_Deployment/target/*.car /h/car-files/'
+    alias mcar='cp "`ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
     alias esb='sh /c/apps/wso2esb-4.8.1/bin/wso2server.sh'
     alias esblog='less +F /c/apps/wso2esb-4.8.1/repository/logs/wso2carbon.log'
+    alias subl='/c/Program\ Files/Sublime\ Text\ 3/subl.exe'
 fi
 
