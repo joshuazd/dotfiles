@@ -26,6 +26,8 @@ endif
 let s:cpo_save = &cpo
 set cpo&vim
 
+syn match javaScriptParenError "(\|)"
+syn region javaScriptParens start="(" end=")"
 
 syn keyword javaScriptCommentTodo      TODO FIXME XXX TBD contained
 syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommentTodo
@@ -42,7 +44,10 @@ syn match javaScriptDeref "\."
 
 syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams
 syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptFuncParam
-syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS skipwhite
+syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber skipwhite
+
+syn region javaScriptParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptParam
+syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS skipwhite
 
 syn match javaScriptItemAccess "\h\w*\[\@="
 
@@ -52,10 +57,10 @@ syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end
 
 syn keyword javaScriptConditional       if nextgroup=javaScriptFuncParams
 syn keyword javaScriptConditional	else switch
-syn keyword javaScriptRepeat		while for do in
+syn keyword javaScriptRepeat		while for do in nextgroup=javaScriptParams
 syn keyword javaScriptBranch		break continue
 syn keyword javaScriptOperator		instanceof typeof
-syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&"
+syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&\|>\|<"
 syn keyword javaScriptType		Array Boolean Date Function Number Object String RegExp nextgroup=javaScriptFuncParams
 syn keyword javaScriptStatement		return with
 syn keyword javaScriptBoolean		true false
@@ -101,7 +106,7 @@ hi def link javaScriptStringS		String
 hi def link javaScriptStringD		String
 hi def link javaScriptCharacter		Character
 hi def link javaScriptSpecialCharacter	javaScriptSpecial
-hi def link javaScriptNumber		javaScriptValue
+hi def link javaScriptNumber		Constant
 hi def link javaScriptConditional	Conditional
 hi def link javaScriptRepeat		Repeat
 hi def link javaScriptBranch		Conditional
@@ -115,6 +120,8 @@ hi def link javaScrParenError		javaScriptError
 hi def link javaScriptNull		Keyword
 hi def link javaScriptBoolean		Boolean
 hi def link javaScriptRegexpString	String
+hi def link javaScriptParens	        PreProc
+hi def link javaScriptParenError        Error
 
 hi def link javaScriptIdentifier	Type
 hi def link javaScriptLabel		Label

@@ -24,23 +24,28 @@ let cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlJavaScript syntax/javascript.vim
 syn region xmlJavaScriptRegion
-    \ start=+\(<script language="js">\)\@<=+
+    \ start=+<script language="js">+
     \ keepend
-    \ end=+\(</script>\)\@=+
+    \ end=+</script>+
     \ contained
-    \ contains=@xmlJavaScript
+    \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlJavaScript
 let b:current_syntax = cur_syntax
 
-let cur_syntax = b:current_syntax
-unlet! b:current_syntax
-syn include @xmlJavaScript syntax/javascript.vim
-syn region xmlJavaScriptRegion
-    \ matchgroup=xmlQuote start=+\(<script language="js">\)\@<=<!\[CDATA\[+
-    \ keepend
-    \ end=+\]\]>\(</script>\)\@=+
-    \ contained
-    \ contains=@xmlJavaScript
-let b:current_syntax = cur_syntax
+syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
+syn match xmlEndScriptTag +</script>+ contains=xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
+syn keyword  xmlCdataCdata CDATA          contained
+syn match    xmlCdataEnd   +]]>+          contained
+"let cur_syntax = b:current_syntax
+"unlet! b:current_syntax
+"syn include @xmlJavaScript syntax/javascript.vim
+"syn region xmlJavaScriptRegion
+"    \ start=+\(<script language="js">\)\(<!\[CDATA\[\)?+
+"    \ end=+\(\]\]>\)?\(</script>\)+
+"    \ contained
+"    \ contains=xmlCdata,xmlTag,xmlEndTag,@xmlJavaScript
+"syn cluster xmlCdataHook add=xmlJavaScript
+"let b:current_syntax = cur_syntax
 
 let cur_syntax = b:current_syntax
 unlet! b:current_syntax
@@ -71,6 +76,8 @@ hi def link param StringPunct
 highlight connection ctermfg=13
 highlight link property Constant
 hi def link sequence StringPunct
+hi def link xmlScriptTag xmlTag
+hi def link xmlEndScriptTag xmlTag
 highlight link db Identifier
 highlight link filter Keyword
 highlight xmlSqlTag ctermfg=202

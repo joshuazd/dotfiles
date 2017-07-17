@@ -338,9 +338,9 @@ hi def link xmlProcessingDelim	Comment
 hi def link xmlProcessing	Type
 
 hi def link xmlCdata		String
-hi def link xmlCdataCdata	Statement
-hi def link xmlCdataStart	Type
-hi def link xmlCdataEnd		Type
+hi def link xmlCdataCdata	xmlQuote
+hi def link xmlCdataStart	xmlQuote
+hi def link xmlCdataEnd		xmlQuote
 
 hi def link xmlDocTypeDecl	Function
 hi def link xmlDocTypeKeyword	Statement
