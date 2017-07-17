@@ -42,7 +42,7 @@ COMPLETION_WAITING_DOTS="true"
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
 # much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
+DISABLE_UNTRACKED_FILES_DIRTY="true"
 
 # Uncomment the following line if you want to change the command execution time
 # stamp shown in the history command output.
@@ -64,7 +64,7 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 #source $ZSH_CUSTOM/mvncolor.sh
-alias mvnc='source $ZSH_CUSTOM/mvncolor.sh'
+alias mvn-color='source $ZSH_CUSTOM/mvncolor.sh'
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
@@ -137,10 +137,6 @@ function ford() {
             cd "$d" && echo "$d" && "$@"
         fi
     done
-}
-
-fuction mcar() {
-    cp *_Deployment/target/*.car /h/car-files/
 }
 
 export PATH=~/pebble-dev/pebble-sdk-4.5-linux64/bin:$PATH
