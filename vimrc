@@ -27,6 +27,7 @@ Plugin 'justmao945/vim-clang'
 Plugin 'shougo/neocomplete.vim'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'godlygeek/tabular'
+Plugin 'tpope/vim-sleuth'
 if has("win32unix") || $USER ==? "vagrant"
     Plugin 'pearofducks/ansible-vim'
 endif
@@ -277,7 +278,7 @@ let g:ctrlp_open_multiple_files = 'ri'
 let g:rainbow_active = 1
 
 let g:rainbow_conf = {
-            \ 'ctermfgs': [14, 11, 10, 9, 6, 5],
+            \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
             \ 'separately': {
             \   'xml': 0,
             \   'vim': 0,

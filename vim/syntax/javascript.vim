@@ -44,10 +44,10 @@ syn match javaScriptDeref "\."
 
 syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams
 syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptFuncParam
-syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber skipwhite
+syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull skipwhite
 
 syn region javaScriptParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptParam
-syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS skipwhite
+syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNull skipwhite
 
 syn match javaScriptItemAccess "\h\w*\[\@="
 
@@ -117,7 +117,7 @@ hi def link javaScriptFunction		Function
 hi def link javaScriptBraces		PreProc
 hi def link javaScriptError		Error
 hi def link javaScrParenError		javaScriptError
-hi def link javaScriptNull		Keyword
+hi def link javaScriptNull		Constant
 hi def link javaScriptBoolean		Boolean
 hi def link javaScriptRegexpString	String
 hi def link javaScriptParens	        PreProc
