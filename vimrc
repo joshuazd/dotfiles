@@ -9,7 +9,7 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'w0rp/ale'
 Plugin 'kien/ctrlp.vim'
 Plugin 'vim-scripts/c.vim'
-Plugin 'raimondi/delimitmate'
+"Plugin 'raimondi/delimitmate'
 Plugin 'junegunn/goyo.vim'
 Plugin 'davidhalter/jedi-vim'
 Plugin 'wting/gitsessions.vim'
@@ -28,6 +28,7 @@ Plugin 'shougo/neocomplete.vim'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'godlygeek/tabular'
 Plugin 'tpope/vim-sleuth'
+Plugin 'jiangmiao/auto-pairs'
 if has("win32unix") || $USER ==? "vagrant"
     Plugin 'pearofducks/ansible-vim'
 endif
@@ -113,7 +114,7 @@ let mapleader = "\<Space>" " make leader a more sane keybinding
 let maplocalleader = "," " remap localleader
 let g:xml_syntax_folding=1 " enable xml folding
 " Make enter create a new line
-nnoremap <CR> o<ESC>
+nnoremap <CR> i<CR><ESC>
 " make 0 work better
 nnoremap 0 ^
 nnoremap ^ 0
@@ -126,8 +127,8 @@ nnoremap <silent> <Leader>q :noh<return><esc>
 " make it easier to use buffers
 nnoremap <Leader>l :bn<CR>
 nnoremap <Leader>h :bp<CR>
-map <Leader><Leader> :b#<CR>
-map <Leader>p :bp<CR>
+noremap <Leader><Leader> :b#<CR>
+noremap <Leader>p :bp<CR>
 " more standard 'close tab' behavior
 nnoremap <C-x> :bn\|bd #<CR>
 " treat wrapped lines as different lines
@@ -150,11 +151,11 @@ nnoremap <Leader>8 :8b<CR>
 nnoremap <Leader>9 :9b<CR>
 nnoremap <Leader>0 :10b<CR>
 " Close other splits easily
-map <Leader>o :only<CR>
+noremap <Leader>o :only<CR>
 " Easier to save
 nnoremap <C-s> :w<CR>
 nnoremap q :q<CR>
-imap <C-s> <Esc>:w<CR>i
+inoremap <C-s> <Esc>:w<CR>i
 " access to macros
 nnoremap Q q
 " Easier to exit insert mode
