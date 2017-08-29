@@ -96,6 +96,7 @@ set noswapfile
 set foldlevel=12                " don't fold most things
 set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
 set term=xterm-256color
+set omnifunc=syntaxcomplete#Complete    " enable omnicompletion
 if has("gui_running")
     set guifont=Liberation\ Mono\ for\ Powerline\ Regular\ 11
     set guioptions-=T
@@ -217,6 +218,12 @@ endfunction
     if !exists('g:neocomplete#force_omni_input_patterns')
         let g:neocomplete#force_omni_input_patterns = {}
     endif
+
+    " xml setup {{{
+        autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+        let g:neocomplete#force_omni_input_patterns.xml = '\%(<\|\s\|</\)[[:alnum:]-]*'
+        call neocomplete#custom#source('omni', 'rank', 1000)
+    " }}}
 
     " python setup {{{
         autocmd FileType python setlocal omnifunc=jedi#completions
