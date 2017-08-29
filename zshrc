@@ -123,7 +123,7 @@ function check_repos() {
         cd "$d"
         echo "$d"
         git update-index -q --refresh
-        if [[ -n `git status --porcelain` && -n $(git rev-list --left-right HEAD...@'{u}' 2>/dev/null) ]]; then
+        if [[ -n `git status --porcelain` || -n $(git rev-list --left-right HEAD...@'{u}' 2>/dev/null) ]]; then
             git status -u
         fi
         cd ..
