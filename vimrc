@@ -175,6 +175,7 @@ autocmd InsertLeave * if pumvisible() == 0|pclose|endif " Close preview window w
 autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab " Change tabs to be 2 spaces for xml files
 autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
 autocmd BufNewFile,BufRead *.dbs set filetype=xml
+autocmd BufNewFile,BufRead *.dmc set filetype=javascript
 autocmd FileType python setlocal foldmethod=indent
 autocmd FileType vim setlocal foldmethod=marker foldlevel=0
 "make folding work better with insert mode
@@ -221,7 +222,7 @@ endfunction
 
     " xml setup {{{
         autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-        let g:neocomplete#force_omni_input_patterns.xml = '\%(<\|\s\|</\)[[:alnum:]-]*'
+        let g:neocomplete#force_omni_input_patterns.xml = '</\?\|\s[A-Za-z0-9\-]*'
         call neocomplete#custom#source('omni', 'rank', 1000)
     " }}}
 
