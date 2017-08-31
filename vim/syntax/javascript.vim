@@ -47,7 +47,7 @@ syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="(" 
 syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull skipwhite
 
 syn region javaScriptParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptParam
-syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNull skipwhite
+syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptIn,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNull skipwhite
 
 syn match javaScriptItemAccess "\h\w*\[\@="
 
@@ -57,7 +57,8 @@ syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end
 
 syn keyword javaScriptConditional       if nextgroup=javaScriptFuncParams
 syn keyword javaScriptConditional	else switch
-syn keyword javaScriptRepeat		while for do in nextgroup=javaScriptParams
+syn keyword javaScriptRepeat		while for do nextgroup=javaScriptParams
+syn keyword javaScriptIn                in
 syn keyword javaScriptBranch		break continue
 syn keyword javaScriptOperator		instanceof typeof
 syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&\|>\|<"
@@ -111,6 +112,7 @@ hi def link javaScriptConditional	Conditional
 hi def link javaScriptRepeat		Repeat
 hi def link javaScriptBranch		Conditional
 hi def link javaScriptOperator		Operator
+hi def link javaScriptIn                Operator
 hi def link javaScriptType		StringPunct
 hi def link javaScriptStatement		Statement
 hi def link javaScriptFunction		Function
