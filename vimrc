@@ -29,6 +29,7 @@ Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'godlygeek/tabular'
 Plugin 'tpope/vim-sleuth'
 Plugin 'jiangmiao/auto-pairs'
+Plugin 'tpope/vim-commentary'
 if has("win32unix") || $USER ==? "vagrant"
     Plugin 'pearofducks/ansible-vim'
 endif

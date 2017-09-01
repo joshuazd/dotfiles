@@ -68,7 +68,7 @@ function custom_git_status {
         BRANCH=$'\ue0a0'
         CUSTOM_THEME_GIT_PROMPT_PREFIX=""
         CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
-        echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators${CUSTOM_THEME_GIT_PROMPT_SUFFIX}"
+        echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
     fi
 
 }
