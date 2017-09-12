@@ -103,7 +103,7 @@ endif
     syn match pythonParam "[^,]*" contained contains=pythonPunct,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonItemAccess,pythonConstant,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField skipwhite
 
     syn match pythonBrackets "{[(|)]}" contained skipwhite
-    syn match pythonBrackets "{\|}" contained skipwhite
+    syn match pythonBrackets "{\|}" skipwhite
 
     syn keyword pythonSelf class nextgroup=pythonClass skipwhite
     syn match pythonClass "\%(\%(class\s\)\s*\)\@<=\h\%(\w\|\.\)*" contained nextgroup=pythonClassVars

@@ -3,10 +3,10 @@ syn match db 'dblookup\|dbreport\|class\|payloadFactory'
 syn match filter '\(filter\|then\|send\|else\|on-fail\|drop\|call\(>\)\@=\|respond\|store\|choose\|when\|otherwise\)'
 syn match property '\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@='
 syn match sequence '\(</\?\)\@<=sequence'
-syn match param 'parameter\|result\|dsName\|target\|with-param\|format\|source \@=\|param'
+syn match param 'parameter\|result\|dsName\|target\|with-param\|format\|source \@=\|param\( \|>\)\@='
 syn match connection 'connection\|statement\|resource\( \|>\)\@=\|stylesheet'
 syn match xmlType 'args'
-syn match xmlEnrich 'enrich\|xslt\|value-of\|schema'
+syn match xmlEnrich 'enrich\|xslt\|value-of\|schema\|datamapper'
 syn match xmlSqlTag '\<\(sql\|script\)\>'
 
 let cur_syntax = b:current_syntax
