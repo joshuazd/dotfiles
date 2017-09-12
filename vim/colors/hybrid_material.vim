@@ -375,6 +375,7 @@ exe "hi! Comment"         .s:fg_comment     .s:bg_none        .s:fmt_none
 exe "hi! Constant"        .s:fg_cyan        .s:bg_none        .s:fmt_none
 exe "hi! String"          .s:fg_green       .s:bg_none        .s:fmt_none
 exe "hi! StringPunct"     .s:fg_lightgreen  .s:bg_none        .s:fmt_none
+exe "hi! Quote"           .s:fg_lightgreen  .s:bg_none        .s:fmt_none
 "   Character"
 "   Number"
 "   Boolean"

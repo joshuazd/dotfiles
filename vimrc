@@ -268,7 +268,15 @@ endfunction
     nmap <silent> [e <Plug>(ale_previous_wrap)
     let g:ale_python_flake8_options = '--max-line-length 99'
     let g:ale_virtualenv_dir_names = []
-    let g:ale_lint_on_text_changed = 'never'
+    " let g:ale_lint_on_text_changed = 'never'
+
+    let g:ale_fixers = {
+                \   'python': [
+                \       'autopep8',
+                \       'yapf'
+                \   ]
+                \}
+    nnoremap <F12> :ALEFix<CR>
 " }}}
 
 " Jedi setup {{{
