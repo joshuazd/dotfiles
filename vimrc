@@ -1,41 +1,42 @@
 set nocompatible
 
 " Plugins {{{
-filetype off
-set runtimepath+=~/.vim/bundle/Vundle.vim
-call vundle#rc()
+" filetype off
+" set runtimepath+=~/.vim/bundle/Vundle.vim
+" call vundle#begin()
+call plug#begin('~/.vim/bundle')
 
-Plugin 'VundleVim/Vundle.vim'
-Plugin 'w0rp/ale'
-Plugin 'kien/ctrlp.vim'
-Plugin 'vim-scripts/c.vim'
-"Plugin 'raimondi/delimitmate'
-Plugin 'junegunn/goyo.vim'
-Plugin 'davidhalter/jedi-vim'
-Plugin 'wting/gitsessions.vim'
-Plugin 'luochen1990/rainbow'
-Plugin 'gerw/vim-HiLinkTrace'
-Plugin 'vim-airline/vim-airline'
-Plugin 'easymotion/vim-easymotion'
-Plugin 'tpope/vim-fugitive'
-Plugin 'airblade/vim-gitgutter'
-Plugin 'tmux-plugins/vim-tmux'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'Shougo/neosnippet'
-Plugin 'Shougo/neosnippet-snippets'
-Plugin 'justmao945/vim-clang'
-Plugin 'shougo/neocomplete.vim'
-Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'godlygeek/tabular'
-Plugin 'tpope/vim-sleuth'
-Plugin 'jiangmiao/auto-pairs'
-Plugin 'tpope/vim-commentary'
+" Plugin 'VundleVim/Vundle.vim'
+Plug 'w0rp/ale'
+Plug 'kien/ctrlp.vim'
+Plug 'vim-scripts/c.vim'
+Plug 'junegunn/goyo.vim'
+Plug 'davidhalter/jedi-vim'
+Plug 'wting/gitsessions.vim'
+Plug 'luochen1990/rainbow'
+Plug 'gerw/vim-HiLinkTrace'
+Plug 'vim-airline/vim-airline'
+Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+Plug 'tmux-plugins/vim-tmux'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'Shougo/neosnippet'
+Plug 'Shougo/neosnippet-snippets'
+Plug 'justmao945/vim-clang'
+Plug 'shougo/neocomplete.vim'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'godlygeek/tabular'
+Plug 'tpope/vim-sleuth'
+Plug 'jiangmiao/auto-pairs'
+Plug 'tpope/vim-commentary'
 if has("win32unix") || $USER ==? "vagrant"
-    Plugin 'pearofducks/ansible-vim'
+    Plug 'pearofducks/ansible-vim'
 endif
 
-call vundle#end()
-filetype plugin indent on
+call plug#end()
+" call vundle#end()
+" filetype plugin indent on
 runtime macros/matchit.vim
 " }}}
 
@@ -172,17 +173,20 @@ inoremap <C-@> <C-x><C-o>
 "              AUTOCOMMANDS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-autocmd InsertLeave * if pumvisible() == 0|pclose|endif " Close preview window when leaving insert mode
-autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab " Change tabs to be 2 spaces for xml files
-autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
-autocmd BufNewFile,BufRead *.dbs set filetype=xml
-autocmd BufNewFile,BufRead *.dmc set filetype=javascript
-autocmd FileType python setlocal foldmethod=indent
-autocmd FileType vim setlocal foldmethod=marker foldlevel=0
-"make folding work better with insert mode
-autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
-autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
-autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+augroup EditVim
+    autocmd!
+    autocmd InsertLeave * if pumvisible() == 0|pclose|endif " Close preview window when leaving insert mode
+    autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab " Change tabs to be 2 spaces for xml files
+    autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
+    autocmd BufNewFile,BufRead *.dbs set filetype=xml
+    autocmd BufNewFile,BufRead *.dmc set filetype=javascript
+    autocmd FileType python setlocal foldmethod=indent
+    autocmd FileType vim setlocal foldmethod=marker foldlevel=0
+    "make folding work better with insert mode
+    autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
+    autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
+    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+augroup END
 function TrimWhiteSpace()
     %s/\s\+$//e
     ''
@@ -282,6 +286,7 @@ endfunction
 " ctrlP setup {{{
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 let g:ctrlp_open_multiple_files = 'ri'
+let g:ctrlp_clear_cache_on_exit = 1
 " }}}
 
 " rainbow parens {{{
