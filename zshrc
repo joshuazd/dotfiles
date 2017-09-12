@@ -97,6 +97,10 @@ if [ -f "${HOME}/.aliases" ]; then
       source "${HOME}/.aliases"
 fi
 
+if [ -f "${HOME}/.functions" ]; then
+      source "${HOME}/.functions"
+fi
+
 stty -ixon
 # bindkey -v
 # export KEYTIMEOUT=10
@@ -109,34 +113,5 @@ setopt HIST_IGNORE_SPACE
 setopt HIST_REDUCE_BLANKS
 setopt HIST_VERIFY
 
-function git_update() {
-    if ! git diff-index --quiet HEAD --; then
-        return true
-    else
-        return false
-    fi
-}
-
-function check_repos() {
-    for d in ./*/
-    do
-        cd "$d"
-        echo "$d"
-        git update-index -q --refresh
-        if [[ -n `git status --porcelain` || -n $(git rev-list --left-right HEAD...@'{u}' 2>/dev/null) ]]; then
-            git status -u
-        fi
-        cd ..
-    done
-}
-
-function ford() {
-    for d in ./*
-    do
-        if [ -d "$d" ]; then
-            cd "$d" && echo "$d" && "$@"
-        fi
-    done
-}
 
 export PATH=~/pebble-dev/pebble-sdk-4.5-linux64/bin:$PATH

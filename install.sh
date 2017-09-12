@@ -1,13 +1,13 @@
 # initialize submodules
-echo "Initializing submodules"
-git submodule init
-git submodule update
-git submodule foreach git pull origin master
+# echo "Initializing submodules"
+# git submodule init
+# git submodule update
+# git submodule foreach git pull origin master
 
 # install Vundle
-echo "Cloning Vundle"
-mkdir -p .vim/bundle
-git clone https://github.com/VundleVim/Vundle.vim.git vim/bundle/Vundle.vim
+# echo "Cloning Vundle"
+# mkdir -p .vim/bundle
+# git clone https://github.com/VundleVim/Vundle.vim.git vim/bundle/Vundle.vim
 
 # install oh my zsh
 echo "Installing oh my zsh"
@@ -46,6 +46,12 @@ if [ -f $HOME/.aliases ]; then
     mv $HOME/.aliases $HOME/.aliases.old
 fi
 ln -s $PWD/aliases $HOME/.aliases
+
+if [ -f $HOME/.functions ]; then
+    echo "Backing up existing functions to .functions.old"
+    mv $HOME/.functions $HOME/.functions.old
+fi
+ln -s $PWD/functions $HOME/.functions
 
 if [ -f $HOME/.tmux.conf ]; then
     echo "Backing up existing tmux.conf to .tmux.conf.old"

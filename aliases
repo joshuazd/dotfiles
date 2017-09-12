@@ -1,3 +1,4 @@
+#!/bin/sh
 alias ls='ls --color=auto'
 alias df='df -h'
 alias du='du -h -c'
