@@ -1,11 +1,14 @@
-syn match xmlFunction 'call-template\|makefault\|template\( \|>\)\@=\|log\|validate'
-syn match db 'dblookup\|dbreport\|class\|payloadFactory'
-syn match filter '\(filter\|then\|send\|else\|on-fail\|drop\|call\(>\)\@=\|respond\|store\|choose\|when\|otherwise\)'
-syn match property '\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@='
+syn match xmlFunction 'makefault\|template\( \|>\)\@=\|validate'
+syn match xmlLog 'call-template\|log'
+syn match db 'dblookup\|dbreport\|class\|payloadFactory\|arg \|http[ >]\@='
+syn match filter '\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)'
+syn match xmlSend '\(<\/\?\)\@<=\(send\|call\(>\)\@=\)'
+syn match property '\(<\/\?\)\@<=\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@='
 syn match sequence '\(</\?\)\@<=sequence'
-syn match param 'parameter\|result\|dsName\|target\|with-param\|format\|source \@=\|param\( \|>\)\@='
+syn match param 'parameter\|result\|dsName\|target\|format\|source \@=\|param\( \|>\)\@='
+syn match xmlLogParam 'with-param'
 syn match connection 'connection\|statement\|resource\( \|>\)\@=\|stylesheet'
-syn match xmlType 'args'
+syn match xmlArgs 'args'
 syn match xmlEnrich 'enrich\|xslt\|value-of\|schema\|datamapper'
 syn match xmlSqlTag '\<\(sql\|script\)\>'
 
@@ -57,23 +60,32 @@ syn region xmlXpathRegion
     \ contained
     \ contains=xmlAttrib,@xmlXpath
 let b:current_syntax = cur_syntax
+syn region xmlXpathRegion
+    \ matchgroup=xmlQuote start=+"{+
+    \ keepend
+    \ end=+}"+
+    \ contained
+    \ contains=xmlAttrib,@xmlXpath
+let b:current_syntax = cur_syntax
 highlight! xmlXpathRegion cterm=italic
 
 
 syn keyword xmlNs ns0
 syn keyword xmlXsl xsl
 
-syn cluster xmlTagHook add=callTemplate,db,filter,property,sequence,connection,param,xmlFunction,xmlType,xmlEnrich,xmlSqlTag
+syn cluster xmlTagHook add=callTemplate,db,filter,property,sequence,connection,param,xmlFunction,xmlArgs,xmlEnrich,xmlSqlTag,xmlSend,xmlLog,xmlLogParam
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
 
 highlight link xmlNs Identifier
 highlight xmlXsl ctermfg=1
 
 hi def link xmlEnrich Operator
-hi def link xmlType Type
+hi def link xmlArgs Primitive
 hi def link xmlFunction Function
+hi def link xmlSend Function
 hi def link param StringPunct
 highlight connection ctermfg=13
+highlight xmlLog ctermfg=7
 highlight link property Constant
 hi def link sequence StringPunct
 hi def link xmlScriptTag xmlTag
@@ -81,3 +93,4 @@ hi def link xmlEndScriptTag xmlTag
 highlight link db Identifier
 highlight link filter Keyword
 highlight xmlSqlTag ctermfg=202
+highlight xmlLogParam ctermfg=245

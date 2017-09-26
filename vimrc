@@ -30,6 +30,8 @@ Plug 'godlygeek/tabular'
 Plug 'tpope/vim-sleuth'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
+Plug 'Konfekt/FastFold'
+Plug 'ehamberg/vim-cute-python'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -48,7 +50,7 @@ set ruler                       " Always show current position
 set cmdheight=1                 " Height of the command bar
 set hidden                      " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent  " Configure backspace so it acts as it should act
-set whichwrap+=<,>,h,l
+set whichwrap+=<,>,h,l          " arrow keys and h,l move to the next line
 set breakindent                 " Indent wrapped lines by 2
 set breakindentopt=shift:2
 set ignorecase                  " Ignore case when searching
@@ -87,6 +89,7 @@ set so=999                      " Set 999 lines to the cursor - when moving vert
 set sidescroll=1                " scroll 1 character at a time
 set sidescrolloff=15            " scroll within 15 characters
 set foldmethod=syntax           " fold based on syntax
+set foldnestmax=2               " no nesting folds
 set wildmenu                    " Turn on the WiLd menu
 set wildmode=longest,list
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/* " Ignore compiled files
@@ -99,6 +102,9 @@ set foldlevel=12                " don't fold most things
 set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
 set term=xterm-256color
 set omnifunc=syntaxcomplete#Complete    " enable omnicompletion
+set completeopt+=longest
+set concealcursor+=n            " conceal characters in normal mode
+set conceallevel=2              " conceal characters by default
 if has("gui_running")
     set guifont=Liberation\ Mono\ for\ Powerline\ Regular\ 11
     set guioptions-=T
@@ -116,24 +122,20 @@ let g:hybrid_custom_term_colors=1
 let mapleader = "\<Space>" " make leader a more sane keybinding
 let maplocalleader = "," " remap localleader
 let g:xml_syntax_folding=1 " enable xml folding
-" Make enter create a new line
-nnoremap <CR> i<CR><ESC>
 " make 0 work better
 nnoremap 0 ^
 nnoremap ^ 0
 " Make moving around splits easier
-nnoremap <Leader>v :vs\|bn<CR>
-" Fold toggle keybind
-nnoremap <Leader>a za
+nnoremap <silent> <Leader>v :vs\|bn<CR>
+nnoremap <silent> <Leader>s :sp\|bn<CR>
 " Make <Leader>q clear highlighting from searches
 nnoremap <silent> <Leader>q :noh<return><esc>
 " make it easier to use buffers
-nnoremap <Leader>l :bn<CR>
-nnoremap <Leader>h :bp<CR>
-noremap <Leader><Leader> :b#<CR>
-noremap <Leader>p :bp<CR>
+nnoremap <silent> <Leader>l :bn<CR>
+nnoremap <silent> <Leader><Leader> :b#<CR>
+nnoremap <silent> <Leader>p :bp<CR>
 " more standard 'close tab' behavior
-nnoremap <C-x> :bn\|bd #<CR>
+nnoremap <silent> <C-x> :bn\|bd #<CR>
 " treat wrapped lines as different lines
 noremap j gj
 noremap k gk
@@ -143,18 +145,18 @@ noremap gk k
 noremap L $
 noremap H ^
 " Buffer keymappings
-nnoremap <Leader>1 :1b<CR>
-nnoremap <Leader>2 :2b<CR>
-nnoremap <Leader>3 :3b<CR>
-nnoremap <Leader>4 :4b<CR>
-nnoremap <Leader>5 :5b<CR>
-nnoremap <Leader>6 :6b<CR>
-nnoremap <Leader>7 :7b<CR>
-nnoremap <Leader>8 :8b<CR>
-nnoremap <Leader>9 :9b<CR>
-nnoremap <Leader>0 :10b<CR>
+nnoremap <silent> <Leader>1 :1b<CR>
+nnoremap <silent> <Leader>2 :2b<CR>
+nnoremap <silent> <Leader>3 :3b<CR>
+nnoremap <silent> <Leader>4 :4b<CR>
+nnoremap <silent> <Leader>5 :5b<CR>
+nnoremap <silent> <Leader>6 :6b<CR>
+nnoremap <silent> <Leader>7 :7b<CR>
+nnoremap <silent> <Leader>8 :8b<CR>
+nnoremap <silent> <Leader>9 :9b<CR>
+nnoremap <silent> <Leader>0 :10b<CR>
 " Close other splits easily
-noremap <Leader>o :only<CR>
+noremap <silent> <Leader>o :only<CR>
 " Easier to save
 nnoremap <C-s> :w<CR>
 nnoremap q :q<CR>
@@ -167,6 +169,8 @@ inoremap jk <Esc>
 nnoremap <Leader>z :set invlist<CR>
 " easier completion
 inoremap <C-@> <C-x><C-o>
+" toggle conceallevel
+noremap <Leader>h :call ToggleConceal()<CR>
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -176,21 +180,30 @@ inoremap <C-@> <C-x><C-o>
 augroup EditVim
     autocmd!
     autocmd InsertLeave * if pumvisible() == 0|pclose|endif " Close preview window when leaving insert mode
-    autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab " Change tabs to be 2 spaces for xml files
+    autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab " Change tabs to be 2 spaces for xml files
+    autocmd FileType xml inoremap <expr> </ pumvisible() ? "\</\<C-x>\<C-o>\<C-y>" : "\</\<C-x>\<C-o>"
     autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
     autocmd BufNewFile,BufRead *.dbs set filetype=xml
     autocmd BufNewFile,BufRead *.dmc set filetype=javascript
     autocmd FileType python setlocal foldmethod=indent
     autocmd FileType vim setlocal foldmethod=marker foldlevel=0
     "make folding work better with insert mode
-    autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
-    autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
+    " autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
+    " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 augroup END
-function TrimWhiteSpace()
+function! TrimWhiteSpace()
     %s/\s\+$//e
     ''
 endfunction
+function! ToggleConceal()
+    if &conceallevel == 0
+        set conceallevel=2
+    else
+        set conceallevel=0
+    endif
+endfunction
+
 " }}}
 
 
@@ -227,7 +240,7 @@ endfunction
 
     " xml setup {{{
         autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-        let g:neocomplete#force_omni_input_patterns.xml = '</\?\|\s[A-Za-z0-9\-]*'
+        let g:neocomplete#force_omni_input_patterns.xml = '</\?' " '\|\s[A-Za-z0-9\-]*'
         call neocomplete#custom#source('omni', 'rank', 1000)
     " }}}
 
@@ -238,7 +251,6 @@ endfunction
         let g:jedi#smart_auto_mappings = 0
         let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
     " }}}
-
 
     " clang setup {{{
         let g:clang_auto = 0 " disable auto completion for vim-clang
@@ -268,7 +280,7 @@ endfunction
     nmap <silent> [e <Plug>(ale_previous_wrap)
     let g:ale_python_flake8_options = '--max-line-length 99'
     let g:ale_virtualenv_dir_names = []
-    " let g:ale_lint_on_text_changed = 'never'
+    let g:ale_lint_on_text_changed = 'normal'
 
     let g:ale_fixers = {
                 \   'python': [
@@ -281,6 +293,19 @@ endfunction
 
 " Jedi setup {{{
     let g:jedi#show_call_signatures = 2
+" }}}
+
+" Goyo setup {{{
+    function! s:goyo_enter()
+        set showmode
+    endfunction
+
+    function! s:goyo_leave()
+        set noshowmode
+    endfunction
+
+    autocmd! User GoyoEnter nested call <SID>goyo_enter()
+    autocmd! User GoyoLeave nested call <SID>goyo_leave()
 " }}}
 
 " Easymotion setup {{{
@@ -307,7 +332,8 @@ let g:rainbow_conf = {
             \   'vim': 0,
             \   'python': 0,
             \   'sh': 0,
-            \   'c': 0
+            \   'c': 0,
+            \   'javascript': 0
             \  }
             \}
 " }}}

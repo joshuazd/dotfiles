@@ -28,6 +28,7 @@ set cpo&vim
 
 syn match javaScriptParenError "(\|)"
 syn region javaScriptParens start="(" end=")"
+syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&\|>\|<"
 
 syn keyword javaScriptCommentTodo      TODO FIXME XXX TBD contained
 syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommentTodo
@@ -44,12 +45,10 @@ syn match javaScriptDeref "\."
 
 syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams
 syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptFuncParam
-syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull skipwhite
+syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull,javaScriptField skipwhite
 
 syn region javaScriptParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptParam
-syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptIn,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNull skipwhite
-
-syn match javaScriptItemAccess "\h\w*\[\@="
+syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptIn,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNull,javaScriptField skipwhite
 
 syn match   javaScriptSpecialCharacter "'\\.'"
 syn match   javaScriptNumber	       "-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
@@ -61,7 +60,6 @@ syn keyword javaScriptRepeat		while for do nextgroup=javaScriptParams
 syn keyword javaScriptIn                in
 syn keyword javaScriptBranch		break continue
 syn keyword javaScriptOperator		instanceof typeof
-syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&\|>\|<"
 syn keyword javaScriptType		Array Boolean Date Function Number Object String RegExp nextgroup=javaScriptFuncParams
 syn keyword javaScriptStatement		return with
 syn keyword javaScriptBoolean		true false
@@ -74,6 +72,10 @@ syn keyword javaScriptGlobal		self window top parent
 syn keyword javaScriptMember		document event location
 syn keyword javaScriptDeprecated	escape unescape
 syn keyword javaScriptReserved		new delete abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile
+
+syn match javaScriptItemAccess "\h\w*\[\@="
+syn match javaScriptField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9(\[]\|$\)\@="
+syn match javaScriptField "\.\@<=\h\w*\(\.\h\w*[(\[]\)\@="
 
 if exists("javaScript_fold")
     syn match	javaScriptFunction	"\<function\>"
@@ -140,6 +142,7 @@ hi def link javaScriptArg               Identifier
 hi def link javaScriptPunct             PreProc
 hi def link javaScriptDeref             Comment
 hi def link javaScriptItemAccess        Special
+highlight javaScriptField ctermfg=250 guifg=#bcbcbc
 
 
 let b:current_syntax = "javascript"

@@ -142,10 +142,11 @@ if exists('g:xml_syntax_folding')
     " s^^^^^^^^^^^^^^^e
     "
     syn region   xmlTag
-        \ matchgroup=xmlTag start=+<[^ /!?<>"']\@=+
-        \ matchgroup=xmlTag end=+>+
+        \ matchgroup=xmlTagPunct start=+<[^ /!?<>"']\@=+
+        \ matchgroup=xmlTagPunct end=+>+
         \ contained
         \ contains=xmlError,xmlXpathRegion,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,@xmlStartTagHook
+        \ concealends
 
 
     " highlight the end tag
@@ -159,10 +160,11 @@ if exists('g:xml_syntax_folding')
     " ^^^^^^
     "
     syn region   xmlEndTag
-        \ matchgroup=xmlTag start=+</[^ /!?<>"']\@=+
-        \ matchgroup=xmlTag end=+>+
+        \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
+        \ matchgroup=xmlTagPunct end=+>+
         \ contained
         \ contains=xmlError,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+        \ concealends
 
 
     " tag elements with syntax-folding.
@@ -183,11 +185,12 @@ if exists('g:xml_syntax_folding')
         \ start=+<\z([^ /!?<>"']\+\)+
         \ skip=+<!--\_.\{-}-->+
         \ end=+</\z1\_\s\{-}>+
-        \ matchgroup=xmlTag end=+/>+
+        \ matchgroup=xmlTagPunct end=+/>+
         \ fold
         \ contains=xmlSqlRegion,xmlJavaScriptRegion,xmlTag,xmlEndTag,xmlCdata,xmlRegion,xmlComment,xmlOperator,xmlEntity,xmlProcessing,@xmlRegionHook,@Spell
         \ keepend
         \ extend
+        \ concealends
 
 else
 
@@ -196,14 +199,16 @@ else
     " - xmlRegion not defined
     "
     syn region   xmlTag
-        \ matchgroup=xmlTag start=+<[^ /!?<>"']\@=+
-        \ matchgroup=xmlTag end=+/\=>+
+        \ matchgroup=xmlTagPunct start=+<[^ /!?<>"']\@=+
+        \ matchgroup=xmlTagPunct end=+/\=>+
         \ contains=xmlError,xmlTagName,xmlAttrib,xmlEqual,xmlString,@xmlTagHook
+        \ concealends
 
     syn region   xmlEndTag
-        \ matchgroup=xmlTag start=+</[^ /!?<>"']\@=+
-        \ matchgroup=xmlTag end=+>+
+        \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
+        \ matchgroup=xmlTagPunct end=+>+
         \ contains=xmlError,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+        \ concealends
 
 endif
 
@@ -310,11 +315,12 @@ unlet b:current_syntax
 
 " The default highlighting.
 hi def link xmlTodo		Todo
-hi def link xmlTag		PreProc
+hi def link xmlTag		Comment
+hi def link xmlTagPunct		Comment
 hi def link xmlEndTag		Identifier
-highlight xmlEndTag ctermfg=203
+highlight xmlEndTag ctermfg=210
 hi def link xmlTagName		Identifier
-highlight xmlTagName ctermfg=203
+highlight xmlTagName ctermfg=210
 if !exists("g:xml_namespace_transparent")
     hi def link xmlNamespace	Tag
 endif

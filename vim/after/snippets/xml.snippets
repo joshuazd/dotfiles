@@ -1,3 +1,10 @@
+snippet     <
+abbr        xml tag
+options     head
+	<${1:name}>
+		${0}
+	</$1>
+
 snippet     api
 abbr        api
 	<api xmlns="http://ws.apache.org/ns/synapse" name="${1:api_name}" context="/${2:context}">
@@ -118,25 +125,25 @@ abbr        property
 
 snippet     valof
 abbr        value-of
-	<xsl:value-of select="$1" />
+	<xsl:value-of select="${1}" />
 
 snippet     xct
 abbr        xsl call-template
 	<xsl:call-template name="nilElement">
-		<xsl:with-param name="value" select="$1" />
-	</xsl:call-template>
+		<xsl:with-param name="value" select="${1}" />
+	</xsl:call-template>${0}
 
 snippet     xslt
 abbr        xslt
 	<xslt key="${1:XSLT Name}">
 		${2:<property name="BATCH_ID" expression="get-property('MessageID')"/>}
-	</xslt>
+	</xslt>${0}
 
 snippet     xsl
 abbr        xslt file
 	<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns0="http://ws.wso2.org/dataservice" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" exclude-result-prefixes="xsi xsl xsd ns0">
 		${1:<xsl:param name="BATCH_ID" />}
 		<xsl:template match="/">
-			$2
+			${2}
 		</xsl:template>
 	</xsl:stylesheet>

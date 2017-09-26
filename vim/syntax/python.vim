@@ -114,7 +114,7 @@ endif
     syn keyword pythonKeyword   if elif else
     syn keyword pythonKeyword   import from
     syn keyword pythonKeyword   try except finally
-    syn keyword pythonOperator      and in is not or
+    syn keyword pythonOperator  and in is not or
 
     syn match pythonExtraOperator "\%([~!^&|/%+-]\|\%(class\s*\)\@<!<<\|<=>\|<=\|\%(<\|\<class\s\+\u\w*\s*\)\@<!<[^<]\@=\|===\|==\|=\~\|>>\|>=\|=\@<!>\|\.\.\.\|\.\.\|::\)"
     syn match pythonExtraPseudoOperator "\%(-=\|/=\|\*\*=\|\*=\|&&=\|&=\|&&\|||=\||=\|||\|%=\|+=\|!\~\|!=\)"

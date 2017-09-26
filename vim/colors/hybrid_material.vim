@@ -124,6 +124,7 @@ if exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:cterm_line       = "0"   " Black
   let s:cterm_comment    = "8"   " LightGrey
   let s:cterm_red        = "9"   " LightRed
+  let s:cterm_darkred    = "1"   " DarkRed
   let s:cterm_orange     = "3"   " DarkYellow
   let s:cterm_yellow     = "11"  " LightYellow
   let s:cterm_green      = "10"  " Green
@@ -141,6 +142,7 @@ else
   let s:cterm_line       = "0"
   let s:cterm_comment    = "8"
   let s:cterm_red        = "9"
+  let s:cterm_darkred    = "1"   " DarkRed
   let s:cterm_orange     = "3"
   let s:cterm_yellow     = "11"
   let s:cterm_green      = "10"
@@ -161,6 +163,7 @@ let s:palette.cterm.selection  = { 'dark' : s:cterm_selection  , 'light' : "250"
 let s:palette.cterm.line       = { 'dark' : s:cterm_line       , 'light' : s:cterm_line }
 let s:palette.cterm.comment    = { 'dark' : s:cterm_comment    , 'light' : "59"  }
 let s:palette.cterm.red        = { 'dark' : s:cterm_red        , 'light' : "52"  }
+let s:palette.cterm.darkred    = { 'dark' : s:cterm_darkred    , 'light' : "52"  }
 let s:palette.cterm.orange     = { 'dark' : s:cterm_orange     , 'light' : "94"  }
 let s:palette.cterm.yellow     = { 'dark' : s:cterm_yellow     , 'light' : "58"  }
 let s:palette.cterm.green      = { 'dark' : s:cterm_green      , 'light' : "22"  }
@@ -179,7 +182,7 @@ let s:palette.cterm.changefg   = { 'dark' : "189"              , 'light' : "53" 
 let s:palette.cterm.delbg      = { 'dark' : s:cterm_delbg      , 'light' : "224" }
 let s:palette.cterm.darkblue   = { 'dark' : "17"               , 'light' : "194" }
 let s:palette.cterm.darkcyan   = { 'dark' : "24"               , 'light' : "22"  }
-let s:palette.cterm.darkred    = { 'dark' : "52"               , 'light' : "189" }
+" let s:palette.cterm.darkred    = { 'dark' : "52"               , 'light' : "189" }
 let s:palette.cterm.darkpurple = { 'dark' : "13"               , 'light' : "13"  }
 
 "}}}
@@ -399,6 +402,7 @@ exe "hi! Include"         .s:fg_purple      .s:bg_none        .s:fmt_none
 "   PreCondit"
 
 exe "hi! Language"        .s:fg_pink        .s:bg_none        .s:fmt_none
+exe "hi! Primitive"       .s:fg_orange      .s:bg_none        .s:fmt_ital
 exe "hi! Type"            .s:fg_yellow      .s:bg_none        .s:fmt_ital
 "   StorageClass"
 exe "hi! Structure"       .s:fg_aqua        .s:bg_none        .s:fmt_none
@@ -406,7 +410,7 @@ exe "hi! Structure"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 
 exe "hi! Special"         .s:fg_red         .s:bg_none        .s:fmt_none
 exe "hi! SpecialChar"     .s:fg_aqua        .s:bg_none        .s:fg_bold
-"   Tag"
+exe "hi! Tag"             .s:fg_red        .s:bg_none        .s:fmt_none
 exe "hi! Delimiter"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 "   SpecialComment"
 "   Debug"
