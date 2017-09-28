@@ -2,11 +2,8 @@ set nocompatible
 
 " Plugins {{{
 " filetype off
-" set runtimepath+=~/.vim/bundle/Vundle.vim
-" call vundle#begin()
 call plug#begin('~/.vim/bundle')
 
-" Plugin 'VundleVim/Vundle.vim'
 Plug 'w0rp/ale'
 Plug 'kien/ctrlp.vim'
 Plug 'vim-scripts/c.vim'
@@ -37,8 +34,6 @@ if has("win32unix") || $USER ==? "vagrant"
 endif
 
 call plug#end()
-" call vundle#end()
-" filetype plugin indent on
 runtime macros/matchit.vim
 " }}}
 
@@ -92,7 +87,7 @@ set foldmethod=syntax           " fold based on syntax
 set foldnestmax=2               " no nesting folds
 set wildmenu                    " Turn on the WiLd menu
 set wildmode=longest,list
-set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/* " Ignore compiled files
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/* " Ignore compiled files
 au FileType * set fo-=o         " Don't insert comment when using 'o'
 set sessionoptions-=options     " make sessions work better with plugins
 let g:is_posix = 1
@@ -166,11 +161,11 @@ nnoremap Q q
 " Easier to exit insert mode
 inoremap jk <Esc>
 " keybinding to see whitespace
-nnoremap <Leader>z :set invlist<CR>
+nnoremap <silent> <Leader>z :set invlist<CR>
 " easier completion
 inoremap <C-@> <C-x><C-o>
 " toggle conceallevel
-noremap <Leader>h :call ToggleConceal()<CR>
+noremap <silent> <Leader>h :call ToggleConceal()<CR>
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -224,7 +219,7 @@ endfunction
     let g:neocomplete#enable_auto_select = 1
     imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
-                \: pumvisible() ? "\<C-n>" : "\<TAB>"
+                \: pumvisible() ? "\<CR>" : "\<TAB>"
     smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: "\<TAB>"

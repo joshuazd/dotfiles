@@ -1,7 +1,7 @@
 syn match xmlFunction 'makefault\|template\( \|>\)\@=\|validate'
 syn match xmlLog 'call-template\|log'
 syn match db 'dblookup\|dbreport\|class\|payloadFactory\|arg \|http[ >]\@='
-syn match filter '\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)'
+syn match filter '\(<\/\?\)\@<=\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)'
 syn match xmlSend '\(<\/\?\)\@<=\(send\|call\(>\)\@=\)'
 syn match property '\(<\/\?\)\@<=\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@='
 syn match sequence '\(</\?\)\@<=sequence'
@@ -34,8 +34,8 @@ syn region xmlJavaScriptRegion
     \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlJavaScript
 let b:current_syntax = cur_syntax
 
-syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
-syn match xmlEndScriptTag +</script>+ contains=xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
+syn match xmlEndScriptTag +</script>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
 syn keyword  xmlCdataCdata CDATA          contained
 syn match    xmlCdataEnd   +]]>+          contained
