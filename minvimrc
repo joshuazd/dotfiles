@@ -1,0 +1,160 @@
+set nocompatible
+
+runtime macros/matchit.vim
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+"              GENERAL OPTIONS
+""""""""""""""""""""""""""""""""""""""""""""""""
+" {{{
+set ruler                       " Always show current position
+set cmdheight=1                 " Height of the command bar
+set hidden                      " A buffer becomes hidden when it is abandoned
+set backspace=eol,start,indent  " Configure backspace so it acts as it should act
+set whichwrap+=<,>,h,l          " arrow keys and h,l move to the next line
+set breakindent                 " Indent wrapped lines by 2
+set breakindentopt=shift:2
+set ignorecase                  " Ignore case when searching
+set smartcase                   " When searching try to be smart about cases
+set hlsearch                    " Highlight search results
+set incsearch                   " Makes search act like search in modern browsers
+set lazyredraw                  " Don't redraw while executing macros (good performance config)
+set magic                       " For regular expressions turn magic on
+set showmatch                   " Show matching brackets when text indicator is over them
+set mat=2                       " How many tenths of a second to blink when matching brackets
+set noerrorbells                " No annoying sound on errors
+set novisualbell
+set t_vb=
+set tm=500
+set splitbelow                  " Make splits behave better
+set splitright
+syntax on                       " turn syntax on
+set background=dark
+set number                      " show line numbers
+set relativenumber              " show relative line numbers
+set numberwidth=1               " set min number column width
+set clipboard=unnamed           " make clipboard work better
+set tabstop=4                   " <TAB>s are 4 spaces
+set softtabstop=4               " number of spaces when inserting/backspacing
+set shiftwidth=4                " shift 4 spaces for indentation
+set expandtab                   " expand tabs into spaces
+set autoindent                  " use the previous lines indentation level
+" set nowrap                      " don't wrap lines by default
+set laststatus=2                " always show statusline
+set cindent                     " better indentation
+set cinkeys-=0#
+set indentkeys-=0#
+set so=999                      " Set 999 lines to the cursor - when moving vertically using j/k
+set sidescroll=1                " scroll 1 character at a time
+set sidescrolloff=15            " scroll within 15 characters
+" set foldmethod=syntax           " fold based on syntax
+" set foldnestmax=2               " no nesting folds
+set wildmenu                    " Turn on the WiLd menu
+set wildmode=longest,list
+" set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/* " Ignore compiled files
+au FileType * set fo-=o         " Don't insert comment when using 'o'
+let g:is_posix = 1
+set backupdir=/tmp              " Better backups
+set noswapfile
+" set foldlevel=12                " don't fold most things
+set listchars=tab:>-,trail:~,extends:>,eol:$ " what to show for whitespace chars
+set term=xterm-256color
+set omnifunc=syntaxcomplete#Complete    " enable omnicompletion
+" set completeopt+=longest
+" set concealcursor+=n            " conceal characters in normal mode
+" set conceallevel=2              " conceal characters by default
+set autowrite                   " automatically save before :next, :make, etc
+set autoread                    " automatically reread changed files
+set statusline=%<%f\ %h%m%r%=%-14.(%l\/%L,%c%)\ %P
+" }}}
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+"              KEYBINDINGS
+""""""""""""""""""""""""""""""""""""""""""""""""
+" {{{
+let mapleader = "\<Space>" " make leader a more sane keybinding
+let maplocalleader = "," " remap localleader
+let g:xml_syntax_folding=1 " enable xml folding
+" make 0 work better
+nnoremap 0 ^
+nnoremap ^ 0
+" Make moving around splits easier
+nnoremap <silent> <Leader>v :vs\|bn<CR>
+nnoremap <silent> <Leader>s :sp\|bn<CR>
+" Make <Leader>q clear highlighting from searches
+nnoremap <silent> <Leader>q :noh<return><esc>
+" make it easier to use buffers
+nnoremap <silent> <Leader>l :bn<CR>
+nnoremap <silent> <Leader><Leader> :b#<CR>
+nnoremap <silent> <Leader>p :bp<CR>
+" more standard 'close tab' behavior
+nnoremap <silent> <C-x> :bn\|bd #<CR>
+" treat wrapped lines as different lines
+noremap j gj
+noremap k gk
+noremap gj j
+noremap gk k
+" easier to go to end/beginning of lines
+noremap L $
+noremap H ^
+" Buffer keymappings
+nnoremap <silent> <Leader>1 :1b<CR>
+nnoremap <silent> <Leader>2 :2b<CR>
+nnoremap <silent> <Leader>3 :3b<CR>
+nnoremap <silent> <Leader>4 :4b<CR>
+nnoremap <silent> <Leader>5 :5b<CR>
+nnoremap <silent> <Leader>6 :6b<CR>
+nnoremap <silent> <Leader>7 :7b<CR>
+nnoremap <silent> <Leader>8 :8b<CR>
+nnoremap <silent> <Leader>9 :9b<CR>
+nnoremap <silent> <Leader>0 :10b<CR>
+" Close other splits easily
+noremap <silent> <Leader>o :only<CR>
+" Easier to save
+nnoremap <C-s> :w<CR>
+nnoremap q :q<CR>
+inoremap <C-s> <Esc>:w<CR>i
+" access to macros
+nnoremap Q q
+" Easier to exit insert mode
+inoremap jk <Esc>
+" keybinding to see whitespace
+nnoremap <silent> <Leader>z :set invlist<CR>
+" easier completion
+inoremap <C-@> <C-x><C-o>
+" toggle conceallevel
+noremap <silent> <Leader>h :call ToggleConceal()<CR>
+" }}}
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+"              AUTOCOMMANDS
+""""""""""""""""""""""""""""""""""""""""""""""""
+" {{{
+augroup EditVim
+    autocmd!
+    autocmd InsertLeave * if pumvisible() == 0|pclose|endif " Close preview window when leaving insert mode
+    autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab " Change tabs to be 2 spaces for xml files
+    autocmd FileType xml inoremap <expr> </ pumvisible() ? "\</\<C-x>\<C-o>\<C-y>" : "\</\<C-x>\<C-o>"
+    autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
+    autocmd BufNewFile,BufRead *.dbs set filetype=xml
+    autocmd BufNewFile,BufRead *.dmc set filetype=javascript
+    autocmd FileType python setlocal foldmethod=indent
+    autocmd FileType vim setlocal foldmethod=marker foldlevel=0
+    "make folding work better with insert mode
+    " autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
+    " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
+    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+augroup END
+function! TrimWhiteSpace()
+    %s/\s\+$//e
+    ''
+endfunction
+function! ToggleConceal()
+    if &conceallevel == 0
+        set conceallevel=2
+    else
+        set conceallevel=0
+    endif
+endfunction
+
+" }}}
+
