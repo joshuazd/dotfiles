@@ -81,6 +81,7 @@ highlight xmlXsl ctermfg=1
 
 hi def link xmlEnrich Operator
 hi def link xmlArgs Primitive
+highlight xmlArgs ctermfg=3
 hi def link xmlFunction Function
 hi def link xmlSend Function
 hi def link param StringPunct

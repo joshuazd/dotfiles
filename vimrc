@@ -97,9 +97,11 @@ set foldlevel=12                " don't fold most things
 set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
 set term=xterm-256color
 set omnifunc=syntaxcomplete#Complete    " enable omnicompletion
-set completeopt+=longest
+" set completeopt+=longest
 set concealcursor+=n            " conceal characters in normal mode
 set conceallevel=2              " conceal characters by default
+set autowrite                   " automatically save before :next, :make, etc
+set autoread                    " automatically reread changed files
 if has("gui_running")
     set guifont=Liberation\ Mono\ for\ Powerline\ Regular\ 11
     set guioptions-=T
@@ -166,6 +168,8 @@ nnoremap <silent> <Leader>z :set invlist<CR>
 inoremap <C-@> <C-x><C-o>
 " toggle conceallevel
 noremap <silent> <Leader>h :call ToggleConceal()<CR>
+" search command
+noremap <silent> <C-f> :CtrlPLine<CR>
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -217,6 +221,7 @@ endfunction
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
     let g:neocomplete#enable_auto_select = 1
+    let g:neocomplete#enable_refresh_always = 1
     imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: pumvisible() ? "\<CR>" : "\<TAB>"
@@ -228,6 +233,11 @@ endfunction
                 \ "\<Plug>(neosnippet_expand)" : "\<CR>"
     let g:neosnippet#enable_snipmate_compatibility = 0
     let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
+
+    if !exists('g:neocomplete#keyword_patterns')
+        let g:neocomplete#keyword_patterns = {}
+    endif
+    let g:neocomplete#keyword_patterns._ = '\h\w*'
 
     if !exists('g:neocomplete#force_omni_input_patterns')
         let g:neocomplete#force_omni_input_patterns = {}
@@ -314,7 +324,11 @@ endfunction
 " ctrlP setup {{{
 set runtimepath^=~/.vim/bundle/ctrlp.vim
 let g:ctrlp_open_multiple_files = 'ri'
-let g:ctrlp_clear_cache_on_exit = 1
+let g:ctrlp_clear_cache_on_exit = 0
+let g:ctrlp_cmd = 'CtrlPMixed'
+
+let g:ctrlp_by_filename = 1
+let g:ctrlp_switch_buffer = 'et'
 " }}}
 
 " rainbow parens {{{
@@ -343,6 +357,21 @@ let g:rainbow_conf = {
     let g:airline_section_z = '%3l:%2c'
     "let g:airline_section_error = ''
     "let g:airline_section_warning = ''
+
+
+    let g:airline_mode_map = {
+                \ '__' : '-',
+                \ 'n'  : 'N',
+                \ 'i'  : 'I',
+                \ 'R'  : 'R',
+                \ 'c'  : 'C',
+                \ 'v'  : 'V',
+                \ 'V'  : 'V',
+                \ '' : 'V',
+                \ 's'  : 'S',
+                \ 'S'  : 'S',
+                \ '' : 'S',
+                \ }
 
     let g:airline#extensions#default#section_truncate_width = {
            \ 'b': 59,

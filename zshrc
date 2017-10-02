@@ -58,7 +58,7 @@ ZSH_TMUX_AUTOSTART="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git tmux)
+plugins=(git tmux vi-mode zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -102,9 +102,20 @@ if [ -f "${HOME}/.functions" ]; then
 fi
 
 stty -ixon
-# bindkey -v
-# export KEYTIMEOUT=10
-# bindkey -M viins 'jk' vi-cmd-mode
+
+export EDITOR=vim
+export VISUAL=vim
+bindkey -v
+export KEYTIMEOUT=7
+bindkey -M viins 'jk' vi-cmd-mode
+bindkey -M viins "^I" expand-or-complete-prefix
+bindkey -M viins "^L" clear-screen
+bindkey -M viins "^P" up-line-or-history
+bindkey -M viins "^N" down-line-or-history
+bindkey -M viins "^R" history-incremental-search-backward
+bindkey -M viins "^W" backward-kill-word
+bindkey -M viins "^A" beginning-of-line
+bindkey -M viins "^E" end-of-line
 
 export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
 setopt INC_APPEND_HISTORY

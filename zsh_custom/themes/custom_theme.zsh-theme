@@ -1,5 +1,5 @@
 function prompt_char {
-    if [ $UID -eq 0 ]; then echo "#"; else echo ''; fi
+    if [ $UID -eq 0 ]; then echo "#"; else echo '»'; fi
 }
 
 function virtualenv_info {
@@ -9,14 +9,15 @@ function virtualenv_info {
         venv=''
     fi
     if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-        [[ -n "$venv" ]] && echo "$BG[003] $FG[000]$venv%{$reset_color%}$FG[003]$BG[008]$SEP"
+        [[ -n "$venv" ]] && echo " $FG[003]$venv%{$reset_color%}"
     else
-        [[ -n "$venv" ]] && echo "$BG[003] $FG[000]$venv%{$reset_color%}$FG[003]$BG[012]$SEP"
+        [[ -n "$venv" ]] && echo " $FG[003]$venv%{$reset_color%}"
     fi
 }
 
 function user {
     if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        # echo -n "$BG[008] %{$fg[green]%}%n $BG[012]$FG[008]$SEP"
         echo -n "$BG[008] %{$fg[green]%}%n $BG[012]$FG[008]$SEP"
     else
         echo -n ""
@@ -65,22 +66,25 @@ function custom_git_status {
         local temp=$(echo $repo | grep -oPm1 "(?<=/)[a-zA-Z\.0-9_\-]+(?=\.git \(push\))")
 
         #[ -n "${indicators}" ] && indicators=" [${indicators}]";
-        BRANCH=$'\ue0a0'
+        # BRANCH=$'\ue0a0'
+        BRANCH=':'
         CUSTOM_THEME_GIT_PROMPT_PREFIX=""
         CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
-        echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
+        # echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
+        echo -n "%{$fg[yellow]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
     fi
 
 }
 
-SEP=$'\ue0b0'
-RIGHT_SEP=$'\ue0b2'
+# SEP=$'\ue0b0'
+# RIGHT_SEP=$'\ue0b2'
 
-PROMPT='$(virtualenv_info)$(user)$BG[012]$FG[008] %2~ $BG[013]$FG[012]$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
+# PROMPT='$(virtualenv_info)$(user)$BG[012]$FG[008] %2~ $BG[013]$FG[012]$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
+PROMPT='$FG[001]λ%{$reset_color%}$(virtualenv_info)$(user)$FG[012] %2~ %{$fg[green]%}$(prompt_char)%{$reset_color%} '
 
-RPS1='$(custom_git_status)%{$reset_color%}'
+RPS1='$(vi_mode_prompt_info)%{$reset_color%}$(custom_git_status)%{$reset_color%}'
 
-MODE_INDICATOR="%{$fg_bold[green]%}<%{$reset_color%}%{$fg[green]%}<<%{$reset_color%}"
+MODE_INDICATOR="%{$fg_bold[green]%}<%{$reset_color%}%{$fg[green]%}<<%{$reset_color%} "
 
 ZSH_THEME_GIT_PROMPT_PREFIX=""
 ZSH_THEME_GIT_PROMPT_SUFFIX=""
