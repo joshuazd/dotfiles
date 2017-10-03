@@ -90,6 +90,7 @@ set wildmode=longest,list
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/* " Ignore compiled files
 au FileType * set fo-=o         " Don't insert comment when using 'o'
 set sessionoptions-=options     " make sessions work better with plugins
+set sessionoptions-=folds
 let g:is_posix = 1
 set backupdir=/tmp              " Better backups
 set noswapfile
@@ -353,13 +354,16 @@ let g:rainbow_conf = {
 " Airline setup {{{
     let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#tabline#buffer_nr_show = 1
-    let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
+    let g:airline#extensions#tabline#formatter = 'unique_tail'
     let g:airline#extensions#tabline#buffer_min_count = 2
+    let g:airline_section_c = '%t'
     let g:airline_section_x = ''
     let g:airline_section_y = '%y %{&ff}'
-    let g:airline_section_z = '%3l:%2c'
+    " let g:airline_section_z = '%3l:%2c'
+    let g:airline_section_z = '%2c'
     "let g:airline_section_error = ''
     "let g:airline_section_warning = ''
+    let g:airline#extensions#hunks#non_zero_only = 1
 
 
     let g:airline_mode_map = {
@@ -419,7 +423,8 @@ let g:rainbow_conf = {
         let g:airline_symbols.maxlinenr = '☰'
         " let g:airline_symbols.maxlinenr = ''
         " let g:airline_symbols.branch = '⎇'
-        let g:airline_symbols.branch = ''
+        " let g:airline_symbols.branch = ''
+        let g:airline_symbols.branch = ''
         "let g:airline_symbols.branch = '⌥'
         " let g:airline_symbols.paste = 'ρ'
         let g:airline_symbols.paste = 'Þ'

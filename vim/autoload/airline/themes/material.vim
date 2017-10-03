@@ -99,3 +99,7 @@ let g:airline#themes#material#palette.replace.airline_error =
 
 let g:airline#themes#material#palette.replace_modified.airline_error =
             \ g:airline#themes#material#palette.normal.airline_error
+
+let g:airline#themes#material#palette.accents = {
+      \ 'red': [ '#e53935' , '' , 9 , ''  ]
+      \ }

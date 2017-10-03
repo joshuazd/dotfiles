@@ -106,7 +106,7 @@ stty -ixon
 export EDITOR=vim
 export VISUAL=vim
 bindkey -v
-export KEYTIMEOUT=7
+export KEYTIMEOUT=1
 bindkey -M viins 'jk' vi-cmd-mode
 bindkey -M viins "^I" expand-or-complete-prefix
 bindkey -M viins "^L" clear-screen

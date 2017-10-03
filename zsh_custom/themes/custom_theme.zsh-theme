@@ -62,6 +62,12 @@ function custom_git_status {
 
         indicators+="$arrows"
 
+        if [[ $indicators != '' ]]; then
+           local ind=$indicators
+           indicators=' '
+           indicators+=$ind
+        fi
+
         local repo=$(current_repository)
         local temp=$(echo $repo | grep -oPm1 "(?<=/)[a-zA-Z\.0-9_\-]+(?=\.git \(push\))")
 
@@ -71,7 +77,7 @@ function custom_git_status {
         CUSTOM_THEME_GIT_PROMPT_PREFIX=""
         CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
         # echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
-        echo -n "%{$fg[yellow]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
+        echo -n "%{$fg[yellow]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch)$indicators"
     fi
 
 }
