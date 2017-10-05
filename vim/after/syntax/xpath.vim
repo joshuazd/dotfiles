@@ -30,19 +30,19 @@ syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+
 
 highlight xpathQuote ctermfg=156 cterm=italic
 hi def link xpathString String
-highlight xpathString ctermfg=10 cterm=italic
+highlight xpathString ctermfg=10 cterm=italic guifg=#91b859 gui=italic
 hi def link xpathFunction Function
-highlight xpathFunction ctermfg=12 cterm=italic
+highlight xpathFunction ctermfg=12 cterm=italic guifg=#82aaff gui=italic
 hi def link xpathNumber Constant
-highlight xpathNumber ctermfg=6 cterm=italic
+highlight xpathNumber ctermfg=6 cterm=italic guifg=#39adb5 gui=italic
 " hi def link xpathParam Identifier
-highlight xpathParam ctermfg=11 cterm=italic
+highlight xpathParam ctermfg=11 cterm=italic guifg=#ffcb6b gui=italic
 hi def link xpathPunct PreProc
-highlight xpathPunct ctermfg=14 cterm=italic
+highlight xpathPunct ctermfg=14 cterm=italic guifg=#89ddff gui=italic
 hi def link xpathLangVar Type
-highlight xpathLangVar ctermfg=3 cterm=italic
-highlight xpathReference ctermfg=156 cterm=italic
-highlight xpathOperator ctermfg=137 cterm=italic
-highlight xpathP2 ctermfg=8 cterm=italic
-highlight xpathSpec ctermfg=1 cterm=italic
+highlight xpathLangVar ctermfg=3 cterm=italic guifg=#ffb62c gui=italic
+highlight xpathReference ctermfg=156 cterm=italic guifg=#afff87 gui=italic
+highlight xpathOperator ctermfg=137 cterm=italic guifg=#ab7967 gui=italic
+highlight xpathP2 ctermfg=8 cterm=italic guifg=#3e515b gui=italic
+highlight xpathSpec ctermfg=1 cterm=italic guifg=#e53935 gui=italic
 hi def link xpathNameSpace Primitive

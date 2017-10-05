@@ -318,9 +318,9 @@ hi def link xmlTodo		Todo
 hi def link xmlTag		Comment
 hi def link xmlTagPunct		Comment
 hi def link xmlEndTag		Identifier
-highlight xmlEndTag ctermfg=210
+highlight xmlEndTag ctermfg=210 guifg=#f07178
 hi def link xmlTagName		Identifier
-highlight xmlTagName ctermfg=210
+highlight xmlTagName ctermfg=210 guifg=#f07178
 if !exists("g:xml_namespace_transparent")
     hi def link xmlNamespace	Tag
 endif
@@ -331,7 +331,7 @@ hi def link xmlOperator         PreProc
 
 hi def link xmlAttribPunct	Comment
 hi def link xmlAttrib		Type
-highlight xmlAttrib ctermfg=152
+highlight xmlAttrib ctermfg=152 guifg=#afd7d7
 
 hi def link xmlString		String
 hi def link xmlComment		Comment
@@ -351,7 +351,7 @@ hi def link xmlCdataEnd		xmlQuote
 hi def link xmlDocTypeDecl	Function
 hi def link xmlDocTypeKeyword	Statement
 hi def link xmlInlineDTD	Function
-highlight xmlQuote ctermfg=156
+highlight xmlQuote ctermfg=156 guifg=#afff87
 
 let b:current_syntax = "xml"
 

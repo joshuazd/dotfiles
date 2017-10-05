@@ -95,15 +95,15 @@ let s:palette.gui.foreground = { 'dark' : "#fefefe"        , 'light' : "#000000"
 let s:palette.gui.selection  = { 'dark' : s:gui_selection  , 'light' : "#bcbcbc" }
 let s:palette.gui.line       = { 'dark' : s:gui_line       , 'light' : "#d0d0d0" }
 let s:palette.gui.comment    = { 'dark' : s:gui_comment    , 'light' : "#5f5f5f" }
-let s:palette.gui.red        = { 'dark' : "#cc6666"        , 'light' : "#5f0000" }
-let s:palette.gui.orange     = { 'dark' : "#de935f"        , 'light' : "#875f00" }
-let s:palette.gui.yellow     = { 'dark' : "#f0c674"        , 'light' : "#5f5f00" }
-let s:palette.gui.green      = { 'dark' : "#b5bd68"        , 'light' : "#005f00" }
+let s:palette.gui.red        = { 'dark' : "#ff5370"        , 'light' : "#5f0000" }
+let s:palette.gui.orange     = { 'dark' : "#ffb62c"        , 'light' : "#875f00" }
+let s:palette.gui.yellow     = { 'dark' : "#ffcb6b"        , 'light' : "#5f5f00" }
+let s:palette.gui.green      = { 'dark' : "#91b859"        , 'light' : "#005f00" }
 let s:palette.gui.lightgreen = { 'dark' : "#C3E88D"        , 'light' : "#C3E88D" }
 let s:palette.gui.pink       = { 'dark' : "#f07178"        , 'light' : "#f07178" }
 let s:palette.gui.aqua       = { 'dark' : "#89DDFF"        , 'light' : "#005f5f" }
 let s:palette.gui.blue       = { 'dark' : "#82aaff"        , 'light' : "#00005f" }
-let s:palette.gui.purple     = { 'dark' : "#b294bb"        , 'light' : "#5f005f" }
+let s:palette.gui.purple     = { 'dark' : "#c792ea"        , 'light' : "#5f005f" }
 let s:palette.gui.cyan       = { 'dark' : "#39ADB5"        , 'light' : "#39adb5" }
 let s:palette.gui.brown      = { 'dark' : "#ab7967"        , 'light' : "#ab7967" }
 let s:palette.gui.window     = { 'dark' : "#303030"        , 'light' : "#9e9e9e" }
@@ -115,8 +115,8 @@ let s:palette.gui.changefg   = { 'dark' : "#d7d7ff"        , 'light' : "#5f005f"
 let s:palette.gui.delbg      = { 'dark' : "#cc6666"        , 'light' : "#ffd7d7" }
 let s:palette.gui.darkblue   = { 'dark' : "#00005f"        , 'light' : "#d7ffd7" }
 let s:palette.gui.darkcyan   = { 'dark' : "#005f5f"        , 'light' : "#005f00" }
-let s:palette.gui.darkred    = { 'dark' : "#5f0000"        , 'light' : "#d7d7ff" }
-let s:palette.gui.darkpurple = { 'dark' : "#5f005f"        , 'light' : "#5f005f" }
+let s:palette.gui.darkred    = { 'dark' : "#e53935"        , 'light' : "#d7d7ff" }
+let s:palette.gui.darkpurple = { 'dark' : "#945eb8"        , 'light' : "#5f005f" }
 
 if exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:cterm_foreground = "15"  " White
@@ -363,12 +363,13 @@ hi LongLineWarning  guifg=NONE        guibg=#371F1C     gui=underline ctermfg=NO
 "   WildMenu"
 
 " Use defined custom background colour for terminal Vim.
-if !has('gui_running') && exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
+if !has('gui_running') 
+" && exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:bg_normal = s:bg_none
 else
   let s:bg_normal = s:bg_background
 endif
-exe "hi! Normal"        .s:fg_foreground  .s:bg_none      .s:fmt_none
+exe "hi! Normal"        .s:fg_foreground  .s:bg_normal      .s:fmt_none
 
 "}}}
 " Generic Syntax Highlighting: (see :help group-name)"{{{
@@ -392,7 +393,7 @@ exe "hi! Statement"       .s:fg_purple        .s:bg_none        .s:fmt_none
 "   Repeat"
 "   Label"
 exe "hi! Operator"        .s:fg_brown        .s:bg_none        .s:fmt_none
-exe "hi! Keyword"        .s:fg_purple        .s:bg_none        .s:fmt_none
+exe "hi! Keyword"         .s:fg_purple        .s:bg_none        .s:fmt_none
 "   Exception"
 
 exe "hi! PreProc"         .s:fg_aqua        .s:bg_none        .s:fmt_none

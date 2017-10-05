@@ -77,21 +77,21 @@ syn cluster xmlTagHook add=callTemplate,db,filter,property,sequence,connection,p
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
 
 highlight link xmlNs Identifier
-highlight xmlXsl ctermfg=1
+highlight xmlXsl ctermfg=1 guifg=#ff5370
 
 hi def link xmlEnrich Operator
 hi def link xmlArgs Primitive
-highlight xmlArgs ctermfg=3
+highlight xmlArgs ctermfg=3 guifg=#ffb62c
 hi def link xmlFunction Function
 hi def link xmlSend Function
 hi def link param StringPunct
-highlight connection ctermfg=13
-highlight xmlLog ctermfg=7
+highlight connection ctermfg=13 guifg=#945eb8
+highlight xmlLog ctermfg=7 guifg=#bbbbbb
 highlight link property Constant
 hi def link sequence StringPunct
 hi def link xmlScriptTag xmlTag
 hi def link xmlEndScriptTag xmlTag
 highlight link db Identifier
 highlight link filter Keyword
-highlight xmlSqlTag ctermfg=202
-highlight xmlLogParam ctermfg=245
+highlight xmlSqlTag ctermfg=202 guifg=#ff5f00
+highlight xmlLogParam ctermfg=245 guifg=#8a8a8a

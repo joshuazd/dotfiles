@@ -54,8 +54,8 @@ syn match   javaScriptSpecialCharacter "'\\.'"
 syn match   javaScriptNumber	       "-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
 syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end=+/[gim]\{0,2\}\s*$+ end=+/[gim]\{0,2\}\s*[;.,)\]}]+me=e-1 contains=@htmlPreproc oneline
 
-syn keyword javaScriptConditional       if nextgroup=javaScriptFuncParams
 syn keyword javaScriptConditional	else switch
+syn keyword javaScriptConditional       if switch nextgroup=javaScriptFuncParams
 syn keyword javaScriptRepeat		while for do nextgroup=javaScriptParams
 syn keyword javaScriptIn                in
 syn keyword javaScriptBranch		break continue
@@ -79,6 +79,7 @@ syn match javaScriptField "\.\@<=\h\w*\(\.\h\w*[(\[]\)\@="
 
 if exists("javaScript_fold")
     syn match	javaScriptFunction	"\<function\>"
+    syn match   javaScriptFunction      "\<function\>" nextgroup=javaScriptFuncParams
     syn region	javaScriptFunctionFold	start="\<function\>.*[^};]$" end="^\z1}.*$" transparent fold keepend
 
     syn sync match javaScriptSync	grouphere javaScriptFunctionFold "\<function\>"
@@ -88,6 +89,7 @@ if exists("javaScript_fold")
     setlocal foldtext=getline(v:foldstart)
 else
     syn keyword javaScriptFunction	function
+    syn keyword javaScriptFunction	function nextgroup=javaScriptFuncParams
     syn match	javaScriptBraces	   "[{}\[\]]"
     syn match	javaScriptParens	   "[()]"
 endif
