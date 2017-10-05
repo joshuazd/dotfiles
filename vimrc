@@ -5,7 +5,7 @@ set nocompatible
 call plug#begin('~/.vim/bundle')
 
 Plug 'w0rp/ale'
-Plug 'kien/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-scripts/c.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim'
@@ -29,6 +29,8 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-commentary'
 Plug 'Konfekt/FastFold'
 Plug 'ehamberg/vim-cute-python'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -99,18 +101,23 @@ set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespa
 set term=xterm-256color
 set omnifunc=syntaxcomplete#Complete    " enable omnicompletion
 " set completeopt+=longest
+set completeopt+=menuone
 set concealcursor+=n            " conceal characters in normal mode
 set conceallevel=2              " conceal characters by default
 set autowrite                   " automatically save before :next, :make, etc
 set autoread                    " automatically reread changed files
 if has("gui_running")
-    set guifont=Liberation\ Mono\ for\ Powerline\ Regular\ 11
+    set guifont=Literation\ Mono\ Powerline\ 14
     set guioptions-=T
     set guioptions+=e
     set guioptions-=m
+    set guioptions-=r
+    set guioptions-=L
     set guitablabel=%M\ %t
+    set lines=35 columns=120
 endif
 let g:hybrid_custom_term_colors=1
+let g:xml_syntax_folding=1 " enable xml folding
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -119,7 +126,6 @@ let g:hybrid_custom_term_colors=1
 " {{{
 let mapleader = "\<Space>" " make leader a more sane keybinding
 let maplocalleader = "," " remap localleader
-let g:xml_syntax_folding=1 " enable xml folding
 " make 0 work better
 nnoremap 0 ^
 nnoremap ^ 0
@@ -129,9 +135,14 @@ nnoremap <silent> <Leader>s :sp\|bn<CR>
 " Make <Leader>q clear highlighting from searches
 nnoremap <silent> <Leader>q :noh<return><esc>
 " make it easier to use buffers
-nnoremap <silent> <Leader>l :bn<CR>
+if has("gui_running")
+    nnoremap <M-d> :bn<CR>
+    nnoremap <M-a> :bp<CR>
+else
+    nnoremap <Esc>d :bn<CR>
+    nnoremap <Esc>a :bp<CR>
+endif
 nnoremap <silent> <Leader><Leader> :b#<CR>
-nnoremap <silent> <Leader>p :bp<CR>
 " more standard 'close tab' behavior
 nnoremap <silent> <C-x> :bn\|bd #<CR>
 " treat wrapped lines as different lines
@@ -153,6 +164,30 @@ nnoremap <silent> <Leader>7 :7b<CR>
 nnoremap <silent> <Leader>8 :8b<CR>
 nnoremap <silent> <Leader>9 :9b<CR>
 nnoremap <silent> <Leader>0 :10b<CR>
+
+if has("gui_running")
+    nnoremap <silent> <M-1> :1b<CR>
+    nnoremap <silent> <M-2> :2b<CR>
+    nnoremap <silent> <M-3> :3b<CR>
+    nnoremap <silent> <M-4> :4b<CR>
+    nnoremap <silent> <M-5> :5b<CR>
+    nnoremap <silent> <M-6> :6b<CR>
+    nnoremap <silent> <M-7> :7b<CR>
+    nnoremap <silent> <M-8> :8b<CR>
+    nnoremap <silent> <M-9> :9b<CR>
+    nnoremap <silent> <M-0> :10b<CR>
+else
+    nnoremap <silent> <Esc>1 :1b<CR>
+    nnoremap <silent> <Esc>2 :2b<CR>
+    nnoremap <silent> <Esc>3 :3b<CR>
+    nnoremap <silent> <Esc>4 :4b<CR>
+    nnoremap <silent> <Esc>5 :5b<CR>
+    nnoremap <silent> <Esc>6 :6b<CR>
+    nnoremap <silent> <Esc>7 :7b<CR>
+    nnoremap <silent> <Esc>8 :8b<CR>
+    nnoremap <silent> <Esc>9 :9b<CR>
+    nnoremap <silent> <Esc>0 :10b<CR>
+endif
 " Close other splits easily
 noremap <silent> <Leader>o :only<CR>
 " Easier to save
@@ -171,6 +206,21 @@ inoremap <C-@> <C-x><C-o>
 noremap <silent> <Leader>h :call ToggleConceal()<CR>
 " search command
 noremap <silent> <C-f> :CtrlPLine<CR>
+" paste and format
+nnoremap <silent> <Leader>p p=']
+nnoremap <silent> <Leader>P P=']
+noremap <silent> <F5> :call VimRefresh()<CR>
+function! VimRefresh()
+    CtrlPClearAllCaches
+    AirlineRefresh
+    ALEToggle
+    ALEToggle
+    GitGutterToggle
+    GitGutterToggle
+    NeoCompleteClean
+    NeoCompleteBufferMakeCache
+    NeoCompleteMemberMakeCache
+endfunction
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -180,8 +230,7 @@ noremap <silent> <C-f> :CtrlPLine<CR>
 augroup EditVim
     autocmd!
     autocmd InsertLeave * if pumvisible() == 0|pclose|endif " Close preview window when leaving insert mode
-    autocmd FileType xml setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab " Change tabs to be 2 spaces for xml files
-    autocmd FileType xml inoremap <expr> </ pumvisible() ? "\</\<C-x>\<C-o>\<C-y>" : "\</\<C-x>\<C-o>"
+    autocmd FileType xml call XmlSetup()
     autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
     autocmd BufNewFile,BufRead *.dbs set filetype=xml
     autocmd BufNewFile,BufRead *.dmc set filetype=javascript
@@ -192,10 +241,13 @@ augroup EditVim
     " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 augroup END
+
 function! TrimWhiteSpace()
     %s/\s\+$//e
     ''
 endfunction
+command! TrimWhiteSpace call TrimWhiteSpace()
+
 function! ToggleConceal()
     if &conceallevel == 0
         set conceallevel=2
@@ -204,6 +256,16 @@ function! ToggleConceal()
     endif
 endfunction
 
+function! XmlSetup()
+    setlocal shiftwidth=2
+    setlocal tabstop=2
+    setlocal softtabstop=2
+    setlocal noexpandtab
+    setlocal foldmethod=syntax
+    setlocal smarttab
+    inoremap <expr> </ pumvisible() ? "\</\<C-x>\<C-o>\<C-y>" : "\</\<C-x>\<C-o>"
+    command! Tabs setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab
+endfunction
 " }}}
 
 
@@ -222,16 +284,16 @@ endfunction
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
     let g:neocomplete#enable_auto_select = 1
-    let g:neocomplete#enable_refresh_always = 1
+    " let g:neocomplete#enable_refresh_always = 1
+    let g:neocomplete#auto_complete_delay = 0
     imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: pumvisible() ? "\<CR>" : "\<TAB>"
     smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: "\<TAB>"
-    imap <expr><CR>
-                \ (pumvisible() && neosnippet#expandable()) ?
-                \ "\<Plug>(neosnippet_expand)" : "\<CR>"
+    imap <expr><CR> neosnippet#expandable() ?
+                \ "\<Plug>(neosnippet_expand)" : "\<CR>\<Plug>AutoPairsReturn"
     let g:neosnippet#enable_snipmate_compatibility = 0
     let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
 
@@ -335,6 +397,10 @@ let g:ctrlp_by_filename = 1
 let g:ctrlp_switch_buffer = 'et'
 " }}}
 
+" AutoPairs setup {{{
+    let g:AutoPairsMapCR = 0
+" }}}
+
 " rainbow parens {{{
 let g:rainbow_active = 1
 
@@ -409,7 +475,8 @@ let g:rainbow_conf = {
         let g:airline_symbols.linenr = '¶'
         let g:airline_symbols.maxlinenr = '☰'
         " let g:airline_symbols.maxlinenr = ''
-        let g:airline_symbols.branch = '⎇'
+        " let g:airline_symbols.branch = '⎇'
+        let g:airline_symbols.branch = ''
         " let g:airline_symbols.paste = 'ρ'
         let g:airline_symbols.paste = 'Þ'
         " let g:airline_symbols.paste = '∥'
