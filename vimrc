@@ -310,7 +310,7 @@ endfunction
         autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
         let g:neocomplete#keyword_patterns.xml =
                     \'</\?\%([[:alnum:]_:-]\+\s*\)\?\%(/\?>\)\?\|&\h\%(\w*;\)\?'.
-                    \'\|\h\w*'
+                    \'\|\h[[:alnum:]_:-]*'
         let g:neocomplete#force_omni_input_patterns.xml = '</\?' "'\|\s[A-Za-z0-9=\-]*'
         call neocomplete#custom#source('omni', 'rank', 1000)
     " }}}
