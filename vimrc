@@ -107,7 +107,7 @@ set conceallevel=2              " conceal characters by default
 set autowrite                   " automatically save before :next, :make, etc
 set autoread                    " automatically reread changed files
 if has("gui_running")
-    set guifont=Literation\ Mono\ Powerline\ 14
+    set guifont=Literation\ Mono\ Powerline\ 11
     set guioptions-=T
     set guioptions+=e
     set guioptions-=m
@@ -135,13 +135,11 @@ nnoremap <silent> <Leader>s :sp\|bn<CR>
 " Make <Leader>q clear highlighting from searches
 nnoremap <silent> <Leader>q :noh<return><esc>
 " make it easier to use buffers
-if has("gui_running")
-    nnoremap <M-d> :bn<CR>
-    nnoremap <M-a> :bp<CR>
-else
-    nnoremap <Esc>d :bn<CR>
-    nnoremap <Esc>a :bp<CR>
-endif
+nnoremap <M-d> :bn<CR>
+nnoremap <M-a> :bp<CR>
+nnoremap <Esc>d :bn<CR>
+nnoremap <Esc>a :bp<CR>
+
 nnoremap <silent> <Leader><Leader> :b#<CR>
 " more standard 'close tab' behavior
 nnoremap <silent> <C-x> :bn\|bd #<CR>
@@ -165,29 +163,27 @@ nnoremap <silent> <Leader>8 :8b<CR>
 nnoremap <silent> <Leader>9 :9b<CR>
 nnoremap <silent> <Leader>0 :10b<CR>
 
-if has("gui_running")
-    nnoremap <silent> <M-1> :1b<CR>
-    nnoremap <silent> <M-2> :2b<CR>
-    nnoremap <silent> <M-3> :3b<CR>
-    nnoremap <silent> <M-4> :4b<CR>
-    nnoremap <silent> <M-5> :5b<CR>
-    nnoremap <silent> <M-6> :6b<CR>
-    nnoremap <silent> <M-7> :7b<CR>
-    nnoremap <silent> <M-8> :8b<CR>
-    nnoremap <silent> <M-9> :9b<CR>
-    nnoremap <silent> <M-0> :10b<CR>
-else
-    nnoremap <silent> <Esc>1 :1b<CR>
-    nnoremap <silent> <Esc>2 :2b<CR>
-    nnoremap <silent> <Esc>3 :3b<CR>
-    nnoremap <silent> <Esc>4 :4b<CR>
-    nnoremap <silent> <Esc>5 :5b<CR>
-    nnoremap <silent> <Esc>6 :6b<CR>
-    nnoremap <silent> <Esc>7 :7b<CR>
-    nnoremap <silent> <Esc>8 :8b<CR>
-    nnoremap <silent> <Esc>9 :9b<CR>
-    nnoremap <silent> <Esc>0 :10b<CR>
-endif
+nnoremap <silent> <M-1> :1b<CR>
+nnoremap <silent> <M-2> :2b<CR>
+nnoremap <silent> <M-3> :3b<CR>
+nnoremap <silent> <M-4> :4b<CR>
+nnoremap <silent> <M-5> :5b<CR>
+nnoremap <silent> <M-6> :6b<CR>
+nnoremap <silent> <M-7> :7b<CR>
+nnoremap <silent> <M-8> :8b<CR>
+nnoremap <silent> <M-9> :9b<CR>
+nnoremap <silent> <M-0> :10b<CR>
+nnoremap <silent> <Esc>1 :1b<CR>
+nnoremap <silent> <Esc>2 :2b<CR>
+nnoremap <silent> <Esc>3 :3b<CR>
+nnoremap <silent> <Esc>4 :4b<CR>
+nnoremap <silent> <Esc>5 :5b<CR>
+nnoremap <silent> <Esc>6 :6b<CR>
+nnoremap <silent> <Esc>7 :7b<CR>
+nnoremap <silent> <Esc>8 :8b<CR>
+nnoremap <silent> <Esc>9 :9b<CR>
+nnoremap <silent> <Esc>0 :10b<CR>
+
 " Close other splits easily
 noremap <silent> <Leader>o :only<CR>
 " Easier to save
