@@ -289,7 +289,8 @@ endfunction
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: "\<TAB>"
     imap <expr><CR> neosnippet#expandable() ?
-                \ "\<Plug>(neosnippet_expand)" : "\<CR>\<Plug>AutoPairsReturn"
+                \ "\<Plug>(neosnippet_expand)"
+                \: pumvisible()? "\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
     let g:neosnippet#enable_snipmate_compatibility = 0
     let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
 
