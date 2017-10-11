@@ -18,7 +18,7 @@ alias j=jobs
 
 alias python='python3'
 alias search='find . -type f -name'
-alias vi='vim'
+alias vi='custom_vim'
 
 if [[ $(uname -s) == CYGWIN* ]]; then
     alias home='cd /c/Users/jzinkduda'

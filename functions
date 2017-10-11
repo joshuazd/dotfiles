@@ -20,3 +20,20 @@ function check_repos() {
         cd ..
     done
 }
+
+function custom_vim() {
+    local jobsresult=$(jobs)
+    local jobsdir=$(jobs -d)
+    local vimresult=$(echo $jobsdir | grep -n vim)
+    if [[ -n $vimresult ]]; then
+        if [[ $(jobs -d | grep -B $vimresult[1,1] -oPm1 '(?<=\(pwd : ).*(?=\))') = $PWD ]]; then
+            local jobnum=$(echo $jobsresult | grep -n vim)
+            eval "fg %$jobnum[1,1]"
+        else
+            eval "vim $@"
+        fi
+    else
+        eval "vim $@"
+    fi
+    return true
+}
