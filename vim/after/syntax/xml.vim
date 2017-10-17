@@ -58,22 +58,12 @@ syn match xmlEndScriptTag +</script>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNa
 syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
 syn keyword  xmlCdataCdata CDATA          contained
 syn match    xmlCdataEnd   +]]>+          contained
-"let cur_syntax = b:current_syntax
-"unlet! b:current_syntax
-"syn include @xmlJavaScript syntax/javascript.vim
-"syn region xmlJavaScriptRegion
-"    \ start=+\(<script language="js">\)\(<!\[CDATA\[\)?+
-"    \ end=+\(\]\]>\)?\(</script>\)+
-"    \ contained
-"    \ contains=xmlCdata,xmlTag,xmlEndTag,@xmlJavaScript
-"syn cluster xmlCdataHook add=xmlJavaScript
-"let b:current_syntax = cur_syntax
 
 let cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlXpath $HOME/.vim/after/syntax/xpath.vim
 syn region xmlXpathRegion
-    \ matchgroup=xmlQuote start=+\(select=\| source=\|when test=\|xpath=\|expression=\)\@<="+
+    \ matchgroup=xmlQuote start=+\(select=\| source=\|when test=\|xpath=\|if test=\|expression=\)\@<="+
     \ keepend
     \ end=+"+
     \ contained
@@ -87,7 +77,6 @@ syn region xmlXpathRegion
     \ contains=xmlAttrib,@xmlXpath
 let b:current_syntax = cur_syntax
 highlight! xmlXpathRegion cterm=italic
-
 
 syn keyword xmlNs ns0
 syn keyword xmlXsl xsl
