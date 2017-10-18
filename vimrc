@@ -31,6 +31,8 @@ Plug 'Konfekt/FastFold'
 Plug 'ehamberg/vim-cute-python'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -184,6 +186,8 @@ nnoremap <silent> <Esc>8 :8b<CR>
 nnoremap <silent> <Esc>9 :9b<CR>
 nnoremap <silent> <Esc>0 :10b<CR>
 
+nnoremap <Leader>n :NERDTreeToggle<CR>
+
 " Close other splits easily
 noremap <silent> <Leader>o :only<CR>
 " Easier to save
@@ -236,6 +240,7 @@ augroup EditVim
     " autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
     " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+    autocmd QuitPre * exe "NERDTreeClose"
 augroup END
 
 function! TrimWhiteSpace()
@@ -274,6 +279,19 @@ endfunction
     let g:netrw_banner = 0
     let g:netrw_liststyle = 3
     let g:netrw_browse_split = 4
+" }}}
+
+" NERDTree setup {{{
+let g:NERDTreeIndicatorMapCustom = {
+         \ "Modified"  : "*",
+         \ "Staged"    : "+",
+         \ "Untracked" : "?",
+         \ "Renamed"   : "=",
+         \ "Unmerged"  : "^",
+         \ "Deleted"   : "x",
+         \ "Dirty"     : "✗"
+         \ }
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 " }}}
 
 " neocomplete setup {{{
