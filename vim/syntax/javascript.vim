@@ -44,7 +44,7 @@ syn match javaScriptArg "\h\w*" contained
 syn match javaScriptDeref "\."
 
 syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams
-syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptFuncParam
+syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="\s*(" end=")" contains=javaScriptFuncParam
 syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull,javaScriptField skipwhite
 
 syn region javaScriptParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptParam

@@ -17,6 +17,9 @@ syn match xpathNumber "\<[0-9]\+\>"
 
 syn match xpathSpec "fn"
 
+syn match   xmlEntity                 "&[^; \t]*;" contains=xmlEntityPunct
+syn match   xmlEntityPunct  contained "[&.;]"
+
 syn match xpathFunction "\(substring\|string\-join\|string\-length\|upper\-case\|lower\-case\|escape\-uri\|starts\-with\|ends\-with\)(\@="
 syn match xpathFunction "\(substring\-before\|substring\-after\|index\-of\|get\-property\|json\-eval\|contains\)(\@="
 syn match xpathFunction "\(number\|abs\|ceiling\|floor\|round\|string\|compare\|concat\|adjust-dateTime-to-timezone\)(\@="
@@ -28,6 +31,8 @@ syn match xpathFunction "\(dayTimeDuration\)"
 syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+
 
 
+hi def link xmlEntity		Statement
+hi def link xmlEntityPunct	PreProc
 highlight xpathQuote ctermfg=156 cterm=italic
 hi def link xpathString String
 highlight xpathString ctermfg=10 cterm=italic guifg=#91b859 gui=italic
