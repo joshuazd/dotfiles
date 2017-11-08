@@ -441,11 +441,9 @@ let g:rainbow_conf = {
     let g:airline_section_x = ''
     let g:airline_section_y = '%y %{&ff}'
     let g:airline_section_z = '%l:%c'
-    " let g:airline_section_z = '%2c'
     "let g:airline_section_error = ''
     "let g:airline_section_warning = ''
     let g:airline#extensions#hunks#non_zero_only = 1
-
 
     let g:airline_mode_map = {
                 \ '__' : '-',

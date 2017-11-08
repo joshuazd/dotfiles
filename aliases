@@ -10,7 +10,7 @@ alias .....="cd ../../../..; ls"
 alias ......="cd ../../../../..; ls"
 alias lt='ls -lrt'
 unalias l
-alias l='ls -lF'
+alias l='ls -lFh'
 
 alias mv='mv -i'
 alias cp='cp -i'

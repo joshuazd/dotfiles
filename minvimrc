@@ -38,7 +38,8 @@ set softtabstop=4               " number of spaces when inserting/backspacing
 set shiftwidth=4                " shift 4 spaces for indentation
 set expandtab                   " expand tabs into spaces
 set autoindent                  " use the previous lines indentation level
-" set nowrap                      " don't wrap lines by default
+set noshowmode
+set nowrap                      " don't wrap lines by default
 set laststatus=2                " always show statusline
 set cindent                     " better indentation
 set cinkeys-=0#
@@ -83,9 +84,12 @@ nnoremap <silent> <Leader>s :sp\|bn<CR>
 " Make <Leader>q clear highlighting from searches
 nnoremap <silent> <Leader>q :noh<return><esc>
 " make it easier to use buffers
-nnoremap <silent> <Leader>l :bn<CR>
+nnoremap <M-d> :bn<CR>
+nnoremap <M-a> :bp<CR>
+nnoremap <Esc>d :bn<CR>
+nnoremap <Esc>a :bp<CR>
+
 nnoremap <silent> <Leader><Leader> :b#<CR>
-nnoremap <silent> <Leader>p :bp<CR>
 " more standard 'close tab' behavior
 nnoremap <silent> <C-x> :bn\|bd #<CR>
 " treat wrapped lines as different lines
@@ -107,6 +111,30 @@ nnoremap <silent> <Leader>7 :7b<CR>
 nnoremap <silent> <Leader>8 :8b<CR>
 nnoremap <silent> <Leader>9 :9b<CR>
 nnoremap <silent> <Leader>0 :10b<CR>
+
+nnoremap <silent> <M-1> :1b<CR>
+nnoremap <silent> <M-2> :2b<CR>
+nnoremap <silent> <M-3> :3b<CR>
+nnoremap <silent> <M-4> :4b<CR>
+nnoremap <silent> <M-5> :5b<CR>
+nnoremap <silent> <M-6> :6b<CR>
+nnoremap <silent> <M-7> :7b<CR>
+nnoremap <silent> <M-8> :8b<CR>
+nnoremap <silent> <M-9> :9b<CR>
+nnoremap <silent> <M-0> :10b<CR>
+nnoremap <silent> <Esc>1 :1b<CR>
+nnoremap <silent> <Esc>2 :2b<CR>
+nnoremap <silent> <Esc>3 :3b<CR>
+nnoremap <silent> <Esc>4 :4b<CR>
+nnoremap <silent> <Esc>5 :5b<CR>
+nnoremap <silent> <Esc>6 :6b<CR>
+nnoremap <silent> <Esc>7 :7b<CR>
+nnoremap <silent> <Esc>8 :8b<CR>
+nnoremap <silent> <Esc>9 :9b<CR>
+nnoremap <silent> <Esc>0 :10b<CR>
+
+nnoremap <Leader>n :NERDTreeToggle<CR>
+
 " Close other splits easily
 noremap <silent> <Leader>o :only<CR>
 " Easier to save
@@ -123,6 +151,9 @@ nnoremap <silent> <Leader>z :set invlist<CR>
 inoremap <C-@> <C-x><C-o>
 " toggle conceallevel
 noremap <silent> <Leader>h :call ToggleConceal()<CR>
+" paste and format
+nnoremap <silent> <Leader>p p=']
+nnoremap <silent> <Leader>P P=']
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -144,10 +175,13 @@ augroup EditVim
     " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 augroup END
+
 function! TrimWhiteSpace()
     %s/\s\+$//e
     ''
 endfunction
+command! TrimWhiteSpace call TrimWhiteSpace()
+
 function! ToggleConceal()
     if &conceallevel == 0
         set conceallevel=2
