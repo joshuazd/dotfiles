@@ -101,6 +101,18 @@ if [ -f "${HOME}/.functions" ]; then
       source "${HOME}/.functions"
 fi
 
+# Options
+setopt AUTO_CD
+setopt EXTENDED_GLOB
+setopt NOMATCH
+setopt NO_BEEP
+setopt COMPLETE_IN_WORD
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
+setopt NO_CLOBBER
+setopt CORRECT
+setopt GLOB_COMPLETE
+
 stty -ixon
 
 export EDITOR=vim
@@ -116,6 +128,7 @@ bindkey -M viins "^R" history-incremental-search-backward
 bindkey -M viins "^W" backward-kill-word
 bindkey -M viins "^A" beginning-of-line
 bindkey -M viins "^E" end-of-line
+bindkey -M viins ' ' magic-space
 
 export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
 setopt INC_APPEND_HISTORY
@@ -125,4 +138,6 @@ setopt HIST_REDUCE_BLANKS
 setopt HIST_VERIFY
 
 
-export PATH=~/pebble-dev/pebble-sdk-4.5-linux64/bin:$PATH
+if [[ $(uname -s) != CYGWIN* ]]; then
+    export PATH=~/pebble-dev/pebble-sdk-4.5-linux64/bin:$PATH
+fi

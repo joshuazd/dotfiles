@@ -25,9 +25,9 @@
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
-if [[ $(uname -s) == CYGWIN* ]]; then
-    /bin/zsh; exit
-fi
+# if [[ $(uname -s) == CYGWIN* ]]; then
+    # /bin/zsh; exit
+# fi
 # Shell Options
 #
 # See man bash for more options...
