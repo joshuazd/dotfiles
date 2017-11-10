@@ -1,5 +1,5 @@
-#!/bin/sh
-alias ls='ls --color=auto'
+#!/bin/zsh
+alias ls='ls -F --color=auto'
 alias df='df -h'
 alias du='du -h -c'
 alias back='cd $OLDPWD'
