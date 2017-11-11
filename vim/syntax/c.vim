@@ -17,7 +17,7 @@ let s:ft = matchstr(&ft, '^\([^.]\)\+')
 syn keyword	cStatement	goto break return continue asm
 syn keyword	cLabel		case default
 syn keyword	cConditional	if else switch nextgroup=cCondParam
-syn keyword	cRepeat		while for do
+syn keyword	cRepeat		while for do nextgroup=cFuncParams
 
 syn keyword	cTodo		contained TODO FIXME XXX
 
@@ -247,7 +247,7 @@ syn match	cCommentError	display "\*/"
 syn match	cCommentStartError display "/\*"me=e-1 contained
 
 syn keyword	cOperator	sizeof
-syn match       cOperator       "\(=\|==\|!=\|+\|*\|*\*\|&&\||\|-\)"
+syn match       cOperator       "\(=\|==\|!=\|>\|<\|<=\|>=\|+\|*\|*\*\|&&\||\|-\)"
 syn match cDereference "->\|\."
 if exists("c_gnu")
   syn keyword	cStatement	__asm__
@@ -408,7 +408,7 @@ syn region	cPreProc	start="^\s*\zs\(%:\|#\)\s*\(pragma\>\|line\>\|warning\>\|war
 " Highlight User Labels
 syn cluster	cMultiGroup	contains=cIncluded,cSpecial,cCommentSkip,cCommentString,cComment2String,@cCommentGroup,cCommentStartError,cUserCont,cUserLabel,cBitField,cOctalZero,cCppOutWrapper,cCppInWrapper,@cCppOutInGroup,cFormat,cNumber,cFloat,cOctal,cOctalError,cNumbersCom,cCppParen,cCppBracket,cCppString
 if s:ft ==# 'c' || exists("cpp_no_cpp11")
-  syn region	cMulti		transparent start='?' skip='::' end=':' contains=ALLBUT,@cMultiGroup,@Spell,@cStringGroup
+  syn region	cMulti		transparent start='?' skip='::' end=':' contains=ALLBUT,@cMultiGroup,@Spell,@cStringGroup,cParamList
 endif
 " Avoid matching foo::bar() in C++ by requiring that the next char is not ':'
 syn cluster	cLabelGroup	contains=cUserLabel
@@ -496,6 +496,7 @@ hi def link cCppInElse2		cCppOutIf2
 hi def link cCppOutIf2		cCppOut
 hi def link cCppOut		Comment
 hi def link cPunct              PreProc
+hi def link cParen              PreProc
 hi def link cFunc               Function
 hi def link cIdentifier         Identifier
 hi def link cDereference        Comment
