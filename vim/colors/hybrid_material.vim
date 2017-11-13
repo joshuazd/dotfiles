@@ -404,7 +404,7 @@ exe "hi! Include"         .s:fg_purple      .s:bg_none        .s:fmt_none
 
 exe "hi! Language"        .s:fg_pink        .s:bg_none        .s:fmt_none
 exe "hi! Primitive"       .s:fg_orange      .s:bg_none        .s:fmt_ital
-exe "hi! Type"            .s:fg_yellow      .s:bg_none        .s:fmt_ital
+exe "hi! Type"            .s:fg_yellow      .s:bg_none        .s:fmt_none
 "   StorageClass"
 exe "hi! Structure"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 "   Typedef"

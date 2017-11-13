@@ -20,6 +20,8 @@ ZSH_THEME="custom_theme"
 # sensitive completion must be off. _ and - will be interchangeable.
 HYPHEN_INSENSITIVE="true"
 export LS_COLORS='di=01;94:ex=01;92:tw=30;00:ow=34;00'
+export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
+export EDITOR='vim'
 
 # Uncomment the following line to disable bi-weekly auto-update checks.
 # DISABLE_AUTO_UPDATE="true"
@@ -53,12 +55,17 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 # Would you like to use another custom folder than $ZSH/custom?
 ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 
-ZSH_TMUX_AUTOSTART="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git tmux vi-mode zsh-syntax-highlighting)
+
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    plugins=(git ansible)
+else
+    plugins=(git tmux vi-mode zsh-syntax-highlighting)
+    ZSH_TMUX_AUTOSTART="true"
+fi
 
 source $ZSH/oh-my-zsh.sh
 

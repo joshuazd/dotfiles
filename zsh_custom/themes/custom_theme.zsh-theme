@@ -1,5 +1,19 @@
 function prompt_char {
-    if [ $UID -eq 0 ]; then echo "#"; else echo '»'; fi
+    if [ $UID -eq 0 ]; then 
+        echo "#"
+    elif [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        echo '›'
+    else
+        echo '»'
+    fi
+}
+
+function prompt_start {
+    if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+        echo 'γ'
+    else
+        echo 'λ'
+    fi
 }
 
 function virtualenv_info {
@@ -18,7 +32,7 @@ function virtualenv_info {
 function user {
     if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
         # echo -n "$BG[008] %{$fg[green]%}%n $BG[012]$FG[008]$SEP"
-        echo -n "$BG[008] %{$fg[green]%}%n $BG[012]$FG[008]$SEP"
+        echo -n ""
     else
         echo -n ""
     fi
@@ -68,7 +82,7 @@ function custom_git_status {
            indicators+=$ind
         fi
 
-        local repo=$(current_repository)
+        repo=$(current_repository)
         local temp=$(echo $repo | grep -oPm1 "(?<=/)[a-zA-Z\.0-9_\-]+(?=\.git \(push\))")
 
         #[ -n "${indicators}" ] && indicators=" [${indicators}]";
@@ -86,7 +100,7 @@ function custom_git_status {
 # RIGHT_SEP=$'\ue0b2'
 
 # PROMPT='$(virtualenv_info)$(user)$BG[012]$FG[008] %2~ $BG[013]$FG[012]$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
-PROMPT='$FG[009]λ%{$reset_color%}$(virtualenv_info)$(user)$FG[012] %1~ $FG[010]$(prompt_char)%{$reset_color%} '
+PROMPT='$FG[009]$(prompt_start)%{$reset_color%}$(virtualenv_info)$(user)$FG[012] %1~ $FG[010]$(prompt_char)%{$reset_color%} '
 
 RPS1='$(vi_mode_prompt_info)%{$reset_color%}$(custom_git_status)%{$reset_color%}'
 
