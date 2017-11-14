@@ -91,7 +91,7 @@ function custom_git_status {
         CUSTOM_THEME_GIT_PROMPT_PREFIX=""
         CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
         # echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
-        echo -n "%{$fg[yellow]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch)$indicators"
+        echo -n "$FG[011]${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch)$indicators"
     fi
 
 }
