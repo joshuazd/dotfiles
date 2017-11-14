@@ -196,8 +196,11 @@ let s:r      = ",reverse"
 let s:s      = ",standout"
 let s:b      = ",bold"
 let s:u      = ",underline"
-let s:i      = ",italic"
-
+if $SSH_CLIENT ==? ""
+  let s:i    = ",italic"
+else
+  let s:i    = ""
+endif
 "}}}
 " Highlighting Primitives:"{{{
 " ----------------------------------------------------------------------------
@@ -363,7 +366,7 @@ hi LongLineWarning  guifg=NONE        guibg=#371F1C     gui=underline ctermfg=NO
 "   WildMenu"
 
 " Use defined custom background colour for terminal Vim.
-if !has('gui_running') 
+if !has('gui_running')
 " && exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:bg_normal = s:bg_none
 else
