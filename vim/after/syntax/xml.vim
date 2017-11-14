@@ -76,7 +76,11 @@ syn region xmlXpathRegion
     \ contained
     \ contains=xmlAttrib,@xmlXpath
 let b:current_syntax = cur_syntax
-highlight! xmlXpathRegion cterm=italic
+if $SSH_CLIENT ==? ""
+    highlight! xmlXpathRegion cterm=italic
+else
+    highlight! xmlXpathRegion cterm=NONE
+endif
 
 syn keyword xmlNs ns0
 syn keyword xmlXsl xsl
