@@ -53,6 +53,17 @@ syn region xmlJavaScriptRegion
     \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlJavaScript
 let b:current_syntax = cur_syntax
 
+let cur_syntax = b:current_syntax
+unlet! b:current_syntax
+syn include @xmlGroovy syntax/groovy.vim
+syn region xmlJavaScriptRegion
+    \ start=+<script language="groovy">+
+    \ keepend
+    \ end=+</script>+
+    \ contained
+    \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlGroovy
+let b:current_syntax = cur_syntax
+
 syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
 syn match xmlEndScriptTag +</script>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
