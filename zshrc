@@ -64,7 +64,7 @@ if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
     plugins=(git ansible)
 else
     plugins=(git tmux vi-mode zsh-syntax-highlighting)
-    ZSH_TMUX_AUTOSTART="true"
+    # ZSH_TMUX_AUTOSTART="true"
 fi
 
 source $ZSH/oh-my-zsh.sh
