@@ -61,7 +61,7 @@ ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 # Add wisely, as too many plugins slow down shell startup.
 
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    plugins=(git ansible)
+    plugins=(git tmux vi-mode ansible zsh-syntax-highlighting)
 else
     plugins=(git tmux vi-mode zsh-syntax-highlighting)
     # ZSH_TMUX_AUTOSTART="true"

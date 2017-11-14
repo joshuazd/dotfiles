@@ -1,5 +1,14 @@
+ZSH_THEME_GIT_PROMPT_UNTRACKED='?'
+ZSH_THEME_GIT_PROMPT_ADDED='+'
+ZSH_THEME_GIT_PROMPT_MODIFIED='*'
+ZSH_THEME_GIT_PROMPT_RENAMED='~'
+ZSH_THEME_GIT_PROMPT_DELETED='-'
+ZSH_THEME_GIT_PROMPT_UNMERGED='%'
+ZSH_THEME_GIT_PROMPT_AHEAD='▲'
+ZSH_THEME_GIT_PROMPT_BEHIND='▼'
+
 function prompt_char {
-    if [ $UID -eq 0 ]; then 
+    if [ $UID -eq 0 ]; then
         echo "#"
     elif [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
         echo '›'
@@ -44,54 +53,58 @@ function custom_git_status {
 
     if [[ "$(git rev-parse --is-inside-git-dir 2> /dev/null)" == 'false' ]]; then
 
-        git update-index --really-refresh -q &>/dev/null
+        # git update-index --really-refresh -q &>/dev/null
 
-        local indicators=''
-        if ! $(git diff --quiet --ignore-submodules --cached); then
-            # uncommited changes
-            indicators+='+'
-        fi
-        if ! $(git diff-files --quiet --ignore-submodules --); then
-            # unstaged changes
+        # local indicators=''
+        # if ! $(git diff --quiet --ignore-submodules --cached); then
+        #     # uncommited changes
+        #     indicators+='+'
+        # fi
+        # if ! $(git diff-files --quiet --ignore-submodules --); then
+        #     # unstaged changes
 
-            # indicators+=$'\u26a1'
-            indicators+='*'
-        fi
-        if [ -n "$(git ls-files --others --exclude-standard)" ]; then
-            # untracked files
-            indicators+='?'
-        fi
+        #     # indicators+=$'\u26a1'
+        #     indicators+='*'
+        # fi
+        # if [ -n "$(git ls-files --others --exclude-standard)" ]; then
+        #     # untracked files
+        #     indicators+='?'
+        # fi
 
-        local count
-        count="$(command git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null)"
-        # exit if the command failed
-        # (( !$? )) || return
-        count=(${(ps:\t:)count})
-        local arrows left=${count[1]} right=${count[2]}
+        # local count
+        # count="$(command git rev-list --left-right --count HEAD...@'{u}' 2>/dev/null)"
+        # # exit if the command failed
+        # # (( !$? )) || return
+        # count=(${(ps:\t:)count})
+        # local arrows left=${count[1]} right=${count[2]}
 
-        (( ${right:-0} > 1 )) && arrows+="${right:-0}"
-        (( ${right:-0} > 0 )) && arrows+="▼"
-        (( ${left:-0} > 1 )) && arrows+="${left:-0}"
-        (( ${left:-0} > 0 )) && arrows+="▲"
+        # (( ${right:-0} > 1 )) && arrows+="${right:-0}"
+        # (( ${right:-0} > 0 )) && arrows+="▼"
+        # (( ${left:-0} > 1 )) && arrows+="${left:-0}"
+        # (( ${left:-0} > 0 )) && arrows+="▲"
 
-        indicators+="$arrows"
+        # indicators+="$arrows"
 
-        if [[ $indicators != '' ]]; then
-           local ind=$indicators
-           indicators=' '
-           indicators+=$ind
-        fi
+        # if [[ $indicators != '' ]]; then
+        #    local ind=$indicators
+        #    indicators=' '
+        #    indicators+=$ind
+        # fi
 
-        repo=$(current_repository)
-        local temp=$(echo $repo | grep -oPm1 "(?<=/)[a-zA-Z\.0-9_\-]+(?=\.git \(push\))")
+        #repo=$(current_repository)
+        #local temp=$(echo $repo | grep -oPm1 "(?<=/)[a-zA-Z\.0-9_\-]+(?=\.git \(push\))")
 
         #[ -n "${indicators}" ] && indicators=" [${indicators}]";
         # BRANCH=$'\ue0a0'
-        BRANCH=':'
-        CUSTOM_THEME_GIT_PROMPT_PREFIX=""
-        CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
+        #BRANCH=':'
+        #CUSTOM_THEME_GIT_PROMPT_PREFIX=""
+        #CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
         # echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
-        echo -n "$FG[011]${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch)$indicators"
+        STATUS=$(git_prompt_status)
+        if [[ $STATUS != '' ]]; then
+            STATUS=' '$STATUS
+        fi
+        echo -n "$FG[011]$(git_current_branch)$STATUS"
     fi
 
 }
