@@ -44,7 +44,7 @@ syn match javaScriptArg "\h\w*" contained
 syn match javaScriptDeref "\."
 
 syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams
-syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptFuncParam
+syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="\s*(" end=")" contains=javaScriptFuncParam
 syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull,javaScriptField skipwhite
 
 syn region javaScriptParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptParam
@@ -59,7 +59,7 @@ syn keyword javaScriptConditional       if switch nextgroup=javaScriptFuncParams
 syn keyword javaScriptRepeat		while for do nextgroup=javaScriptParams
 syn keyword javaScriptIn                in
 syn keyword javaScriptBranch		break continue
-syn keyword javaScriptOperator		instanceof typeof
+syn keyword javaScriptOperator		instanceof typeof delete 
 syn keyword javaScriptType		Array Boolean Date Function Number Object String RegExp nextgroup=javaScriptFuncParams
 syn keyword javaScriptStatement		return with
 syn keyword javaScriptBoolean		true false
@@ -71,7 +71,7 @@ syn keyword javaScriptMessage		alert confirm prompt status
 syn keyword javaScriptGlobal		self window top parent
 syn keyword javaScriptMember		document event location
 syn keyword javaScriptDeprecated	escape unescape
-syn keyword javaScriptReserved		new delete abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile
+syn keyword javaScriptReserved		new abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile
 
 syn match javaScriptItemAccess "\h\w*\[\@="
 syn match javaScriptField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9(\[]\|$\)\@="

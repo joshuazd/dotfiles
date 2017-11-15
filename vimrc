@@ -31,6 +31,8 @@ Plug 'Konfekt/FastFold'
 Plug 'ehamberg/vim-cute-python'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -135,13 +137,11 @@ nnoremap <silent> <Leader>s :sp\|bn<CR>
 " Make <Leader>q clear highlighting from searches
 nnoremap <silent> <Leader>q :noh<return><esc>
 " make it easier to use buffers
-if has("gui_running")
-    nnoremap <M-d> :bn<CR>
-    nnoremap <M-a> :bp<CR>
-else
-    nnoremap <Esc>d :bn<CR>
-    nnoremap <Esc>a :bp<CR>
-endif
+nnoremap <M-d> :bn<CR>
+nnoremap <M-a> :bp<CR>
+nnoremap <Esc>d :bn<CR>
+nnoremap <Esc>a :bp<CR>
+
 nnoremap <silent> <Leader><Leader> :b#<CR>
 " more standard 'close tab' behavior
 nnoremap <silent> <C-x> :bn\|bd #<CR>
@@ -165,29 +165,29 @@ nnoremap <silent> <Leader>8 :8b<CR>
 nnoremap <silent> <Leader>9 :9b<CR>
 nnoremap <silent> <Leader>0 :10b<CR>
 
-if has("gui_running")
-    nnoremap <silent> <M-1> :1b<CR>
-    nnoremap <silent> <M-2> :2b<CR>
-    nnoremap <silent> <M-3> :3b<CR>
-    nnoremap <silent> <M-4> :4b<CR>
-    nnoremap <silent> <M-5> :5b<CR>
-    nnoremap <silent> <M-6> :6b<CR>
-    nnoremap <silent> <M-7> :7b<CR>
-    nnoremap <silent> <M-8> :8b<CR>
-    nnoremap <silent> <M-9> :9b<CR>
-    nnoremap <silent> <M-0> :10b<CR>
-else
-    nnoremap <silent> <Esc>1 :1b<CR>
-    nnoremap <silent> <Esc>2 :2b<CR>
-    nnoremap <silent> <Esc>3 :3b<CR>
-    nnoremap <silent> <Esc>4 :4b<CR>
-    nnoremap <silent> <Esc>5 :5b<CR>
-    nnoremap <silent> <Esc>6 :6b<CR>
-    nnoremap <silent> <Esc>7 :7b<CR>
-    nnoremap <silent> <Esc>8 :8b<CR>
-    nnoremap <silent> <Esc>9 :9b<CR>
-    nnoremap <silent> <Esc>0 :10b<CR>
-endif
+nnoremap <silent> <M-1> :1b<CR>
+nnoremap <silent> <M-2> :2b<CR>
+nnoremap <silent> <M-3> :3b<CR>
+nnoremap <silent> <M-4> :4b<CR>
+nnoremap <silent> <M-5> :5b<CR>
+nnoremap <silent> <M-6> :6b<CR>
+nnoremap <silent> <M-7> :7b<CR>
+nnoremap <silent> <M-8> :8b<CR>
+nnoremap <silent> <M-9> :9b<CR>
+nnoremap <silent> <M-0> :10b<CR>
+nnoremap <silent> <Esc>1 :1b<CR>
+nnoremap <silent> <Esc>2 :2b<CR>
+nnoremap <silent> <Esc>3 :3b<CR>
+nnoremap <silent> <Esc>4 :4b<CR>
+nnoremap <silent> <Esc>5 :5b<CR>
+nnoremap <silent> <Esc>6 :6b<CR>
+nnoremap <silent> <Esc>7 :7b<CR>
+nnoremap <silent> <Esc>8 :8b<CR>
+nnoremap <silent> <Esc>9 :9b<CR>
+nnoremap <silent> <Esc>0 :10b<CR>
+
+nnoremap <Leader>n :NERDTreeToggle<CR>
+
 " Close other splits easily
 noremap <silent> <Leader>o :only<CR>
 " Easier to save
@@ -240,6 +240,7 @@ augroup EditVim
     " autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
     " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+    autocmd QuitPre * exe "NERDTreeClose"
 augroup END
 
 function! TrimWhiteSpace()
@@ -266,6 +267,8 @@ function! XmlSetup()
     inoremap <expr> </ pumvisible() ? "\</\<C-x>\<C-o>\<C-y>" : "\</\<C-x>\<C-o>"
     command! Tabs setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab
 endfunction
+
+command! FormatJSON %!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin, object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
 
 
@@ -278,6 +281,22 @@ endfunction
     let g:netrw_banner = 0
     let g:netrw_liststyle = 3
     let g:netrw_browse_split = 4
+" }}}
+
+" NERDTree setup {{{
+let g:NERDTreeIndicatorMapCustom = {
+         \ "Modified"  : "*",
+         \ "Staged"    : "+",
+         \ "Untracked" : "?",
+         \ "Renamed"   : "=",
+         \ "Unmerged"  : "^",
+         \ "Deleted"   : "x",
+         \ "Dirty"     : "✗"
+         \ }
+
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 " }}}
 
 " neocomplete setup {{{
@@ -293,7 +312,8 @@ endfunction
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: "\<TAB>"
     imap <expr><CR> neosnippet#expandable() ?
-                \ "\<Plug>(neosnippet_expand)" : "\<CR>\<Plug>AutoPairsReturn"
+                \ "\<Plug>(neosnippet_expand)"
+                \: pumvisible()? "\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
     let g:neosnippet#enable_snipmate_compatibility = 0
     let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
 
@@ -426,12 +446,10 @@ let g:rainbow_conf = {
     let g:airline_section_c = '%t'
     let g:airline_section_x = ''
     let g:airline_section_y = '%y %{&ff}'
-    " let g:airline_section_z = '%3l:%2c'
-    let g:airline_section_z = '%2c'
+    let g:airline_section_z = '%l:%c'
     "let g:airline_section_error = ''
     "let g:airline_section_warning = ''
     let g:airline#extensions#hunks#non_zero_only = 1
-
 
     let g:airline_mode_map = {
                 \ '__' : '-',

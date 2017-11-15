@@ -17,6 +17,9 @@ syn match xpathNumber "\<[0-9]\+\>"
 
 syn match xpathSpec "fn"
 
+syn match   xmlEntity                 "&[^; \t]*;" contains=xmlEntityPunct
+syn match   xmlEntityPunct  contained "[&.;]"
+
 syn match xpathFunction "\(substring\|string\-join\|string\-length\|upper\-case\|lower\-case\|escape\-uri\|starts\-with\|ends\-with\)(\@="
 syn match xpathFunction "\(substring\-before\|substring\-after\|index\-of\|get\-property\|json\-eval\|contains\)(\@="
 syn match xpathFunction "\(number\|abs\|ceiling\|floor\|round\|string\|compare\|concat\|adjust-dateTime-to-timezone\)(\@="
@@ -27,22 +30,29 @@ syn match xpathFunction "\(dayTimeDuration\)"
 " STRINGS
 syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+
 
+if $SSH_CLIENT ==? ""
+    let format='italic'
+else
+    let format='NONE'
+endif
 
-highlight xpathQuote ctermfg=156 cterm=italic
-hi def link xpathString String
-highlight xpathString ctermfg=10 cterm=italic guifg=#91b859 gui=italic
-hi def link xpathFunction Function
-highlight xpathFunction ctermfg=12 cterm=italic guifg=#82aaff gui=italic
-hi def link xpathNumber Constant
-highlight xpathNumber ctermfg=6 cterm=italic guifg=#39adb5 gui=italic
+hi def link xmlEntity		Statement
+hi def link xmlEntityPunct	PreProc
+exe "highlight xpathQuote ctermfg=156 cterm=" .format
+" hi def link xpathString String
+exe "highlight xpathString ctermfg=10 cterm=" .format ." guifg=#91b859 gui=" .format
+" hi def link xpathFunction Function
+exe "highlight xpathFunction ctermfg=12 cterm=" .format ." guifg=#82aaff gui=" .format
+" hi def link xpathNumber Constant
+exe "highlight xpathNumber ctermfg=6 cterm=" .format ." guifg=#39adb5 gui=" .format
 " hi def link xpathParam Identifier
-highlight xpathParam ctermfg=11 cterm=italic guifg=#ffcb6b gui=italic
-hi def link xpathPunct PreProc
-highlight xpathPunct ctermfg=14 cterm=italic guifg=#89ddff gui=italic
-hi def link xpathLangVar Type
-highlight xpathLangVar ctermfg=3 cterm=italic guifg=#ffb62c gui=italic
-highlight xpathReference ctermfg=156 cterm=italic guifg=#afff87 gui=italic
-highlight xpathOperator ctermfg=137 cterm=italic guifg=#ab7967 gui=italic
-highlight xpathP2 ctermfg=8 cterm=italic guifg=#3e515b gui=italic
-highlight xpathSpec ctermfg=1 cterm=italic guifg=#e53935 gui=italic
+exe "highlight xpathParam ctermfg=11 cterm=" .format ." guifg=#ffcb6b gui=" .format
+"hi def link xpathPunct PreProc
+exe "highlight xpathPunct ctermfg=14 cterm=" .format ." guifg=#89ddff gui=" .format
+" hi def link xpathLangVar Type
+exe "highlight xpathLangVar ctermfg=3 cterm=" .format ." guifg=#ffb62c gui=" .format
+exe "highlight xpathReference ctermfg=156 cterm=" .format ." guifg=#afff87 gui=" .format
+exe "highlight xpathOperator ctermfg=137 cterm=" .format ." guifg=#ab7967 gui=" .format
+exe "highlight xpathP2 ctermfg=8 cterm=" .format ." guifg=#3e515b gui=" .format
+exe "highlight xpathSpec ctermfg=1 cterm=" .format ." guifg=#e53935 gui=" .format
 hi def link xpathNameSpace Primitive

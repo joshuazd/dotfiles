@@ -1,5 +1,5 @@
-#!/bin/sh
-alias ls='ls --color=auto'
+#!/bin/zsh
+alias ls='ls -F --color=auto'
 alias df='df -h'
 alias du='du -h -c'
 alias back='cd $OLDPWD'
@@ -10,7 +10,7 @@ alias .....="cd ../../../..; ls"
 alias ......="cd ../../../../..; ls"
 alias lt='ls -lrt'
 unalias l
-alias l='ls -lF'
+alias l='ls -lFh'
 
 alias mv='mv -i'
 alias cp='cp -i'
@@ -18,7 +18,7 @@ alias j=jobs
 
 alias python='python3'
 alias search='find . -type f -name'
-alias vi='vim'
+alias vi='custom_vim'
 
 if [[ $(uname -s) == CYGWIN* ]]; then
     alias home='cd /c/Users/jzinkduda'
@@ -32,7 +32,7 @@ if [[ $(uname -s) == CYGWIN* ]]; then
     alias wls='cd /c/apps/wls12120/user_projects/domains/mydomain/servers/myserver/logs'
     alias wso='cd /c/apps/wso2esb-5.0.0/bin'
 
-    alias mcar='cp "`ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
+    alias mcar='cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
     alias esb='sh /c/apps/wso2esb-5.0.0/bin/wso2server.sh'
     alias esblog='less +F /c/apps/wso2esb-5.0.0/repository/logs/wso2carbon.log'
     alias subl='/c/Program\ Files/Sublime\ Text\ 3/subl.exe'

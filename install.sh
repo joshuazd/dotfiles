@@ -1,14 +1,4 @@
-# initialize submodules
-# echo "Initializing submodules"
-# git submodule init
-# git submodule update
-# git submodule foreach git pull origin master
-
-# install Vundle
-# echo "Cloning Vundle"
-# mkdir -p .vim/bundle
-# git clone https://github.com/VundleVim/Vundle.vim.git vim/bundle/Vundle.vim
-
+#!/bin/zsh
 # install oh my zsh
 echo "Installing oh my zsh"
 if [ -f /bin/zsh -o -f /usr/bin/zsh -o -f /bin/zsh.exe -o -f /usr/bin/zsh.exe ]; then
@@ -59,3 +49,4 @@ if [ -f $HOME/.tmux.conf ]; then
 fi
 ln -s $PWD/tmux.conf $HOME/.tmux.conf
 
+echo "To install vim plugins, open vim and run :PlugInstall"
