@@ -107,14 +107,14 @@ set conceallevel=2              " conceal characters by default
 set autowrite                   " automatically save before :next, :make, etc
 set autoread                    " automatically reread changed files
 if has("gui_running")
-    set guifont=Literation\ Mono\ Powerline\ 14
+    set guifont=Literation\ Mono\ Powerline\ 10
     set guioptions-=T
     set guioptions+=e
     set guioptions-=m
     set guioptions-=r
     set guioptions-=L
     set guitablabel=%M\ %t
-    set lines=35 columns=120
+    set lines=43 columns=120
 endif
 let g:hybrid_custom_term_colors=1
 let g:xml_syntax_folding=1 " enable xml folding
@@ -410,6 +410,7 @@ let g:rainbow_conf = {
             \   'xml': 0,
             \   'vim': 0,
             \   'python': 0,
+            \   'java': 0,
             \   'sh': 0,
             \   'c': 0,
             \   'javascript': 0
