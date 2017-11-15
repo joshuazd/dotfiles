@@ -363,7 +363,7 @@ hi LongLineWarning  guifg=NONE        guibg=#371F1C     gui=underline ctermfg=NO
 "   WildMenu"
 
 " Use defined custom background colour for terminal Vim.
-if !has('gui_running') 
+if !has('gui_running')
 " && exists("g:hybrid_custom_term_colors") && g:hybrid_custom_term_colors == 1
   let s:bg_normal = s:bg_none
 else
@@ -405,7 +405,7 @@ exe "hi! Include"         .s:fg_purple      .s:bg_none        .s:fmt_none
 exe "hi! Language"        .s:fg_pink        .s:bg_none        .s:fmt_none
 exe "hi! Primitive"       .s:fg_orange      .s:bg_none        .s:fmt_ital
 exe "hi! Type"            .s:fg_yellow      .s:bg_none        .s:fmt_ital
-"   StorageClass"
+exe "hi! StorageClass"    .s:fg_darkpurple  .s:bg_none        .s:fmt_ital
 exe "hi! Structure"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 "   Typedef"
 
