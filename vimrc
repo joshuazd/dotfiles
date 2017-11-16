@@ -34,7 +34,6 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'tpope/vim-endwise'
 Plug 'mhinz/vim-startify'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
@@ -375,6 +374,8 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
     let g:ale_python_flake8_options = '--max-line-length 99'
     let g:ale_virtualenv_dir_names = []
     let g:ale_lint_on_text_changed = 'normal'
+
+    let g:ale_linters = {'java': []}
 
     let g:ale_fixers = {
                 \   'python': [
