@@ -19,6 +19,12 @@ if [ -f $HOME/.vimrc ]; then
 fi
 ln -s $PWD/vimrc $HOME/.vimrc
 
+if [ -f $HOME/.inputrc ]; then
+    echo "Backing up existing inputrc to .inputrc.old"
+    mv $HOME/.inputrc $HOME/.inputrc.old
+fi
+ln -s $PWD/inputrc $HOME/.inputrc
+
 if [ -f $HOME/.bashrc ]; then
     echo "Backing up existing bashrc to .bashrc.old"
     mv $HOME/.bashrc $HOME/.bashrc.old
