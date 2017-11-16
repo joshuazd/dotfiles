@@ -61,9 +61,9 @@ ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 # Add wisely, as too many plugins slow down shell startup.
 
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    plugins=(git tmux vi-mode ansible zsh-syntax-highlighting)
+    plugins=(git tmux ansible zsh-syntax-highlighting z history-substring-search)
 else
-    plugins=(git tmux vi-mode zsh-syntax-highlighting)
+    plugins=(git tmux zsh-syntax-highlighting z history-substring-search)
     # ZSH_TMUX_AUTOSTART="true"
 fi
 
@@ -122,9 +122,13 @@ setopt GLOB_COMPLETE
 
 stty -ixon
 
+bindkey '^P' history-substring-search-up
+bindkey '^N' history-substring-search-down
+export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=none,fg=magenta,bold'
+
 export EDITOR=vim
 export VISUAL=vim
-bindkey -v
+# bindkey -v
 export KEYTIMEOUT=1
 bindkey -M viins 'jk' vi-cmd-mode
 bindkey -M viins "^I" expand-or-complete-prefix
