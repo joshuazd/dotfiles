@@ -412,7 +412,7 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 
 " ctrlP setup {{{
 set runtimepath^=~/.vim/bundle/ctrlp.vim
-let g:ctrlp_open_multiple_files = 'ri'
+let g:ctrlp_open_multiple_files = 'ij'
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_cmd = 'CtrlP'
 
