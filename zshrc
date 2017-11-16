@@ -61,9 +61,9 @@ ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 # Add wisely, as too many plugins slow down shell startup.
 
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    plugins=(git tmux ansible zsh-syntax-highlighting z history-substring-search)
+    plugins=(git tmux ansible z history-substring-search zsh-autosuggestions zsh-syntax-highlighting)
 else
-    plugins=(git tmux zsh-syntax-highlighting z history-substring-search)
+    plugins=(git tmux z history-substring-search zsh-autosuggestions zsh-syntax-highlighting)
     # ZSH_TMUX_AUTOSTART="true"
 fi
 
