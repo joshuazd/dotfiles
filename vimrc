@@ -38,6 +38,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'mhinz/vim-startify'
 Plug 'ryanoasis/vim-devicons'
+Plug 'plasticboy/vim-markdown'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -115,7 +116,8 @@ set conceallevel=2              " conceal characters by default
 set autowrite                   " automatically save before :next, :make, etc
 set autoread                    " automatically reread changed files
 if has("gui_running")
-    set guifont=Literation\ Mono\ Powerline\ 10
+    " set guifont=Literation\ Mono\ Powerline\ 10
+    " set guifont=DejaVuSansMono\ NF\ 10
     set guioptions-=T
     set guioptions+=e
     set guioptions-=m

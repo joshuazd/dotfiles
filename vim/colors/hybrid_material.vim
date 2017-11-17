@@ -85,7 +85,8 @@ let g:colors_name = "hybrid_material"
 
 let s:palette = {'gui' : {} , 'cterm' : {}}
 
-let s:gui_background = "#263238"
+" let s:gui_background = "#263238"
+let s:gui_background = "#212121"
 let s:gui_selection  = "#455A64"
 let s:gui_line       = "#212D32"
 let s:gui_comment    = "#707880"
@@ -331,7 +332,7 @@ exe "hi! DiffDelete"    .s:fg_background  .s:bg_delbg       .s:fmt_none
 exe "hi! DiffText"      .s:fg_background  .s:bg_blue        .s:fmt_none
 exe "hi! ErrorMsg"      .s:fg_background  .s:bg_red         .s:fmt_stnd
 exe "hi! VertSplit"     .s:fg_window      .s:bg_none        .s:fmt_none
-exe "hi! Folded ctermfg=245"                          .s:bg_darkcolumn  .s:fmt_none
+exe "hi! Folded ctermfg=245 guifg=#8a8a8a"                          .s:bg_darkcolumn  .s:fmt_none
 exe "hi! FoldColumn"    .s:fg_none        .s:bg_darkcolumn  .s:fmt_none
 exe "hi! SignColumn"    .s:fg_none        .s:bg_darkcolumn  .s:fmt_none
 "   Incsearch"
