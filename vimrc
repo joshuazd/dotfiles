@@ -20,6 +20,8 @@ Plug 'tmux-plugins/vim-tmux'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
+Plug 'Shougo/neco-vim'
+Plug 'Shougo/vimshell.vim'
 Plug 'justmao945/vim-clang'
 Plug 'shougo/neocomplete.vim'
 Plug 'christoomey/vim-tmux-navigator'
@@ -35,6 +37,7 @@ Plug 'tpope/vim-speeddating'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'mhinz/vim-startify'
+Plug 'ryanoasis/vim-devicons'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -52,6 +55,7 @@ set cmdheight=1                 " Height of the command bar
 set hidden                      " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent  " Configure backspace so it acts as it should act
 set whichwrap+=<,>,h,l          " arrow keys and h,l move to the next line
+set showcmd                     " show keystrokes
 set breakindent                 " Indent wrapped lines by 2
 set breakindentopt=shift:2
 set ignorecase                  " Ignore case when searching
@@ -277,6 +281,13 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+" devicons setup {{{
+
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
+
+" }}}
+
 " netrw setup {{{
     let g:netrw_winsize = -28
     let g:netrw_banner = 0
@@ -295,8 +306,10 @@ let g:NERDTreeIndicatorMapCustom = {
          \ "Dirty"     : "✗"
          \ }
 
-let g:NERDTreeDirArrowExpandable = '▸'
-let g:NERDTreeDirArrowCollapsible = '▾'
+" let g:NERDTreeDirArrowExpandable = '▸'
+" let g:NERDTreeDirArrowCollapsible = '▾'
+let g:NERDTreeDirArrowExpandable = ''
+let g:NERDTreeDirArrowCollapsible = ''
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 " }}}
 
@@ -359,6 +372,11 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
               \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)\|\h\w*::\w*'
         let g:clang_verbose_pmenu = 1
     " }}}
+
+    " javascript setup {{{
+        autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+    " }}}
+
 " }}}
 
 " Ansible setup {{{
@@ -498,7 +516,8 @@ let g:rainbow_conf = {
         let g:airline_symbols.maxlinenr = '☰'
         " let g:airline_symbols.maxlinenr = ''
         " let g:airline_symbols.branch = '⎇'
-        let g:airline_symbols.branch = ''
+        let g:airline_symbols.branch = ''
+        " let g:airline_symbols.branch = ''
         " let g:airline_symbols.paste = 'ρ'
         let g:airline_symbols.paste = 'Þ'
         " let g:airline_symbols.paste = '∥'
@@ -506,14 +525,14 @@ let g:rainbow_conf = {
         let g:airline_symbols.notexists = '∄'
         let g:airline_symbols.whitespace = 'Ξ'
     else
-        "let g:airline_right_sep = ''
-        "let g:airline_left_sep = ''
+        " let g:airline_right_sep = ''
+        " let g:airline_left_sep = ''
         let g:airline_symbols.linenr = '¶'
         let g:airline_symbols.maxlinenr = '☰'
         " let g:airline_symbols.maxlinenr = ''
         " let g:airline_symbols.branch = '⎇'
         " let g:airline_symbols.branch = ''
-        let g:airline_symbols.branch = ''
+        let g:airline_symbols.branch = ''
         "let g:airline_symbols.branch = '⌥'
         " let g:airline_symbols.paste = 'ρ'
         let g:airline_symbols.paste = 'Þ'
