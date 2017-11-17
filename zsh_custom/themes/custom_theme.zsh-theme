@@ -11,16 +11,21 @@ ZSH_THEME_GIT_PROMPT_DIRTY='✗'
 function prompt_char {
     if [ $UID -eq 0 ]; then
         echo "#"
-    elif [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-        echo '›'
+    # elif [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+    #     # echo '›'
+    #     # echo '〉'
+    #     echo '❯ '
     else
-        echo '»'
+        # echo '»'
+        # echo '⟫ '
+        echo '❯ '
     fi
 }
 
 function prompt_start {
     if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-        echo 'γ'
+        # echo 'γ'
+        echo 'Δ'
     else
         echo 'λ'
     fi
@@ -114,7 +119,7 @@ function custom_git_status {
 # RIGHT_SEP=$'\ue0b2'
 
 # PROMPT='$(virtualenv_info)$(user)$BG[012]$FG[008] %2~ $BG[013]$FG[012]$SEP%{$fg[black]%}$(prompt_char)%{$reset_color%}$FG[013]$SEP%{$reset_color%} '
-PROMPT='$FG[009]$(prompt_start)%{$reset_color%}$(virtualenv_info)$(user)$FG[012] %1~ $FG[010]$(prompt_char)%{$reset_color%} '
+PROMPT='$FG[009]$(prompt_start)%{$reset_color%}$(virtualenv_info)$(user)$FG[012] %1~ $FG[010]$(prompt_char)%{$reset_color%}'
 
 RPS1='$(vi_mode_prompt_info)%{$reset_color%}$(custom_git_status)%{$reset_color%}'
 
