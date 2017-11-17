@@ -9,7 +9,7 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-scripts/c.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim'
-Plug 'wting/gitsessions.vim'
+Plug 'tpope/vim-obsession'
 Plug 'luochen1990/rainbow'
 Plug 'gerw/vim-HiLinkTrace'
 Plug 'vim-airline/vim-airline'
@@ -31,8 +31,10 @@ Plug 'Konfekt/FastFold'
 Plug 'ehamberg/vim-cute-python'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-speeddating'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'mhinz/vim-startify'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -109,14 +111,14 @@ set conceallevel=2              " conceal characters by default
 set autowrite                   " automatically save before :next, :make, etc
 set autoread                    " automatically reread changed files
 if has("gui_running")
-    set guifont=Literation\ Mono\ Powerline\ 11
+    set guifont=Literation\ Mono\ Powerline\ 10
     set guioptions-=T
     set guioptions+=e
     set guioptions-=m
     set guioptions-=r
     set guioptions-=L
     set guitablabel=%M\ %t
-    set lines=35 columns=120
+    set lines=43 columns=120
 endif
 let g:hybrid_custom_term_colors=1
 let g:xml_syntax_folding=1 " enable xml folding
@@ -143,8 +145,8 @@ nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
 
 nnoremap <silent> <Leader><Leader> :b#<CR>
-" more standard 'close tab' behavior
-nnoremap <silent> <C-x> :bn\|bd #<CR>
+" more standard 'close buffer' behavior
+nnoremap <silent> <Leader>x :bn\|bd #<CR>
 " treat wrapped lines as different lines
 noremap j gj
 noremap k gk
@@ -271,7 +273,6 @@ endfunction
 command! FormatJSON %!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin, object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -373,6 +374,8 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
     let g:ale_virtualenv_dir_names = []
     let g:ale_lint_on_text_changed = 'normal'
 
+    let g:ale_linters = {'java': []}
+
     let g:ale_fixers = {
                 \   'python': [
                 \       'autopep8',
@@ -409,7 +412,7 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 
 " ctrlP setup {{{
 set runtimepath^=~/.vim/bundle/ctrlp.vim
-let g:ctrlp_open_multiple_files = 'ri'
+let g:ctrlp_open_multiple_files = 'ij'
 let g:ctrlp_clear_cache_on_exit = 0
 let g:ctrlp_cmd = 'CtrlP'
 
@@ -430,6 +433,7 @@ let g:rainbow_conf = {
             \   'xml': 0,
             \   'vim': 0,
             \   'python': 0,
+            \   'java': 0,
             \   'sh': 0,
             \   'c': 0,
             \   'javascript': 0
