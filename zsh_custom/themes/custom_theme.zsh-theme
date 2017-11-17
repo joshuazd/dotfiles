@@ -6,6 +6,7 @@ ZSH_THEME_GIT_PROMPT_DELETED='-'
 ZSH_THEME_GIT_PROMPT_UNMERGED='%'
 ZSH_THEME_GIT_PROMPT_AHEAD='▲'
 ZSH_THEME_GIT_PROMPT_BEHIND='▼'
+ZSH_THEME_GIT_PROMPT_DIRTY='✗'
 
 function prompt_char {
     if [ $UID -eq 0 ]; then
@@ -100,7 +101,7 @@ function custom_git_status {
         #CUSTOM_THEME_GIT_PROMPT_PREFIX=""
         #CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
         # echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
-        STATUS=$(git_prompt_status)
+        STATUS=$(parse_git_dirty)
         if [[ $STATUS != '' ]]; then
             STATUS=' '$STATUS
         fi
