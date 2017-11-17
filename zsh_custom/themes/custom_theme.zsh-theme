@@ -101,7 +101,7 @@ function custom_git_status {
         #CUSTOM_THEME_GIT_PROMPT_PREFIX=""
         #CUSTOM_THEME_GIT_PROMPT_SUFFIX=""
         # echo -n "%{$fg[red]%}$RIGHT_SEP%{$bg[red]%}%{$fg[black]%}${CUSTOM_THEME_GIT_PROMPT_PREFIX}$temp $BRANCH $(git_current_branch) $indicators"
-        STATUS=$(parse_git_dirty)
+        STATUS=$(parse_git_dirty)$(git_prompt_ahead)$(git_prompt_behind)
         if [[ $STATUS != '' ]]; then
             STATUS=' '$STATUS
         fi
