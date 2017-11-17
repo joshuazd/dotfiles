@@ -9,7 +9,6 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-scripts/c.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim'
-" Plug 'wting/gitsessions.vim'
 Plug 'tpope/vim-obsession'
 Plug 'luochen1990/rainbow'
 Plug 'gerw/vim-HiLinkTrace'
@@ -32,6 +31,7 @@ Plug 'Konfekt/FastFold'
 Plug 'ehamberg/vim-cute-python'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-speeddating'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'mhinz/vim-startify'
@@ -145,8 +145,8 @@ nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
 
 nnoremap <silent> <Leader><Leader> :b#<CR>
-" more standard 'close tab' behavior
-nnoremap <silent> <C-x> :bn\|bd #<CR>
+" more standard 'close buffer' behavior
+nnoremap <silent> <Leader>x :bn\|bd #<CR>
 " treat wrapped lines as different lines
 noremap j gj
 noremap k gk
