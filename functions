@@ -25,15 +25,20 @@ function custom_vim() {
     local jobsresult=$(jobs)
     local jobsdir=$(jobs -d)
     local vimresult=$(echo $jobsdir | grep -n vim)
+    if [ -f $PWD/.git/Session.vim ]; then
+        flags=' -S .git/Session.vim'
+    else
+        flags=''
+    fi
     if [[ -n $vimresult ]]; then
         if [[ $(jobs -d | grep -B $vimresult[1,1] -oPm1 '(?<=\(pwd : ).*(?=\))') = $PWD ]]; then
             local jobnum=$(echo $jobsresult | grep -n vim)
             eval "fg %$jobnum[1,1]"
         else
-            eval "vim $@"
+            eval "vim $flags $@"
         fi
     else
-        eval "vim $@"
+        eval "vim $flags $@"
     fi
     return true
 }

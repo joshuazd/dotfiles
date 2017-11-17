@@ -93,7 +93,7 @@ endif
     syn cluster pythonBuiltinFuncC add=pythonBuiltinFunc,pythonPrint,pythonMagic
     syn region pythonFuncParams matchgroup=pythonBrackets start="(" end=")" contained contains=pythonFuncParam,pythonPunct
     syn match pythonKeywordParam "\(=\s*\)\@<=\h\w*" contained
-    syn match pythonFuncParam "[^,)]*" contained contains=pythonKeywordParam,pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup skipwhite
+    syn match pythonFuncParam "[^,)]*" contained contains=pythonKeywordParam,pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonDict skipwhite
 
 
     syn match pythonFunction "\(\(def\s\|@\)\s*\)\@<=\h\(\w\|\.\)*" contains=@pythonFuncC nextgroup=pythonVars
@@ -122,11 +122,14 @@ endif
 
     " item access
     syn region pythonAccess matchgroup=pythonBrackets start="\[" end="\]" contained contains=pythonAccessParam
-    syn match pythonAccessParam "[^\]]*" contained contains=pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonList skipwhite
+    syn match pythonAccessParam "[^\]]*" contained contains=pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonList,pythonDict skipwhite
     syn match pythonItemAccess "\h\(\w\)*\[\@=" nextgroup=pythonAccess
 
     syn region pythonList matchgroup=pythonBrackets start="\[" end="\]" contains=pythonListParam
-    syn match pythonListParam "[^\]]*" contained contains=pythonIdentifier,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup skipwhite
+    syn match pythonListParam "[^\]]*" contained contains=pythonIdentifier,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
+
+    syn region pythonDict matchgroup=pythonBrackets start="{" end="}" contains=pythonDictParam
+    syn match pythonDictParam "[^}]*" contained contains=pythonIdentifier,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
 
     syn match pythonPunct ":"
     syn match pythonPunct ","
@@ -153,7 +156,7 @@ endif
     " if g:pymode_syntax_highlight_self
         syn keyword pythonSelf self cls
     " endif
-    syn match pythonField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9(\[]\|$\)\@="
+    syn match pythonField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9_(\[]\|$\)\@="
     syn match pythonField "\(\.\)\@<=\h\w*\(\.\h\w*[(\[]\)\@="
 
 " }}}
@@ -444,7 +447,7 @@ endif
     "highlight pythonBuiltinType ctermfg=156
     hi link  pythonBuiltinObj   Structure
     hi link  pythonBuiltinFunc  Function
-    highlight pythonBuiltinFunc ctermfg=208
+    highlight pythonBuiltinFunc ctermfg=208 guifg=#ff8700
 
     hi link  pythonPreProc      PreProc
     hi link  pythonItemAccess   Special
