@@ -304,7 +304,7 @@ endif
     " Builtin objects and types
     " if g:pymode_syntax_builtin_objs
         syn keyword pythonConstant True False Ellipsis None NotImplemented
-        syn match pythonConstant '\<[A-Z_][A-Z_0-9]\+\>'
+        syn match pythonConstant '\<\(\u\|_\)\(\u\|\d\|_\)\+\>'
         syn keyword pythonBuiltinObj __debug__ __doc__ __file__ __name__ __package__
     " endif
 
