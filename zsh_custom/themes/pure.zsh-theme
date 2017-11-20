@@ -24,7 +24,7 @@
 # \e[2K => clear everything on the current line
 
 PURER_PROMPT_COMMAND_COUNT=0
-PURE_PROMPT_SYMBOL_COLOR='2'
+PURE_PROMPT_SYMBOL_COLOR='10'
 STATUS_COLOR='12'
 
 # turns seconds into human readable time
@@ -139,7 +139,7 @@ prompt_pure_preprompt_render() {
 	# username and machine if applicable
 	preprompt+=$prompt_pure_username
 	# directory, colored by vim status
-	preprompt+="%B%F{$STATUS_COLOR}%c%f%b"
+	preprompt+="%F{$STATUS_COLOR}%c%f"
 	# begin with symbol, colored by previous command exit code
 	preprompt+=" %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}%f"
 	# git info

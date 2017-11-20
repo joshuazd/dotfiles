@@ -141,6 +141,7 @@ bindkey -M viins "^W" backward-kill-word
 bindkey -M viins "^A" beginning-of-line
 bindkey -M viins "^E" end-of-line
 bindkey -M viins ' ' magic-space
+bindkey '^x^e' edit-command-line
 
 export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
 setopt INC_APPEND_HISTORY
