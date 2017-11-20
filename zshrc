@@ -11,7 +11,7 @@ esac
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="custom_theme"
+ZSH_THEME=""
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -74,7 +74,8 @@ source $ZSH/oh-my-zsh.sh
 alias mvn-color='source $ZSH_CUSTOM/mvncolor.sh'
 
 # export MANPATH="/usr/local/man:$MANPATH"
-
+autoload -U promptinit; promptinit
+prompt pure
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
