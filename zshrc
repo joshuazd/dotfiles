@@ -152,5 +152,5 @@ setopt HIST_VERIFY
 
 
 if [[ $(uname -s) != CYGWIN* ]]; then
-    export PATH=~/pebble-dev/pebble-sdk-4.5-linux64/bin:$PATH
+    export PATH=$PATH:~/pebble-dev/pebble-sdk-4.5-linux64/bin
 fi

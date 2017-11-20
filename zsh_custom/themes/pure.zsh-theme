@@ -52,7 +52,15 @@ prompt_pure_check_cmd_exec_time() {
 	prompt_pure_cmd_exec_time=
 	(( elapsed > ${PURE_CMD_MAX_EXEC_TIME:=5} )) && {
 		prompt_pure_human_time_to_var $elapsed "prompt_pure_cmd_exec_time"
-	}
+}
+}
+
+prompt_pure_venv_info() {
+	if [[ -n "$VIRTUAL_ENV" ]]; then
+		echo "(${VIRTUAL_ENV##*/})"
+	else
+		echo ''
+	fi
 }
 
 prompt_pure_clear_screen() {
@@ -138,6 +146,8 @@ prompt_pure_preprompt_render() {
 
 	# username and machine if applicable
 	preprompt+=$prompt_pure_username
+	#show virtualenv info
+	[[ -n $VIRTUAL_ENV ]] && preprompt+="%F{246} ($(basename $VIRTUAL_ENV))%f"
 	# directory, colored by vim status
 	preprompt+=" %F{$STATUS_COLOR}%c%f"
 	# begin with symbol, colored by previous command exit code
@@ -244,45 +254,45 @@ prompt_pure_async_tasks() {
 	# initialize async worker
 	((!${prompt_pure_async_init:-0})) && {
 		async_start_worker "prompt_pure" -u -n
-		async_register_callback "prompt_pure" prompt_pure_async_callback
-		prompt_pure_async_init=1
-	}
+	async_register_callback "prompt_pure" prompt_pure_async_callback
+	prompt_pure_async_init=1
+}
 
-	# store working_tree without the "x" prefix
-	local working_tree="${vcs_info_msg_1_#x}"
+# store working_tree without the "x" prefix
+local working_tree="${vcs_info_msg_1_#x}"
 
-	# check if the working tree changed (prompt_pure_current_working_tree is prefixed by "x")
-	if [[ ${prompt_pure_current_working_tree#x} != $working_tree ]]; then
-		# stop any running async jobs
-		async_flush_jobs "prompt_pure"
+# check if the working tree changed (prompt_pure_current_working_tree is prefixed by "x")
+if [[ ${prompt_pure_current_working_tree#x} != $working_tree ]]; then
+	# stop any running async jobs
+	async_flush_jobs "prompt_pure"
 
-		# reset git preprompt variables, switching working tree
-		unset prompt_pure_git_dirty
-		unset prompt_pure_git_last_dirty_check_timestamp
-		prompt_pure_git_arrows=
+	# reset git preprompt variables, switching working tree
+	unset prompt_pure_git_dirty
+	unset prompt_pure_git_last_dirty_check_timestamp
+	prompt_pure_git_arrows=
 
-		# set the new working tree and prefix with "x" to prevent the creation of a named path by AUTO_NAME_DIRS
-		prompt_pure_current_working_tree="x${working_tree}"
-	fi
+	# set the new working tree and prefix with "x" to prevent the creation of a named path by AUTO_NAME_DIRS
+	prompt_pure_current_working_tree="x${working_tree}"
+fi
 
-	# only perform tasks inside git working tree
-	[[ -n $working_tree ]] || return
+# only perform tasks inside git working tree
+[[ -n $working_tree ]] || return
 
-	async_job "prompt_pure" prompt_pure_async_git_arrows $working_tree
+async_job "prompt_pure" prompt_pure_async_git_arrows $working_tree
 
-	# do not preform git fetch if it is disabled or working_tree == HOME
-	if (( ${PURE_GIT_PULL:-1} )) && [[ $working_tree != $HOME ]]; then
-		# tell worker to do a git fetch
-		async_job "prompt_pure" prompt_pure_async_git_fetch $working_tree
-	fi
+# do not preform git fetch if it is disabled or working_tree == HOME
+if (( ${PURE_GIT_PULL:-1} )) && [[ $working_tree != $HOME ]]; then
+	# tell worker to do a git fetch
+	async_job "prompt_pure" prompt_pure_async_git_fetch $working_tree
+fi
 
-	# if dirty checking is sufficiently fast, tell worker to check it again, or wait for timeout
-	integer time_since_last_dirty_check=$(( EPOCHSECONDS - ${prompt_pure_git_last_dirty_check_timestamp:-0} ))
-	if (( time_since_last_dirty_check > ${PURE_GIT_DELAY_DIRTY_CHECK:-1800} )); then
-		unset prompt_pure_git_last_dirty_check_timestamp
-		# check check if there is anything to pull
-		async_job "prompt_pure" prompt_pure_async_git_dirty ${PURE_GIT_UNTRACKED_DIRTY:-1} $working_tree
-	fi
+# if dirty checking is sufficiently fast, tell worker to check it again, or wait for timeout
+integer time_since_last_dirty_check=$(( EPOCHSECONDS - ${prompt_pure_git_last_dirty_check_timestamp:-0} ))
+if (( time_since_last_dirty_check > ${PURE_GIT_DELAY_DIRTY_CHECK:-1800} )); then
+	unset prompt_pure_git_last_dirty_check_timestamp
+	# check check if there is anything to pull
+	async_job "prompt_pure" prompt_pure_async_git_dirty ${PURE_GIT_UNTRACKED_DIRTY:-1} $working_tree
+fi
 }
 
 prompt_pure_check_git_arrows() {
@@ -372,11 +382,17 @@ prompt_pure_setup() {
 	# register custom function for vim-mode
 	zle -N zle-keymap-select prompt_purer_vim_mode
 
+	prompt_pure_username=''
+
 	# show username@host if logged in through SSH
 	[[ "$SSH_CONNECTION" != '' ]] && prompt_pure_username='%F{242}%n@%m%f'
 
 	# show username@host if root, with username in white
 	[[ $UID -eq 0 ]] && prompt_pure_username='%F{white}%n%f%F{242}@%m%f'
+
+	# if [[ -n "$VIRTUAL_ENV" ]]; then
+	# 	prompt_pure_username+="%F{246}(${VIRTUAL_ENV##*/})%f"
+	# fi
 
 	# create prompt
 	prompt_pure_preprompt_render 'precmd'
