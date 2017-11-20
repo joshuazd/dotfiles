@@ -55,4 +55,8 @@ if [ -f $HOME/.tmux.conf ]; then
 fi
 ln -s $PWD/tmux.conf $HOME/.tmux.conf
 
+echo "Creating symlinks for theme"
+sudo ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup
+sudo ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async
+
 echo "To install vim plugins, open vim and run :PlugInstall"
