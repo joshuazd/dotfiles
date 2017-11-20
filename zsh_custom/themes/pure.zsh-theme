@@ -139,7 +139,7 @@ prompt_pure_preprompt_render() {
 	# username and machine if applicable
 	preprompt+=$prompt_pure_username
 	# directory, colored by vim status
-	preprompt+="%F{$STATUS_COLOR}%c%f"
+	preprompt+=" %F{$STATUS_COLOR}%c%f"
 	# begin with symbol, colored by previous command exit code
 	preprompt+=" %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}%f"
 	# git info
@@ -373,10 +373,10 @@ prompt_pure_setup() {
 	zle -N zle-keymap-select prompt_purer_vim_mode
 
 	# show username@host if logged in through SSH
-	[[ "$SSH_CONNECTION" != '' ]] && prompt_pure_username='%F{242}%n@%m%f '
+	[[ "$SSH_CONNECTION" != '' ]] && prompt_pure_username='%F{242}%n@%m%f'
 
 	# show username@host if root, with username in white
-	[[ $UID -eq 0 ]] && prompt_pure_username='%F{white}%n%f%F{242}@%m%f '
+	[[ $UID -eq 0 ]] && prompt_pure_username='%F{white}%n%f%F{242}@%m%f'
 
 	# create prompt
 	prompt_pure_preprompt_render 'precmd'
