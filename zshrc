@@ -19,7 +19,7 @@ ZSH_THEME=""
 # Uncomment the following line to use hyphen-insensitive completion. Case
 # sensitive completion must be off. _ and - will be interchangeable.
 HYPHEN_INSENSITIVE="true"
-export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94'
+export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94:ln=01;36'
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
 export EDITOR='vim'
 

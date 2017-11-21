@@ -117,7 +117,7 @@ set autowrite                   " automatically save before :next, :make, etc
 set autoread                    " automatically reread changed files
 if has("gui_running")
     " set guifont=Literation\ Mono\ Powerline\ 10
-    " set guifont=DejaVuSansMono\ NF\ 10
+    set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
     set guioptions-=T
     set guioptions+=e
     set guioptions-=m
