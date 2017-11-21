@@ -135,6 +135,7 @@ prompt_pure_preprompt_render() {
 	# construct preprompt
 	local preprompt=""
 	local postprompt=""
+	local preprompt2=""
 
 	# add a newline between commands
 	FIRST_COMMAND_THRESHOLD=1
@@ -146,10 +147,13 @@ prompt_pure_preprompt_render() {
 
 	# username and machine if applicable
 	preprompt+=$prompt_pure_username
+	preprompt2+=$username
+
 	#show virtualenv info
-	[[ -n $VIRTUAL_ENV ]] && preprompt+="%F{246} ($(basename $VIRTUAL_ENV))%f"
+	[[ -n $VIRTUAL_ENV ]] && preprompt+="%F{246} ($(basename $VIRTUAL_ENV))%f" && preprompt2+=" ($(basename $VIRTUAL_ENV))"
 	# directory, colored by vim status
 	preprompt+=" %F{$STATUS_COLOR}%c%f"
+	preprompt2+=" %c"
 	# begin with symbol, colored by previous command exit code
 	preprompt+=" %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}%f"
 	# git info
@@ -166,6 +170,9 @@ prompt_pure_preprompt_render() {
 
 	PROMPT="$preprompt"
 	RPS1="$postprompt"
+	PROMPT2="%F{000}$preprompt2%f %_ %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}${PURE_PROMPT_SYMBOL:-❯}${PURE_PROMPT_SYMBOL:-❯}%f "
+	PROMPT3="
+(?) %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}${PURE_PROMPT_SYMBOL:-❯}%f "
 
 	# if executing through precmd, do not perform fancy terminal editing
 	if [[ "$1" != "precmd" ]]; then
@@ -385,14 +392,10 @@ prompt_pure_setup() {
 	prompt_pure_username=''
 
 	# show username@host if logged in through SSH
-	[[ "$SSH_CONNECTION" != '' ]] && prompt_pure_username='%F{242}%n@%m%f'
+	[[ "$SSH_CONNECTION" != '' ]] && prompt_pure_username='%F{242}%n@%m%f' && username='%n@%m'
 
 	# show username@host if root, with username in white
-	[[ $UID -eq 0 ]] && prompt_pure_username='%F{white}%n%f%F{242}@%m%f'
-
-	# if [[ -n "$VIRTUAL_ENV" ]]; then
-	# 	prompt_pure_username+="%F{246}(${VIRTUAL_ENV##*/})%f"
-	# fi
+	[[ $UID -eq 0 ]] && prompt_pure_username='%F{white}%n%f%F{242}@%m%f' && username='%n@%m'
 
 	# create prompt
 	prompt_pure_preprompt_render 'precmd'
