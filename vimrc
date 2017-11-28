@@ -39,6 +39,7 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'mhinz/vim-startify'
 Plug 'ryanoasis/vim-devicons'
 Plug 'plasticboy/vim-markdown'
+Plug 'joshuazd/vim-ipython'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -283,6 +284,45 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+" ipython setup {{{
+let g:ipy_perform_mappings = 0 "make our own mappings
+
+map  <buffer> <silent> <F10>           <Plug>(IPython-RunFile)
+map  <buffer> <silent> <S-F10>         <Plug>(IPython-RunLine)
+map  <buffer> <silent> <F9>           <Plug>(IPython-RunLines)
+map  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
+map  <buffer> <silent> <LocalLeader>s <Plug>(IPython-UpdateShell)
+map  <buffer> <silent> <S-F9>         <Plug>(IPython-ToggleReselect)
+"map  <buffer> <silent> <C-F6>         <Plug>(IPython-StartDebugging)
+"map  <buffer> <silent> <F6>           <Plug>(IPython-BreakpointSet)
+"map  <buffer> <silent> <S-F6>         <Plug>(IPython-BreakpointClear)
+"map  <buffer> <silent> <F7>           <Plug>(IPython-DebugThisFile)
+"map  <buffer> <silent> <S-F7>         <Plug>(IPython-BreakpointClearAll)
+imap <buffer>          <C-F10>         <C-o><Plug>(IPython-RunFile)
+imap <buffer>          <S-F10>         <C-o><Plug>(IPython-RunLines)
+imap <buffer> <silent> <F10>           <C-o><Plug>(IPython-RunFile)
+map  <buffer>          <C-F10>         <Plug>(IPython-ToggleSendOnSave)
+"" Example of how to quickly clear the current plot with a keystroke
+"map  <buffer> <silent> <F12>          <Plug>(IPython-PlotClearCurrent)
+"" Example of how to quickly close all figures with a keystroke
+"map  <buffer> <silent> <F11>          <Plug>(IPython-PlotCloseAll)
+
+"pi custom
+map  <buffer> <silent> <C-Return>     <Plug>(IPython-RunFile)
+map  <buffer> <silent> <C-i>          <Plug>(IPython-RunLine)
+imap <buffer> <silent> <C-i>          <C-o><Plug>(IPython-RunLine)
+map  <buffer> <silent> <M-i>          <Plug>(IPython-RunLineAsTopLevel)
+map  <buffer> <silent> <Esc>i          <Plug>(IPython-RunLineAsTopLevel)
+xmap <buffer> <silent> <C-I>          <Plug>(IPython-RunLines)
+xmap <buffer> <silent> <M-i>          <Plug>(IPython-RunLinesAsTopLevel)
+xmap <buffer> <silent> <Esc>i          <Plug>(IPython-RunLinesAsTopLevel)
+
+" noremap  <buffer> <silent> <M-c>      I#<ESC>
+" xnoremap <buffer> <silent> <M-c>      I#<ESC>
+" noremap  <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
+" xnoremap <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
+" }}}
+
 " devicons setup {{{
 
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
