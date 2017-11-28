@@ -242,7 +242,7 @@ augroup EditVim
     autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
     autocmd BufNewFile,BufRead *.dbs set filetype=xml
     autocmd BufNewFile,BufRead *.dmc set filetype=javascript
-    autocmd FileType python setlocal foldmethod=indent
+    autocmd FileType python call PythonSetup()
     autocmd FileType vim setlocal foldmethod=marker foldlevel=0
     "make folding work better with insert mode
     " autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
@@ -276,6 +276,11 @@ function! XmlSetup()
     command! Tabs setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab
 endfunction
 
+function! PythonSetup()
+    setlocal foldmethod=indent
+    call IPythonKeyBinds()
+endfunction
+
 command! FormatJSON %!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin, object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
 
@@ -285,41 +290,43 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 " {{{
 " ipython setup {{{
 let g:ipy_perform_mappings = 0 "make our own mappings
+function! IPythonKeyBinds()
 
-map  <buffer> <silent> <F10>           <Plug>(IPython-RunFile)
-map  <buffer> <silent> <S-F10>         <Plug>(IPython-RunLine)
-map  <buffer> <silent> <F9>           <Plug>(IPython-RunLines)
-map  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
-map  <buffer> <silent> <LocalLeader>s <Plug>(IPython-UpdateShell)
-map  <buffer> <silent> <S-F9>         <Plug>(IPython-ToggleReselect)
-"map  <buffer> <silent> <C-F6>         <Plug>(IPython-StartDebugging)
-"map  <buffer> <silent> <F6>           <Plug>(IPython-BreakpointSet)
-"map  <buffer> <silent> <S-F6>         <Plug>(IPython-BreakpointClear)
-"map  <buffer> <silent> <F7>           <Plug>(IPython-DebugThisFile)
-"map  <buffer> <silent> <S-F7>         <Plug>(IPython-BreakpointClearAll)
-imap <buffer>          <C-F10>         <C-o><Plug>(IPython-RunFile)
-imap <buffer>          <S-F10>         <C-o><Plug>(IPython-RunLines)
-imap <buffer> <silent> <F10>           <C-o><Plug>(IPython-RunFile)
-map  <buffer>          <C-F10>         <Plug>(IPython-ToggleSendOnSave)
-"" Example of how to quickly clear the current plot with a keystroke
-"map  <buffer> <silent> <F12>          <Plug>(IPython-PlotClearCurrent)
-"" Example of how to quickly close all figures with a keystroke
-"map  <buffer> <silent> <F11>          <Plug>(IPython-PlotCloseAll)
+    nmap  <buffer> <silent> <F10>           <Plug>(IPython-RunFile)
+    nmap  <buffer> <silent> <S-F10>         <Plug>(IPython-RunLine)
+    nmap  <buffer> <silent> <F9>           <Plug>(IPython-RunLines)
+    nmap  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
+    nmap  <buffer> <silent> <LocalLeader>r <Plug>(IPython-UpdateShell)
+    nmap  <buffer> <silent> <S-F9>         <Plug>(IPython-ToggleReselect)
+    "noremap  <buffer> <silent> <C-F6>         <Plug>(IPython-StartDebugging)
+    "noremap  <buffer> <silent> <F6>           <Plug>(IPython-BreakpointSet)
+    "noremap  <buffer> <silent> <S-F6>         <Plug>(IPython-BreakpointClear)
+    "noremap  <buffer> <silent> <F7>           <Plug>(IPython-DebugThisFile)
+    "noremap  <buffer> <silent> <S-F7>         <Plug>(IPython-BreakpointClearAll)
+    imap <buffer>          <C-F10>         <C-o><Plug>(IPython-RunFile)
+    imap <buffer>          <S-F10>         <C-o><Plug>(IPython-RunLines)
+    imap <buffer> <silent> <F10>           <C-o><Plug>(IPython-RunFile)
+    nmap  <buffer>          <C-F10>         <Plug>(IPython-ToggleSendOnSave)
+    "" Example of how to quickly clear the current plot with a keystroke
+    "noremap  <buffer> <silent> <F12>          <Plug>(IPython-PlotClearCurrent)
+    "" Example of how to quickly close all figures with a keystroke
+    "noremap  <buffer> <silent> <F11>          <Plug>(IPython-PlotCloseAll)
 
-"pi custom
-map  <buffer> <silent> <C-Return>     <Plug>(IPython-RunFile)
-map  <buffer> <silent> <C-i>          <Plug>(IPython-RunLine)
-imap <buffer> <silent> <C-i>          <C-o><Plug>(IPython-RunLine)
-map  <buffer> <silent> <M-i>          <Plug>(IPython-RunLineAsTopLevel)
-map  <buffer> <silent> <Esc>i          <Plug>(IPython-RunLineAsTopLevel)
-xmap <buffer> <silent> <C-I>          <Plug>(IPython-RunLines)
-xmap <buffer> <silent> <M-i>          <Plug>(IPython-RunLinesAsTopLevel)
-xmap <buffer> <silent> <Esc>i          <Plug>(IPython-RunLinesAsTopLevel)
+    "pi custom
+    nmap  <buffer> <silent> <C-Return>     <Plug>(IPython-RunFile)
+    nmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLine)
+    imap <buffer> <silent> <LocalLeader>s          <C-o><Plug>(IPython-RunLine)
+    nmap  <buffer> <silent> <M-s>          <Plug>(IPython-RunLineAsTopLevel)
+    nmap  <buffer> <silent> <Esc>s          <Plug>(IPython-RunLineAsTopLevel)
+    xmap <buffer> <silent> <LocalLeader>s          <Plug>(IPython-RunLines)
+    xmap <buffer> <silent> <M-s>          <Plug>(IPython-RunLinesAsTopLevel)
+    xmap <buffer> <silent> <Esc>s          <Plug>(IPython-RunLinesAsTopLevel)
 
-" noremap  <buffer> <silent> <M-c>      I#<ESC>
-" xnoremap <buffer> <silent> <M-c>      I#<ESC>
-" noremap  <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
-" xnoremap <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
+    " noremap  <buffer> <silent> <M-c>      I#<ESC>
+    " xnoremap <buffer> <silent> <M-c>      I#<ESC>
+    " noremap  <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
+    " xnoremap <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
+endfunction
 " }}}
 
 " devicons setup {{{
