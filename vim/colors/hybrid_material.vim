@@ -200,7 +200,7 @@ let s:u      = ",underline"
 if $SSH_CLIENT ==? ""
   let s:i    = ",italic"
 else
-  let s:i    = ""
+  let s:i    = ",italic"
 endif
 "}}}
 " Highlighting Primitives:"{{{
@@ -408,8 +408,8 @@ exe "hi! Include"         .s:fg_purple      .s:bg_none        .s:fmt_none
 
 exe "hi! Language"        .s:fg_pink        .s:bg_none        .s:fmt_none
 exe "hi! Primitive"       .s:fg_orange      .s:bg_none        .s:fmt_ital
-exe "hi! Type"            .s:fg_yellow      .s:bg_none        .s:fmt_ital
-exe "hi! StorageClass"    .s:fg_darkpurple  .s:bg_none        .s:fmt_ital
+exe "hi! Type"            .s:fg_yellow      .s:bg_none        .s:fmt_none
+exe "hi! StorageClass"    .s:fg_darkpurple  .s:bg_none        .s:fmt_none
 exe "hi! Structure"       .s:fg_aqua        .s:bg_none        .s:fmt_none
 "   Typedef"
 
