@@ -42,7 +42,7 @@ syn keyword javaConstant	null
 syn keyword javaTypedef		this super
 syn keyword javaOperator	new instanceof
 syn keyword javaType		boolean char byte short int long float double
-syn keyword javaType		void
+syn keyword javaType    	void
 syn keyword javaStatement	return
 syn keyword javaStorageClass	static synchronized transient volatile final strictfp serializable
 syn keyword javaExceptions	throw try catch finally
@@ -91,11 +91,12 @@ if exists("java_highlight_all")  || exists("java_highlight_java")  || exists("ja
   hi def link javaX_		     javaExceptions
   hi def link javaR_		     javaExceptions
   hi def link javaE_		     javaExceptions
-  hi def link javaC_		     javaConstant
+  hi def link javaC_		     javaType
 
   syn keyword javaLangObject clone equals finalize getClass hashCode
   syn keyword javaLangObject notify notifyAll toString wait
-  hi def link javaLangObject		     javaConstant
+  " hi def link javaLangObject		     javaConstant
+  highlight javaLangObject                   ctermfg=208 guifg=#ff8700
   syn cluster javaTop add=javaLangObject
 endif
 
@@ -283,7 +284,7 @@ exec "syn sync ccomment javaComment minlines=" . java_minlines
 
 " The default highlighting.
 hi def link javaLambdaDef		Function
-hi def link javaFuncDef		        Function
+" hi def link javaFuncDef		        Function
 hi def link javaVarArg			Function
 hi def link javaBraces			Function
 hi def link javaBranch			Conditional
@@ -314,7 +315,7 @@ hi def link javaComment	        	Comment
 hi def link javaDocComment		Comment
 hi def link javaLineComment		Comment
 hi def link javaConstant		Constant
-hi def link javaTypedef	        	Typedef
+hi def link javaTypedef	        	Primitive
 hi def link javaTodo			Todo
 hi def link javaAnnotation		PreProc
 
