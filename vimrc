@@ -39,6 +39,7 @@ Plug 'mhinz/vim-startify'
 Plug 'ryanoasis/vim-devicons'
 Plug 'plasticboy/vim-markdown'
 Plug 'joshuazd/vim-ipython'
+Plug 'artur-shaik/vim-javacomplete2'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -288,6 +289,9 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+" javacomplete setup {{{
+let g:JavaComplete_JavaviLogfileDirectory = '~/.javacomplete/servers'
+" }}}
 " ipython setup {{{
 let g:ipy_perform_mappings = 0 "make our own mappings
 function! IPythonKeyBinds()
@@ -365,8 +369,9 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
     let g:neocomplete#enable_auto_select = 1
-    " let g:neocomplete#enable_refresh_always = 1
+    let g:neocomplete#enable_refresh_always = 1
     let g:neocomplete#auto_complete_delay = 0
+    let g:neocomplete#enable_auto_delimiter = 1
     imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: pumvisible() ? "\<CR>" : "\<TAB>"
@@ -423,6 +428,10 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 
     " javascript setup {{{
         autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+    " }}}
+
+    " java setup {{{
+        autocmd FileType java setlocal omnifunc=javacomplete#Complete
     " }}}
 
 " }}}
@@ -510,7 +519,7 @@ let g:rainbow_conf = {
 " Airline setup {{{
     let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#tabline#buffer_nr_show = 1
-    let g:airline#extensions#tabline#formatter = 'unique_tail'
+    let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
     let g:airline#extensions#tabline#buffer_min_count = 2
     let g:airline_section_c = '%t'
     let g:airline_section_x = ''
