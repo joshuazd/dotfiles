@@ -96,7 +96,6 @@ set so=999                      " Set 999 lines to the cursor - when moving vert
 set sidescroll=1                " scroll 1 character at a time
 set sidescrolloff=15            " scroll within 15 characters
 set foldmethod=syntax           " fold based on syntax
-set foldnestmax=2               " no nesting folds
 set wildmenu                    " Turn on the WiLd menu
 set wildmode=longest,list
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/* " Ignore compiled files
@@ -250,6 +249,7 @@ augroup EditVim
     " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
     autocmd QuitPre * exe "NERDTreeClose"
+    autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10
 augroup END
 
 function! TrimWhiteSpace()
@@ -273,6 +273,7 @@ function! XmlSetup()
     setlocal noexpandtab
     setlocal foldmethod=syntax
     setlocal smarttab
+    set foldnestmax=2               " no nesting folds
     inoremap <expr> </ pumvisible() ? "\</\<C-x>\<C-o>\<C-y>" : "\</\<C-x>\<C-o>"
     command! Tabs setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab
 endfunction
@@ -292,6 +293,7 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 " javacomplete setup {{{
 let g:JavaComplete_JavaviLogfileDirectory = '~/.javacomplete/servers'
 " }}}
+
 " ipython setup {{{
 let g:ipy_perform_mappings = 0 "make our own mappings
 function! IPythonKeyBinds()
