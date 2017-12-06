@@ -27,6 +27,8 @@ PURER_PROMPT_COMMAND_COUNT=0
 PURE_PROMPT_SYMBOL_COLOR='10'
 STATUS_COLOR='12'
 
+
+
 # turns seconds into human readable time
 # 165392 => 1d 21h 56m 32s
 # https://github.com/sindresorhus/pretty-time-zsh
@@ -171,6 +173,8 @@ prompt_pure_preprompt_render() {
 	PROMPT="$preprompt"
 	RPS1="$postprompt"
 	PROMPT2="%F{000}$preprompt2%f %_ %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}${PURE_PROMPT_SYMBOL:-❯}${PURE_PROMPT_SYMBOL:-❯}%f "
+	PROMPT3="
+(?) %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}${PURE_PROMPT_SYMBOL:-❯}%f "
 	SPROMPT="
 Correct %F{9}%R%f to %F{10}%r%f ? [nyae] "
 
@@ -398,8 +402,6 @@ prompt_pure_setup() {
 	[[ $UID -eq 0 ]] && prompt_pure_username='%F{white}%n%f%F{242}@%m%f' && username='%n@%m'
 
 
-	PROMPT3="
-(?) %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}${PURE_PROMPT_SYMBOL:-❯}%f "
 
 	# create prompt
 	prompt_pure_preprompt_render 'precmd'

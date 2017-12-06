@@ -76,6 +76,7 @@ alias mvn-color='source $ZSH_CUSTOM/mvncolor.sh'
 # export MANPATH="/usr/local/man:$MANPATH"
 autoload -U promptinit; promptinit
 prompt pure
+source $ZSH_CUSTOM/themes/pure.zsh-theme
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
