@@ -24,18 +24,18 @@ syn region xmlSqlRegion
 let b:current_syntax = cur_syntax
 
 
-syn region xmlPayloadRegion
-            \ start=+\%(<payloadFactory media-type="json">\)+
-            \ keepend
-            \ end=+\%(</payloadFactory>\)+
-            \ contained
-            \ contains=xmlTag,xmlEndTag,xmlJsonRegion
+" syn region xmlPayloadRegion
+"             \ start=+\%(<payloadFactory media-type="json">\)+
+"             \ keepend
+"             \ end=+\%(</payloadFactory>\)+
+"             \ contained
+"             \ contains=xmlTag,xmlEndTag,xmlJsonRegion
 
 let cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlJson syntax/json.vim
 syn region xmlJsonRegion
-            \ start=+<format>+
+            \ start=+\%(<payloadFactory media-type="json">\)+
             \ keepend
             \ end=+</format>+
             \ contained
