@@ -80,7 +80,7 @@ colorscheme hybrid_material     " material color scheme
 set number                      " show line numbers
 set relativenumber              " show relative line numbers
 set numberwidth=1               " set min number column width
-set clipboard=unnamed           " make clipboard work better
+set clipboard=unnamedplus       " make clipboard work better
 set tabstop=4                   " <TAB>s are 4 spaces
 set softtabstop=4               " number of spaces when inserting/backspacing
 set shiftwidth=4                " shift 4 spaces for indentation
@@ -142,6 +142,7 @@ nnoremap ^ 0
 " Make moving around splits easier
 nnoremap <silent> <Leader>v :vs\|bn<CR>
 nnoremap <silent> <Leader>s :sp\|bn<CR>
+nnoremap <silent> <TAB> <c-w>w
 " Make <Leader>q clear highlighting from searches
 nnoremap <silent> <Leader>q :noh<return><esc>
 " make it easier to use buffers
@@ -217,6 +218,9 @@ noremap <silent> <C-f> :CtrlPLine<CR>
 " paste and format
 nnoremap <silent> <Leader>p p=']
 nnoremap <silent> <Leader>P P=']
+" xnoremap <silent> p "_dP
+xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
+
 noremap <silent> <F5> :call VimRefresh()<CR>
 function! VimRefresh()
     CtrlPClearAllCaches
@@ -340,6 +344,9 @@ endfunction
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
 
+let g:WebDevIconsNerdTreeGitPluginForceVAlign = 0
+let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
+" let g:WebDevIconsUnicodeGlyphDoubleWidth = 0
 " }}}
 
 " netrw setup {{{
@@ -524,12 +531,14 @@ let g:rainbow_conf = {
     let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
     let g:airline#extensions#tabline#buffer_min_count = 2
     let g:airline_section_c = '%t'
-    let g:airline_section_x = ''
-    let g:airline_section_y = '%y %{&ff}'
+    let g:airline_section_x = '%{airline#extensions#obsession#get_status()}'
+    let g:airline_section_y = '%{&fileformat}'
     let g:airline_section_z = '%l:%c'
-    "let g:airline_section_error = ''
-    "let g:airline_section_warning = ''
+    " let g:airline_section_error = ''
+    " let g:airline_section_warning = ''
     let g:airline#extensions#hunks#non_zero_only = 1
+
+    let g:airline#extensions#obsession#indicator_text = ""
 
     let g:airline_mode_map = {
                 \ '__' : '-',
