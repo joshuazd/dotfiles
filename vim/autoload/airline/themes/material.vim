@@ -8,7 +8,7 @@ let s:termbg = s:bg_none
 let s:termbg2= 0
 
 let s:N1 = [ s:guibg , '#6182b8' , 232 , 4 ]
-let s:N2 = [ '#263238' , '#9e9e9e', s:termbg2, 247 ]
+let s:N2 = [ '#212121' , '#9e9e9e', 245, 235 ]
 let s:N3 = [ '#82aaff' , s:guibg2, 12 , 8]
 let g:airline#themes#material#palette.normal = airline#themes#generate_color_map(s:N1, s:N2, s:N3)
 let g:airline#themes#material#palette.normal_modified = {
@@ -39,12 +39,13 @@ let g:airline#themes#material#palette.visual = airline#themes#generate_color_map
 let g:airline#themes#material#palette.visual_modified = copy(g:airline#themes#material#palette.normal_modified)
 
 
-let s:IA  = [ '#d75f5f' , s:guibg2  , 167 , 8 , '' ]
-let s:IA2 = [ '#6182b8' , s:guibg2 , 12 , 8, '' ]
-let g:airline#themes#material#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA2, s:IA2)
+let s:IA  = [ '#d75f5f' , s:guibg2  , 244 , 234, '' ]
+let s:IA2 = [ '#6182b8' , s:guibg2 , 244 , 233, '' ]
+let s:IA3 = [  '#d75f5f' , s:guibg2  , 244 , 234]
+let g:airline#themes#material#palette.inactive = airline#themes#generate_color_map(s:IA, s:IA2, s:IA3)
 let g:airline#themes#material#palette.inactive_modified = {
-      \ 'airline_c': [ '#ffcb6b', '', 3, '', '' ] ,
-      \ }
+      \ 'airline_c': [ '#ffcb6b', '', 3, 235, '' ] ,
+      \  }
 
 " Warnings
 let s:WI = [ '#282C34', '#E5C07B', 16, 202 ]
