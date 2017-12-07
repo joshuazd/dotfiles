@@ -49,6 +49,8 @@ syn keyword javaExceptions	throw try catch finally
 syn keyword javaAssert		assert
 syn keyword javaMethodDecl	synchronized throws
 syn keyword javaClassDecl	extends implements interface
+syn match   javaSemicolon       ";"
+syn match javaOperator          "[<>=!]"
 " to differentiate the keyword class from MyClass.class we use a match here
 syn match   javaTypedef		"\.\s*\<class\>"ms=s+1
 syn keyword javaClassDecl	enum
@@ -59,6 +61,7 @@ syn match   javaClassDecl	"@interface\>"
 syn keyword javaBranch		break continue nextgroup=javaUserLabelRef skipwhite
 syn match   javaUserLabelRef	"\k\+" contained
 syn match   javaVarArg		"\.\.\."
+syn match   javaConstant '\<\(\u\|_\)\(\u\|\d\|_\)\+\>'
 syn keyword javaScopeDecl	public protected private abstract
 
 if exists("java_highlight_java_lang_ids")
@@ -93,11 +96,6 @@ if exists("java_highlight_all")  || exists("java_highlight_java")  || exists("ja
   hi def link javaE_		     javaExceptions
   hi def link javaC_		     javaType
 
-  syn keyword javaLangObject clone equals finalize getClass hashCode
-  syn keyword javaLangObject notify notifyAll toString wait
-  " hi def link javaLangObject		     javaConstant
-  highlight javaLangObject                   ctermfg=208 guifg=#ff8700
-  syn cluster javaTop add=javaLangObject
 endif
 
 if filereadable(expand("<sfile>:p:h")."/javaid.vim")
@@ -121,7 +119,7 @@ syn keyword javaLabel		default
 " annoying.  Was: if !exists("java_allow_cpp_keywords")
 
 " The following cluster contains all java groups except the contained ones
-syn cluster javaTop add=javaExternal,javaError,javaError,javaBranch,javaLabelRegion,javaLabel,javaConditional,javaRepeat,javaBoolean,javaConstant,javaTypedef,javaOperator,javaType,javaType,javaStatement,javaStorageClass,javaAssert,javaExceptions,javaMethodDecl,javaClassDecl,javaClassDecl,javaClassDecl,javaScopeDecl,javaError,javaError2,javaUserLabel,javaLangObject,javaAnnotation,javaVarArg
+syn cluster javaTop add=javaExternal,javaError,javaError,javaBranch,javaLabelRegion,javaLabel,javaConditional,javaRepeat,javaBoolean,javaConstant,javaTypedef,javaOperator,javaType,javaType,javaStatement,javaStorageClass,javaAssert,javaExceptions,javaMethodDecl,javaClassDecl,javaClassDecl,javaClassDecl,javaScopeDecl,javaError,javaError2,javaUserLabel,javaAnnotation,javaVarArg
 
 
 " Comments
@@ -191,6 +189,38 @@ syn match   javaSpecial "\\u\d\{4\}"
 
 syn cluster javaTop add=javaString,javaCharacter,javaNumber,javaSpecial,javaStringError
 
+" function calls
+syn match javaFuncName "[a-zA-Z_][a-zA-Z0-9_]*(\@=" contains=javaLangObject contained
+hi def link javaFuncName Function
+syn match javaFuncCall "[a-zA-Z_][a-zA-Z0-9_]*(\@=" contains=javaFuncName nextgroup=javaFuncArgs
+syn cluster javaTop add=javaFuncCall
+syn region javaFuncArgs matchgroup=javaParen start="(" skip="(" end=")" contains=javaArgs,javaComma contained
+syn match javaArgs "[^,)]*" contains=@javaTop,javaFuncCall contained skipwhite
+
+
+  syn keyword javaLangObject contained clone equals finalize getClass hashCode
+  syn keyword javaLangObject contained notify notifyAll toString wait
+  " hi def link javaLangObject		     javaConstant
+  highlight javaLangObject                   ctermfg=208 guifg=#ff8700
+
+" accessor
+syn match javaAccessor "\."
+syn cluster javaTop add=javaAccessor
+hi def link javaAccessor Comment
+
+" templates
+syn match javaClassName "\<[A-Z_][a-zA-Z0-9_]*" contained
+hi def link javaClassName Type
+syn match javaTemplate "[A-Z_][a-zA-Z0-9_]*<\@=" contains=javaClassName nextgroup=javaTemplateArgs
+syn cluster javaTop add=javaTemplate
+syn region javaTemplateArgs matchgroup=javaOperator start="<" skip="<" end=">" contains=javaTemplateArgList,javaComma contained
+syn match javaTemplateArgList "[^,>]*" contains=@javaTop,javaClassName contained skipwhite
+
+" classes
+syn match javaClassDeclName "\(\(class\|implements\)\s\+\)\@<=[A-Z_][a-zA-Z0-9_]*"
+highlight javaClassDeclName ctermfg=4 guifg=#82aaff cterm=bold gui=bold
+
+
 let java_highlight_functions = "syntax"
 if exists("java_highlight_functions")
   if java_highlight_functions == "indent"
@@ -203,8 +233,10 @@ if exists("java_highlight_functions")
     " two things:
     "	1. class names are always capitalized (ie: Button)
     "	2. method names are never capitalized (except constructors, of course)
-    syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*([^0-9]+ end=+)+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses
-    syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(+ end=+)+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation
+    syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*([^0-9]+ end=+)+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate keepend
+    syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(+ end=+)+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncParams,javaFuncName,javaTemplate keepend
+    syn region javaFuncParams matchgroup=javaParen start="(" skip="(" end=")" contains=javaFuncParamList,javaComma contained
+    syn match javaFuncParamList "[^,)]*" contains=javaClassName contained skipwhite
   endif
   syn match javaLambdaDef "[a-zA-Z_][a-zA-Z0-9_]*\s*->"
   syn match  javaBraces  "[{}]"
@@ -259,6 +291,10 @@ if exists("java_mark_braces_in_parens_as_errors")
   syn cluster javaTop add=javaInParen
 endif
 
+" comma
+syn match javaComma ","
+hi def link javaComma PreProc
+
 " catch errors caused by wrong parenthesis
 syn region  javaParenT	transparent matchgroup=javaParen  start="(" end=")" contains=@javaTop,javaParenT1
 syn region  javaParenT1 transparent matchgroup=javaParen1 start="(" end=")" contains=@javaTop,javaParenT2 contained
@@ -270,7 +306,13 @@ syn region  javaParenT1 transparent matchgroup=javaParen1 start="\[" end="\]" co
 syn region  javaParenT2 transparent matchgroup=javaParen2 start="\[" end="\]" contains=@javaTop,javaParenT  contained
 syn match   javaParenError	 "\]"
 
+syn cluster javaParen add=javaParenT,javaParenT1,javaParenT2
+
 hi def link javaParenError	javaError
+hi def link javaParen           PreProc
+hi def link javaParen1          PreProc
+hi def link javaParen2          PreProc
+
 
 if exists("java_highlight_functions")
    syn match javaLambdaDef "([a-zA-Z0-9_<>\[\], \t]*)\s*->"
@@ -286,7 +328,7 @@ exec "syn sync ccomment javaComment minlines=" . java_minlines
 hi def link javaLambdaDef		Function
 " hi def link javaFuncDef		        Function
 hi def link javaVarArg			Function
-hi def link javaBraces			Function
+hi def link javaBraces			PreProc
 hi def link javaBranch			Conditional
 hi def link javaUserLabelRef		javaUserLabel
 hi def link javaLabel			Label
@@ -294,6 +336,7 @@ hi def link javaUserLabel		Label
 hi def link javaConditional		Conditional
 hi def link javaRepeat			Repeat
 hi def link javaExceptions		Exception
+hi def link javaSemicolon               PreProc
 hi def link javaAssert			Statement
 hi def link javaStorageClass		StorageClass
 hi def link javaMethodDecl		javaStorageClass
