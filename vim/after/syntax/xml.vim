@@ -36,8 +36,7 @@ unlet! b:current_syntax
 syn include @xmlJson syntax/json.vim
 syn region xmlJsonRegion
             \ start=+\%(<payloadFactory media-type="json">\)+
-            \ keepend
-            \ end=+</format>+
+            \ end=+</payloadFactory>+
             \ contained
             \ contains=xmlTag,xmlEndTag,@xmlJson
 let b:current_syntax = cur_syntax
