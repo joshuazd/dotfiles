@@ -33,13 +33,11 @@ Plug 'Konfekt/FastFold'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating'
-Plug 'scrooloose/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'mhinz/vim-startify'
 Plug 'ryanoasis/vim-devicons'
 Plug 'plasticboy/vim-markdown'
 Plug 'joshuazd/vim-ipython'
 Plug 'artur-shaik/vim-javacomplete2'
+Plug 'ludovicchabant/vim-gutentags'
 if has("win32unix") || $USER ==? "vagrant"
     Plug 'pearofducks/ansible-vim'
 endif
@@ -195,7 +193,7 @@ nnoremap <silent> <Esc>8 :8b<CR>
 nnoremap <silent> <Esc>9 :9b<CR>
 nnoremap <silent> <Esc>0 :10b<CR>
 
-nnoremap <Leader>n :NERDTreeToggle<CR>
+" nnoremap <Leader>n :NERDTreeToggle<CR>
 
 " Close other splits easily
 noremap <silent> <Leader>o :only<CR>
@@ -232,6 +230,9 @@ function! VimRefresh()
     NeoCompleteClean
     NeoCompleteBufferMakeCache
     NeoCompleteMemberMakeCache
+    if &filetype ==? 'java'
+        JCcacheClear
+    endif
 endfunction
 " }}}
 
@@ -252,8 +253,8 @@ augroup EditVim
     " autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
     " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-    autocmd QuitPre * exe "NERDTreeClose"
-    autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10
+    " autocmd QuitPre * exe "NERDTreeClose"
+    autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
 augroup END
 
 function! TrimWhiteSpace()
@@ -294,8 +295,21 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+" gutentag setup {{{
+
+" }}}
+
+" gitgutter setup {{{
+
+  let g:gitgutter_sign_added = ''
+  let g:gitgutter_sign_modified = ''
+  let g:gitgutter_sign_removed = ''
+  let g:gitgutter_sign_modified_removed = ''
+" }}}
+
 " javacomplete setup {{{
 let g:JavaComplete_JavaviLogfileDirectory = '~/.javacomplete/servers'
+let g:JavaComplete_ClosingBrace = 1
 " }}}
 
 " ipython setup {{{
@@ -357,21 +371,21 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
 " }}}
 
 " NERDTree setup {{{
-let g:NERDTreeIndicatorMapCustom = {
-         \ "Modified"  : "*",
-         \ "Staged"    : "+",
-         \ "Untracked" : "?",
-         \ "Renamed"   : "=",
-         \ "Unmerged"  : "^",
-         \ "Deleted"   : "x",
-         \ "Dirty"     : "✗"
-         \ }
+" let g:NERDTreeIndicatorMapCustom = {
+"          \ "Modified"  : "*",
+"          \ "Staged"    : "+",
+"          \ "Untracked" : "?",
+"          \ "Renamed"   : "=",
+"          \ "Unmerged"  : "^",
+"          \ "Deleted"   : "x",
+"          \ "Dirty"     : "✗"
+"          \ }
 
 " let g:NERDTreeDirArrowExpandable = '▸'
 " let g:NERDTreeDirArrowCollapsible = '▾'
-let g:NERDTreeDirArrowExpandable = ''
-let g:NERDTreeDirArrowCollapsible = ''
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+" let g:NERDTreeDirArrowExpandable = ''
+" let g:NERDTreeDirArrowCollapsible = ''
+" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 " }}}
 
 " neocomplete setup {{{
@@ -508,7 +522,7 @@ let g:ctrlp_switch_buffer = 'et'
     let g:AutoPairsMapCR = 0
 " }}}
 
-" rainbow parens {{{
+" rainbow parens setup {{{
 let g:rainbow_active = 1
 
 let g:rainbow_conf = {
@@ -517,7 +531,6 @@ let g:rainbow_conf = {
             \   'xml': 0,
             \   'vim': 0,
             \   'python': 0,
-            \   'java': 0,
             \   'sh': 0,
             \   'c': 0,
             \   'javascript': 0
@@ -531,7 +544,7 @@ let g:rainbow_conf = {
     let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
     let g:airline#extensions#tabline#buffer_min_count = 2
     let g:airline_section_c = '%t'
-    let g:airline_section_x = '%{airline#extensions#obsession#get_status()}'
+    let g:airline_section_x = '%{airline#extensions#obsession#get_status()}%{gutentags#statusline()}'
     let g:airline_section_y = '%{&fileformat}'
     let g:airline_section_z = '%l:%c'
     " let g:airline_section_error = ''
