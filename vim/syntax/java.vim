@@ -194,7 +194,7 @@ syn match javaFuncName "[a-zA-Z_][a-zA-Z0-9_]*(\@=" contains=javaLangObject cont
 hi def link javaFuncName Function
 syn match javaFuncCall "[a-zA-Z_][a-zA-Z0-9_]*(\@=" contains=javaFuncName nextgroup=javaFuncArgs
 syn cluster javaTop add=javaFuncCall
-syn region javaFuncArgs matchgroup=javaParen start="(" skip="(" end=")" contains=javaArgs,javaComma contained
+syn region javaFuncArgs start="(\@<=" end=")\@=" contains=javaArgs,javaComma contained
 syn match javaArgs "[^,)]*" contains=@javaTop,javaFuncCall contained skipwhite
 
 
@@ -233,9 +233,10 @@ if exists("java_highlight_functions")
     " two things:
     "	1. class names are always capitalized (ie: Button)
     "	2. method names are never capitalized (except constructors, of course)
-    syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*([^0-9]+ end=+)+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate keepend
-    syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(+ end=+)+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncParams,javaFuncName,javaTemplate keepend
-    syn region javaFuncParams matchgroup=javaParen start="(" skip="(" end=")" contains=javaFuncParamList,javaComma contained
+    " syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*([^0-9]+ end=+)\@=+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma
+    " syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*+ end=+\({\?\s*$\)\@=+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncParams,javaFuncName,javaTemplate
+    syn match javaFuncDef +^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncName,javaTemplate nextgroup=javaFuncParams
+    syn region javaFuncParams start="(\@<=" skip="(" end=")\@=" contains=javaFuncParamList,javaComma contained
     syn match javaFuncParamList "[^,)]*" contains=javaClassName contained skipwhite
   endif
   syn match javaLambdaDef "[a-zA-Z_][a-zA-Z0-9_]*\s*->"
@@ -296,22 +297,22 @@ syn match javaComma ","
 hi def link javaComma PreProc
 
 " catch errors caused by wrong parenthesis
-syn region  javaParenT	transparent matchgroup=javaParen  start="(" end=")" contains=@javaTop,javaParenT1
-syn region  javaParenT1 transparent matchgroup=javaParen1 start="(" end=")" contains=@javaTop,javaParenT2 contained
-syn region  javaParenT2 transparent matchgroup=javaParen2 start="(" end=")" contains=@javaTop,javaParenT  contained
+syn region  javaParenT	transparent start="(" end=")" contains=@javaTop,javaParenT1
+syn region  javaParenT1 transparent start="(" end=")" contains=@javaTop,javaParenT2 contained
+syn region  javaParenT2 transparent start="(" end=")" contains=@javaTop,javaParenT  contained
 syn match   javaParenError	 ")"
 " catch errors caused by wrong square parenthesis
-syn region  javaParenT	transparent matchgroup=javaParen  start="\[" end="\]" contains=@javaTop,javaParenT1
-syn region  javaParenT1 transparent matchgroup=javaParen1 start="\[" end="\]" contains=@javaTop,javaParenT2 contained
-syn region  javaParenT2 transparent matchgroup=javaParen2 start="\[" end="\]" contains=@javaTop,javaParenT  contained
+syn region  javaParenT	transparent start="\[" end="\]" contains=@javaTop,javaParenT1
+syn region  javaParenT1 transparent start="\[" end="\]" contains=@javaTop,javaParenT2 contained
+syn region  javaParenT2 transparent start="\[" end="\]" contains=@javaTop,javaParenT  contained
 syn match   javaParenError	 "\]"
 
 syn cluster javaParen add=javaParenT,javaParenT1,javaParenT2
 
 hi def link javaParenError	javaError
-hi def link javaParen           PreProc
-hi def link javaParen1          PreProc
-hi def link javaParen2          PreProc
+" hi def link javaParen           PreProc
+" hi def link javaParen1          PreProc
+" hi def link javaParen2          PreProc
 
 
 if exists("java_highlight_functions")
