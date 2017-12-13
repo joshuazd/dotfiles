@@ -9,38 +9,37 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-scripts/c.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim'
-Plug 'tpope/vim-obsession'
 Plug 'luochen1990/rainbow'
 Plug 'gerw/vim-HiLinkTrace'
 Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'easymotion/vim-easymotion'
-Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'tmux-plugins/vim-tmux'
-Plug 'vim-airline/vim-airline-themes'
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
 Plug 'Shougo/neco-vim'
 Plug 'Shougo/vimshell.vim'
-Plug 'justmao945/vim-clang'
 Plug 'shougo/neocomplete.vim'
+Plug 'justmao945/vim-clang'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'godlygeek/tabular'
-Plug 'tpope/vim-sleuth'
 Plug 'jiangmiao/auto-pairs'
-Plug 'tpope/vim-commentary'
 Plug 'Konfekt/FastFold'
+Plug 'tpope/vim-obsession'
+Plug 'tpope/vim-sleuth'
+Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-vinegar'
 Plug 'ryanoasis/vim-devicons'
 Plug 'plasticboy/vim-markdown'
 Plug 'joshuazd/vim-ipython'
 Plug 'artur-shaik/vim-javacomplete2'
 Plug 'ludovicchabant/vim-gutentags'
-if has("win32unix") || $USER ==? "vagrant"
-    Plug 'pearofducks/ansible-vim'
-endif
+Plug 'pearofducks/ansible-vim'
 
 call plug#end()
 runtime macros/matchit.vim
@@ -50,72 +49,76 @@ runtime macros/matchit.vim
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-set ruler                       " Always show current position
-set cmdheight=1                 " Height of the command bar
-set hidden                      " A buffer becomes hidden when it is abandoned
-set backspace=eol,start,indent  " Configure backspace so it acts as it should act
-set whichwrap+=<,>,h,l          " arrow keys and h,l move to the next line
-set showcmd                     " show keystrokes
-set breakindent                 " Indent wrapped lines by 2
-set breakindentopt=shift:2
-set ignorecase                  " Ignore case when searching
-set smartcase                   " When searching try to be smart about cases
-set hlsearch                    " Highlight search results
-set incsearch                   " Makes search act like search in modern browsers
-set lazyredraw                  " Don't redraw while executing macros (good performance config)
-set magic                       " For regular expressions turn magic on
-set showmatch                   " Show matching brackets when text indicator is over them
-set mat=2                       " How many tenths of a second to blink when matching brackets
-set noerrorbells                " No annoying sound on errors
+set ruler						" Always show current position
+set cmdheight=1					" Height of the command bar
+set hidden						" A buffer becomes hidden when it is abandoned
+set backspace=eol,start,indent	" Configure backspace so it acts as it should act
+set whichwrap+=<,>,h,l			" arrow keys and h,l move to the next line
+set showcmd						" show keystrokes
+set breakindent					" Indent wrapped lines by 2 {{{
+set breakindentopt=shift:2		" }}}
+" search {{{
+set ignorecase					" Ignore case when searching
+set smartcase					" When searching try to be smart about cases
+set hlsearch					" Highlight search results
+set incsearch					" Makes search act like search in modern browsers
+" }}}
+set lazyredraw					" Don't redraw while executing macros (good performance config)
+set magic						" For regular expressions turn magic on
+set showmatch					" Show matching brackets when text indicator is over them {{{
+set matchtime=2					" How many tenths of a second to blink when matching brackets }}}
+set noerrorbells				" No annoying sound on errors {{{
 set novisualbell
 set t_vb=
-set tm=500
-set splitbelow                  " Make splits behave better
-set splitright
-set background=dark             " dark background
-syntax on                       " turn syntax on
-colorscheme hybrid_material     " material color scheme
-set number                      " show line numbers
-set relativenumber              " show relative line numbers
-set numberwidth=1               " set min number column width
-set clipboard=unnamedplus       " make clipboard work better
-set tabstop=4                   " <TAB>s are 4 spaces
-set softtabstop=4               " number of spaces when inserting/backspacing
-set shiftwidth=4                " shift 4 spaces for indentation
-set expandtab                   " expand tabs into spaces
-set autoindent                  " use the previous lines indentation level
-set noshowmode                  " don't show mode in the statusline
-set nowrap                      " don't wrap lines by default
-set laststatus=2                " always show statusline
-set cindent                     " better indentation
-set cinkeys-=0#
+set timeoutlen=500				" }}}
+set splitbelow					" Make splits behave better {{{
+set splitright					" }}}
+set background=dark				" dark background {{{
+syntax on						" turn syntax on
+colorscheme hybrid_material		" material color scheme }}}
+set number						" show line numbers {{{
+set relativenumber				" show relative line numbers
+set numberwidth=1				" set min number column width }}}
+set clipboard=unnamedplus		" make clipboard work better
+set tabstop=4					" <TAB>s are 4 spaces {{{
+set softtabstop=4				" number of spaces when inserting/backspacing
+set shiftwidth=4				" shift 4 spaces for indentation
+set expandtab					" expand tabs into spaces
+set autoindent					" use the previous lines indentation level }}}
+set noshowmode					" don't show mode in the statusline
+set nowrap						" don't wrap lines by default
+set laststatus=2				" always show statusline
+set cindent						" better indentation
+" set cinkeys-=0#
 set indentkeys-=0#
-set so=999                      " Set 999 lines to the cursor - when moving vertically using j/k
-set sidescroll=1                " scroll 1 character at a time
-set sidescrolloff=15            " scroll within 15 characters
-set foldmethod=syntax           " fold based on syntax
-set wildmenu                    " Turn on the WiLd menu
-set wildmode=longest,list
-set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/* " Ignore compiled files
-au FileType * set fo-=o         " Don't insert comment when using 'o'
-set sessionoptions-=options     " make sessions work better with plugins
+set scrolloff=999				" Set 999 lines to the cursor - when moving vertically using j/k {{{
+set sidescroll=1				" scroll 1 character at a time
+set sidescrolloff=15			" scroll within 15 characters }}}
+set foldmethod=syntax			" fold based on syntax
+set wildmenu					" Turn on the WiLd menu {{{
+set wildmode=list:longest
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/*,tags	" Ignore compiled files
+set wildignorecase				" ignore case in wildmenu }}}
+au FileType * set fo-=o			" Don't insert comment when using 'o'
+set sessionoptions-=options		" make sessions work better with plugins
 set sessionoptions-=folds
 let g:is_posix = 1
-set backupdir=/tmp              " Better backups
+set backupdir=/tmp				" Better backups
 set noswapfile
-set foldlevel=12                " don't fold most things
+set foldlevel=12				" don't fold most things
 set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
 set term=xterm-256color
-set omnifunc=syntaxcomplete#Complete    " enable omnicompletion
-" set completeopt+=longest
+set omnifunc=syntaxcomplete#Complete	" enable omnicompletion
 set completeopt+=menuone
-set concealcursor+=n            " conceal characters in normal mode
-set conceallevel=2              " conceal characters by default
-set autowrite                   " automatically save before :next, :make, etc
-set autoread                    " automatically reread changed files
-if has("gui_running")
+set concealcursor+=n			" conceal characters in normal mode
+set conceallevel=2				" conceal characters by default
+set autowrite					" automatically save before :next, :make, etc
+set autoread					" automatically reread changed files
+set path=.,**					" set path to all subdirectories
+if has("gui_running") " {{{
     " set guifont=Literation\ Mono\ Powerline\ 10
-    set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
+    " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
+    set guifont=DejaVu\ Sans\ Mono\ Book\ 10
     set guioptions-=T
     set guioptions+=e
     set guioptions-=m
@@ -123,7 +126,7 @@ if has("gui_running")
     set guioptions-=L
     set guitablabel=%M\ %t
     set lines=43 columns=120
-endif
+endif " }}}
 let g:hybrid_custom_term_colors=1
 let g:xml_syntax_folding=1 " enable xml folding
 " }}}
@@ -161,39 +164,14 @@ noremap gk k
 noremap L $
 noremap H ^
 " Buffer keymappings
-nnoremap <silent> <Leader>1 :1b<CR>
-nnoremap <silent> <Leader>2 :2b<CR>
-nnoremap <silent> <Leader>3 :3b<CR>
-nnoremap <silent> <Leader>4 :4b<CR>
-nnoremap <silent> <Leader>5 :5b<CR>
-nnoremap <silent> <Leader>6 :6b<CR>
-nnoremap <silent> <Leader>7 :7b<CR>
-nnoremap <silent> <Leader>8 :8b<CR>
-nnoremap <silent> <Leader>9 :9b<CR>
-nnoremap <silent> <Leader>0 :10b<CR>
+nnoremap gb :ls<CR>:b<space>
+nnoremap <Leader>b :buffer *
 
-nnoremap <silent> <M-1> :1b<CR>
-nnoremap <silent> <M-2> :2b<CR>
-nnoremap <silent> <M-3> :3b<CR>
-nnoremap <silent> <M-4> :4b<CR>
-nnoremap <silent> <M-5> :5b<CR>
-nnoremap <silent> <M-6> :6b<CR>
-nnoremap <silent> <M-7> :7b<CR>
-nnoremap <silent> <M-8> :8b<CR>
-nnoremap <silent> <M-9> :9b<CR>
-nnoremap <silent> <M-0> :10b<CR>
-nnoremap <silent> <Esc>1 :1b<CR>
-nnoremap <silent> <Esc>2 :2b<CR>
-nnoremap <silent> <Esc>3 :3b<CR>
-nnoremap <silent> <Esc>4 :4b<CR>
-nnoremap <silent> <Esc>5 :5b<CR>
-nnoremap <silent> <Esc>6 :6b<CR>
-nnoremap <silent> <Esc>7 :7b<CR>
-nnoremap <silent> <Esc>8 :8b<CR>
-nnoremap <silent> <Esc>9 :9b<CR>
-nnoremap <silent> <Esc>0 :10b<CR>
+" add files to bufferlist
+nnoremap <Leader>a :argadd **/*
 
-" nnoremap <Leader>n :NERDTreeToggle<CR>
+" find file
+nnoremap <Leader>f :find *
 
 " Close other splits easily
 noremap <silent> <Leader>o :only<CR>
@@ -220,7 +198,7 @@ nnoremap <silent> <Leader>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call VimRefresh()<CR>
-function! VimRefresh()
+function! VimRefresh() " {{{
     CtrlPClearAllCaches
     AirlineRefresh
     ALEToggle
@@ -233,7 +211,7 @@ function! VimRefresh()
     if &filetype ==? 'java'
         JCcacheClear
     endif
-endfunction
+endfunction " }}}
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -257,21 +235,21 @@ augroup EditVim
     autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
 augroup END
 
-function! TrimWhiteSpace()
+function! TrimWhiteSpace() " {{{
     %s/\s\+$//e
     ''
 endfunction
-command! TrimWhiteSpace call TrimWhiteSpace()
+command! TrimWhiteSpace call TrimWhiteSpace() " }}}
 
-function! ToggleConceal()
+function! ToggleConceal() " {{{
     if &conceallevel == 0
         set conceallevel=2
     else
         set conceallevel=0
     endif
-endfunction
+endfunction " }}}
 
-function! XmlSetup()
+function! XmlSetup() " {{{
     setlocal shiftwidth=2
     setlocal tabstop=2
     setlocal softtabstop=2
@@ -281,12 +259,12 @@ function! XmlSetup()
     set foldnestmax=2               " no nesting folds
     inoremap <expr> </ pumvisible() ? "\</\<C-x>\<C-o>\<C-y>" : "\</\<C-x>\<C-o>"
     command! Tabs setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab
-endfunction
+endfunction " }}}
 
-function! PythonSetup()
+function! PythonSetup() " {{{
     setlocal foldmethod=indent
     call IPythonKeyBinds()
-endfunction
+endfunction " }}}
 
 command! FormatJSON %!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin, object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
@@ -317,20 +295,20 @@ let g:ipy_perform_mappings = 0 "make our own mappings
 function! IPythonKeyBinds()
 
     nmap  <buffer> <silent> <F10>           <Plug>(IPython-RunFile)
-    nmap  <buffer> <silent> <S-F10>         <Plug>(IPython-RunLine)
-    nmap  <buffer> <silent> <F9>           <Plug>(IPython-RunLines)
+    " nmap  <buffer> <silent> <S-F10>         <Plug>(IPython-RunLine)
+    " nmap  <buffer> <silent> <F9>           <Plug>(IPython-RunLines)
     nmap  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
     nmap  <buffer> <silent> <LocalLeader>r <Plug>(IPython-UpdateShell)
-    nmap  <buffer> <silent> <S-F9>         <Plug>(IPython-ToggleReselect)
+    " nmap  <buffer> <silent> <S-F9>         <Plug>(IPython-ToggleReselect)
     "noremap  <buffer> <silent> <C-F6>         <Plug>(IPython-StartDebugging)
     "noremap  <buffer> <silent> <F6>           <Plug>(IPython-BreakpointSet)
     "noremap  <buffer> <silent> <S-F6>         <Plug>(IPython-BreakpointClear)
     "noremap  <buffer> <silent> <F7>           <Plug>(IPython-DebugThisFile)
     "noremap  <buffer> <silent> <S-F7>         <Plug>(IPython-BreakpointClearAll)
-    imap <buffer>          <C-F10>         <C-o><Plug>(IPython-RunFile)
-    imap <buffer>          <S-F10>         <C-o><Plug>(IPython-RunLines)
-    imap <buffer> <silent> <F10>           <C-o><Plug>(IPython-RunFile)
-    nmap  <buffer>          <C-F10>         <Plug>(IPython-ToggleSendOnSave)
+    " imap <buffer>          <C-F10>         <C-o><Plug>(IPython-RunFile)
+    " imap <buffer>          <S-F10>         <C-o><Plug>(IPython-RunLines)
+    " imap <buffer> <silent> <F10>           <C-o><Plug>(IPython-RunFile)
+    " nmap  <buffer>          <C-F10>         <Plug>(IPython-ToggleSendOnSave)
     "" Example of how to quickly clear the current plot with a keystroke
     "noremap  <buffer> <silent> <F12>          <Plug>(IPython-PlotClearCurrent)
     "" Example of how to quickly close all figures with a keystroke
@@ -340,16 +318,10 @@ function! IPythonKeyBinds()
     nmap  <buffer> <silent> <C-Return>     <Plug>(IPython-RunFile)
     nmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLine)
     imap <buffer> <silent> <LocalLeader>s          <C-o><Plug>(IPython-RunLine)
-    nmap  <buffer> <silent> <M-s>          <Plug>(IPython-RunLineAsTopLevel)
+    " nmap  <buffer> <silent> <M-s>          <Plug>(IPython-RunLineAsTopLevel)
     nmap  <buffer> <silent> <Esc>s          <Plug>(IPython-RunLineAsTopLevel)
     xmap <buffer> <silent> <LocalLeader>s          <Plug>(IPython-RunLines)
-    xmap <buffer> <silent> <M-s>          <Plug>(IPython-RunLinesAsTopLevel)
-    xmap <buffer> <silent> <Esc>s          <Plug>(IPython-RunLinesAsTopLevel)
 
-    " noremap  <buffer> <silent> <M-c>      I#<ESC>
-    " xnoremap <buffer> <silent> <M-c>      I#<ESC>
-    " noremap  <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
-    " xnoremap <buffer> <silent> <M-C>      :s/^\([ \t]*\)#/\1/<CR>
 endfunction
 " }}}
 
@@ -364,28 +336,11 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
 " }}}
 
 " netrw setup {{{
-    let g:netrw_winsize = -28
+    let g:netrw_winsize = 20
     let g:netrw_banner = 0
     let g:netrw_liststyle = 3
     let g:netrw_browse_split = 4
-" }}}
-
-" NERDTree setup {{{
-" let g:NERDTreeIndicatorMapCustom = {
-"          \ "Modified"  : "*",
-"          \ "Staged"    : "+",
-"          \ "Untracked" : "?",
-"          \ "Renamed"   : "=",
-"          \ "Unmerged"  : "^",
-"          \ "Deleted"   : "x",
-"          \ "Dirty"     : "✗"
-"          \ }
-
-" let g:NERDTreeDirArrowExpandable = '▸'
-" let g:NERDTreeDirArrowCollapsible = '▾'
-" let g:NERDTreeDirArrowExpandable = ''
-" let g:NERDTreeDirArrowCollapsible = ''
-" autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+    let g:netrw_altv = 1
 " }}}
 
 " neocomplete setup {{{
