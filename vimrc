@@ -270,6 +270,44 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
+"              STATUSLINE SETUP
+""""""""""""""""""""""""""""""""""""""""""""""""
+" {{{
+let g:modemap = {
+      \ 'n' : 'N',
+      \ 'no': 'N',
+      \ 'v' : 'V',
+      \ 'V' : 'V',
+      \ '': 'V',
+      \ 's' : 'S',
+      \ 'S' : 'S',
+      \ '': 'S',
+      \ 'i' : 'I',
+      \ 'R' : 'R',
+      \ 'Rv': 'R',
+      \ 'c' : 'C',
+      \ 'cv': 'VIMEX',
+      \ 'ce': 'EX',
+      \ 'r' : 'PROMPT',
+      \ 'rm': 'MORE',
+      \ 'r?': 'CONFIRM',
+      \ '!' : 'SHELL',
+      \ 't' : 'TERM'
+\}
+function! GitStatus() abort
+  let gitstatus = fugitive#head()
+  if gitstatus != ''
+    return ' ' . gitstatus
+  else
+    return ''
+  endif
+endfunction
+set statusline=\ "
+set statusline+=%{g:modemap[mode()]}\ \ "
+set statusline+=%{GitStatus()}
+" }}}
+
+""""""""""""""""""""""""""""""""""""""""""""""""
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
