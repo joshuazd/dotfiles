@@ -1,16 +1,16 @@
-syn match xmlFunction 'makefault\|template\( \|>\)\@=\|validate'
-syn match xmlLog 'call-template\|log'
-syn match db 'dblookup\|dbreport\|class\|payloadFactory\|arg \|http[ >]\@='
-syn match filter '\(<\/\?\)\@<=\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)'
-syn match xmlSend '\(<\/\?\)\@<=\(send\|call\(>\)\@=\)'
-syn match property '\(<\/\?\)\@<=\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@='
-syn match sequence '\(</\?\)\@<=sequence'
-syn match param 'parameter\|result\|dsName\|target\|format\|source \@=\|param\( \|>\)\@='
-syn match xmlLogParam 'with-param'
-syn match connection 'connection\|statement\|resource\( \|>\)\@=\|stylesheet'
-syn match xmlArgs 'args'
-syn match xmlEnrich 'enrich\|xslt\|value-of\|schema\|datamapper'
-syn match xmlSqlTag '\<\(sql\|script\)\>'
+syn match xmlFunction 'makefault\|template\( \|>\)\@=\|validate' contained
+syn match xmlLog 'call-template\|log' contained
+syn match db 'dblookup\|dbreport\|class\|payloadFactory\|arg \|http[ >]\@=' contained
+syn match filter '\(<\/\?\)\@<=\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)' contained
+syn match xmlSend '\(<\/\?\)\@<=\(send\|call\(>\)\@=\)' contained
+syn match property '\(<\/\?\)\@<=\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@=' contained
+syn match sequence '\(</\?\)\@<=sequence' contained
+syn match param 'parameter\|result\|dsName\|target\|format\|source \@=\|param\( \|>\)\@=' contained
+syn match xmlLogParam 'with-param' contained
+syn match connection 'connection\|statement\|resource\( \|>\)\@=\|stylesheet' contained
+syn match xmlArgs 'args' contained
+syn match xmlEnrich 'enrich\|xslt\|value-of\|schema\|datamapper' contained
+syn match xmlSqlTag '\<\(sql\|script\)\>' contained
 
 let cur_syntax = b:current_syntax
 unlet! b:current_syntax
@@ -23,22 +23,20 @@ syn region xmlSqlRegion
     \ contains=xmlTag,,xmlEndTag,@xmlSQL
 let b:current_syntax = cur_syntax
 
-
-" syn region xmlPayloadRegion
-"             \ start=+\%(<payloadFactory media-type="json">\)+
-"             \ keepend
-"             \ end=+\%(</payloadFactory>\)+
-"             \ contained
-"             \ contains=xmlTag,xmlEndTag,xmlJsonRegion
-
 let cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlJson syntax/json.vim
 syn region xmlJsonRegion
-            \ start=+\%(<payloadFactory media-type="json">\)+
-            \ end=+</payloadFactory>+
+            \ start=+\%(<format>\)+
+            \ keepend
+            \ end=+</format>+
             \ contained
-            \ contains=xmlTag,xmlEndTag,@xmlJson
+            \ contains=xmlFormatTag,xmlFormatEndTag,@xmlJson,xmlTag
+" syn region xmlJsonRegion
+"             \ start=+\%(<payloadFactory media-type="json">\)+
+"             \ end=+</payloadFactory>+
+"             \ contained
+"             \ contains=xmlTag,xmlEndTag,@xmlJson,xmlRegion
 let b:current_syntax = cur_syntax
 
 let cur_syntax = b:current_syntax
@@ -65,6 +63,8 @@ let b:current_syntax = cur_syntax
 
 syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
 syn match xmlEndScriptTag +</script>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+syn match xmlFormatTag +<format[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
+syn match xmlFormatEndTag +</format>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
 syn keyword  xmlCdataCdata CDATA          contained
 syn match    xmlCdataEnd   +]]>+          contained
