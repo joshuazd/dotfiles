@@ -11,8 +11,8 @@ Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim'
 Plug 'luochen1990/rainbow'
 Plug 'gerw/vim-HiLinkTrace'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
+" Plug 'vim-airline/vim-airline'
+" Plug 'vim-airline/vim-airline-themes'
 Plug 'easymotion/vim-easymotion'
 Plug 'airblade/vim-gitgutter'
 Plug 'tmux-plugins/vim-tmux'
@@ -137,6 +137,9 @@ let g:xml_syntax_folding=1 " enable xml folding
 " {{{
 let mapleader = "\<Space>" " make leader a more sane keybinding
 let maplocalleader = "," " remap localleader
+" easier : mapping
+noremap ; :
+noremap , ;
 " make 0 work better
 nnoremap 0 ^
 nnoremap ^ 0
@@ -165,7 +168,7 @@ noremap L $
 noremap H ^
 " Buffer keymappings
 nnoremap gb :ls<CR>:b<space>
-nnoremap <Leader>b :buffer *
+nnoremap <Leader>b :buffer *<C-d>
 
 " add files to bufferlist
 nnoremap <Leader>a :argadd **/*
@@ -233,6 +236,7 @@ augroup EditVim
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
     " autocmd QuitPre * exe "NERDTreeClose"
     autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
+    autocmd FileType java set makeprg=mvn\ install
 augroup END
 
 function! TrimWhiteSpace() " {{{
@@ -294,28 +298,108 @@ let g:modemap = {
       \ '!' : 'SHELL',
       \ 't' : 'TERM'
 \}
-function! GitStatus() abort
+function! GetModeIndicator() abort
+  if &filetype ==# 'help'
+    return 'Help'
+  elseif &filetype ==# 'netrw'
+    return 'netrw'
+  else
+    return g:modemap[mode()]
+endfunction
+function! StatusLineColor()
+  if mode() ==# 'i'
+    exe 'highlight! StatusLine ctermfg=3 ctermbg=0 cterm=bold,inverse'
+    exe 'highlight! User3 ctermfg=3 ctermbg=0 cterm=inverse'
+  elseif mode() =~# '\v(n|no)'
+    exe 'highlight! StatusLine ctermfg=12 ctermbg=0 cterm=bold,inverse'
+    exe 'highlight! User3 ctermfg=12 ctermbg=0 cterm=inverse'
+  elseif mode() =~# '\v(v|V|)'
+    exe 'highlight! StatusLine ctermfg=10 ctermbg=0 cterm=bold,inverse'
+    exe 'highlight! User3 ctermfg=10 ctermbg=0 cterm=inverse'
+  elseif mode() =~# '\v(R|Rv)'
+    exe 'highlight! StatusLine ctermfg=1 ctermbg=0 cterm=bold,inverse'
+    exe 'highlight! User3 ctermfg=1 ctermbg=0 cterm=inverse'
+  else
+    exe 'highlight! StatusLine ctermfg=12 ctermbg=0 cterm=bold,inverse'
+    exe 'highlight! User3 ctermfg=12 ctermbg=0 cterm=inverse'
+  endif
+  return ''
+endfunction
+function! GitStatus()
   let gitstatus = fugitive#head()
   if gitstatus != ''
-    return '|  ' . gitstatus . ' '
+    return '  ' . gitstatus . ''
   else
     return ''
   endif
 endfunction
-set statusline=\ "
-set statusline+=%{g:modemap[mode()]}\ "
-set statusline+=%{GitStatus()}
-set statusline+=\|\ %f
+function! GitHunks()
+  let githunks = GitGutterGetHunkSummary()
+  let returnval = ''
+  if githunks[0] != 0
+    let returnval .= ' ' . githunks[0] . '+'
+  endif
+  if githunks[1] != 0
+    let returnval .= ' ' . githunks[1] . '~'
+  endif
+  if githunks[2] != 0
+    let returnval .= ' ' . githunks[2] . '-'
+  endif
+  return returnval
+endfunction
+function! GitStatusLine() abort
+  let gitstatus = GitStatus()
+  let githunks = GitHunks()
+  let gitline = ''
+  if githunks != ''
+    let gitline .= githunks
+  endif
+  if gitstatus != ''
+    let gitline .= (gitline == '' ? '' : '') . gitstatus
+  endif
+  if gitline != ''
+    let gitline .= ' '
+  endif
+  return gitline
+endfunction
+function! GetReadOnlyStatus() abort
+  let readonly = &readonly
+  if readonly == 1
+    return ' '
+  else
+    return ''
+  endif
+endfunction
+function! LinterStatus() abort
+  let l:counts = ale#statusline#Count(bufnr(''))
+  let l:all_errors = l:counts.error + l:counts.style_error
+  let l:all_non_errors = l:counts.total - l:all_errors
+  return l:counts.total == 0 ? '' : printf(
+        \ ' %dW %dE ',
+        \ all_non_errors,
+        \ all_errors
+        \)
+endfunction
+highlight User1 ctermfg=7 ctermbg=8
+highlight User2 ctermfg=242 ctermbg=235
+highlight User4 ctermfg=9 ctermbg=8
+highlight User5 ctermfg=0 ctermbg=1
+highlight StatusLineNC cterm=inverse,bold
+set statusline=
+set statusline+=%{StatusLineColor()}
+set statusline+=%0*\ %{GetModeIndicator()}\ "
+set statusline+=%2*%{GitStatusLine()}
+set statusline+=%1*\ %t%m\ %4*%{GetReadOnlyStatus()}
+set statusline+=%=
+set statusline+=%2*\ %{WebDevIconsGetFileTypeSymbol()}
+set statusline+=\ %3*\ %l:%c\ "
+set statusline+=%5*%{LinterStatus()}
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-" gutentag setup {{{
-
-" }}}
-
 " gitgutter setup {{{
 
   let g:gitgutter_sign_added = ''
@@ -368,6 +452,9 @@ endfunction
 
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
 let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
+let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols = {}
+let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['\.\?vimrc']  = ''
+let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['tags']  = ''
 
 let g:WebDevIconsNerdTreeGitPluginForceVAlign = 0
 let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
@@ -391,13 +478,13 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
     let g:neocomplete#enable_auto_delimiter = 1
     imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
-                \: pumvisible() ? "\<CR>" : "\<TAB>"
+                \: pumvisible() ? "\<C-y>" : "\<TAB>"
     smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: "\<TAB>"
     imap <expr><CR> neosnippet#expandable() ?
                 \ "\<Plug>(neosnippet_expand)"
-                \: pumvisible()? "\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
+                \: pumvisible()? "\<C-e>\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
     let g:neosnippet#enable_snipmate_compatibility = 0
     let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
 
@@ -464,9 +551,12 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
     nmap <silent> [e <Plug>(ale_previous_wrap)
     let g:ale_python_flake8_options = '--max-line-length 99'
     let g:ale_virtualenv_dir_names = []
+    let g:ale_warn_about_trailing_whitespace = 1
     let g:ale_lint_on_text_changed = 'normal'
+    autocmd! FileType java let g:ale_lint_on_text_changed = 'never'
+    let g:ale_java_javac_options = '-Xlint:-serial'
 
-    let g:ale_linters = {'java': []}
+    " let g:ale_linters = {'java': []}
 
     let g:ale_fixers = {
                 \   'python': [
@@ -496,7 +586,6 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
 
 " Easymotion setup {{{
     map <Leader> <Plug>(easymotion-prefix)
-"    nmap s <Plug>(easymotion-overwin-f)
     map / <Plug>(easymotion-sn)
     omap / <Plug><easymotion-tn)
     let g:EasyMotion_startofline = 0
