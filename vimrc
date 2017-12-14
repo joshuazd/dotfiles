@@ -275,7 +275,7 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 " {{{
 let g:modemap = {
       \ 'n' : 'N',
-      \ 'no': 'N',
+      \ 'no': 'NO',
       \ 'v' : 'V',
       \ 'V' : 'V',
       \ '': 'V',
@@ -297,14 +297,15 @@ let g:modemap = {
 function! GitStatus() abort
   let gitstatus = fugitive#head()
   if gitstatus != ''
-    return ' ' . gitstatus
+    return '|  ' . gitstatus . ' '
   else
     return ''
   endif
 endfunction
 set statusline=\ "
-set statusline+=%{g:modemap[mode()]}\ \ "
+set statusline+=%{g:modemap[mode()]}\ "
 set statusline+=%{GitStatus()}
+set statusline+=\|\ %f
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""

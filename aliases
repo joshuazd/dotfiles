@@ -17,6 +17,7 @@ alias cp='cp -i'
 alias j=jobs
 
 alias python='python3'
+alias pip='pip3'
 alias search='find . -type f -name'
 alias vi='custom_vim'
 
