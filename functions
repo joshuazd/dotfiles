@@ -25,7 +25,7 @@ function custom_vim() {
     local jobsresult=$(jobs)
     local jobsdir=$(jobs -d)
     local vimresult=$(echo $jobsdir | grep -n vim)
-    if [ -f $PWD/.git/Session.vim ]; then
+    if [[ $@ == '' &&  -f $PWD/.git/Session.vim ]]; then
         flags=' -S .git/Session.vim'
     else
         flags=''
