@@ -608,6 +608,7 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
     omap / <Plug><easymotion-tn)
     omap ? <Plug><easymotion-tn)
     let g:EasyMotion_startofline = 0
+    let g:EasyMotion_smartcase = 1
 " }}}
 
 " ctrlP setup {{{
