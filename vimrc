@@ -197,6 +197,8 @@ noremap <silent> <Leader>h :call ToggleConceal()<CR>
 " paste and format
 nnoremap <silent> <Leader>p p=']
 nnoremap <silent> <Leader>P P=']
+xnoremap <silent> <Leader>p p=']
+xnoremap <silent> <Leader>P P=']
 " xnoremap <silent> p "_dP
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
@@ -595,9 +597,12 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
 " }}}
 
 " Easymotion setup {{{
-    map <Leader> <Plug>(easymotion-prefix)
+    map <LocalLeader> <Plug>(easymotion-prefix)
+    map s <Plug>(easymotion-s2)
     map / <Plug>(easymotion-sn)
+    map ? <Plug>(easymotion-sn)
     omap / <Plug><easymotion-tn)
+    omap ? <Plug><easymotion-tn)
     let g:EasyMotion_startofline = 0
 " }}}
 
