@@ -24,6 +24,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'godlygeek/tabular'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Konfekt/FastFold'
+Plug 'justinmk/vim-dirvish'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-commentary'
@@ -32,6 +33,7 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-vinegar'
+Plug 'tpope/vim-unimpaired'
 Plug 'ryanoasis/vim-devicons'
 Plug 'plasticboy/vim-markdown'
 Plug 'joshuazd/vim-ipython'
@@ -191,7 +193,7 @@ inoremap <C-@> <C-x><C-o>
 " toggle conceallevel
 noremap <silent> <Leader>h :call ToggleConceal()<CR>
 " search command
-noremap <silent> <C-f> :CtrlPLine<CR>
+" noremap <silent> <C-f> :CtrlPLine<CR>
 " paste and format
 nnoremap <silent> <Leader>p p=']
 nnoremap <silent> <Leader>P P=']
@@ -267,6 +269,14 @@ function! PythonSetup() " {{{
     setlocal foldmethod=indent
     call IPythonKeyBinds()
 endfunction " }}}
+
+function! VimGrepAll(pattern) abort
+  call setqflist([])
+  exe 'bufdo silent vimgrepadd ' . a:pattern . ' %'
+  cwindow
+endfunction
+command! -nargs=1 Search call VimGrepAll(<f-args>)
+nnoremap <C-f> :Search 
 
 command! FormatJSON %!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin, object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
@@ -380,8 +390,10 @@ function! LinterStatus() abort
 endfunction
 highlight User1 ctermfg=7 ctermbg=8
 highlight User2 ctermfg=242 ctermbg=235
+highlight User3 ctermfg=12 ctermbg=0 cterm=inverse
 highlight User4 ctermfg=9 ctermbg=8
 highlight User5 ctermfg=0 ctermbg=1
+highlight StatusLine ctermfg=12 ctermbg=0 cterm=bold,inverse
 highlight StatusLineNC cterm=inverse,bold
 set statusline=
 set statusline+=%{StatusLineColor()}
