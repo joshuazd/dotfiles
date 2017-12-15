@@ -599,6 +599,10 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
 " Easymotion setup {{{
     map <LocalLeader> <Plug>(easymotion-prefix)
     map s <Plug>(easymotion-s2)
+    map f <Plug>(easymotion-f)
+    map F <Plug>(easymotion-F)
+    map t <Plug>(easymotion-t)
+    map T <Plug>(easymotion-T)
     map / <Plug>(easymotion-sn)
     map ? <Plug>(easymotion-sn)
     omap / <Plug><easymotion-tn)
