@@ -263,7 +263,7 @@ function! XmlSetup() " {{{
     setlocal foldmethod=syntax
     setlocal smarttab
     set foldnestmax=2               " no nesting folds
-    inoremap <expr> </ pumvisible() ? "\</\<C-x>\<C-o>\<C-y>" : "\</\<C-x>\<C-o>"
+    inoremap </ </<C-x><C-o><C-y>
     command! Tabs setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab
 endfunction " }}}
 
@@ -396,13 +396,14 @@ highlight User3 ctermfg=12 ctermbg=0 cterm=inverse
 highlight User4 ctermfg=9 ctermbg=8
 highlight User5 ctermfg=0 ctermbg=1
 highlight StatusLine ctermfg=12 ctermbg=0 cterm=bold,inverse
-highlight StatusLineNC cterm=inverse,bold
+highlight StatusLineNC ctermbg=244 cterm=inverse,bold
 set statusline=
 set statusline+=%{StatusLineColor()}
 set statusline+=%0*\ %{GetModeIndicator()}\ "
 set statusline+=%2*%{GitStatusLine()}
 set statusline+=%1*\ %t%m\ %4*%{GetReadOnlyStatus()}
 set statusline+=%=
+set statusline+=%1*%{ObsessionStatus('')}\ %{gutentags#statusline()}\ "
 set statusline+=%2*\ %{WebDevIconsGetFileTypeSymbol()}
 set statusline+=\ %3*\ %l:%c\ "
 set statusline+=%5*%{LinterStatus()}
@@ -412,6 +413,10 @@ set statusline+=%5*%{LinterStatus()}
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+" gutentags setup {{{
+  let g:gutentags_exclude_project_root = ['/home/shepard/ansible/ansible-checkout','/home/shepard/ansible/environments','/home/shepard/ansible/playbooks-mw']
+" }}}
+
 " gitgutter setup {{{
 
   let g:gitgutter_sign_added = ''
@@ -497,6 +502,7 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
     imap <expr><CR> neosnippet#expandable() ?
                 \ "\<Plug>(neosnippet_expand)"
                 \: pumvisible()? "\<C-e>\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
+    inoremap <expr><C-l> pumvisible() ? neocomplete#complete_common_string() : "\<C-l>"
     let g:neosnippet#enable_snipmate_compatibility = 0
     let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
 
