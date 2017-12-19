@@ -32,11 +32,17 @@ syn region xmlJsonRegion
             \ end=+</format>+
             \ contained
             \ contains=xmlFormatTag,xmlFormatEndTag,@xmlJson,xmlTag
-" syn region xmlJsonRegion
-"             \ start=+\%(<payloadFactory media-type="json">\)+
-"             \ end=+</payloadFactory>+
-"             \ contained
-"             \ contains=xmlTag,xmlEndTag,@xmlJson,xmlRegion
+syn region xmlPayloadArgsRegion
+            \ start=+\%(<args>\)+
+            \ keepend
+            \ end=+</args>+
+            \ contained
+            \ contains=xmlTag,xmlEndTag
+syn region xmlPayloadRegion
+            \ start=+\%(<payloadFactory media-type="json">\)+
+            \ end=+</payloadFactory>+
+            \ contained
+            \ contains=xmlJsonRegion,xmlPayloadTag,xmlPayloadEndTag,xmlPayloadArgsRegion,xmlPayloadArgsTag
 let b:current_syntax = cur_syntax
 
 let cur_syntax = b:current_syntax
@@ -65,6 +71,9 @@ syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,
 syn match xmlEndScriptTag +</script>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 syn match xmlFormatTag +<format[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
 syn match xmlFormatEndTag +</format>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+syn match xmlPayloadTag +<payloadFactory[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
+syn match xmlPayloadEndTag +</payloadFactory>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+syn match xmlPayloadArgsTag +<args/>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
 syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
 syn keyword  xmlCdataCdata CDATA          contained
 syn match    xmlCdataEnd   +]]>+          contained
