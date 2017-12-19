@@ -642,7 +642,8 @@ let g:rainbow_conf = {
             \   'python': 0,
             \   'sh': 0,
             \   'c': 0,
-            \   'javascript': 0
+            \   'javascript': 0,
+            \   'json': 0
             \  }
             \}
 " }}}

@@ -124,5 +124,5 @@ hi def link xmlScriptTag xmlTag
 hi def link xmlEndScriptTag xmlTag
 highlight link db Identifier
 highlight link filter Keyword
-highlight xmlSqlTag ctermfg=202 guifg=#ff5f00
+highlight xmlSqlTag ctermfg=173 guifg=#ff5f00
 highlight xmlLogParam ctermfg=245 guifg=#8a8a8a
