@@ -5,7 +5,7 @@ set nocompatible
 call plug#begin('~/.vim/bundle')
 
 Plug 'w0rp/ale'
-Plug 'ctrlpvim/ctrlp.vim'
+" Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-scripts/c.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim'
@@ -96,7 +96,7 @@ set sidescroll=1				" scroll 1 character at a time
 set sidescrolloff=15			" scroll within 15 characters }}}
 set foldmethod=syntax			" fold based on syntax
 set wildmenu					" Turn on the WiLd menu {{{
-set wildmode=list:longest
+set wildmode=list:longest,list:full
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/*,tags	" Ignore compiled files
 set wildignorecase				" ignore case in wildmenu }}}
 au FileType * set fo-=o			" Don't insert comment when using 'o'
@@ -288,97 +288,58 @@ command! FormatJSON %!python -c "import json, sys, collections; print json.dumps
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 let g:modemap = {
-      \ 'n' : 'N',
-      \ 'no': 'NO',
-      \ 'v' : 'V',
-      \ 'V' : 'V',
-      \ '': 'V',
-      \ 's' : 'S',
-      \ 'S' : 'S',
-      \ '': 'S',
-      \ 'i' : 'I',
-      \ 'R' : 'R',
-      \ 'Rv': 'R',
-      \ 'c' : 'C',
-      \ 'cv': 'VIMEX',
-      \ 'ce': 'EX',
-      \ 'r' : 'PROMPT',
-      \ 'rm': 'MORE',
-      \ 'r?': 'CONFIRM',
-      \ '!' : 'SHELL',
-      \ 't' : 'TERM'
-\}
+      \ 'n' : ['N', 'NormalMode'],
+      \ 'no': ['NO', 'NormalMode'],
+      \ 'v' : ['V', 'VisualMode'],
+      \ 'V' : ['V', 'VisualMode'],
+      \ '': ['V', 'VisualMode'],
+      \ 's' : ['S', 'VisualMode'],
+      \ 'S' : ['S', 'VisualMode'],
+      \ '': ['S', 'VisualMode'],
+      \ 'i' : ['I', 'InsertMode'],
+      \ 'ic': ['COMPLETE', 'InsertMode'],
+      \ 'R' : ['R', 'ReplaceMode'],
+      \ 'Rv': ['R', 'ReplaceMode'],
+      \ 'c' : ['C', 'CommandMode'],
+      \ 'cv': ['VIMEX', 'CommandMode'],
+      \ 'ce': ['EX', 'CommandMode'],
+      \ 'r' : ['PROMPT', 'CommandMode'],
+      \ 'rm': ['MORE', 'CommandMode'],
+      \ 'r?': ['CONFIRM', 'CommandMode'],
+      \ '!' : ['SHELL', 'CommandMode'],
+      \ 't' : ['TERM', 'CommandMode']}
 function! GetModeIndicator() abort
-  if &filetype ==# 'help'
-    return 'Help'
-  elseif &filetype ==# 'netrw'
-    return 'netrw'
-  else
-    return g:modemap[mode()]
+  if &filetype ==# 'help'      | return ['Help']
+  elseif &filetype ==# 'netrw' | return ['netrw']
+  else                         | return g:modemap[mode()]
 endfunction
-function! StatusLineColor()
-  if mode() ==# 'i'
-    exe 'highlight! StatusLine ctermfg=3 ctermbg=0 cterm=bold,inverse'
-    exe 'highlight! User3 ctermfg=3 ctermbg=0 cterm=inverse'
-  elseif mode() =~# '\v(n|no)'
-    exe 'highlight! StatusLine ctermfg=12 ctermbg=0 cterm=bold,inverse'
-    exe 'highlight! User3 ctermfg=12 ctermbg=0 cterm=inverse'
-  elseif mode() =~# '\v(v|V|)'
-    exe 'highlight! StatusLine ctermfg=10 ctermbg=0 cterm=bold,inverse'
-    exe 'highlight! User3 ctermfg=10 ctermbg=0 cterm=inverse'
-  elseif mode() =~# '\v(R|Rv)'
-    exe 'highlight! StatusLine ctermfg=1 ctermbg=0 cterm=bold,inverse'
-    exe 'highlight! User3 ctermfg=1 ctermbg=0 cterm=inverse'
-  else
-    exe 'highlight! StatusLine ctermfg=12 ctermbg=0 cterm=bold,inverse'
-    exe 'highlight! User3 ctermfg=12 ctermbg=0 cterm=inverse'
-  endif
-  return ''
-endfunction
-function! GitStatus()
-  let gitstatus = fugitive#head()
-  if gitstatus != ''
-    return '  ' . gitstatus . ''
-  else
-    return ''
-  endif
-endfunction
+let g:mode_hi = {
+      \'NormalMode'  : ' ctermbg=12  ctermfg=0 ',
+      \'InsertMode'  : ' ctermbg=3   ctermfg=0 ',
+      \'VisualMode'  : ' ctermbg=10  ctermfg=0 ',
+      \'ReplaceMode' : ' ctermbg=1   ctermfg=0 ',
+      \'CommandMode' : ' ctermbg=13  ctermfg=0 '}
+highlight StlGit      ctermbg=235 ctermfg=242 cterm=none
+highlight MainStl     ctermbg=8   ctermfg=7   cterm=none
+highlight ReadOnlyStl ctermbg=8   ctermfg=1   cterm=none
+highlight InactiveStl ctermbg=242 ctermfg=235 cterm=none
+highlight StatusLine  ctermbg=8   ctermfg=7   cterm=none
 function! GitHunks()
   let githunks = GitGutterGetHunkSummary()
-  let returnval = ''
-  if githunks[0] != 0
-    let returnval .= ' ' . githunks[0] . '+'
-  endif
-  if githunks[1] != 0
-    let returnval .= ' ' . githunks[1] . '~'
-  endif
-  if githunks[2] != 0
-    let returnval .= ' ' . githunks[2] . '-'
-  endif
-  return returnval
+  let returnval = ' '
+  let returnval .= (githunks[0] != 0 ? ' ' . githunks[0] . '+' : '')
+  let returnval .= (githunks[1] != 0 ? ' ' . githunks[1] . '~' : '')
+  let returnval .= (githunks[2] != 0 ? ' ' . githunks[2] . '-' : '')
+  return returnval == ' ' ? '' : returnval
 endfunction
 function! GitStatusLine() abort
-  let gitstatus = GitStatus()
+  let gitstatus = (fugitive#head() != '' ? '  ' . fugitive#head() : '')
   let githunks = GitHunks()
   let gitline = ''
-  if githunks != ''
-    let gitline .= githunks
-  endif
-  if gitstatus != ''
-    let gitline .= (gitline == '' ? '' : '') . gitstatus
-  endif
-  if gitline != ''
-    let gitline .= ' '
-  endif
+  let gitline .= (githunks != '' ? githunks : '')
+  let gitline .= (gitstatus != '' ? (gitline == '' ? ' ' : '') . gitstatus : '')
+  let gitline .= (gitline != '' ? ' ' : '')
   return gitline
-endfunction
-function! GetReadOnlyStatus() abort
-  let readonly = &readonly
-  if readonly == 1
-    return ' '
-  else
-    return ''
-  endif
 endfunction
 function! LinterStatus() abort
   let l:counts = ale#statusline#Count(bufnr(''))
@@ -390,23 +351,42 @@ function! LinterStatus() abort
         \ all_errors
         \)
 endfunction
-highlight User1 ctermfg=7 ctermbg=8
-highlight User2 ctermfg=242 ctermbg=235
-highlight User3 ctermfg=12 ctermbg=0 cterm=inverse
-highlight User4 ctermfg=9 ctermbg=8
-highlight User5 ctermfg=0 ctermbg=1
-highlight StatusLine ctermfg=12 ctermbg=0 cterm=bold,inverse
-highlight StatusLineNC ctermbg=244 cterm=inverse,bold
-set statusline=
-set statusline+=%{StatusLineColor()}
-set statusline+=%0*\ %{GetModeIndicator()}\ "
-set statusline+=%2*%{GitStatusLine()}
-set statusline+=%1*\ %t%m\ %4*%{GetReadOnlyStatus()}
-set statusline+=%=
-set statusline+=%1*%{ObsessionStatus('')}\ %{gutentags#statusline()}\ "
-set statusline+=%2*\ %{WebDevIconsGetFileTypeSymbol()}
-set statusline+=\ %3*\ %l:%c\ "
-set statusline+=%5*%{LinterStatus()}
+fun! s:updateStatusLineHighlight(nr,newMode)
+  execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ["", a:newMode])[1]] . ' cterm=bold'
+  execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ["", a:newMode])[1]] . ' cterm=none'
+  return 1
+endf
+function! SetupStatusLine(nr) abort
+  return get(extend(w:, {
+        \ "lf_active": winnr() != a:nr
+          \ ? 0
+          \ : (mode(1) ==# get(g:, "lf_cached_mode", "")
+            \ ? 1
+            \ : s:updateStatusLineHighlight(a:nr,get(extend(g:, { "lf_cached_mode": mode(1) }), "lf_cached_mode"))
+            \ ),
+        \ "lf_winwd": winwidth(winnr())
+        \ }), "", "")
+endfunction
+function! BuildStatusLine(nr) abort
+  return '%{SetupStatusLine('.a:nr.')}
+        \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
+        \%#StlGit#%{w:["lf_active"] ? GitStatusLine() : ""}
+        \%#MainStl# %t%m
+        \%#ReadOnlyStl# %{&readonly ? "" : ""}%#MainStl#
+        \%=
+        \%{ObsessionStatus("")}%{w:["lf_active"] ? " " . gutentags#statusline() . " " : ""}
+        \%#StlGit# %{WebDevIconsGetFileTypeSymbol()." "}
+        \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
+        \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}
+        \%#StlLinter#%{LinterStatus()}'
+endfunction
+function! s:enableStatusLine() abort
+  if exists("g:default_stl") | return | endif
+  let g:default_stl = &statusline
+  set statusline=%!BuildStatusLine(winnr())
+endfunction
+command! -nargs=0 EnableStatusLine call <SID>enableStatusLine()
+EnableStatusLine
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
