@@ -233,11 +233,7 @@ augroup EditVim
     autocmd BufNewFile,BufRead *.dmc set filetype=javascript
     autocmd FileType python call PythonSetup()
     autocmd FileType vim setlocal foldmethod=marker foldlevel=0
-    "make folding work better with insert mode
-    " autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
-    " autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-    " autocmd QuitPre * exe "NERDTreeClose"
     autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
     autocmd FileType java set makeprg=mvn\ install
 augroup END
@@ -277,6 +273,7 @@ function! VimGrepAll(pattern) abort
   call setqflist([])
   exe 'bufdo silent vimgrepadd ' . a:pattern . ' %'
   cwindow
+  exe 'normal '
 endfunction
 command! -nargs=1 Search call VimGrepAll(<f-args>)
 nnoremap <C-f> :Search 
@@ -399,7 +396,6 @@ EnableStatusLine
 " }}}
 
 " gitgutter setup {{{
-
   let g:gitgutter_sign_added = ''
   let g:gitgutter_sign_modified = ''
   let g:gitgutter_sign_removed = ''
@@ -407,56 +403,32 @@ EnableStatusLine
 " }}}
 
 " javacomplete setup {{{
-let g:JavaComplete_JavaviLogfileDirectory = '~/.javacomplete/servers'
-let g:JavaComplete_ClosingBrace = 1
+  let g:JavaComplete_JavaviLogfileDirectory = '~/.javacomplete/servers'
+  let g:JavaComplete_ClosingBrace = 1
 " }}}
 
 " ipython setup {{{
-let g:ipy_perform_mappings = 0 "make our own mappings
-function! IPythonKeyBinds()
+  let g:ipy_perform_mappings = 0 "make our own mappings
+  function! IPythonKeyBinds()
 
-    nmap  <buffer> <silent> <F10>           <Plug>(IPython-RunFile)
-    " nmap  <buffer> <silent> <S-F10>         <Plug>(IPython-RunLine)
-    " nmap  <buffer> <silent> <F9>           <Plug>(IPython-RunLines)
+    nmap  <buffer> <silent> <F10>          <Plug>(IPython-RunFile)
     nmap  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
     nmap  <buffer> <silent> <LocalLeader>r <Plug>(IPython-UpdateShell)
-    " nmap  <buffer> <silent> <S-F9>         <Plug>(IPython-ToggleReselect)
-    "noremap  <buffer> <silent> <C-F6>         <Plug>(IPython-StartDebugging)
-    "noremap  <buffer> <silent> <F6>           <Plug>(IPython-BreakpointSet)
-    "noremap  <buffer> <silent> <S-F6>         <Plug>(IPython-BreakpointClear)
-    "noremap  <buffer> <silent> <F7>           <Plug>(IPython-DebugThisFile)
-    "noremap  <buffer> <silent> <S-F7>         <Plug>(IPython-BreakpointClearAll)
-    " imap <buffer>          <C-F10>         <C-o><Plug>(IPython-RunFile)
-    " imap <buffer>          <S-F10>         <C-o><Plug>(IPython-RunLines)
-    " imap <buffer> <silent> <F10>           <C-o><Plug>(IPython-RunFile)
-    " nmap  <buffer>          <C-F10>         <Plug>(IPython-ToggleSendOnSave)
-    "" Example of how to quickly clear the current plot with a keystroke
-    "noremap  <buffer> <silent> <F12>          <Plug>(IPython-PlotClearCurrent)
-    "" Example of how to quickly close all figures with a keystroke
-    "noremap  <buffer> <silent> <F11>          <Plug>(IPython-PlotCloseAll)
-
-    "pi custom
     nmap  <buffer> <silent> <C-Return>     <Plug>(IPython-RunFile)
     nmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLine)
-    imap <buffer> <silent> <LocalLeader>s          <C-o><Plug>(IPython-RunLine)
-    " nmap  <buffer> <silent> <M-s>          <Plug>(IPython-RunLineAsTopLevel)
-    nmap  <buffer> <silent> <Esc>s          <Plug>(IPython-RunLineAsTopLevel)
-    xmap <buffer> <silent> <LocalLeader>s          <Plug>(IPython-RunLines)
+    nmap  <buffer> <silent> <Esc>s         <Plug>(IPython-RunLineAsTopLevel)
+    xmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLines)
 
-endfunction
+  endfunction
 " }}}
 
 " devicons setup {{{
-
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
-let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols = {}
-let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['\.\?vimrc']  = ''
-let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['tags']  = ''
-
-let g:WebDevIconsNerdTreeGitPluginForceVAlign = 0
-let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
-" let g:WebDevIconsUnicodeGlyphDoubleWidth = 0
+  let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
+  let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
+  let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols = {}
+  let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['\.\?vimrc']  = ''
+  let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['tags']  = ''
+  let g:WebDevIconsUnicodeGlyphDoubleWidth = 0
 " }}}
 
 " netrw setup {{{
@@ -552,10 +524,9 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
     let g:ale_virtualenv_dir_names = []
     let g:ale_warn_about_trailing_whitespace = 1
     let g:ale_lint_on_text_changed = 'normal'
+    " javac can be slow, so only lint on save
     autocmd! FileType java let g:ale_lint_on_text_changed = 'never'
     let g:ale_java_javac_options = '-Xlint:-serial'
-
-    " let g:ale_linters = {'java': []}
 
     let g:ale_fixers = {
                 \   'python': [
@@ -563,7 +534,6 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
                 \       'yapf'
                 \   ]
                 \}
-    nnoremap <F12> :ALEFix<CR>
 " }}}
 
 " Jedi setup {{{
@@ -579,6 +549,7 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
         set noshowmode
     endfunction
 
+    " toggle showmode because Goyo hides statusline 
     autocmd! User GoyoEnter nested call <SID>goyo_enter()
     autocmd! User GoyoLeave nested call <SID>goyo_leave()
 " }}}
@@ -598,120 +569,25 @@ let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
     let g:EasyMotion_smartcase = 1
 " }}}
 
-" ctrlP setup {{{
-set runtimepath^=~/.vim/bundle/ctrlp.vim
-let g:ctrlp_open_multiple_files = 'ij'
-let g:ctrlp_clear_cache_on_exit = 0
-let g:ctrlp_cmd = 'CtrlP'
-
-let g:ctrlp_by_filename = 1
-let g:ctrlp_switch_buffer = 'et'
-" }}}
-
 " AutoPairs setup {{{
-    let g:AutoPairsMapCR = 0
+  " we map this in the neocomplete setup section 
+  let g:AutoPairsMapCR = 0
 " }}}
 
 " rainbow parens setup {{{
-let g:rainbow_active = 1
+  let g:rainbow_active = 1
 
-let g:rainbow_conf = {
-            \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
-            \ 'separately': {
-            \   'xml': 0,
-            \   'vim': 0,
-            \   'python': 0,
-            \   'sh': 0,
-            \   'c': 0,
-            \   'javascript': 0,
-            \   'json': 0
-            \  }
-            \}
-" }}}
-
-" Airline setup {{{
-    let g:airline#extensions#tabline#enabled = 1
-    let g:airline#extensions#tabline#buffer_nr_show = 1
-    let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-    let g:airline#extensions#tabline#buffer_min_count = 2
-    let g:airline_section_c = '%t'
-    let g:airline_section_x = '%{airline#extensions#obsession#get_status()}%{gutentags#statusline()}'
-    let g:airline_section_y = '%{&fileformat}'
-    let g:airline_section_z = '%l:%c'
-    " let g:airline_section_error = ''
-    " let g:airline_section_warning = ''
-    let g:airline#extensions#hunks#non_zero_only = 1
-
-    let g:airline#extensions#obsession#indicator_text = ""
-
-    let g:airline_mode_map = {
-                \ '__' : '-',
-                \ 'n'  : 'N',
-                \ 'i'  : 'I',
-                \ 'R'  : 'R',
-                \ 'c'  : 'C',
-                \ 'v'  : 'V',
-                \ 'V'  : 'V',
-                \ '' : 'V',
-                \ 's'  : 'S',
-                \ 'S'  : 'S',
-                \ '' : 'S',
-                \ }
-
-    let g:airline#extensions#default#section_truncate_width = {
-           \ 'b': 59,
-           \ 'x': 79,
-           \ 'y': 69,
-           \ 'z': 39,
-           \ 'warning': 69,
-           \ 'error': 69,
-           \ }
-
-    let g:airline_powerline_fonts = 1
-
-    if !exists('g:airline_symbols')
-        let g:airline_symbols = {}
-    endif
-    let g:airline_skip_empty_sections = 1
-    let g:airline_theme='material'
-
-    if has("gui_running")
-        " unicode symbols
-        " let g:airline_left_sep = '»'
-        "let g:airline_left_sep = '▶'
-        " let g:airline_right_sep = '«'
-        "let g:airline_right_sep = '◀'
-        " let g:airline_symbols.crypt = '🔒'
-        " let g:airline_symbols.linenr = '␊'
-        " let g:airline_symbols.linenr = '␤'
-        let g:airline_symbols.linenr = '¶'
-        let g:airline_symbols.maxlinenr = '☰'
-        " let g:airline_symbols.maxlinenr = ''
-        " let g:airline_symbols.branch = '⎇'
-        let g:airline_symbols.branch = ''
-        " let g:airline_symbols.branch = ''
-        " let g:airline_symbols.paste = 'ρ'
-        let g:airline_symbols.paste = 'Þ'
-        " let g:airline_symbols.paste = '∥'
-        let g:airline_symbols.spell = 'Ꞩ'
-        let g:airline_symbols.notexists = '∄'
-        let g:airline_symbols.whitespace = 'Ξ'
-    else
-        " let g:airline_right_sep = ''
-        " let g:airline_left_sep = ''
-        let g:airline_symbols.linenr = '¶'
-        let g:airline_symbols.maxlinenr = '☰'
-        " let g:airline_symbols.maxlinenr = ''
-        " let g:airline_symbols.branch = '⎇'
-        " let g:airline_symbols.branch = ''
-        let g:airline_symbols.branch = ''
-        "let g:airline_symbols.branch = '⌥'
-        " let g:airline_symbols.paste = 'ρ'
-        let g:airline_symbols.paste = 'Þ'
-        " let g:airline_symbols.paste = '∥'
-        let g:airline_symbols.spell = 'Ꞩ'
-        let g:airline_symbols.notexists = '∄'
-        let g:airline_symbols.whitespace = 'Ξ'
-    endif
+  let g:rainbow_conf = {
+              \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
+              \ 'separately': {
+              \   'xml': 0,
+              \   'vim': 0,
+              \   'python': 0,
+              \   'sh': 0,
+              \   'c': 0,
+              \   'javascript': 0,
+              \   'json': 0
+              \  }
+              \}
 " }}}
 " }}}
