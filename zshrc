@@ -23,15 +23,6 @@ export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94:ln=01;36'
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
 export EDITOR='vim'
 
-# Uncomment the following line to disable bi-weekly auto-update checks.
-# DISABLE_AUTO_UPDATE="true"
-
-# Uncomment the following line to change how often to auto-update (in days).
-# export UPDATE_ZSH_DAYS=13
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
 # Uncomment the following line to disable auto-setting terminal title.
 # DISABLE_AUTO_TITLE="true"
 
@@ -60,23 +51,16 @@ ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 
-if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
-    plugins=(git tmux ansible z history-substring-search zsh-autosuggestions zsh-syntax-highlighting)
-else
-    plugins=(git tmux z history-substring-search zsh-autosuggestions zsh-syntax-highlighting)
-    # ZSH_TMUX_AUTOSTART="true"
-fi
+plugins=(git tmux ansible z history-substring-search zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
-#source $ZSH_CUSTOM/mvncolor.sh
 alias mvn-color='source $ZSH_CUSTOM/mvncolor.sh'
 
 # export MANPATH="/usr/local/man:$MANPATH"
 autoload -U promptinit; promptinit
 prompt pure
-source $ZSH_CUSTOM/themes/pure.zsh-theme
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 

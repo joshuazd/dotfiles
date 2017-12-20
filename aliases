@@ -1,8 +1,5 @@
 #!/bin/zsh
 alias ls='ls -F --color=auto'
-alias df='df -h'
-alias du='du -h -c'
-alias back='cd $OLDPWD'
 alias ..="cd ..; ls"
 alias ...="cd ../..; ls"
 alias ....="cd ../../..; ls"
