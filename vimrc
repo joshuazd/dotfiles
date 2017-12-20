@@ -318,10 +318,10 @@ let g:mode_hi = {
       \'ReplaceMode' : ' ctermbg=1   ctermfg=0 ',
       \'CommandMode' : ' ctermbg=13  ctermfg=0 '}
 highlight StlGit      ctermbg=235 ctermfg=242 cterm=none
-highlight MainStl     ctermbg=8   ctermfg=7   cterm=none
-highlight ReadOnlyStl ctermbg=8   ctermfg=1   cterm=none
+highlight MainStl     ctermbg=236 ctermfg=7   cterm=none
+highlight ReadOnlyStl ctermbg=236 ctermfg=1   cterm=none
 highlight InactiveStl ctermbg=242 ctermfg=235 cterm=none
-highlight StatusLine  ctermbg=8   ctermfg=7   cterm=none
+highlight StatusLine  ctermbg=236 ctermfg=7   cterm=none
 function! GitHunks()
   let githunks = GitGutterGetHunkSummary()
   let returnval = ' '
@@ -375,8 +375,8 @@ function! BuildStatusLine(nr) abort
         \%{ObsessionStatus(" ")}%{w:["lf_active"] ? gutentags#statusline() : ""}
         \%#StlGit# %{WebDevIconsGetFileTypeSymbol()." "}
         \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
-        \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}
-        \%#StlLinter#%{LinterStatus()}'
+        \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}%#MainStl#
+        \%#StlLinter#%{LinterStatus()}%#MainStl#'
 endfunction
 function! s:enableStatusLine() abort
   if exists("g:default_stl") | return | endif
