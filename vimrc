@@ -5,7 +5,6 @@ set nocompatible
 call plug#begin('~/.vim/bundle')
 
 Plug 'w0rp/ale'
-" Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-scripts/c.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim'
