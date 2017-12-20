@@ -87,6 +87,7 @@ set expandtab					" expand tabs into spaces
 set autoindent					" use the previous lines indentation level }}}
 set noshowmode					" don't show mode in the statusline
 set nowrap						" don't wrap lines by default
+set linebreak					" wrap lines at words
 set laststatus=2				" always show statusline
 set cindent						" better indentation
 " set cinkeys-=0#
@@ -374,7 +375,7 @@ function! BuildStatusLine(nr) abort
         \%#MainStl# %t%m
         \%#ReadOnlyStl# %{&readonly ? "" : ""}%#MainStl#
         \%=
-        \%{ObsessionStatus("")}%{w:["lf_active"] ? " " . gutentags#statusline() . " " : ""}
+        \%{ObsessionStatus(" ")}%{w:["lf_active"] ? gutentags#statusline() : ""}
         \%#StlGit# %{WebDevIconsGetFileTypeSymbol()." "}
         \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
         \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}
