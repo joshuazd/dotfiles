@@ -1,24 +1,20 @@
-set nocompatible
-
 " Plugins {{{
 " filetype off
 call plug#begin('~/.vim/bundle')
 
 Plug 'w0rp/ale'
-Plug 'vim-scripts/c.vim'
 Plug 'junegunn/goyo.vim'
-Plug 'davidhalter/jedi-vim'
+Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 Plug 'luochen1990/rainbow'
 Plug 'gerw/vim-HiLinkTrace'
 Plug 'easymotion/vim-easymotion'
 Plug 'airblade/vim-gitgutter'
-Plug 'tmux-plugins/vim-tmux'
+Plug 'tmux-plugins/vim-tmux', { 'for': 'tmux' }
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
 Plug 'Shougo/neco-vim'
-Plug 'Shougo/vimshell.vim'
 Plug 'shougo/neocomplete.vim'
-Plug 'justmao945/vim-clang'
+Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'godlygeek/tabular'
 Plug 'jiangmiao/auto-pairs'
@@ -31,12 +27,11 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-unimpaired'
 Plug 'ryanoasis/vim-devicons'
 Plug 'plasticboy/vim-markdown'
 Plug 'joshuazd/vim-ipython'
-Plug 'artur-shaik/vim-javacomplete2'
+Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'pearofducks/ansible-vim'
 
@@ -115,10 +110,10 @@ set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
-if executable("ag")
+if executable("ag")				" use ag when available {{{
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column
   set grepformat=%f:%l:%c:%m,%f:%l:%m
-endif
+endif " }}}
 if has("gui_running") " {{{
     " set guifont=Literation\ Mono\ Powerline\ 10
     " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
@@ -203,13 +198,11 @@ nnoremap <silent> <Leader>p p=']
 nnoremap <silent> <Leader>P P=']
 xnoremap <silent> <Leader>p p=']
 xnoremap <silent> <Leader>P P=']
-" xnoremap <silent> p "_dP
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call VimRefresh()<CR>
 function! VimRefresh() " {{{
     CtrlPClearAllCaches
-    AirlineRefresh
     ALEToggle
     ALEToggle
     GitGutterToggle
@@ -230,15 +223,11 @@ endfunction " }}}
 augroup EditVim
     autocmd!
     autocmd InsertLeave * if pumvisible() == 0|pclose|endif " Close preview window when leaving insert mode
-    autocmd FileType xml call XmlSetup()
     autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
     autocmd BufNewFile,BufRead *.dbs set filetype=xml
     autocmd BufNewFile,BufRead *.dmc set filetype=javascript
-    autocmd FileType python call PythonSetup()
-    autocmd FileType vim setlocal foldmethod=marker foldlevel=0
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
     autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
-    autocmd FileType java set makeprg=mvn\ install
 augroup END
 
 function! TrimWhiteSpace() " {{{
@@ -255,23 +244,6 @@ function! ToggleConceal() " {{{
     endif
 endfunction " }}}
 
-function! XmlSetup() " {{{
-    setlocal shiftwidth=2
-    setlocal tabstop=2
-    setlocal softtabstop=2
-    setlocal noexpandtab
-    setlocal foldmethod=syntax
-    setlocal smarttab
-    set foldnestmax=2               " no nesting folds
-    inoremap </ </<C-x><C-o><C-y>
-    command! Tabs setlocal shiftwidth=2 tabstop=2 softtabstop=2 noexpandtab foldmethod=syntax smarttab
-endfunction " }}}
-
-function! PythonSetup() " {{{
-    setlocal foldmethod=indent
-    call IPythonKeyBinds()
-endfunction " }}}
-
 function! VimGrepAll(pattern) abort
   call setqflist([])
   exe 'bufdo silent vimgrepadd ' . a:pattern . ' %'
@@ -281,7 +253,9 @@ endfunction
 command! -nargs=1 Search call VimGrepAll(<f-args>)
 nnoremap <C-f> :Search 
 
-command! FormatJSON %!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin, object_pairs_hook=collections.OrderedDict), indent=2)"
+command! FormatJSON %!python -c 
+      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,
+      \object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -326,21 +300,21 @@ highlight ReadOnlyStl ctermbg=236 ctermfg=1   cterm=none
 highlight InactiveStl ctermbg=242 ctermfg=235 cterm=none
 highlight StatusLine  ctermbg=236 ctermfg=7   cterm=none
 function! GitHunks()
-  let githunks = GitGutterGetHunkSummary()
-  let returnval = ' '
-  let returnval .= (githunks[0] != 0 ? ' ' . githunks[0] . '+' : '')
-  let returnval .= (githunks[1] != 0 ? ' ' . githunks[1] . '~' : '')
-  let returnval .= (githunks[2] != 0 ? ' ' . githunks[2] . '-' : '')
-  return returnval == ' ' ? '' : returnval
+  let l:githunks = GitGutterGetHunkSummary()
+  let l:returnval = ' '
+  let l:returnval .= (l:githunks[0] != 0 ? ' ' . l:githunks[0] . '+' : '')
+  let l:returnval .= (l:githunks[1] != 0 ? ' ' . l:githunks[1] . '~' : '')
+  let l:returnval .= (l:githunks[2] != 0 ? ' ' . l:githunks[2] . '-' : '')
+  return l:returnval == ' ' ? '' : l:returnval
 endfunction
 function! GitStatusLine() abort
-  let gitstatus = (fugitive#head() != '' ? '  ' . fugitive#head() : '')
-  let githunks = GitHunks()
-  let gitline = ''
-  let gitline .= (githunks != '' ? githunks : '')
-  let gitline .= (gitstatus != '' ? (gitline == '' ? ' ' : '') . gitstatus : '')
-  let gitline .= (gitline != '' ? ' ' : '')
-  return gitline
+  let l:gitstatus = (fugitive#head() != '' ? '  ' . fugitive#head() : '')
+  let l:githunks = GitHunks()
+  let l:gitline = ''
+  let l:gitline .= (l:githunks != '' ? l:githunks : '')
+  let l:gitline .= (l:gitstatus != '' ? (l:gitline == '' ? ' ' : '') . l:gitstatus : '')
+  let l:gitline .= (l:gitline != '' ? ' ' : '')
+  return l:gitline
 endfunction
 function! LinterStatus() abort
   let l:counts = ale#statusline#Count(bufnr(''))
@@ -378,7 +352,7 @@ function! BuildStatusLine(nr) abort
         \%{ObsessionStatus(" ")}%{w:["lf_active"] ? gutentags#statusline() : ""}
         \%#StlGit# %{WebDevIconsGetFileTypeSymbol()." "}
         \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
-        \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}%#MainStl#
+        \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}
         \%#StlLinter#%{LinterStatus()}%#MainStl#'
 endfunction
 function! s:enableStatusLine() abort
@@ -393,9 +367,12 @@ EnableStatusLine
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
-" {{{
+" {{{ filetype spefic plugins are in ftplugin folders
 " gutentags setup {{{
-  let g:gutentags_exclude_project_root = ['/home/shepard/ansible/ansible-checkout','/home/shepard/ansible/environments','/home/shepard/ansible/playbooks-mw']
+  let g:gutentags_exclude_project_root = [
+        \'/home/shepard/ansible/ansible-checkout',
+        \'/home/shepard/ansible/environments',
+        \'/home/shepard/ansible/playbooks-mw']
 " }}}
 
 " gitgutter setup {{{
@@ -405,26 +382,6 @@ EnableStatusLine
   let g:gitgutter_sign_modified_removed = ''
 " }}}
 
-" javacomplete setup {{{
-  let g:JavaComplete_JavaviLogfileDirectory = '~/.javacomplete/servers'
-  let g:JavaComplete_ClosingBrace = 1
-" }}}
-
-" ipython setup {{{
-  let g:ipy_perform_mappings = 0 "make our own mappings
-  function! IPythonKeyBinds()
-
-    nmap  <buffer> <silent> <F10>          <Plug>(IPython-RunFile)
-    nmap  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
-    nmap  <buffer> <silent> <LocalLeader>r <Plug>(IPython-UpdateShell)
-    nmap  <buffer> <silent> <C-Return>     <Plug>(IPython-RunFile)
-    nmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLine)
-    nmap  <buffer> <silent> <Esc>s         <Plug>(IPython-RunLineAsTopLevel)
-    xmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLines)
-
-  endfunction
-" }}}
-
 " devicons setup {{{
   let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
   let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
@@ -432,14 +389,6 @@ EnableStatusLine
   let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['\.\?vimrc']  = ''
   let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['tags']  = ''
   let g:WebDevIconsUnicodeGlyphDoubleWidth = 0
-" }}}
-
-" netrw setup {{{
-    let g:netrw_winsize = 20
-    let g:netrw_banner = 0
-    let g:netrw_liststyle = 3
-    let g:netrw_browse_split = 4
-    let g:netrw_altv = 1
 " }}}
 
 " neocomplete setup {{{
@@ -458,7 +407,8 @@ EnableStatusLine
     imap <expr><CR> neosnippet#expandable() ?
                 \ "\<Plug>(neosnippet_expand)"
                 \: pumvisible()? "\<C-e>\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
-    inoremap <expr><C-l> pumvisible() ? neocomplete#complete_common_string() : "\<C-l>"
+    inoremap <expr><C-l> pumvisible() ? 
+                \ neocomplete#complete_common_string() : "\<C-l>"
     let g:neosnippet#enable_snipmate_compatibility = 0
     let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
 
@@ -472,27 +422,26 @@ EnableStatusLine
     endif
 
     " xml setup {{{
-        autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
         let g:neocomplete#keyword_patterns.xml =
                     \'</\?\%([[:alnum:]_:-]\+\s*\)\?\%(/\?>\)\?\|&\h\%(\w*;\)\?'.
                     \'\|\h[[:alnum:]_:-]*'
-        let g:neocomplete#force_omni_input_patterns.xml = '</\?' "'\|\s[A-Za-z0-9=\-]*'
+        let g:neocomplete#force_omni_input_patterns.xml = '</\?'
         call neocomplete#custom#source('omni', 'rank', 1000)
     " }}}
 
     " python setup {{{
-        autocmd FileType python setlocal omnifunc=jedi#completions
         let g:jedi#completions_enabled = 0
         let g:jedi#auto_vim_configuration = 0
         let g:jedi#smart_auto_mappings = 0
-        let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
+        let g:neocomplete#force_omni_input_patterns.python = 
+              \'\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|'.
+              \'^\s*from \|^\s*import \)\w*'
     " }}}
 
     " clang setup {{{
         let g:clang_auto = 0 " disable auto completion for vim-clang
-        let g:clang_c_completeopt = 'longest,menuone,preview' " default 'longest' can not work with neocomplete
+        let g:clang_c_completeopt = 'longest,menuone,preview'
         let g:clang_cpp_completeopt = 'longest,menuone,preview'
-        autocmd FileType c setlocal omnifunc=ClangComplete
         let g:neocomplete#force_omni_input_patterns.c =
               \ '\h\w*\%(\.\|->\)\w*'
         let g:neocomplete#force_omni_input_patterns.cpp =
@@ -502,14 +451,6 @@ EnableStatusLine
         let g:neocomplete#force_omni_input_patterns.objcpp =
               \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)\|\h\w*::\w*'
         let g:clang_verbose_pmenu = 1
-    " }}}
-
-    " javascript setup {{{
-        autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-    " }}}
-
-    " java setup {{{
-        autocmd FileType java setlocal omnifunc=javacomplete#Complete
     " }}}
 
 " }}}
@@ -527,8 +468,6 @@ EnableStatusLine
     let g:ale_virtualenv_dir_names = []
     let g:ale_warn_about_trailing_whitespace = 1
     let g:ale_lint_on_text_changed = 'normal'
-    " javac can be slow, so only lint on save
-    autocmd! FileType java let g:ale_lint_on_text_changed = 'never'
     let g:ale_java_javac_options = '-Xlint:-serial'
 
     let g:ale_fixers = {
@@ -537,10 +476,6 @@ EnableStatusLine
                 \       'yapf'
                 \   ]
                 \}
-" }}}
-
-" Jedi setup {{{
-    let g:jedi#show_call_signatures = 2
 " }}}
 
 " Goyo setup {{{

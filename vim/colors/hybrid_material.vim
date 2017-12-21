@@ -318,7 +318,7 @@ endif
 "}}}
 " Vim Highlighting: (see :help highlight-groups)"{{{
 " ----------------------------------------------------------------------------
-exe "hi! ColorColumn"   .s:fg_none        .s:bg_none        .s:fmt_none
+exe "hi! ColorColumn"   .s:fg_none        .s:bg_comment      .s:fmt_none
 "   Conceal"
 "   Cursor"
 exe "hi! Cursor cterm=reverse"
