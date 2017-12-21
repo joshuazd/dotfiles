@@ -115,6 +115,10 @@ set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
+if executable("ag")
+  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column
+  set grepformat=%f:%l:%c:%m,%f:%l:%m
+endif
 if has("gui_running") " {{{
     " set guifont=Literation\ Mono\ Powerline\ 10
     " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
