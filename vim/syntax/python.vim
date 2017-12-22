@@ -126,7 +126,7 @@ endif
     syn match pythonItemAccess "\h\(\w\)*\[\@=" nextgroup=pythonAccess
 
     syn region pythonList matchgroup=pythonBrackets start="\[" end="\]" contains=pythonListParam
-    syn match pythonListParam "[^\]]*" contained contains=pythonIdentifier,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
+    syn match pythonListParam "[^\]]*" contained contains=pythonIdentifier,pyNiceOperator,pythonOperator,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
 
     syn region pythonDict matchgroup=pythonBrackets start="{" end="}" contains=pythonDictParam
     syn match pythonDictParam "[^}]*" contained contains=pythonIdentifier,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
@@ -456,7 +456,7 @@ endif
     hi link  pythonExClass      Structure
     hi link  pythonJedi         Type
     hi link  pythonPunct        PreProc
-    hi link  pythonIdentifier   Identifier
+    " hi link  pythonIdentifier   Identifier
     hi link  pythonPrint        Keyword
     hi link  pythonKeywordParam pythonField
 

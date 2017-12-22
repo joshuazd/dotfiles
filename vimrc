@@ -274,6 +274,7 @@ let g:modemap = {
       \ '': ['S', 'VisualMode'],
       \ 'i' : ['I', 'InsertMode'],
       \ 'ic': ['COMPLETE', 'InsertMode'],
+      \ 'ix': ['X', 'InsertMode'],
       \ 'R' : ['R', 'ReplaceMode'],
       \ 'Rv': ['R', 'ReplaceMode'],
       \ 'c' : ['C', 'CommandMode'],
@@ -462,6 +463,7 @@ EnableStatusLine
     let g:ale_warn_about_trailing_whitespace = 1
     let g:ale_lint_on_text_changed = 'normal'
     let g:ale_java_javac_options = '-Xlint:-serial'
+    let g:ale_yaml_yamllint_options = '-d "{rules: {line-length: disable}}"'
 
     let g:ale_fixers = {
                 \   'python': [
