@@ -300,6 +300,7 @@ highlight MainStl     ctermbg=236 ctermfg=7   cterm=none
 highlight ReadOnlyStl ctermbg=236 ctermfg=1   cterm=none
 highlight InactiveStl ctermbg=242 ctermfg=235 cterm=none
 highlight StatusLine  ctermbg=236 ctermfg=7   cterm=none
+highlight StlLinter   ctermbg=1   ctermfg=0   cterm=none
 function! GitHunks()
   let l:githunks = GitGutterGetHunkSummary()
   let l:returnval = ' '
@@ -322,7 +323,7 @@ function! LinterStatus() abort
   let l:all_errors = l:counts.error + l:counts.style_error
   let l:all_non_errors = l:counts.total - l:all_errors
   return l:counts.total == 0 ? '' : printf(
-        \ ' %dW %dE ',
+        \ '  %dW %dE ',
         \ all_non_errors,
         \ all_errors
         \)
@@ -385,7 +386,6 @@ EnableStatusLine
 
 " neocomplete setup {{{
 
-  if exists('g:loaded_neocomplete')
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
     let g:neocomplete#enable_auto_select = 1
@@ -446,7 +446,6 @@ EnableStatusLine
               \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)\|\h\w*::\w*'
         let g:clang_verbose_pmenu = 1
     " }}}
-  endif
 " }}}
 
 " Ansible setup {{{
@@ -456,7 +455,6 @@ EnableStatusLine
 " }}}
 
 " ALE setup {{{
-  if exists('g:loaded_ale_dont_use_this_in_other_plugins_please')
     nmap <silent> ]e <Plug>(ale_next_wrap)
     nmap <silent> [e <Plug>(ale_previous_wrap)
     let g:ale_python_flake8_options = '--max-line-length 99'
@@ -471,7 +469,6 @@ EnableStatusLine
                 \       'yapf'
                 \   ]
                 \}
-  endif
 " }}}
 
 " Goyo setup {{{
@@ -489,7 +486,6 @@ EnableStatusLine
 " }}}
 
 " Easymotion setup {{{
-  if exists('g:EasyMotion_loaded')
     map <LocalLeader> <Plug>(easymotion-prefix)
     map s <Plug>(easymotion-s2)
     map f <Plug>(easymotion-f)
@@ -502,7 +498,6 @@ EnableStatusLine
     omap ? <Plug><easymotion-tn)
     let g:EasyMotion_startofline = 0
     let g:EasyMotion_smartcase = 1
-  endif
 " }}}
 
 " AutoPairs setup {{{
