@@ -6,13 +6,13 @@ Plug 'w0rp/ale'
 Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 Plug 'luochen1990/rainbow'
-Plug 'gerw/vim-HiLinkTrace'
+Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'easymotion/vim-easymotion'
 Plug 'airblade/vim-gitgutter'
 Plug 'tmux-plugins/vim-tmux', { 'for': 'tmux' }
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
-Plug 'Shougo/neco-vim'
+Plug 'Shougo/neco-vim', { 'for': 'vim' }
 Plug 'shougo/neocomplete.vim'
 Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'christoomey/vim-tmux-navigator'
@@ -28,8 +28,8 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
-Plug 'plasticboy/vim-markdown'
-Plug 'joshuazd/vim-ipython'
+Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
+Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
 Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
 Plug 'pearofducks/ansible-vim'
 if executable("ctags")
