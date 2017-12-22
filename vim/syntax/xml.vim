@@ -318,9 +318,9 @@ hi def link xmlTodo		Todo
 hi def link xmlTag		Comment
 hi def link xmlTagPunct		Comment
 hi def link xmlEndTag		Identifier
-highlight xmlEndTag ctermfg=210 guifg=#f07178
+highlight xmlEndTag ctermfg=203 guifg=#f07178
 hi def link xmlTagName		Identifier
-highlight xmlTagName ctermfg=210 guifg=#f07178
+highlight xmlTagName ctermfg=203 guifg=#f07178
 if !exists("g:xml_namespace_transparent")
     hi def link xmlNamespace	Tag
 endif

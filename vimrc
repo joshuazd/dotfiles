@@ -28,12 +28,13 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
-Plug 'ryanoasis/vim-devicons'
 Plug 'plasticboy/vim-markdown'
 Plug 'joshuazd/vim-ipython'
 Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
-Plug 'ludovicchabant/vim-gutentags'
 Plug 'pearofducks/ansible-vim'
+if executable("ctags")
+  Plug 'ludovicchabant/vim-gutentags'
+endif
 
 call plug#end()
 runtime macros/matchit.vim
@@ -308,7 +309,7 @@ function! GitHunks()
   return l:returnval == ' ' ? '' : l:returnval
 endfunction
 function! GitStatusLine() abort
-  let l:gitstatus = (fugitive#head() != '' ? '  ' . fugitive#head() : '')
+  let l:gitstatus = (fugitive#head() != '' ? ' ' . fugitive#head() : '')
   let l:githunks = GitHunks()
   let l:gitline = ''
   let l:gitline .= (l:githunks != '' ? l:githunks : '')
@@ -347,10 +348,10 @@ function! BuildStatusLine(nr) abort
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
         \%#StlGit#%{w:["lf_active"] ? GitStatusLine() : ""}
         \%#MainStl# %t%m
-        \%#ReadOnlyStl# %{&readonly ? "" : ""}%#MainStl#
+        \%#ReadOnlyStl# %{&readonly ? "RO" : ""}%#MainStl#
         \%=
-        \%{ObsessionStatus(" ")}%{w:["lf_active"] ? gutentags#statusline() : ""}
-        \%#StlGit# %{WebDevIconsGetFileTypeSymbol()." "}
+        \%{ObsessionStatus("$ ")}%{w:["lf_active"] ? gutentags#statusline()." " : ""}
+        \%#StlGit# %{&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
         \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}
         \%#StlLinter#%{LinterStatus()}%#MainStl#'
@@ -376,22 +377,15 @@ EnableStatusLine
 " }}}
 
 " gitgutter setup {{{
-  let g:gitgutter_sign_added = ''
-  let g:gitgutter_sign_modified = ''
-  let g:gitgutter_sign_removed = ''
-  let g:gitgutter_sign_modified_removed = ''
-" }}}
-
-" devicons setup {{{
-  let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {} " needed
-  let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
-  let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols = {}
-  let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['\.\?vimrc']  = ''
-  let g:WebDevIconsUnicodeDecorateFileNodesPatternSymbols['tags']  = ''
-  let g:WebDevIconsUnicodeGlyphDoubleWidth = 0
+  let g:gitgutter_sign_added = '•'
+  let g:gitgutter_sign_modified = '•'
+  let g:gitgutter_sign_removed = '•'
+  let g:gitgutter_sign_modified_removed = '•'
 " }}}
 
 " neocomplete setup {{{
+
+  if exists('g:loaded_neocomplete')
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
     let g:neocomplete#enable_auto_select = 1
@@ -452,7 +446,7 @@ EnableStatusLine
               \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)\|\h\w*::\w*'
         let g:clang_verbose_pmenu = 1
     " }}}
-
+  endif
 " }}}
 
 " Ansible setup {{{
@@ -462,6 +456,7 @@ EnableStatusLine
 " }}}
 
 " ALE setup {{{
+  if exists('g:loaded_ale_dont_use_this_in_other_plugins_please')
     nmap <silent> ]e <Plug>(ale_next_wrap)
     nmap <silent> [e <Plug>(ale_previous_wrap)
     let g:ale_python_flake8_options = '--max-line-length 99'
@@ -476,6 +471,7 @@ EnableStatusLine
                 \       'yapf'
                 \   ]
                 \}
+  endif
 " }}}
 
 " Goyo setup {{{
@@ -493,6 +489,7 @@ EnableStatusLine
 " }}}
 
 " Easymotion setup {{{
+  if exists('g:EasyMotion_loaded')
     map <LocalLeader> <Plug>(easymotion-prefix)
     map s <Plug>(easymotion-s2)
     map f <Plug>(easymotion-f)
@@ -505,6 +502,7 @@ EnableStatusLine
     omap ? <Plug><easymotion-tn)
     let g:EasyMotion_startofline = 0
     let g:EasyMotion_smartcase = 1
+  endif
 " }}}
 
 " AutoPairs setup {{{

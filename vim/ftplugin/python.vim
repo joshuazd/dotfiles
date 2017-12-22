@@ -1,5 +1,4 @@
 setlocal foldmethod=indent
-call IPythonKeyBinds()
 setlocal omnifunc=jedi#completions
 
 " Jedi setup {{{
@@ -20,3 +19,5 @@ setlocal omnifunc=jedi#completions
 
   endfunction
 " }}}
+
+call IPythonKeyBinds()
