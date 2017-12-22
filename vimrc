@@ -351,7 +351,7 @@ function! BuildStatusLine(nr) abort
         \%#MainStl# %t%m
         \%#ReadOnlyStl# %{&readonly ? "RO" : ""}%#MainStl#
         \%=
-        \%{ObsessionStatus("$ ")}%{w:["lf_active"] ? gutentags#statusline()." " : ""}
+        \%{ObsessionStatus("$ ")}%{w:["lf_active"] ? gutentags#statusline() != "" ? gutentags#statusline()." " : "" : ""}
         \%#StlGit# %{&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
         \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}

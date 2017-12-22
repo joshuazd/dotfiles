@@ -33,7 +33,7 @@ syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+
 if $SSH_CLIENT ==? ""
     let format='italic'
 else
-    let format='NONE'
+    let format='italic'
 endif
 
 hi def link xmlEntity		Statement
