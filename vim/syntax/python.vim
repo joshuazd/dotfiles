@@ -382,13 +382,15 @@ endif
     hi link  pythonFunction     Function
     hi link  pythonFunctionCall Function
     hi link  pythonClass        Function
-    highlight pythonClass ctermfg=4 guifg=#82aaff cterm=bold gui=bold
+    " highlight pythonClass ctermfg=4 guifg=#82aaff cterm=none
+    highlight pythonClass ctermfg=67 cterm=bold gui=bold
     hi link  pythonParameters   Normal
     hi link  pythonParam        Identifier
     hi link  pythonBrackets     PreProc
     hi link  pythonClassParameters Normal
     hi link  pythonSelf         Identifier
     highlight pythonSelf ctermfg=3 guifg=#ffb62c cterm=italic gui=italic
+    " highlight pythonSelf ctermfg=214 cterm=italic gui=italic
 
     hi link  pythonMagic        Language
 
@@ -406,6 +408,7 @@ endif
     hi link  pythonComment      Comment
     hi! link  pythonCoding       Special
     highlight pythonCoding ctermfg=1 guifg=#e53935 cterm=italic gui=italic
+    " highlight pythonCoding ctermfg=167 guifg=#e53935 cterm=italic gui=italic
     hi link  pythonRun          Special
     hi link  pythonTodo         Todo
 
@@ -414,7 +417,7 @@ endif
     hi link  pythonSpaceError   Error
 
     hi link  pythonString       String
-    hi link  pythonStringPunc   StringPunct
+    hi link  pythonStringPunc   StringDelimiter
     hi link  pythonDocstring    Comment
     hi link  pythonUniString    String
     hi link  pythonRawString    String
@@ -443,7 +446,7 @@ endif
     hi link  pythonHexError     Error
     hi link  pythonBinError     Error
 
-    hi link  pythonBuiltinType  StringPunct
+    hi link  pythonBuiltinType  StringDelimiter
     "highlight pythonBuiltinType ctermfg=156
     hi link  pythonBuiltinObj   Structure
     hi link  pythonBuiltinFunc  Function

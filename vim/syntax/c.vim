@@ -23,7 +23,7 @@ syn keyword	cTodo		contained TODO FIXME XXX
 
 syn match       cPunct ";\|\.\|,"
 
-syn region      cCondParam contained matchgroup=cPunct start="(" end=")" contains=cType,cPunct,cOperator,cString,cConstant,cNumber
+syn region      cCondParam contained matchgroup=cPunct start="\s*(" end=")" contains=cType,cPunct,cOperator,cString,cConstant,cNumber,cFunc
 
 syn match       cFunc "\h\w*(\@=" contains=@cFuncName nextgroup=cFuncParams
 syn region      cFuncParams contained matchgroup=cPunct start="(" end=")" contains=cParamList
@@ -247,7 +247,7 @@ syn match	cCommentError	display "\*/"
 syn match	cCommentStartError display "/\*"me=e-1 contained
 
 syn keyword	cOperator	sizeof
-syn match       cOperator       "\(=\|==\|!=\|>\|<\|<=\|>=\|+\|*\|*\*\|&&\||\|-\)"
+syn match       cOperator       "\(=\|==\|!=\|>\|<\|<=\|>=\|+\|*\|*\*\|&\||\|-\)"
 syn match cDereference "->\|\."
 if exists("c_gnu")
   syn keyword	cStatement	__asm__
