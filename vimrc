@@ -111,6 +111,7 @@ set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
+set signcolumn=yes
 if executable("ag")				" use ag when available {{{
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column
   set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -229,7 +230,19 @@ augroup EditVim
     autocmd BufNewFile,BufRead *.dmc set filetype=javascript
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
     autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
+    autocmd InsertEnter * call InsertToggle('enter')
+    autocmd InsertLeave * call InsertToggle('leave')
 augroup END
+
+function! InsertToggle(toggle) abort
+  if a:toggle ==# 'enter'
+    GitGutterDisable
+    ALEDisableBuffer
+  else
+    GitGutterEnable
+    ALEEnableBuffer
+  endif
+endfunction
 
 function! TrimWhiteSpace() " {{{
     %s/\s\+$//e
@@ -291,11 +304,11 @@ function! GetModeIndicator() abort
   else                         | return g:modemap[mode()]
 endfunction
 let g:mode_hi = {
-      \'NormalMode'  : ' ctermbg=12  ctermfg=0 ',
-      \'InsertMode'  : ' ctermbg=3   ctermfg=0 ',
-      \'VisualMode'  : ' ctermbg=10  ctermfg=0 ',
-      \'ReplaceMode' : ' ctermbg=1   ctermfg=0 ',
-      \'CommandMode' : ' ctermbg=13  ctermfg=0 '}
+      \'NormalMode'  : ' ctermbg=4   ctermfg=234 ',
+      \'InsertMode'  : ' ctermbg=3   ctermfg=234 ',
+      \'VisualMode'  : ' ctermbg=10  ctermfg=234 ',
+      \'ReplaceMode' : ' ctermbg=1   ctermfg=234 ',
+      \'CommandMode' : ' ctermbg=13  ctermfg=234 '}
 highlight StlGit      ctermbg=235 ctermfg=242 cterm=none
 highlight MainStl     ctermbg=236 ctermfg=7   cterm=none
 highlight ReadOnlyStl ctermbg=236 ctermfg=1   cterm=none
@@ -356,11 +369,11 @@ function! BuildStatusLine(nr) abort
         \%#StlGit# %{&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
         \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}
-        \%#StlLinter#%{LinterStatus()}%#MainStl#'
+        \%#StlLinter#%{w:["lf_active"] ? LinterStatus() : ""}%#MainStl#'
 endfunction
 function! s:enableStatusLine() abort
-  if exists("g:default_stl") | return | endif
-  let g:default_stl = &statusline
+  " if exists("g:default_stl") | return | endif
+  " let g:default_stl = &statusline
   set statusline=%!BuildStatusLine(winnr())
 endfunction
 command! -nargs=0 EnableStatusLine call <SID>enableStatusLine()
