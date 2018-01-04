@@ -1,4 +1,4 @@
-if exists("b:current_syntax")
+if exists('b:current_syntax')
     finish
 endif
 
@@ -30,29 +30,29 @@ syn match xpathFunction "\(dayTimeDuration\)"
 " STRINGS
 syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+
 
-if $SSH_CLIENT ==? ""
-    let format='italic'
+if $SSH_CLIENT ==? ''
+    let s:format='italic'
 else
-    let format='italic'
+    let s:format='italic'
 endif
 
 hi def link xmlEntity		Statement
 hi def link xmlEntityPunct	PreProc
-exe "highlight xpathQuote ctermfg=156 cterm=" .format
+exe 'highlight xpathQuote ctermfg=156 cterm=' .s:format
 " hi def link xpathString String
-exe "highlight xpathString ctermfg=10 cterm=" .format ." guifg=#91b859 gui=" .format
+exe 'highlight xpathString ctermfg=10 cterm=' .s:format .' guifg=#91b859 gui=' .s:format
 " hi def link xpathFunction Function
-exe "highlight xpathFunction ctermfg=12 cterm=" .format ." guifg=#82aaff gui=" .format
+exe 'highlight xpathFunction ctermfg=12 cterm=' .s:format .' guifg=#82aaff gui=' .s:format
 " hi def link xpathNumber Constant
-exe "highlight xpathNumber ctermfg=6 cterm=" .format ." guifg=#39adb5 gui=" .format
+exe 'highlight xpathNumber ctermfg=6 cterm=' .s:format .' guifg=#39adb5 gui=' .s:format
 " hi def link xpathParam Identifier
-exe "highlight xpathParam ctermfg=11 cterm=" .format ." guifg=#ffcb6b gui=" .format
+exe 'highlight xpathParam ctermfg=11 cterm=' .s:format .' guifg=#ffcb6b gui=' .s:format
 "hi def link xpathPunct PreProc
-exe "highlight xpathPunct ctermfg=14 cterm=" .format ." guifg=#89ddff gui=" .format
+exe 'highlight xpathPunct ctermfg=14 cterm=' .s:format .' guifg=#89ddff gui=' .s:format
 " hi def link xpathLangVar Type
-exe "highlight xpathLangVar ctermfg=3 cterm=" .format ." guifg=#ffb62c gui=" .format
-exe "highlight xpathReference ctermfg=156 cterm=" .format ." guifg=#afff87 gui=" .format
-exe "highlight xpathOperator ctermfg=137 cterm=" .format ." guifg=#ab7967 gui=" .format
-exe "highlight xpathP2 ctermfg=8 cterm=" .format ." guifg=#3e515b gui=" .format
-exe "highlight xpathSpec ctermfg=1 cterm=" .format ." guifg=#e53935 gui=" .format
+exe 'highlight xpathLangVar ctermfg=3 cterm=' .s:format .' guifg=#ffb62c gui=' .s:format
+exe 'highlight xpathReference ctermfg=156 cterm=' .s:format .' guifg=#afff87 gui=' .s:format
+exe 'highlight xpathOperator ctermfg=137 cterm=' .s:format .' guifg=#ab7967 gui=' .s:format
+exe 'highlight xpathP2 ctermfg=8 cterm=' .s:format .' guifg=#3e515b gui=' .s:format
+exe 'highlight xpathSpec ctermfg=1 cterm=' .s:format .' guifg=#e53935 gui=' .s:format
 hi def link xpathNameSpace Primitive

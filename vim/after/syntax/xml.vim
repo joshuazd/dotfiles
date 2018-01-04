@@ -12,7 +12,7 @@ syn match xmlArgs 'args' contained
 syn match xmlEnrich 'enrich\|xslt\|value-of\|schema\|datamapper' contained
 syn match xmlSqlTag '\<\(sql\|script\)\>' contained
 
-let cur_syntax = b:current_syntax
+let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlSQL syntax/sql.vim
 syn region xmlSqlRegion
@@ -21,9 +21,9 @@ syn region xmlSqlRegion
     \ end=+\%(</sql>\)+
     \ contained
     \ contains=xmlTag,,xmlEndTag,@xmlSQL
-let b:current_syntax = cur_syntax
+let b:current_syntax = s:cur_syntax
 
-let cur_syntax = b:current_syntax
+let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlJson syntax/json.vim
 syn region xmlJsonRegion
@@ -43,9 +43,9 @@ syn region xmlPayloadRegion
             \ end=+</payloadFactory>+
             \ contained
             \ contains=xmlJsonRegion,xmlPayloadTag,xmlPayloadEndTag,xmlPayloadArgsRegion,xmlPayloadArgsTag
-let b:current_syntax = cur_syntax
+let b:current_syntax = s:cur_syntax
 
-let cur_syntax = b:current_syntax
+let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlJavaScript syntax/javascript.vim
 syn region xmlJavaScriptRegion
@@ -54,9 +54,9 @@ syn region xmlJavaScriptRegion
     \ end=+</script>+
     \ contained
     \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlJavaScript
-let b:current_syntax = cur_syntax
+let b:current_syntax = s:cur_syntax
 
-let cur_syntax = b:current_syntax
+let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlGroovy syntax/groovy.vim
 syn region xmlJavaScriptRegion
@@ -65,7 +65,7 @@ syn region xmlJavaScriptRegion
     \ end=+</script>+
     \ contained
     \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlGroovy
-let b:current_syntax = cur_syntax
+let b:current_syntax = s:cur_syntax
 
 syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
 syn match xmlEndScriptTag +</script>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
@@ -78,7 +78,7 @@ syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
 syn keyword  xmlCdataCdata CDATA          contained
 syn match    xmlCdataEnd   +]]>+          contained
 
-let cur_syntax = b:current_syntax
+let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlXpath $HOME/.vim/after/syntax/xpath.vim
 syn region xmlXpathRegion
@@ -87,15 +87,15 @@ syn region xmlXpathRegion
     \ end=+"+
     \ contained
     \ contains=xmlAttrib,@xmlXpath
-let b:current_syntax = cur_syntax
+let b:current_syntax = s:cur_syntax
 syn region xmlXpathRegion
     \ matchgroup=xmlQuote start=+"{+
     \ keepend
     \ end=+}"+
     \ contained
     \ contains=xmlAttrib,@xmlXpath
-let b:current_syntax = cur_syntax
-if $SSH_CLIENT ==? ""
+let b:current_syntax = s:cur_syntax
+if $SSH_CLIENT ==? ''
     highlight! xmlXpathRegion cterm=italic
 else
     highlight! xmlXpathRegion cterm=NONE
