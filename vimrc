@@ -32,7 +32,8 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
 Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
 Plug 'pearofducks/ansible-vim'
-if executable("ctags")
+Plug 'xtal8/traces.vim'
+if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
 
@@ -44,79 +45,74 @@ runtime macros/matchit.vim
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-set ruler						" Always show current position
+set ruler					" Always show current position
 set cmdheight=1					" Height of the command bar
-set hidden						" A buffer becomes hidden when it is abandoned
-set backspace=eol,start,indent	" Configure backspace so it acts as it should act
-set whichwrap+=<,>,h,l			" arrow keys and h,l move to the next line
-set showcmd						" show keystrokes
-set breakindent					" Indent wrapped lines by 2 {{{
-set breakindentopt=shift:2		" }}}
-" search {{{
+set hidden					" A buffer becomes hidden when it is abandoned
+set backspace=eol,start,indent			" Configure backspace so it acts as it should act
+set whichwrap+=<,>,h,l				" arrow keys and h,l move to the next line
+set showcmd					" show keystrokes
+set breakindent					" Indent wrapped lines by 2
+set breakindentopt=shift:2
 set ignorecase					" Ignore case when searching
 set smartcase					" When searching try to be smart about cases
 set hlsearch					" Highlight search results
 set incsearch					" Makes search act like search in modern browsers
-" }}}
+set wrapscan					" Search commands wrap around end of buffer
 set lazyredraw					" Don't redraw while executing macros (good performance config)
-set magic						" For regular expressions turn magic on
-set showmatch					" Show matching brackets when text indicator is over them {{{
-set matchtime=2					" How many tenths of a second to blink when matching brackets }}}
-set noerrorbells				" No annoying sound on errors {{{
+set magic					" For regular expressions turn magic on
+set showmatch					" Show matching brackets when text indicator is over them
+set matchtime=2					" How many tenths of a second to blink when matching brackets
+set noerrorbells				" No annoying sound on errors
 set novisualbell
 set t_vb=
-set timeoutlen=500				" }}}
-set splitbelow					" Make splits behave better {{{
-set splitright					" }}}
-set background=dark				" dark background {{{
-syntax on						" turn syntax on
-colorscheme hybrid_material		" material color scheme }}}
-set number						" show line numbers {{{
+set timeoutlen=500
+set splitbelow					" Make splits behave better
+set splitright
+set background=dark				" dark background
+syntax enable					" turn syntax on
+colorscheme hybrid_material			" material color scheme
+set number					" show line numbers
 set relativenumber				" show relative line numbers
-set numberwidth=1				" set min number column width }}}
-set clipboard=unnamedplus		" make clipboard work better
-set tabstop=4					" <TAB>s are 4 spaces {{{
+set numberwidth=1				" set min number column width
+set clipboard=unnamedplus			" make clipboard work better
 set softtabstop=4				" number of spaces when inserting/backspacing
 set shiftwidth=4				" shift 4 spaces for indentation
 set expandtab					" expand tabs into spaces
-set autoindent					" use the previous lines indentation level }}}
+set autoindent					" use the previous lines indentation level
 set noshowmode					" don't show mode in the statusline
-set nowrap						" don't wrap lines by default
+set nowrap					" don't wrap lines by default
 set linebreak					" wrap lines at words
 set laststatus=2				" always show statusline
-set cindent						" better indentation
-" set cinkeys-=0#
+set cindent					" better indentation
 set indentkeys-=0#
-set scrolloff=999				" Set 999 lines to the cursor - when moving vertically using j/k {{{
+set scrolloff=999				" Set 999 lines to the cursor - when moving vertically using j/k
 set sidescroll=1				" scroll 1 character at a time
-set sidescrolloff=15			" scroll within 15 characters }}}
-set foldmethod=syntax			" fold based on syntax
-set wildmenu					" Turn on the WiLd menu {{{
+set sidescrolloff=15				" scroll within 15 characters
+set foldmethod=syntax				" fold based on syntax
+set wildmenu					" Turn on the WiLd menu
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/*,tags	" Ignore compiled files
-set wildignorecase				" ignore case in wildmenu }}}
-au FileType * set fo-=o			" Don't insert comment when using 'o'
-set sessionoptions-=options		" make sessions work better with plugins
+set wildignorecase				" ignore case in wildmenu
+set sessionoptions-=options			" make sessions work better with plugins
 set sessionoptions-=folds
 let g:is_posix = 1
 set backupdir=/tmp				" Better backups
 set noswapfile
 set foldlevel=12				" don't fold most things
 set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
-set term=xterm-256color
-set omnifunc=syntaxcomplete#Complete	" enable omnicompletion
+set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
 set completeopt+=menuone
-set concealcursor+=n			" conceal characters in normal mode
+set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 set signcolumn=yes
-if executable("ag")				" use ag when available {{{
+if executable('ag')				" use ag when available {{{
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif " }}}
-if has("gui_running") " {{{
+if has('gui_running') " {{{
     " set guifont=Literation\ Mono\ Powerline\ 10
     " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
     set guifont=DejaVu\ Sans\ Mono\ Book\ 10
@@ -128,16 +124,14 @@ if has("gui_running") " {{{
     set guitablabel=%M\ %t
     set lines=43 columns=120
 endif " }}}
-let g:hybrid_custom_term_colors=1
-let g:xml_syntax_folding=1 " enable xml folding
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              KEYBINDINGS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-let mapleader = "\<Space>" " make leader a more sane keybinding
-let maplocalleader = "," " remap localleader
+let g:mapleader = "\<Space>" " make leader a more sane keybinding
+let g:maplocalleader = ',' " remap localleader
 " easier : mapping
 noremap ; :
 noremap , ;
@@ -160,8 +154,8 @@ nnoremap <silent> <Leader><Leader> :b#<CR>
 " more standard 'close buffer' behavior
 nnoremap <silent> <Leader>x :bn\|bd #<CR>
 " treat wrapped lines as different lines
-noremap j gj
-noremap k gk
+nnoremap <expr> j v:count ? 'j' : 'gj'
+nnoremap <expr> k v:count ? 'k' : 'gk'
 noremap gj j
 noremap gk k
 " easier to go to end/beginning of lines
@@ -192,9 +186,8 @@ nnoremap <silent> <Leader>z :set invlist<CR>
 " easier completion
 inoremap <C-@> <C-x><C-o>
 " toggle conceallevel
-noremap <silent> <Leader>h :call ToggleConceal()<CR>
-" search command
-" noremap <silent> <C-f> :CtrlPLine<CR>
+nnoremap <silent> <Leader>h :call functions#ToggleConceal()<CR>
+xnoremap <silent> <Leader>h :call functions#ToggleConceal()<CR>
 " paste and format
 nnoremap <silent> <Leader>p p=']
 nnoremap <silent> <Leader>P P=']
@@ -202,20 +195,7 @@ xnoremap <silent> <Leader>p p=']
 xnoremap <silent> <Leader>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
-noremap <silent> <F5> :call VimRefresh()<CR>
-function! VimRefresh() " {{{
-    CtrlPClearAllCaches
-    ALEToggle
-    ALEToggle
-    GitGutterToggle
-    GitGutterToggle
-    NeoCompleteClean
-    NeoCompleteBufferMakeCache
-    NeoCompleteMemberMakeCache
-    if &filetype ==? 'java'
-        JCcacheClear
-    endif
-endfunction " }}}
+noremap <silent> <F5> :call functions#VimRefresh()<CR>
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -230,6 +210,7 @@ augroup EditVim
     autocmd BufNewFile,BufRead *.dmc set filetype=javascript
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
     autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
+    au FileType * set formatoptions-=o		" Don't insert comment when using 'o'
     autocmd InsertEnter * call InsertToggle('enter')
     autocmd InsertLeave * call InsertToggle('leave')
 augroup END
@@ -244,27 +225,9 @@ function! InsertToggle(toggle) abort
   endif
 endfunction
 
-function! TrimWhiteSpace() " {{{
-    %s/\s\+$//e
-    ''
-endfunction
-command! TrimWhiteSpace call TrimWhiteSpace() " }}}
+command! TrimWhiteSpace call functions#TrimWhiteSpace()
 
-function! ToggleConceal() " {{{
-    if &conceallevel == 0
-        set conceallevel=2
-    else
-        set conceallevel=0
-    endif
-endfunction " }}}
-
-function! VimGrepAll(pattern) abort
-  call setqflist([])
-  exe 'bufdo silent vimgrepadd ' . a:pattern . ' %'
-  cwindow
-  exe 'normal '
-endfunction
-command! -nargs=1 Search call VimGrepAll(<f-args>)
+command! -nargs=1 Search call functions#VimGrepAll(<f-args>)
 nnoremap <C-f> :Search 
 
 command! FormatJSON %!python -c 
@@ -302,6 +265,7 @@ function! GetModeIndicator() abort
   if &filetype ==# 'help'      | return ['Help']
   elseif &filetype ==# 'netrw' | return ['netrw']
   else                         | return g:modemap[mode()]
+  endif
 endfunction
 let g:mode_hi = {
       \'NormalMode'  : ' ctermbg=4   ctermfg=234 ',
@@ -321,15 +285,15 @@ function! GitHunks()
   let l:returnval .= (l:githunks[0] != 0 ? ' ' . l:githunks[0] . '+' : '')
   let l:returnval .= (l:githunks[1] != 0 ? ' ' . l:githunks[1] . '~' : '')
   let l:returnval .= (l:githunks[2] != 0 ? ' ' . l:githunks[2] . '-' : '')
-  return l:returnval == ' ' ? '' : l:returnval
+  return l:returnval ==# ' ' ? '' : l:returnval
 endfunction
 function! GitStatusLine() abort
-  let l:gitstatus = (fugitive#head() != '' ? ' ' . fugitive#head() : '')
+  let l:gitstatus = (fugitive#head() !=# '' ? ' ' . fugitive#head() : '')
   let l:githunks = GitHunks()
   let l:gitline = ''
-  let l:gitline .= (l:githunks != '' ? l:githunks : '')
-  let l:gitline .= (l:gitstatus != '' ? (l:gitline == '' ? ' ' : '') . l:gitstatus : '')
-  let l:gitline .= (l:gitline != '' ? ' ' : '')
+  let l:gitline .= (l:githunks !=# '' ? l:githunks : '')
+  let l:gitline .= (l:gitstatus !=# '' ? (l:gitline ==# '' ? ' ' : '') . l:gitstatus : '')
+  let l:gitline .= (l:gitline !=# '' ? ' ' : '')
   return l:gitline
 endfunction
 function! LinterStatus() abort
@@ -338,25 +302,25 @@ function! LinterStatus() abort
   let l:all_non_errors = l:counts.total - l:all_errors
   return l:counts.total == 0 ? '' : printf(
         \ '  %dW %dE ',
-        \ all_non_errors,
-        \ all_errors
+        \ l:all_non_errors,
+        \ l:all_errors
         \)
 endfunction
 fun! s:updateStatusLineHighlight(nr,newMode)
-  execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ["", a:newMode])[1]] . ' cterm=bold'
-  execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ["", a:newMode])[1]] . ' cterm=none'
+  execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold'
+  execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none'
   return 1
 endf
 function! SetupStatusLine(nr) abort
   return get(extend(w:, {
-        \ "lf_active": winnr() != a:nr
+        \ 'lf_active': winnr() != a:nr
           \ ? 0
-          \ : (mode(1) ==# get(g:, "lf_cached_mode", "")
+          \ : (mode(1) ==# get(g:, 'lf_cached_mode', '')
             \ ? 1
-            \ : s:updateStatusLineHighlight(a:nr,get(extend(g:, { "lf_cached_mode": mode(1) }), "lf_cached_mode"))
+            \ : s:updateStatusLineHighlight(a:nr,get(extend(g:, { 'lf_cached_mode': mode(1) }), 'lf_cached_mode'))
             \ ),
-        \ "lf_winwd": winwidth(winnr())
-        \ }), "", "")
+        \ 'lf_winwd': winwidth(winnr())
+        \ }), '', '')
 endfunction
 function! BuildStatusLine(nr) abort
   return '%{SetupStatusLine('.a:nr.')}
@@ -365,8 +329,8 @@ function! BuildStatusLine(nr) abort
         \%#MainStl# %t%m
         \%#ReadOnlyStl# %{&readonly ? "RO" : ""}%#MainStl#
         \%=
-        \%{ObsessionStatus("$ ")}%{w:["lf_active"] ? gutentags#statusline() != "" ? gutentags#statusline()." " : "" : ""}
-        \%#StlGit# %{&syntax." "}
+        \%{ObsessionStatus("$ ")}%{w:["lf_active"] ? gutentags#statusline() != "" ? gutentags#statusline() : "" : ""}
+        \ %#StlGit#%{&syntax == "" ? "" : " ".&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
         \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}
         \%#StlLinter#%{w:["lf_active"] ? LinterStatus() : ""}%#MainStl#'
@@ -383,7 +347,7 @@ EnableStatusLine
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
-" {{{ filetype spefic plugins are in ftplugin folders
+" {{{ filetype specific plugin settings are in ftplugin folders
 " gutentags setup {{{
   let g:gutentags_exclude_project_root = [
         \'/home/shepard/ansible/ansible-checkout',
@@ -464,13 +428,13 @@ EnableStatusLine
 
 " Ansible setup {{{
     let g:ansible_unindent_after_newline = 1
-    let g:ansible_attribute_highlight = "a"
+    let g:ansible_attribute_highlight = 'a'
     let g:ansible_extra_keywords_highlight = 1
 " }}}
 
 " ALE setup {{{
-    nmap <silent> ]e <Plug>(ale_next_wrap)
-    nmap <silent> [e <Plug>(ale_previous_wrap)
+    nmap <silent> ]c <Plug>(ale_next_wrap)
+    nmap <silent> [c <Plug>(ale_previous_wrap)
     let g:ale_python_flake8_options = '--max-line-length 99'
     let g:ale_virtualenv_dir_names = []
     let g:ale_warn_about_trailing_whitespace = 1
@@ -496,8 +460,11 @@ EnableStatusLine
     endfunction
 
     " toggle showmode because Goyo hides statusline 
-    autocmd! User GoyoEnter nested call <SID>goyo_enter()
-    autocmd! User GoyoLeave nested call <SID>goyo_leave()
+    augroup Goyo
+      autocmd!
+      autocmd! User GoyoEnter nested call <SID>goyo_enter()
+      autocmd! User GoyoLeave nested call <SID>goyo_leave()
+    augroup END
 " }}}
 
 " Easymotion setup {{{

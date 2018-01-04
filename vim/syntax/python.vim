@@ -62,12 +62,12 @@
 
 " }}}
 
-if exists("b:current_syntax")
+if exists('b:current_syntax')
   finish
 endif
 
 " For version 5.x: Clear all syntax items
-if version < 600
+if v:version < 600
     syntax clear
 endif
 
@@ -463,6 +463,6 @@ endif
     hi link  pythonPrint        Keyword
     hi link  pythonKeywordParam pythonField
 
-let b:current_syntax = "python"
+let b:current_syntax = 'python'
 
 " }}}

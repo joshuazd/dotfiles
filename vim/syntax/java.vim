@@ -50,7 +50,7 @@ syn keyword javaAssert		assert
 syn keyword javaMethodDecl	synchronized throws
 syn keyword javaClassDecl	extends implements interface
 syn match   javaSemicolon       ";"
-syn match javaOperator          "[<>=!]"
+syn match javaOperator          "[<>=!+-]"
 " to differentiate the keyword class from MyClass.class we use a match here
 syn match   javaTypedef		"\.\s*\<class\>"ms=s+1
 syn keyword javaClassDecl	enum
