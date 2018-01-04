@@ -16,16 +16,16 @@ Plug 'Shougo/neco-vim', { 'for': 'vim' }
 Plug 'shougo/neocomplete.vim'
 Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'romainl/vim-qf'
 Plug 'godlygeek/tabular'
 Plug 'jiangmiao/auto-pairs'
-Plug 'Konfekt/FastFold'
+" Plug 'Konfekt/FastFold'
 Plug 'justinmk/vim-dirvish'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-speeddating'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
@@ -107,9 +107,9 @@ set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
-set signcolumn=yes
+set signcolumn=yes				" always have signcolumn on
 if executable('ag')				" use ag when available {{{
-  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column
+  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif " }}}
 if has('gui_running') " {{{
