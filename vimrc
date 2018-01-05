@@ -106,7 +106,7 @@ set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
-set path=.,**					" set path to all subdirectories
+set path=.,**/src/main/java/com/panera/**/,**/src/main/synapse-config/**/	" set path to all subdirectories
 set signcolumn=yes				" always have signcolumn on
 if executable('ag')				" use ag when available {{{
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
@@ -209,7 +209,7 @@ augroup EditVim
     autocmd BufNewFile,BufRead *.dbs set filetype=xml
     autocmd BufNewFile,BufRead *.dmc set filetype=javascript
     autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-    autocmd BufNewFile,BufRead pom.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
+    autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
     au FileType * set formatoptions-=o		" Don't insert comment when using 'o'
     autocmd InsertEnter * call InsertToggle('enter')
     autocmd InsertLeave * call InsertToggle('leave')
@@ -360,6 +360,8 @@ EnableStatusLine
   let g:gitgutter_sign_modified = '•'
   let g:gitgutter_sign_removed = '•'
   let g:gitgutter_sign_modified_removed = '•'
+  nmap [h <Plug>GitGutterPrevHunk
+  nmap ]h <Plug>GitGutterNextHunk
 " }}}
 
 " neocomplete setup {{{
