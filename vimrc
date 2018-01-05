@@ -106,7 +106,7 @@ set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
-set path=.,**/src/main/java/com/panera/**/,**/src/main/synapse-config/**/	" set path to all subdirectories
+set path=.,,**/src/main/java/com/panera/**/,**/src/main/synapse-config/**/	" set path to all subdirectories
 set signcolumn=yes				" always have signcolumn on
 if executable('ag')				" use ag when available {{{
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
