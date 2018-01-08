@@ -187,7 +187,7 @@ if exists('g:xml_syntax_folding')
         \ end=+</\z1\_\s\{-}>+
         \ matchgroup=xmlTagPunct end=+/>+
         \ fold
-        \ contains=xmlPayloadRegion,xmlSqlRegion,xmlJavaScriptRegion,xmlTag,xmlEndTag,xmlCdata,xmlRegion,xmlComment,xmlOperator,xmlEntity,xmlProcessing,@xmlRegionHook,@Spell
+        \ contains=xmlGroovyRegion,xmlPayloadRegion,xmlSqlRegion,xmlJavaScriptRegion,xmlTag,xmlEndTag,xmlCdata,xmlRegion,xmlComment,xmlOperator,xmlEntity,xmlProcessing,@xmlRegionHook,@Spell
         \ keepend
         \ extend
         \ concealends

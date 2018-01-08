@@ -38,21 +38,21 @@ endif
 
 hi def link xmlEntity		Statement
 hi def link xmlEntityPunct	PreProc
-exe 'highlight xpathQuote ctermfg=156 cterm=' .s:format
+exe 'highlight xpathQuote ctermbg=234 ctermfg=156 cterm=' .s:format
 " hi def link xpathString String
-exe 'highlight xpathString ctermfg=10 cterm=' .s:format .' guifg=#91b859 gui=' .s:format
+exe 'highlight xpathString ctermbg=234 ctermfg=10 cterm=' .s:format .' guifg=#91b859 gui=' .s:format
 " hi def link xpathFunction Function
-exe 'highlight xpathFunction ctermfg=12 cterm=' .s:format .' guifg=#82aaff gui=' .s:format
+exe 'highlight xpathFunction ctermbg=234 ctermfg=12 cterm=' .s:format .' guifg=#82aaff gui=' .s:format
 " hi def link xpathNumber Constant
-exe 'highlight xpathNumber ctermfg=6 cterm=' .s:format .' guifg=#39adb5 gui=' .s:format
+exe 'highlight xpathNumber ctermbg=234 ctermfg=6 cterm=' .s:format .' guifg=#39adb5 gui=' .s:format
 " hi def link xpathParam Identifier
-exe 'highlight xpathParam ctermfg=11 cterm=' .s:format .' guifg=#ffcb6b gui=' .s:format
+exe 'highlight xpathParam ctermbg=234 ctermfg=11 cterm=' .s:format .' guifg=#ffcb6b gui=' .s:format
 "hi def link xpathPunct PreProc
-exe 'highlight xpathPunct ctermfg=14 cterm=' .s:format .' guifg=#89ddff gui=' .s:format
+exe 'highlight xpathPunct ctermbg=234 ctermfg=14 cterm=' .s:format .' guifg=#89ddff gui=' .s:format
 " hi def link xpathLangVar Type
-exe 'highlight xpathLangVar ctermfg=3 cterm=' .s:format .' guifg=#ffb62c gui=' .s:format
-exe 'highlight xpathReference ctermfg=156 cterm=' .s:format .' guifg=#afff87 gui=' .s:format
-exe 'highlight xpathOperator ctermfg=137 cterm=' .s:format .' guifg=#ab7967 gui=' .s:format
-exe 'highlight xpathP2 ctermfg=8 cterm=' .s:format .' guifg=#3e515b gui=' .s:format
-exe 'highlight xpathSpec ctermfg=1 cterm=' .s:format .' guifg=#e53935 gui=' .s:format
+exe 'highlight xpathLangVar ctermbg=234 ctermfg=3 cterm=' .s:format .' guifg=#ffb62c gui=' .s:format
+exe 'highlight xpathReference ctermbg=234 ctermfg=156 cterm=' .s:format .' guifg=#afff87 gui=' .s:format
+exe 'highlight xpathOperator ctermbg=234 ctermfg=137 cterm=' .s:format .' guifg=#ab7967 gui=' .s:format
+exe 'highlight xpathP2 ctermbg=234 ctermfg=8 cterm=' .s:format .' guifg=#3e515b gui=' .s:format
+exe 'highlight xpathSpec ctermbg=234 ctermfg=1 cterm=' .s:format .' guifg=#e53935 gui=' .s:format
 hi def link xpathNameSpace Primitive

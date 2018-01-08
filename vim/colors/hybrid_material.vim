@@ -193,7 +193,8 @@ function! s:build_prim(hi_elem, field)
   exe 'let ' . l:vname . ' = " ' . l:gui_assign . ' ' . l:cterm_assign . '"'
 endfunction
 
-let s:bg_none = ' guibg=NONE ctermbg=NONE'
+" let s:bg_none = ' guibg=NONE ctermbg=NONE'
+let s:bg_none = ' '
 call s:build_prim('bg', 'foreground')
 call s:build_prim('bg', 'background')
 call s:build_prim('bg', 'selection')

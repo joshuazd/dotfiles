@@ -59,7 +59,7 @@ let b:current_syntax = s:cur_syntax
 let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlGroovy syntax/groovy.vim
-syn region xmlJavaScriptRegion
+syn region xmlGroovyRegion
     \ start=+<script language="groovy">+
     \ keepend
     \ end=+</script>+
@@ -96,9 +96,9 @@ syn region xmlXpathRegion
     \ contains=xmlAttrib,@xmlXpath
 let b:current_syntax = s:cur_syntax
 if $SSH_CLIENT ==? ''
-    highlight! xmlXpathRegion cterm=italic
+    highlight! xmlXpathRegion cterm=italic ctermbg=234
 else
-    highlight! xmlXpathRegion cterm=NONE
+    highlight! xmlXpathRegion cterm=italic ctermbg=234
 endif
 
 syn keyword xmlNs ns0
