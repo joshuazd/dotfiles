@@ -1,13 +1,13 @@
 syn match xmlFunction 'makefault\|template\( \|>\)\@=\|validate' contained
 syn match xmlLog 'call-template\|log' contained
-syn match db 'dblookup\|dbreport\|class\|payloadFactory\|arg \|http[ >]\@=' contained
-syn match filter '\(<\/\?\)\@<=\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)' contained
+syn match xmlDb 'dblookup\|dbreport\|class\|payloadFactory\|arg \|http[ >]\@=' contained
+syn match xmlFilter '\(<\/\?\)\@<=\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)' contained
 syn match xmlSend '\(<\/\?\)\@<=\(send\|call\(>\)\@=\)' contained
-syn match property '\(<\/\?\)\@<=\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@=' contained
-syn match sequence '\(</\?\)\@<=sequence' contained
-syn match param 'parameter\|result\|dsName\|target\|format\|source \@=\|param\( \|>\)\@=' contained
+syn match xmlProperty '\(<\/\?\)\@<=\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@=' contained
+syn match xmlSequence '\(</\?\)\@<=sequence' contained
+syn match xmlParam 'parameter\|result\|dsName\|target\|format\|source \@=\|param\( \|>\)\@=' contained
 syn match xmlLogParam 'with-param' contained
-syn match connection 'connection\|statement\|resource\( \|>\)\@=\|stylesheet' contained
+syn match xmlConnection 'connection\|statement\|resource\( \|>\)\@=\|stylesheet' contained
 syn match xmlArgs 'args' contained
 syn match xmlEnrich 'enrich\|xslt\|value-of\|schema\|datamapper' contained
 syn match xmlSqlTag '\<\(sql\|script\)\>' contained
@@ -40,6 +40,7 @@ syn region xmlPayloadArgsRegion
             \ contains=xmlTag,xmlEndTag
 syn region xmlPayloadRegion
             \ start=+\%(<payloadFactory media-type="json">\)+
+            \ keepend
             \ end=+</payloadFactory>+
             \ contained
             \ contains=xmlJsonRegion,xmlPayloadTag,xmlPayloadEndTag,xmlPayloadArgsRegion,xmlPayloadArgsTag
@@ -96,15 +97,15 @@ syn region xmlXpathRegion
     \ contains=xmlAttrib,@xmlXpath
 let b:current_syntax = s:cur_syntax
 if $SSH_CLIENT ==? ''
-    highlight! xmlXpathRegion cterm=italic ctermbg=234
+    highlight! xmlXpathRegion cterm=italic
 else
-    highlight! xmlXpathRegion cterm=italic ctermbg=234
+    highlight! xmlXpathRegion cterm=italic
 endif
 
 syn keyword xmlNs ns0
 syn keyword xmlXsl xsl
 
-syn cluster xmlTagHook add=callTemplate,db,filter,property,sequence,connection,param,xmlFunction,xmlArgs,xmlEnrich,xmlSqlTag,xmlSend,xmlLog,xmlLogParam
+syn cluster xmlTagHook add=callTemplate,xmlDb,xmlFilter,xmlProperty,xmlSequence,xmlConnection,xmlParam,xmlFunction,xmlArgs,xmlEnrich,xmlSqlTag,xmlSend,xmlLog,xmlLogParam
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
 
 highlight link xmlNs Identifier
@@ -115,14 +116,14 @@ hi def link xmlArgs Primitive
 highlight xmlArgs ctermfg=3 guifg=#ffb62c
 hi def link xmlFunction Function
 hi def link xmlSend Function
-hi def link param StringPunct
-highlight connection ctermfg=13 guifg=#945eb8
+hi def link xmlParam StringPunct
+highlight xmlConnection ctermfg=13 guifg=#945eb8
 highlight xmlLog ctermfg=7 guifg=#bbbbbb
-highlight link property Constant
-hi def link sequence StringPunct
+highlight link xmlProperty Constant
+hi def link xmlSequence StringPunct
 hi def link xmlScriptTag xmlTag
 hi def link xmlEndScriptTag xmlTag
-highlight link db Identifier
-highlight link filter Keyword
-highlight xmlSqlTag ctermfg=173 guifg=#ff5f00
+highlight link xmlDb Identifier
+highlight link xmlFilter Keyword
+highlight xmlSqlTag ctermfg=209 guifg=#ff5f00
 highlight xmlLogParam ctermfg=245 guifg=#8a8a8a

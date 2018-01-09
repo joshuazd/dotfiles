@@ -86,7 +86,7 @@ syn match   xmlAttrib
     \ contains=xmlAttribPunct,@xmlAttribHook
     \ display
 
-syn match xmlOperator "=" contained
+" syn match xmlOperator "=" contained
 
 " namespace spec
 "
@@ -156,14 +156,16 @@ if exists('g:xml_syntax_folding')
     "
     " EXAMPLE:
     "
+        " \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
+        " \ matchgroup=xmlTagPunct end=+>+
     " </tag>
     " ^^^^^^
     "
     syn region   xmlEndTag
         \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
         \ matchgroup=xmlTagPunct end=+>+
-        \ contained
-        \ contains=xmlError,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+	\ contained
+	\ contains=xmlNamespace,xmlAttribPunct,@xmlTagHook
         \ concealends
 
 
