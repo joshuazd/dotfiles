@@ -19,10 +19,8 @@ set lazyredraw					" Don't redraw while executing macros (good performance confi
 set magic					" For regular expressions turn magic on
 set showmatch					" Show matching brackets when text indicator is over them
 set matchtime=2					" How many tenths of a second to blink when matching brackets
-set noerrorbells				" No annoying sound on errors
-set novisualbell
-set t_vb=
-set timeoutlen=500
+set vb t_vb=					" No annoying sound on errors
+set timeoutlen=500				" shorter timeout
 set splitbelow					" Make splits behave better
 set splitright
 set background=dark				" dark background
@@ -40,30 +38,27 @@ set noshowmode					" don't show mode in the statusline
 set nowrap					" don't wrap lines by default
 set linebreak					" wrap lines at words
 set laststatus=2				" always show statusline
-set cindent					" better indentation
-set indentkeys-=0#
 set scrolloff=999				" Set 999 lines to the cursor - when moving vertically using j/k
 set sidescroll=1				" scroll 1 character at a time
 set sidescrolloff=15				" scroll within 15 characters
 set foldmethod=syntax				" fold based on syntax
-set wildmenu					" Turn on the WiLd menu
+set wildmenu					" Turn on the wild menu
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/*,tags	" Ignore compiled files
 set wildignorecase				" ignore case in wildmenu
-set sessionoptions-=options			" make sessions work better with plugins
-set sessionoptions-=folds
+set sessionoptions-=options,folds,blank		" make sessions work better with plugins
 let g:is_posix = 1
 set backupdir=/tmp				" Better backups
 set noswapfile
-set foldlevel=12				" don't fold most things
+set foldlevel=99				" don't fold things by default
 set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
-set completeopt+=menuone,preview,noinsert
+set completeopt+=menuone,preview,noinsert	" configure popup menu
 set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
-set path=.,,**					" set path to all subdirectories
+set path=.,**					" set path to all subdirectories
 set signcolumn=yes				" always have signcolumn on
 if executable('ag')				" use ag when available {{{
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
