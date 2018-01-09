@@ -85,13 +85,11 @@ endif " }}}
 call plug#begin('~/.vim/bundle')
 
 " Plug 'w0rp/ale'
-Plug 'junegunn/goyo.vim'
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 Plug 'luochen1990/rainbow'
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'easymotion/vim-easymotion'
 Plug 'airblade/vim-gitgutter'
-Plug 'tmux-plugins/vim-tmux', { 'for': 'tmux' }
 Plug 'Shougo/neosnippet'
 Plug 'Shougo/neosnippet-snippets'
 Plug 'Shougo/neco-vim', { 'for': 'vim' }
@@ -104,7 +102,7 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'Konfekt/FastFold'
 Plug 'justinmk/vim-dirvish'
 Plug 'tpope/vim-obsession'
-Plug 'tpope/vim-sleuth'
+" Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
@@ -113,7 +111,6 @@ Plug 'tpope/vim-unimpaired'
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
 Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
-Plug 'pearofducks/ansible-vim'
 Plug 'xtal8/traces.vim'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
@@ -195,6 +192,8 @@ xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
 
 nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
+
+cnoremap <expr> <CR> functions#CCR()
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -431,8 +430,8 @@ EnableStatusLine
 " }}}
 
 " ALE setup {{{
-    nmap <silent> ]c <Plug>(ale_next_wrap)
-    nmap <silent> [c <Plug>(ale_previous_wrap)
+    " nmap <silent> ]c <Plug>(ale_next_wrap)
+    " nmap <silent> [c <Plug>(ale_previous_wrap)
     let g:ale_python_flake8_options = '--max-line-length 99'
     let g:ale_virtualenv_dir_names = []
     let g:ale_warn_about_trailing_whitespace = 1
@@ -447,23 +446,6 @@ EnableStatusLine
                 \       'yapf'
                 \   ]
                 \}
-" }}}
-
-" Goyo setup {{{
-    function! s:goyo_enter()
-        set showmode
-    endfunction
-
-    function! s:goyo_leave()
-        set noshowmode
-    endfunction
-
-    " toggle showmode because Goyo hides statusline 
-    augroup Goyo
-      autocmd!
-      autocmd! User GoyoEnter nested call <SID>goyo_enter()
-      autocmd! User GoyoLeave nested call <SID>goyo_leave()
-    augroup END
 " }}}
 
 " Easymotion setup {{{
