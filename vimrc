@@ -1,46 +1,3 @@
-" Plugins {{{
-" filetype off
-call plug#begin('~/.vim/bundle')
-
-Plug 'w0rp/ale'
-Plug 'junegunn/goyo.vim'
-Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-Plug 'luochen1990/rainbow'
-Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
-Plug 'easymotion/vim-easymotion'
-Plug 'airblade/vim-gitgutter'
-Plug 'tmux-plugins/vim-tmux', { 'for': 'tmux' }
-Plug 'Shougo/neosnippet'
-Plug 'Shougo/neosnippet-snippets'
-Plug 'Shougo/neco-vim', { 'for': 'vim' }
-Plug 'shougo/neocomplete.vim'
-Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'romainl/vim-qf'
-Plug 'godlygeek/tabular'
-Plug 'jiangmiao/auto-pairs'
-" Plug 'Konfekt/FastFold'
-Plug 'justinmk/vim-dirvish'
-Plug 'tpope/vim-obsession'
-Plug 'tpope/vim-sleuth'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-unimpaired'
-Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
-Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
-Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
-Plug 'pearofducks/ansible-vim'
-Plug 'xtal8/traces.vim'
-if executable('ctags')
-  Plug 'ludovicchabant/vim-gutentags'
-endif
-
-call plug#end()
-runtime macros/matchit.vim
-" }}}
-
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -101,12 +58,12 @@ set noswapfile
 set foldlevel=12				" don't fold most things
 set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
-set completeopt+=menuone
+set completeopt+=menuone,preview,noinsert
 set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
-set path=.,,**/src/main/java/com/panera/**/,**/src/main/synapse-config/**/	" set path to all subdirectories
+set path=.,,**					" set path to all subdirectories
 set signcolumn=yes				" always have signcolumn on
 if executable('ag')				" use ag when available {{{
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
@@ -124,6 +81,51 @@ if has('gui_running') " {{{
     set guitablabel=%M\ %t
     set lines=43 columns=120
 endif " }}}
+" }}}
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+"              PLUGINS
+""""""""""""""""""""""""""""""""""""""""""""""""
+" Plugins {{{
+call plug#begin('~/.vim/bundle')
+
+" Plug 'w0rp/ale'
+Plug 'junegunn/goyo.vim'
+Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+Plug 'luochen1990/rainbow'
+Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
+Plug 'easymotion/vim-easymotion'
+Plug 'airblade/vim-gitgutter'
+Plug 'tmux-plugins/vim-tmux', { 'for': 'tmux' }
+Plug 'Shougo/neosnippet'
+Plug 'Shougo/neosnippet-snippets'
+Plug 'Shougo/neco-vim', { 'for': 'vim' }
+Plug 'shougo/neocomplete.vim'
+Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'romainl/vim-qf'
+Plug 'godlygeek/tabular'
+Plug 'jiangmiao/auto-pairs'
+Plug 'Konfekt/FastFold'
+Plug 'justinmk/vim-dirvish'
+Plug 'tpope/vim-obsession'
+Plug 'tpope/vim-sleuth'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-unimpaired'
+Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
+Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
+Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
+Plug 'pearofducks/ansible-vim'
+Plug 'xtal8/traces.vim'
+if executable('ctags')
+  Plug 'ludovicchabant/vim-gutentags'
+endif
+
+call plug#end()
+runtime macros/matchit.vim
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -196,6 +198,8 @@ xnoremap <silent> <Leader>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
+
+nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -218,10 +222,10 @@ augroup END
 function! InsertToggle(toggle) abort
   if a:toggle ==# 'enter'
     GitGutterDisable
-    ALEDisableBuffer
+    " ALEDisableBuffer
   else
     GitGutterEnable
-    ALEEnableBuffer
+    " ALEEnableBuffer
   endif
 endfunction
 
@@ -297,6 +301,7 @@ function! GitStatusLine() abort
   return l:gitline
 endfunction
 function! LinterStatus() abort
+  return ''
   let l:counts = ale#statusline#Count(bufnr(''))
   let l:all_errors = l:counts.error + l:counts.style_error
   let l:all_non_errors = l:counts.total - l:all_errors
@@ -378,11 +383,7 @@ EnableStatusLine
     smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
                 \ "\<Plug>(neosnippet_expand_or_jump)"
                 \: "\<TAB>"
-    imap <expr><CR> neosnippet#expandable() ?
-                \ "\<Plug>(neosnippet_expand)"
-                \: pumvisible()? "\<C-e>\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
-    inoremap <expr><C-l> pumvisible() ? 
-                \ neocomplete#complete_common_string() : "\<C-l>"
+    imap <expr><CR> pumvisible() ? "\<C-e>\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
     let g:neosnippet#enable_snipmate_compatibility = 0
     let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
 
@@ -414,8 +415,8 @@ EnableStatusLine
 
     " clang setup {{{
         let g:clang_auto = 0 " disable auto completion for vim-clang
-        let g:clang_c_completeopt = 'longest,menuone,preview'
-        let g:clang_cpp_completeopt = 'longest,menuone,preview'
+        let g:clang_c_completeopt = 'menuone,preview'
+        let g:clang_cpp_completeopt = 'menuone,preview'
         let g:neocomplete#force_omni_input_patterns.c =
               \ '\h\w*\%(\.\|->\)\w*'
         let g:neocomplete#force_omni_input_patterns.cpp =
@@ -440,6 +441,7 @@ EnableStatusLine
     let g:ale_python_flake8_options = '--max-line-length 99'
     let g:ale_virtualenv_dir_names = []
     let g:ale_warn_about_trailing_whitespace = 1
+    let g:ale_lint_on_enter = 0
     let g:ale_lint_on_text_changed = 'normal'
     let g:ale_java_javac_options = '-Xlint:-serial'
     let g:ale_yaml_yamllint_options = '-d "{rules: {line-length: disable}}"'
