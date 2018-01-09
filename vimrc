@@ -124,8 +124,6 @@ runtime macros/matchit.vim
 "              KEYBINDINGS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-let g:mapleader = "\<Space>" " make leader a more sane keybinding
-let g:maplocalleader = ',' " remap localleader
 " easier : mapping
 noremap ; :
 noremap , ;
@@ -133,20 +131,20 @@ noremap , ;
 nnoremap 0 ^
 nnoremap ^ 0
 " Make moving around splits easier
-nnoremap <silent> <Leader>v :vs\|bn<CR>
-nnoremap <silent> <Leader>s :sp\|bn<CR>
+nnoremap <silent> <Space>v :vs\|bn<CR>
+nnoremap <silent> <Space>s :sp\|bn<CR>
 nnoremap <silent> <TAB> <c-w>w
-" Make <Leader>q clear highlighting from searches
-nnoremap <silent> <Leader>q :noh<return><esc>
+" Make <Space>q clear highlighting from searches
+nnoremap <silent> <Space>q :noh<return><esc>
 " make it easier to use buffers
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
 
-nnoremap <silent> <Leader><Leader> :b#<CR>
+nnoremap <silent> <Space><Space> :b#<CR>
 " more standard 'close buffer' behavior
-nnoremap <silent> <Leader>x :bn\|bd #<CR>
+nnoremap <silent> <Space>x :bn\|bd #<CR>
 " treat wrapped lines as different lines
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
@@ -157,16 +155,16 @@ noremap L $
 noremap H ^
 " Buffer keymappings
 nnoremap gb :ls<CR>:b<space>
-nnoremap <Leader>b :buffer *<C-d>
+nnoremap <Space>b :buffer *<C-d>
 
 " add files to bufferlist
-nnoremap <Leader>a :argadd **/*
+nnoremap <Space>a :argadd **/*
 
 " find file
-nnoremap <Leader>f :find *
+nnoremap <Space>f :find *
 
 " Close other splits easily
-noremap <silent> <Leader>o :only<CR>
+noremap <silent> <Space>o :only<CR>
 " Easier to save
 nnoremap <C-s> :w<CR>
 nnoremap q :q<CR>
@@ -176,17 +174,17 @@ nnoremap Q q
 " Easier to exit insert mode
 inoremap jk <Esc>
 " keybinding to see whitespace
-nnoremap <silent> <Leader>z :set invlist<CR>
+nnoremap <silent> <Space>z :set invlist<CR>
 " easier completion
 inoremap <C-@> <C-x><C-o>
 " toggle conceallevel
-nnoremap <silent> <Leader>h :call functions#ToggleConceal()<CR>
-xnoremap <silent> <Leader>h :call functions#ToggleConceal()<CR>
+nnoremap <silent> <Space>h :call functions#ToggleConceal()<CR>
+xnoremap <silent> <Space>h :call functions#ToggleConceal()<CR>
 " paste and format
-nnoremap <silent> <Leader>p p=']
-nnoremap <silent> <Leader>P P=']
-xnoremap <silent> <Leader>p p=']
-xnoremap <silent> <Leader>P P=']
+nnoremap <silent> <Space>p p=']
+nnoremap <silent> <Space>P P=']
+xnoremap <silent> <Space>p p=']
+xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
@@ -449,7 +447,7 @@ EnableStatusLine
 " }}}
 
 " Easymotion setup {{{
-    map <LocalLeader> <Plug>(easymotion-prefix)
+    map , <Plug>(easymotion-prefix)
     map s <Plug>(easymotion-s2)
     map f <Plug>(easymotion-f)
     map F <Plug>(easymotion-F)
