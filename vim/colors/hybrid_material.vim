@@ -193,8 +193,7 @@ function! s:build_prim(hi_elem, field)
   exe 'let ' . l:vname . ' = " ' . l:gui_assign . ' ' . l:cterm_assign . '"'
 endfunction
 
-" let s:bg_none = ' guibg=NONE ctermbg=NONE'
-let s:bg_none = ' '
+let s:bg_none = ' guibg=NONE ctermbg=NONE'
 call s:build_prim('bg', 'foreground')
 call s:build_prim('bg', 'background')
 call s:build_prim('bg', 'selection')
@@ -304,7 +303,7 @@ exe 'hi! ColorColumn'   .s:fg_none        .s:bg_comment      .s:fmt_none
 "   Cursor"
 exe 'hi! Cursor cterm=reverse'
 "   CursorIM"
-exe 'hi! CursorColumn'  .s:fg_none        .s:bg_none        .s:fmt_none
+exe 'hi! CursorColumn'  .s:fg_comment        .s:bg_comment        .s:fmt_none
 exe 'hi! CursorLine'    .s:fg_none        .s:bg_none        .s:fmt_none
 exe 'hi! Directory'     .s:fg_blue        .s:bg_none        .s:fmt_none
 exe 'hi! DiffAdd'       .s:fg_addfg       .s:bg_addbg       .s:fmt_none
