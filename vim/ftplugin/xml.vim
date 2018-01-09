@@ -13,4 +13,4 @@ compiler ant
 setlocal omnifunc=xmlcomplete#CompleteTags
 setlocal makeprg=mvn\ install\ -e\ -ff\ -T\ 16
 set syntax=xml
-set path=.,,*/src/main/synapse-config/**/
+set path=.,*/src/main/synapse-config/**/
