@@ -31,13 +31,13 @@ syn region xmlJsonRegion
             \ keepend
             \ end=+</format>+
             \ contained
-            \ contains=xmlFormatTag,xmlFormatEndTag,@xmlJson,xmlTag
+            \ contains=xmlFormatTag,xmlFormatEndTag,@xmlJson
 syn region xmlPayloadArgsRegion
             \ start=+\%(<args>\)+
             \ keepend
             \ end=+</args>+
             \ contained
-            \ contains=xmlTag,xmlEndTag
+            \ contains=xmlArgTag,xmlTag,xmlEndTag,xmlRegion
 syn region xmlPayloadRegion
             \ start=+\%(<payloadFactory media-type="json">\)+
             \ keepend
@@ -74,7 +74,8 @@ syn match xmlFormatTag +<format[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,
 syn match xmlFormatEndTag +</format>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 syn match xmlPayloadTag +<payloadFactory[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
 syn match xmlPayloadEndTag +</payloadFactory>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
-syn match xmlPayloadArgsTag +<args/>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
+syn match xmlPayloadArgsTag +<args/>+ contains=xmlTag,xmlTagName,@xmlTagHook
+syn match xmlArgTag +<arg [^/]/>+ contains=@xmlTagHook
 syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
 syn keyword  xmlCdataCdata CDATA          contained
 syn match    xmlCdataEnd   +]]>+          contained
