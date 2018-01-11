@@ -303,8 +303,8 @@ exe 'hi! ColorColumn'   .s:fg_none        .s:bg_comment      .s:fmt_none
 "   Cursor"
 exe 'hi! Cursor cterm=reverse'
 "   CursorIM"
-exe 'hi! CursorColumn'  .s:fg_comment        .s:bg_comment        .s:fmt_none
-exe 'hi! CursorLine'    .s:fg_none        .s:bg_none        .s:fmt_none
+exe 'hi! CursorColumn'  .s:fg_none        .s:bg_comment     .s:fmt_none
+exe 'hi! CursorLine'    .s:fg_none        .s:bg_comment     .s:fmt_none
 exe 'hi! Directory'     .s:fg_blue        .s:bg_none        .s:fmt_none
 exe 'hi! DiffAdd'       .s:fg_addfg       .s:bg_addbg       .s:fmt_none
 exe 'hi! DiffChange'    .s:fg_changefg    .s:bg_changebg    .s:fmt_none
