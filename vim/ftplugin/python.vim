@@ -7,7 +7,6 @@ setlocal omnifunc=jedi#completions
 
 " ipython setup {{{
   let g:ipy_perform_mappings = 0 "make our own mappings
-  function! IPythonKeyBinds()
 
     nmap  <buffer> <silent> <F10>          <Plug>(IPython-RunFile)
     nmap  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
@@ -17,7 +16,5 @@ setlocal omnifunc=jedi#completions
     nmap  <buffer> <silent> <Esc>s         <Plug>(IPython-RunLineAsTopLevel)
     xmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLines)
 
-  endfunction
 " }}}
 
-call IPythonKeyBinds()
