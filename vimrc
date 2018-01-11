@@ -53,7 +53,7 @@ set noswapfile
 set foldlevel=99				" don't fold things by default
 set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
-set completeopt+=menuone,preview,noinsert	" configure popup menu
+set completeopt+=menuone			" configure popup menu
 set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
@@ -85,16 +85,18 @@ endif " }}}
 call plug#begin('~/.vim/bundle')
 
 " Plug 'w0rp/ale'
-Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-Plug 'luochen1990/rainbow'
-Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'easymotion/vim-easymotion'
 Plug 'airblade/vim-gitgutter'
-Plug 'Shougo/neosnippet'
-Plug 'Shougo/neosnippet-snippets'
+Plug 'luochen1990/rainbow'
+Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
+Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
+Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
+Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
+Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
+Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 Plug 'Shougo/neco-vim', { 'for': 'vim' }
 Plug 'shougo/neocomplete.vim'
-Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
+Plug 'SirVer/ultisnips'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'romainl/vim-qf'
 Plug 'godlygeek/tabular'
@@ -102,15 +104,11 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'Konfekt/FastFold'
 Plug 'justinmk/vim-dirvish'
 Plug 'tpope/vim-obsession'
-" Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-unimpaired'
-Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
-Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
-Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
 Plug 'xtal8/traces.vim'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
@@ -365,20 +363,63 @@ EnableStatusLine
 
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#enable_auto_select = 1
+    let g:neocomplete#enable_auto_select = 0
     let g:neocomplete#enable_refresh_always = 1
     let g:neocomplete#auto_complete_delay = 0
     let g:neocomplete#enable_auto_delimiter = 1
-    imap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-                \ "\<Plug>(neosnippet_expand_or_jump)"
-                \: pumvisible() ? "\<C-y>" : "\<TAB>"
-    smap <expr><TAB> neosnippet#expandable_or_jumpable() ?
-                \ "\<Plug>(neosnippet_expand_or_jump)"
-                \: "\<TAB>"
-    imap <expr><CR> pumvisible() ? "\<C-e>\<CR>" : "\<CR>\<Plug>AutoPairsReturn"
-    let g:neosnippet#enable_snipmate_compatibility = 0
-    let g:neosnippet#snippets_directory = '~/.vim/after/snippets'
+    let g:UltiSnipsJumpForwardTrigger='<NOP>'
+    let g:UltiSnipsExpandTrigger='<NOP>'
+    let g:ulti_expand_or_jump_res = 0
+    let g:ulti_jump_forwards_res = 0
+    call neocomplete#custom#source('ultisnips', 'rank', 1000)
+    function! TabMapping() abort
+        if neocomplete#complete_common_string() !=? ''
+            return neocomplete#complete_common_string()
+        elseif pumvisible()
+            return "\<C-n>"
+        else
+            let l:snippet = UltiSnips#ExpandSnippetOrJump()
+            if g:ulti_expand_or_jump_res > 0
+                return l:snippet
+            else
+                return "\<TAB>"
+            endif
+        endif
+    endfunction
+    function! ReverseTabMapping() abort
+        if pumvisible()
+            return "\<C-p>"
+        else
+            let l:snippet = UltiSnips#JumpBackwards()
+            if g:ulti_jump_backwards_res > 0
+                return l:snippet
+            else
+                return "\<TAB>"
+            endif
+        endif
+    endfunction
+    function! EnterMapping() abort
+        let l:snippet = UltiSnips#ExpandSnippetOrJump()
+        if g:ulti_expand_or_jump_res > 0
+            return l:snippet
+        elseif pumvisible()
+            return "\<ESC>o"
+        else
+            return "\<CR>\<Plug>AutoPairsReturn"
+        endif
+    endfunction
+    function! EnterMapTest() abort
+        call UltiSnips#ExpandSnippetOrJump()
+        return g:ulti_expand_or_jump_res
+    endfunction
 
+    inoremap <expr><TAB> "<C-R>=TabMapping()<CR>"
+    inoremap <expr><S-TAB> "<C-R>=ReverseTabMapping()<CR>"
+    xnoremap <expr><TAB> ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
+    snoremap <expr><TAB> "<ESC>:call UltiSnips#JumpForwards()<cr>"
+    snoremap <expr><S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<cr>"
+    imap <silent> <CR> <C-R>=((EnterMapTest() > 0) ? "" : pumvisible() ? "\eo" : "\r")<CR><Plug>AutoPairsReturn
+    
     if !exists('g:neocomplete#keyword_patterns')
         let g:neocomplete#keyword_patterns = {}
     endif

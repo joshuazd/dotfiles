@@ -1,0 +1,184 @@
+snippet xml "XML declaration" b
+<?xml version="1.0"?>
+
+endsnippet
+
+snippet < "tag" b
+<${1:tag}>
+	${2:content}
+</${1/([\w:._-]+).*/$1/}>
+endsnippet
+
+snippet     api "api" b
+<api xmlns="http://ws.apache.org/ns/synapse" name="${1:api_name}" context="/${2:context}">
+	${0}
+</api>
+endsnippet
+
+snippet     ct "call-template" b
+<call-template target="${1:Logger Name}">
+	<with-param name="message" value="${2:Log Message}"/>
+</call-template>${0}
+endsnippet
+
+snippet     dbl "dblookup" b
+<dblookup>
+	<connection>
+		<pool>
+			<dsName>jdbc/${1:db name}</dsName>
+		</pool>
+	</connection>
+	<statement>
+		<sql>${2:SQL Statement}</sql>
+		<parameter expression="${3:param expression}" type="${4:STRING}"/>
+		<result name="${5:result}" column="${6:column}"/>
+	</statement>
+</dblookup>${0}
+endsnippet
+
+snippet     ep "endpoint" b
+<endpoint xmlns="http://ws.apache.org/ns/synapse" name="conf/${1}">
+	<http method="${2:get}" uri-template="${3}"/>
+</endpoint>${0}
+endsnippet
+
+snippet     epa "anonymous endpoint" b
+<endpoint>
+	<http method="${2:get}" uri-template="${3}"/>
+</endpoint>${0}
+endsnippet
+
+snippet     epk "endpoint with key" b
+<endpoint key="conf:/${1}.xml"/>${0}
+endsnippet
+
+snippet     enr "enrich" b
+<enrich>
+	<source type="${1:source type}" ${3}/>
+	<target type="${2:target type}" ${4}/>
+</enrich>${0}
+endsnippet
+
+snippet     fault "makefault" b
+<makefault version="pox">
+	<reason value="${1:reason}" />
+	<detail ${2:expression="${3:detail}"} />
+</makefault>${0}
+endsnippet
+
+snippet     fil "filter" b
+<filter ${1:xpath="${2:xpath expression}"}>
+	<then>
+		${0}
+	</then>
+</filter>
+endsnippet
+
+snippet     else "filter else" b
+<else>
+	${0}
+</else>
+endsnippet
+
+snippet     header "header" b
+<header name="${1:name}" scope="transport" value="${2:value}" />${0}
+endsnippet
+
+snippet     logg "logging template" b
+<template xmlns="http://ws.apache.org/ns/synapse" name="${1:Logger Name}">
+	<parameter name="message"/>
+	<sequence>
+		<filter xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" xpath="fn:boolean(\$ctx:messageId)">
+			<then/>
+			<else>
+				<filter xmlns:pan="http://panera.wso2.esb" xpath="\$trp:messageId">
+					<then>
+						<property name="messageId" expression="get-property('transport', 'messageId')" scope="default" type="STRING"/>
+					</then>
+					<else>
+						<property name="messageId" expression="get-property('MessageID')" scope="default" type="STRING"/>
+						<header name="messageId" scope="transport" expression="get-property('messageId')"/>
+					</else>
+				</filter>
+			</else>
+		</filter>
+		<log level="custom">
+			<property xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" name="message" expression="\$func:message"/>
+			<property name="serviceName" value="${2:Service Name}"/>
+			<property xmlns:ns2="http://org.apache.synapse/xsd" xmlns:ns="http://org.apache.synapse/xsd" name="messageId" expression="get-property('messageId')"/>
+		</log>
+	</sequence>
+</template>
+endsnippet
+
+snippet     nilel "nilElement" b
+<xsl:template name="nilElement">
+	<xsl:param name="value" />
+	<xsl:choose>
+		<xsl:when test="string(\$value)">
+			<xsl:value-of select="\$value" />
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:attribute name="xsi:nil" namespace="http://www.w3.org/2001/XMLSchema-instance">true</xsl:attribute>
+		</xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+endsnippet
+
+snippet     pay "payloadFactory" b
+<payloadFactory media-type="${1:xml}">
+	<format>
+		${2:<Success xmlns="">Thank you. Your file has been submitted.</Success>}
+	</format>
+	<args/>
+</payloadFactory>${0}
+endsnippet
+
+snippet     prop "property" bA
+<property name="${1:name}" ${2:value="${3:value}"}${4: scope="${5:default}"}/>${0}
+endsnippet
+
+snippet     valof "value-of" b
+<xsl:value-of select="${1}" />${0}
+endsnippet
+
+snippet     xct "xsl call-template" b
+<xsl:call-template name="nilElement">
+	<xsl:with-param name="value" select="${1}"/>
+</xsl:call-template>${0}
+endsnippet
+
+snippet     xslt "xslt" b
+<xslt key="${1:XSLT Name}">
+	${2:<property name="BATCH_ID" expression="get-property('MessageID')"/>}
+</xslt>${0}
+endsnippet
+
+snippet     xsl "xslt file" b
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns0="http://ws.wso2.org/dataservice" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" exclude-result-prefixes="xsi xsl xsd ns0">
+	${1:<xsl:param name="BATCH_ID" />}
+	<xsl:template match="/">
+		${2}
+	</xsl:template>
+</xsl:stylesheet>
+endsnippet
+
+snippet     dm "datamapper" b
+<datamapper config="gov:/${1}.dmc" inputSchema="gov:/${2}.json" inputType="${3:JSON}" outputSchema="gov:/${4}.json" outputType="${5:JSON}"/>${0}
+endsnippet
+
+snippet     class "class mediator" b
+<class name="${1:com.panera.mediators.BABuilder}">
+	<property name="lookupKey" value="${2}"/>
+</class>${0}
+endsnippet
+
+snippet     resource "resource" b
+<resource methods="${1}" faultSequence="${2:CustomErrorSequence}" url-mapping="${3}">
+	${0}
+</resource>
+endsnippet
+
+snippet     seq "sequence" b
+<sequence key="${1}"/>${0}
+endsnippet
