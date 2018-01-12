@@ -84,35 +84,41 @@ endif " }}}
 " Plugins {{{
 call plug#begin('~/.vim/bundle')
 
-" Plug 'w0rp/ale'
-Plug 'easymotion/vim-easymotion'
-Plug 'airblade/vim-gitgutter'
-Plug 'luochen1990/rainbow'
+" tools
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
+Plug 'Konfekt/FastFold'
+Plug 'godlygeek/tabular'
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+if executable('ctags')
+  Plug 'ludovicchabant/vim-gutentags'
+endif
+" completion and snippets
+Plug 'shougo/neocomplete.vim'
+Plug 'SirVer/ultisnips'
+" mappings
+Plug 'easymotion/vim-easymotion'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'jiangmiao/auto-pairs'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-commentary'
+" improve vim builtins
+Plug 'romainl/vim-qf'
+Plug 'justinmk/vim-dirvish'
+Plug 'tpope/vim-obsession'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-dispatch'
+Plug 'xtal8/traces.vim'
+" colors
+Plug 'luochen1990/rainbow'
+" language specific plugins
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
 Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
 Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 Plug 'Shougo/neco-vim', { 'for': 'vim' }
-Plug 'shougo/neocomplete.vim'
-Plug 'SirVer/ultisnips'
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'romainl/vim-qf'
-Plug 'godlygeek/tabular'
-Plug 'jiangmiao/auto-pairs'
-Plug 'Konfekt/FastFold'
-Plug 'justinmk/vim-dirvish'
-Plug 'tpope/vim-obsession'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-fugitive'
-Plug 'tpope/vim-unimpaired'
-Plug 'xtal8/traces.vim'
-if executable('ctags')
-  Plug 'ludovicchabant/vim-gutentags'
-endif
 
 call plug#end()
 runtime macros/matchit.vim
