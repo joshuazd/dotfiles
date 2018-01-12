@@ -208,15 +208,15 @@ nmap <silent> <Space>hp <Plug>GitGutterPreviewHunk
 " {{{
 augroup EditVim
     autocmd!
-    autocmd InsertLeave * if pumvisible() == 0|pclose|endif " Close preview window when leaving insert mode
-    autocmd BufNewFile,BufRead *.zsh-theme set filetype=zsh
-    autocmd BufNewFile,BufRead *.dbs set filetype=xml
-    autocmd BufNewFile,BufRead *.dmc set filetype=javascript
-    autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+    autocmd InsertLeave        *                    if pumvisible() == 0|pclose|endif
+    autocmd BufNewFile,BufRead *.zsh-theme          set filetype=zsh
+    autocmd BufNewFile,BufRead *.dbs                set filetype=xml
+    autocmd BufNewFile,BufRead *.dmc                set filetype=javascript
+    autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
     autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
-    au FileType * set formatoptions-=o		" Don't insert comment when using 'o'
-    autocmd InsertEnter * call InsertToggle('enter')
-    autocmd InsertLeave * call InsertToggle('leave')
+    autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
+    autocmd InsertEnter        *                    call InsertToggle('enter')
+    autocmd InsertLeave        *                    call InsertToggle('leave')
 augroup END
 
 function! InsertToggle(toggle) abort
@@ -449,23 +449,9 @@ EnableStatusLine
     let g:ansible_extra_keywords_highlight = 1
 " }}}
 
-" ALE setup {{{
-    " nmap <silent> ]c <Plug>(ale_next_wrap)
-    " nmap <silent> [c <Plug>(ale_previous_wrap)
-    let g:ale_python_flake8_options = '--max-line-length 99'
-    let g:ale_virtualenv_dir_names = []
-    let g:ale_warn_about_trailing_whitespace = 1
-    let g:ale_lint_on_enter = 0
-    let g:ale_lint_on_text_changed = 'normal'
-    let g:ale_java_javac_options = '-Xlint:-serial'
-    let g:ale_yaml_yamllint_options = '-d "{rules: {line-length: disable}}"'
-
-    let g:ale_fixers = {
-                \   'python': [
-                \       'autopep8',
-                \       'yapf'
-                \   ]
-                \}
+" netrw setup {{{
+  let g:loaded_netrw       = 1
+  let g:loaded_netrwPlugin = 1
 " }}}
 
 " Easymotion setup {{{
