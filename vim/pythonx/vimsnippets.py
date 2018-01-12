@@ -1,6 +1,8 @@
 """Helper methods used in UltiSnips snippets."""
 
-import string, vim
+import string
+import vim
+
 
 def complete(tab, opts):
     """
@@ -20,6 +22,7 @@ def complete(tab, opts):
     if not len(opts):
         msg = "{0}"
     return msg.format("|".join(opts))
+
 
 def _parse_comments(s):
     """ Parses vim's comments option to extract comment format """
@@ -58,6 +61,7 @@ def _parse_comments(s):
     except StopIteration:
         return rv
 
+
 def get_comment_format():
     """ Returns a 4-element tuple (first_line, middle_lines, end_line, indent)
     representing the comment format for the current file.
@@ -86,6 +90,7 @@ def make_box(twidth, bwidth=None):
     mlinee = " " + " "*(bwidth_inner - twidth - nspaces) + m
     eline = i + m + bwidth_inner * m[0] + 2 * m[0] + e
     return sline, mlines, mlinee, eline
+
 
 def foldmarker():
     "Return a tuple of (open fold marker, close fold marker)"
