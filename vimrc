@@ -182,8 +182,8 @@ nnoremap <silent> <Space>z :set invlist<CR>
 " easier completion
 inoremap <C-@> <C-x><C-o>
 " toggle conceallevel
-nnoremap <silent> <Space>h :call functions#ToggleConceal()<CR>
-xnoremap <silent> <Space>h :call functions#ToggleConceal()<CR>
+nnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
+xnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
 " paste and format
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
@@ -196,6 +196,10 @@ noremap <silent> <F5> :call functions#VimRefresh()<CR>
 nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
 
 cnoremap <expr> <CR> functions#CCR()
+
+nmap <silent> <Space>hs <Plug>GitGutterStageHunk
+nmap <silent> <Space>hu <Plug>GitGutterUndoHunk
+nmap <silent> <Space>hp <Plug>GitGutterPreviewHunk
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -218,10 +222,8 @@ augroup END
 function! InsertToggle(toggle) abort
   if a:toggle ==# 'enter'
     GitGutterDisable
-    " ALEDisableBuffer
   else
     GitGutterEnable
-    " ALEEnableBuffer
   endif
 endfunction
 
