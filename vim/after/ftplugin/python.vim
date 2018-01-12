@@ -1,5 +1,10 @@
 setlocal foldmethod=indent
 setlocal omnifunc=jedi#completions
+command! Pythonlint cexpr system('flake8 --max-line-length=100 ' . shellescape(expand('%')))
+augroup PYTHON
+    autocmd!
+    autocmd BufWritePost *.py silent Pythonlint
+augroup END
 
 " Jedi setup {{{
     let g:jedi#show_call_signatures = 2
