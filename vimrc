@@ -46,7 +46,9 @@ set wildmenu					" Turn on the wild menu
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/*,tags	" Ignore compiled files
 set wildignorecase				" ignore case in wildmenu
-set sessionoptions-=options,folds,blank		" make sessions work better with plugins
+set sessionoptions-=options			" make sessions work better with plugins
+set sessionoptions-=folds
+set sessionoptions-=blank
 let g:is_posix = 1
 set backupdir=/tmp				" Better backups
 set noswapfile
@@ -87,7 +89,7 @@ call plug#begin('~/.vim/bundle')
 " tools
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'Konfekt/FastFold'
-Plug 'godlygeek/tabular'
+Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 if executable('ctags')
