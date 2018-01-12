@@ -242,31 +242,18 @@ command! FormatJSON %!python -c
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 let g:modemap = {
-      \ 'n' : ['N', 'NormalMode'],
-      \ 'no': ['NO', 'NormalMode'],
-      \ 'v' : ['V', 'VisualMode'],
-      \ 'V' : ['V', 'VisualMode'],
-      \ '': ['V', 'VisualMode'],
-      \ 's' : ['S', 'VisualMode'],
-      \ 'S' : ['S', 'VisualMode'],
-      \ '': ['S', 'VisualMode'],
-      \ 'i' : ['I', 'InsertMode'],
-      \ 'ic': ['COMPLETE', 'InsertMode'],
-      \ 'ix': ['X', 'InsertMode'],
-      \ 'R' : ['R', 'ReplaceMode'],
-      \ 'Rv': ['R', 'ReplaceMode'],
-      \ 'c' : ['C', 'CommandMode'],
-      \ 'cv': ['VIMEX', 'CommandMode'],
-      \ 'ce': ['EX', 'CommandMode'],
-      \ 'r' : ['PROMPT', 'CommandMode'],
-      \ 'rm': ['MORE', 'CommandMode'],
-      \ 'r?': ['CONFIRM', 'CommandMode'],
-      \ '!' : ['SHELL', 'CommandMode'],
-      \ 't' : ['TERM', 'CommandMode']}
+      \ 'n' : ['N', 'NormalMode'],        'no': ['NO', 'NormalMode'],  'v' : ['V', 'VisualMode'],
+      \ 'V' : ['V', 'VisualMode'],        '': ['V', 'VisualMode'],   's' : ['S', 'VisualMode'],
+      \ 'S' : ['S', 'VisualMode'],        '': ['S', 'VisualMode'],   'i' : ['I', 'InsertMode'],
+      \ 'ic': ['COMPL', 'InsertMode'],    'ix': ['X', 'InsertMode'],   'R' : ['R', 'ReplaceMode'],
+      \ 'Rv': ['R', 'ReplaceMode'],       'c' : ['C', 'CommandMode'],  'cv': ['VIMEX', 'CommandMode'],
+      \ 'ce': ['EX', 'CommandMode'],      'r' : ['P', 'CommandMode'],  'rm': ['MORE', 'CommandMode'],
+      \ 'r?': ['CONFIRM', 'CommandMode'], '!' : ['SH', 'CommandMode'], 't' : ['TERM', 'CommandMode']}
 function! GetModeIndicator() abort
-  if &filetype ==# 'help'      | return ['Help']
-  elseif &filetype ==# 'netrw' | return ['netrw']
-  else                         | return g:modemap[mode()]
+  if &filetype ==# 'help'        | return ['Help']
+  elseif &filetype ==# 'netrw'   | return ['netrw']
+  elseif &filetype ==# 'dirvish' | return ['dirvish']
+  else                           | return g:modemap[mode()]
   endif
 endfunction
 let g:mode_hi = {
@@ -298,17 +285,6 @@ function! GitStatusLine() abort
   let l:gitline .= (l:gitline !=# '' ? ' ' : '')
   return l:gitline
 endfunction
-function! LinterStatus() abort
-  return ''
-  let l:counts = ale#statusline#Count(bufnr(''))
-  let l:all_errors = l:counts.error + l:counts.style_error
-  let l:all_non_errors = l:counts.total - l:all_errors
-  return l:counts.total == 0 ? '' : printf(
-        \ '  %dW %dE ',
-        \ l:all_non_errors,
-        \ l:all_errors
-        \)
-endfunction
 fun! s:updateStatusLineHighlight(nr,newMode)
   execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold'
   execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none'
@@ -332,15 +308,12 @@ function! BuildStatusLine(nr) abort
         \%#MainStl# %t%m
         \%#ReadOnlyStl# %{&readonly ? "RO" : ""}%#MainStl#
         \%=
-        \%{ObsessionStatus("$ ")}%{w:["lf_active"] ? gutentags#statusline() != "" ? gutentags#statusline() : "" : ""}
-        \ %#StlGit#%{&syntax == "" ? "" : " ".&syntax." "}
-        \%#ModeNoBold#%{w:["lf_active"] ? "  ".line(".").":".virtcol(".")." " : ""}
-        \%#InactiveStl#%{w:["lf_active"] ? "" : "  ".line(".").":".virtcol(".")." "}
-        \%#StlLinter#%{w:["lf_active"] ? LinterStatus() : ""}%#MainStl#'
+        \%{ObsessionStatus("$")}%{w:["lf_active"] ? gutentags#statusline() != "" ? " ".gutentags#statusline()." " : " " : " "}
+        \%#StlGit#%{&syntax == "" ? "" : " ".&syntax." "}
+        \%#ModeNoBold#%{w:["lf_active"] ? " ".line(".").":".virtcol(".")." " : ""}
+        \%#InactiveStl#%{w:["lf_active"] ? "" : " ".line(".").":".virtcol(".")." "}%#MainStl#'
 endfunction
 function! s:enableStatusLine() abort
-  " if exists("g:default_stl") | return | endif
-  " let g:default_stl = &statusline
   set statusline=%!BuildStatusLine(winnr())
 endfunction
 command! -nargs=0 EnableStatusLine call <SID>enableStatusLine()
