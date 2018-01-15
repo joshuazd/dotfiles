@@ -173,10 +173,11 @@ nnoremap <Space>f :find *
 noremap <silent> <Space>o :only<CR>
 " Easier to save
 nnoremap <C-s> :w<CR>
-nnoremap q :q<CR>
+" nnoremap q :q<CR>
+nnoremap <C-q> :q<CR>
 inoremap <C-s> <Esc>:w<CR>i
 " access to macros
-nnoremap Q q
+" nnoremap Q q
 " Easier to exit insert mode
 inoremap jk <Esc>
 " keybinding to see whitespace
