@@ -15,7 +15,7 @@ set smartcase					" When searching try to be smart about cases
 set hlsearch					" Highlight search results
 set incsearch					" Makes search act like search in modern browsers
 set wrapscan					" Search commands wrap around end of buffer
-set lazyredraw					" Don't redraw while executing macros (good performance config)
+set lazyredraw					" Don't redraw while executing macros
 set magic					" For regular expressions turn magic on
 set showmatch					" Show matching brackets when text indicator is over them
 set matchtime=2					" How many tenths of a second to blink when matching brackets
@@ -49,7 +49,7 @@ set wildignorecase				" ignore case in wildmenu
 set sessionoptions-=options			" make sessions work better with plugins
 set sessionoptions-=folds
 set sessionoptions-=blank
-let g:is_posix = 1
+let g:is_posix = 1				" make vim recognize posix compatible shells
 set backupdir=/tmp				" Better backups
 set noswapfile
 set foldlevel=99				" don't fold things by default
@@ -117,7 +117,6 @@ Plug 'luochen1990/rainbow'
 " language specific plugins
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
-Plug 'artur-shaik/vim-javacomplete2', { 'for': 'java' }
 Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 Plug 'Shougo/neco-vim', { 'for': 'vim' }
@@ -245,13 +244,13 @@ command! FormatJSON %!python -c
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 let g:modemap = {
-      \ 'n' : ['N', 'NormalMode'],        'no': ['NO', 'NormalMode'],  'v' : ['V', 'VisualMode'],
-      \ 'V' : ['V', 'VisualMode'],        '': ['V', 'VisualMode'],   's' : ['S', 'VisualMode'],
-      \ 'S' : ['S', 'VisualMode'],        '': ['S', 'VisualMode'],   'i' : ['I', 'InsertMode'],
-      \ 'ic': ['COMPL', 'InsertMode'],    'ix': ['X', 'InsertMode'],   'R' : ['R', 'ReplaceMode'],
-      \ 'Rv': ['R', 'ReplaceMode'],       'c' : ['C', 'CommandMode'],  'cv': ['VIMEX', 'CommandMode'],
-      \ 'ce': ['EX', 'CommandMode'],      'r' : ['P', 'CommandMode'],  'rm': ['MORE', 'CommandMode'],
-      \ 'r?': ['CONFIRM', 'CommandMode'], '!' : ['SH', 'CommandMode'], 't' : ['TERM', 'CommandMode']}
+      \ 'n' : ['N',       'NormalMode'],  'no': ['NO', 'NormalMode'],  'v' : ['V',     'VisualMode'],
+      \ 'V' : ['V',       'VisualMode'],  '': ['V',  'VisualMode'],  's' : ['S',     'VisualMode'],
+      \ 'S' : ['S',       'VisualMode'],  '': ['S',  'VisualMode'],  'i' : ['I',     'InsertMode'],
+      \ 'ic': ['COMPL',   'InsertMode'],  'ix': ['X',  'InsertMode'],  'R' : ['R',     'ReplaceMode'],
+      \ 'Rv': ['R',       'ReplaceMode'], 'c' : ['C',  'CommandMode'], 'cv': ['VIMEX', 'CommandMode'],
+      \ 'ce': ['EX',      'CommandMode'], 'r' : ['P',  'CommandMode'], 'rm': ['MORE',  'CommandMode'],
+      \ 'r?': ['CONFIRM', 'CommandMode'], '!' : ['SH', 'CommandMode'], 't' : ['TERM',  'CommandMode']}
 function! GetModeIndicator() abort
   if &filetype ==# 'help'        | return ['Help']
   elseif &filetype ==# 'netrw'   | return ['netrw']
@@ -271,7 +270,7 @@ highlight ReadOnlyStl ctermbg=236 ctermfg=1   cterm=none
 highlight InactiveStl ctermbg=242 ctermfg=235 cterm=none
 highlight StatusLine  ctermbg=236 ctermfg=7   cterm=none
 highlight StlLinter   ctermbg=1   ctermfg=0   cterm=none
-function! GitHunks()
+function! GitHunks() abort
   let l:githunks = GitGutterGetHunkSummary()
   let l:returnval = ' '
   let l:returnval .= (l:githunks[0] != 0 ? ' ' . l:githunks[0] . '+' : '')
@@ -288,7 +287,7 @@ function! GitStatusLine() abort
   let l:gitline .= (l:gitline !=# '' ? ' ' : '')
   return l:gitline
 endfunction
-fun! s:updateStatusLineHighlight(nr,newMode)
+function! s:updateStatusLineHighlight(nr,newMode) abort
   execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold'
   execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none'
   return 1
@@ -327,27 +326,16 @@ EnableStatusLine
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{ filetype specific plugin settings are in ftplugin folders
-" gutentags setup {{{
-  let g:gutentags_exclude_project_root = [
-        \'/home/shepard/ansible/ansible-checkout',
-        \'/home/shepard/ansible/environments',
-        \'/home/shepard/ansible/playbooks-mw']
-" }}}
-
 " gitgutter setup {{{
-  let g:gitgutter_sign_added = '•'
-  let g:gitgutter_sign_modified = '•'
-  let g:gitgutter_sign_removed = '•'
-  let g:gitgutter_sign_modified_removed = '•'
+  let g:gitgutter_sign_modified_removed = '±'
   nmap [h <Plug>GitGutterPrevHunk
   nmap ]h <Plug>GitGutterNextHunk
 " }}}
 
-" neocomplete setup {{{
+" neocomplete/ultisnips setup {{{
 
     let g:neocomplete#enable_at_startup = 1
     let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#enable_auto_select = 0
     let g:neocomplete#enable_refresh_always = 1
     let g:neocomplete#auto_complete_delay = 0
     let g:neocomplete#enable_auto_delimiter = 1
@@ -355,54 +343,15 @@ EnableStatusLine
     let g:UltiSnipsExpandTrigger='<NOP>'
     let g:ulti_expand_or_jump_res = 0
     let g:ulti_jump_forwards_res = 0
+    let g:ulti_jump_backwards_res = 0
     call neocomplete#custom#source('ultisnips', 'rank', 1000)
-    function! TabMapping() abort
-        if neocomplete#complete_common_string() !=? ''
-            return neocomplete#complete_common_string()
-        elseif pumvisible()
-            return "\<C-n>"
-        else
-            let l:snippet = UltiSnips#ExpandSnippetOrJump()
-            if g:ulti_expand_or_jump_res > 0
-                return l:snippet
-            else
-                return "\<TAB>"
-            endif
-        endif
-    endfunction
-    function! ReverseTabMapping() abort
-        if pumvisible()
-            return "\<C-p>"
-        else
-            let l:snippet = UltiSnips#JumpBackwards()
-            if g:ulti_jump_backwards_res > 0
-                return l:snippet
-            else
-                return "\<TAB>"
-            endif
-        endif
-    endfunction
-    function! EnterMapping() abort
-        let l:snippet = UltiSnips#ExpandSnippetOrJump()
-        if g:ulti_expand_or_jump_res > 0
-            return l:snippet
-        elseif pumvisible()
-            return "\<ESC>o"
-        else
-            return "\<CR>\<Plug>AutoPairsReturn"
-        endif
-    endfunction
-    function! EnterMapTest() abort
-        call UltiSnips#ExpandSnippetOrJump()
-        return g:ulti_expand_or_jump_res
-    endfunction
 
-    inoremap <expr><TAB> "<C-R>=TabMapping()<CR>"
-    inoremap <expr><S-TAB> "<C-R>=ReverseTabMapping()<CR>"
-    xnoremap <expr><TAB> ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
-    snoremap <expr><TAB> "<ESC>:call UltiSnips#JumpForwards()<cr>"
-    snoremap <expr><S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<cr>"
-    imap <silent> <CR> <C-R>=((EnterMapTest() > 0) ? "" : pumvisible() ? "\eo" : "\r")<CR><Plug>AutoPairsReturn
+    inoremap <silent> <expr><TAB> "<C-R>=functions#TabMapping()<CR>"
+    inoremap <silent> <expr><S-TAB> "<C-R>=functions#ReverseTabMapping()<CR>"
+    xnoremap <silent> <expr><TAB> ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
+    snoremap <silent> <expr><TAB> "<ESC>:call UltiSnips#JumpForwards()<cr>"
+    snoremap <silent> <expr><S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<cr>"
+    imap <silent> <CR> <C-R>=((functions#EnterMapping() > 0) ? "" : pumvisible() ? "\eo" : "\r")<CR><Plug>AutoPairsReturn
     
     if !exists('g:neocomplete#keyword_patterns')
         let g:neocomplete#keyword_patterns = {}
@@ -446,12 +395,6 @@ EnableStatusLine
     " }}}
 " }}}
 
-" Ansible setup {{{
-    let g:ansible_unindent_after_newline = 1
-    let g:ansible_attribute_highlight = 'a'
-    let g:ansible_extra_keywords_highlight = 1
-" }}}
-
 " netrw setup {{{
   let g:loaded_netrw       = 1
   let g:loaded_netrwPlugin = 1
@@ -483,13 +426,12 @@ EnableStatusLine
   let g:rainbow_conf = {
               \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
               \ 'separately': {
-              \   'xml': 0,
-              \   'vim': 0,
-              \   'python': 0,
-              \   'sh': 0,
-              \   'c': 0,
-              \   'javascript': 0,
-              \   'json': 0
+              \  'xml':         0,
+              \  'python':      0,
+              \  'sh':          0,
+              \  'c':           0,
+              \  'javascript':  0,
+              \  'json':        0
               \  }
               \}
 " }}}
