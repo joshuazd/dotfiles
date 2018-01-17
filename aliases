@@ -16,10 +16,9 @@ alias j=jobs
 alias python='python3'
 alias pip='pip3'
 alias search='find . -type f -name'
-alias vi='custom_vim'
 
 alias mcar='cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
-alias build='mvnc clean install; mcar'
+alias build='mvnc install -T 2.0C; mcar'
 
 if [[ $(uname -s) == CYGWIN* ]]; then
     alias home='cd /c/Users/jzinkduda'
