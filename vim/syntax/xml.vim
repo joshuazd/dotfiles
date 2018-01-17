@@ -146,7 +146,6 @@ if exists('g:xml_syntax_folding')
         \ matchgroup=xmlTagPunct end=+>+
         \ contained
         \ contains=xmlError,xmlXpathRegion,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,@xmlStartTagHook
-        \ concealends
 
 
     " highlight the end tag
@@ -166,7 +165,6 @@ if exists('g:xml_syntax_folding')
         \ matchgroup=xmlTagPunct end=+>+
 	\ contained
 	\ contains=xmlNamespace,xmlAttribPunct,@xmlTagHook
-        \ concealends
 
 
     " tag elements with syntax-folding.
@@ -192,7 +190,6 @@ if exists('g:xml_syntax_folding')
         \ contains=xmlGroovyRegion,xmlPayloadRegion,xmlSqlRegion,xmlJavaScriptRegion,xmlTag,xmlEndTag,xmlCdata,xmlRegion,xmlComment,xmlOperator,xmlEntity,xmlProcessing,@xmlRegionHook,@Spell
         \ keepend
         \ extend
-        \ concealends
 
 else
 
@@ -204,13 +201,11 @@ else
         \ matchgroup=xmlTagPunct start=+<[^ /!?<>"']\@=+
         \ matchgroup=xmlTagPunct end=+/\=>+
         \ contains=xmlError,xmlTagName,xmlAttrib,xmlEqual,xmlString,@xmlTagHook
-        \ concealends
 
     syn region   xmlEndTag
         \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
         \ matchgroup=xmlTagPunct end=+>+
         \ contains=xmlError,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
-        \ concealends
 
 endif
 
