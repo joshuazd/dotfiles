@@ -1,9 +1,9 @@
 setlocal shiftwidth=2
 setlocal tabstop=2
 setlocal softtabstop=2
-" setlocal noexpandtab
 setlocal foldmethod=syntax
 setlocal smarttab
+setlocal conceallevel=0
 set foldnestmax=2
 let g:xml_syntax_folding=1 " enable xml folding
 inoremap <buffer> </ </<C-x><C-o><C-y>
