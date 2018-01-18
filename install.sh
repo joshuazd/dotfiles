@@ -1,10 +1,12 @@
 #!/bin/zsh
 # install oh my zsh
-echo "Installing oh my zsh"
 if [ -f /bin/zsh -o -f /usr/bin/zsh -o -f /bin/zsh.exe -o -f /usr/bin/zsh.exe ]; then
+    echo "Installing oh my zsh"
     if [[ ! -d $HOME/.oh-my-zsh/ ]]; then
         sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
     fi
+elif
+    echo "Could not find zsh"
 fi
 
 if [ -d $HOME/.vim ]; then
