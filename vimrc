@@ -19,7 +19,6 @@ set lazyredraw					" Don't redraw while executing macros
 set magic					" For regular expressions turn magic on
 set showmatch					" Show matching brackets when text indicator is over them
 set matchtime=2					" How many tenths of a second to blink when matching brackets
-set vb t_vb=					" No annoying sound on errors
 set timeoutlen=500				" shorter timeout
 set splitbelow					" Make splits behave better
 set splitright
@@ -53,7 +52,7 @@ let g:is_posix = 1				" make vim recognize posix compatible shells
 set backupdir=/tmp				" Better backups
 set noswapfile
 set foldlevel=99				" don't fold things by default
-set listchars=tab:>-,trail:~,extends:>,space:.,eol:$ " what to show for whitespace chars
+set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:$,nbsp:␣ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
 set completeopt+=menuone			" configure popup menu
 set concealcursor+=n				" conceal characters in normal mode
@@ -85,34 +84,29 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""
 " Plugins {{{
 call plug#begin('~/.vim/bundle')
-" tools
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'Konfekt/FastFold'
 Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
-if executable('ctags')
-  Plug 'ludovicchabant/vim-gutentags'
-endif
-" completion and snippets
 Plug 'shougo/neocomplete.vim'
 Plug 'SirVer/ultisnips'
-" mappings
 Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
-" improve vim builtins
 Plug 'romainl/vim-qf'
 Plug 'justinmk/vim-dirvish'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-dispatch'
 Plug 'xtal8/traces.vim'
-" colors
 Plug 'luochen1990/rainbow'
+if executable('ctags')
+  Plug 'ludovicchabant/vim-gutentags'
+endif
 " language specific plugins
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
@@ -127,44 +121,43 @@ runtime macros/matchit.vim
 "              KEYBINDINGS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-noremap ; :
-noremap , ;
-
+nnoremap ; :
+nnoremap , ;
 nnoremap 0 ^
 nnoremap ^ 0
+nnoremap L $
+nnoremap H ^
+
+nnoremap Y y$
 
 nnoremap <silent> <Space>v :vs\|bn<CR>
 nnoremap <silent> <Space>s :sp\|bn<CR>
 nnoremap <silent> <TAB> <c-w>w
-nnoremap <silent> <Space>q :noh<return><esc>
 
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
-
 nnoremap <silent> <Space><Space> :b#<CR>
 nnoremap <silent> <Space>x :bn\|bd #<CR>
 
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 
-noremap L $
-noremap H ^
-
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
 nnoremap <Space>j :tjump /
+nnoremap <Space>l :set colorcolumn=
 
-nnoremap <C-s> :w<CR>
+nnoremap <Space>w :w<CR>
 nnoremap <C-q> :q<CR>
-inoremap <C-s> <Esc>:w<CR>i
 
 inoremap jk <Esc>
 
 nnoremap <silent> <Space>z :set invlist<CR>
+nnoremap <silent> <Space>q :noh<return><esc>
 
 nnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
 xnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
