@@ -20,7 +20,6 @@ set lazyredraw					" Don't redraw while executing macros
 set magic					" For regular expressions turn magic on
 set showmatch					" Show matching brackets when text indicator is over them
 set matchtime=2					" How many tenths of a second to blink when matching brackets
-set vb t_vb=					" No annoying sound on errors
 set timeoutlen=500				" shorter timeout
 set splitbelow					" Make splits behave better
 set splitright
@@ -54,7 +53,7 @@ let g:is_posix = 1				" make vim recognize posix compatible shells
 set backupdir=/tmp				" Better backups
 set noswapfile
 set foldlevel=99				" don't fold things by default
-set listchars=tab:>-,trail:~,extends:>,eol:$ " what to show for whitespace chars
+set listchars=tab:»\ ,trail:~,extends:>,eol:$,nbsp:␣ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
 set completeopt+=menuone			" configure popup menu
 set concealcursor+=n				" conceal characters in normal mode
@@ -63,11 +62,11 @@ set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 " set signcolumn=yes				" always have signcolumn on
-if executable('ag')				" use ag when available {{{
+if executable('ag')				" use ag when available
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
-endif " }}}
-if has('gui_running') " {{{
+endif
+if has('gui_running')
     " set guifont=Literation\ Mono\ Powerline\ 10
     " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
     set guifont=DejaVu\ Sans\ Mono\ Book\ 10
@@ -78,7 +77,7 @@ if has('gui_running') " {{{
     set guioptions-=L
     set guitablabel=%M\ %t
     set lines=43 columns=120
-endif " }}}
+endif
 filetype plugin indent on
 " }}}
 
@@ -86,61 +85,47 @@ filetype plugin indent on
 "              KEYBINDINGS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-" easier : mapping
-noremap ; :
-noremap , ;
-" make 0 work better
+nnoremap ; :
+nnoremap , ;
 nnoremap 0 ^
 nnoremap ^ 0
-" Make moving around splits easier
+nnoremap L $
+nnoremap H ^
+
+nnoremap Y y$
+
 nnoremap <silent> <Space>v :vs\|bn<CR>
 nnoremap <silent> <Space>s :sp\|bn<CR>
 nnoremap <silent> <TAB> <c-w>w
-" Make <Space>q clear highlighting from searches
-nnoremap <silent> <Space>q :noh<return><esc>
-" make it easier to use buffers
+
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
-
 nnoremap <silent> <Space><Space> :b#<CR>
-" more standard 'close buffer' behavior
 nnoremap <silent> <Space>x :bn\|bd #<CR>
-" treat wrapped lines as different lines
+
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
-noremap gj j
-noremap gk k
-" easier to go to end/beginning of lines
-noremap L $
-noremap H ^
-" Buffer keymappings
+
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
-
-" add files to bufferlist
 nnoremap <Space>a :argadd **/*
-
-" find file
 nnoremap <Space>f :find *
+nnoremap <Space>j :tjump /
+nnoremap <Space>l :set colorcolumn=
 
-" Close other splits easily
-noremap <silent> <Space>o :only<CR>
-" Easier to save
-nnoremap <C-s> :w<CR>
+nnoremap <Space>w :w<CR>
 nnoremap <C-q> :q<CR>
-inoremap <C-s> <Esc>:w<CR>i
-" Easier to exit insert mode
+
 inoremap jk <Esc>
-" keybinding to see whitespace
+
 nnoremap <silent> <Space>z :set invlist<CR>
-" easier completion
-inoremap <C-@> <C-x><C-o>
-" toggle conceallevel
+nnoremap <silent> <Space>q :noh<return><esc>
+
 nnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
 xnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
-" paste and format
+
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
 xnoremap <silent> <Space>p p=']
@@ -148,9 +133,7 @@ xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
-
 nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
-
 cnoremap <expr> <CR> functions#CCR()
 " }}}
 
@@ -167,8 +150,6 @@ augroup EditVim
     autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
     autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
     autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
-    autocmd InsertEnter        *                    call InsertToggle('enter')
-    autocmd InsertLeave        *                    call InsertToggle('leave')
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
