@@ -85,6 +85,13 @@ export VISUAL=vim
 export KEYTIMEOUT=1
 bindkey '^x^e' edit-command-line
 
+change-first-word() {
+    zle beginning-of-line -N
+    zle kill-word
+}
+zle -N change-first-word
+bindkey -M emacs "\ea" change-first-word
+
 export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
 setopt INC_APPEND_HISTORY
 setopt HIST_IGNORE_ALL_DUPS
