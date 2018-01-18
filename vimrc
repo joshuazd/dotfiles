@@ -62,11 +62,11 @@ set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 set signcolumn=yes				" always have signcolumn on
-if executable('ag')				" use ag when available {{{
+if executable('ag')				" use ag when available
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
-endif " }}}
-if has('gui_running') " {{{
+endif
+if has('gui_running')
     " set guifont=Literation\ Mono\ Powerline\ 10
     " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
     set guifont=DejaVu\ Sans\ Mono\ Book\ 10
@@ -77,7 +77,7 @@ if has('gui_running') " {{{
     set guioptions-=L
     set guitablabel=%M\ %t
     set lines=43 columns=120
-endif " }}}
+endif
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -85,7 +85,6 @@ endif " }}}
 """"""""""""""""""""""""""""""""""""""""""""""""
 " Plugins {{{
 call plug#begin('~/.vim/bundle')
-
 " tools
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'Konfekt/FastFold'
@@ -120,7 +119,6 @@ Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
 Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 Plug 'Shougo/neco-vim', { 'for': 'vim' }
-
 call plug#end()
 runtime macros/matchit.vim
 " }}}
@@ -129,61 +127,48 @@ runtime macros/matchit.vim
 "              KEYBINDINGS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-" easier : mapping
 noremap ; :
 noremap , ;
-" make 0 work better
+
 nnoremap 0 ^
 nnoremap ^ 0
-" Make moving around splits easier
+
 nnoremap <silent> <Space>v :vs\|bn<CR>
 nnoremap <silent> <Space>s :sp\|bn<CR>
 nnoremap <silent> <TAB> <c-w>w
-" Make <Space>q clear highlighting from searches
 nnoremap <silent> <Space>q :noh<return><esc>
-" make it easier to use buffers
+
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
 
 nnoremap <silent> <Space><Space> :b#<CR>
-" more standard 'close buffer' behavior
 nnoremap <silent> <Space>x :bn\|bd #<CR>
-" treat wrapped lines as different lines
+
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
-noremap gj j
-noremap gk k
-" easier to go to end/beginning of lines
+
 noremap L $
 noremap H ^
-" Buffer keymappings
+
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
-
-" add files to bufferlist
 nnoremap <Space>a :argadd **/*
-
-" find file
 nnoremap <Space>f :find *
+nnoremap <Space>j :tjump /
 
-" Close other splits easily
-noremap <silent> <Space>o :only<CR>
-" Easier to save
 nnoremap <C-s> :w<CR>
 nnoremap <C-q> :q<CR>
 inoremap <C-s> <Esc>:w<CR>i
-" Easier to exit insert mode
+
 inoremap jk <Esc>
-" keybinding to see whitespace
+
 nnoremap <silent> <Space>z :set invlist<CR>
-" easier completion
-inoremap <C-@> <C-x><C-o>
-" toggle conceallevel
+
 nnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
 xnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
-" paste and format
+
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
 xnoremap <silent> <Space>p p=']
@@ -191,9 +176,7 @@ xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
-
 nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
-
 cnoremap <expr> <CR> functions#CCR()
 
 nmap <silent> <Space>hs <Plug>GitGutterStageHunk
@@ -214,17 +197,9 @@ augroup EditVim
     autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
     autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
     autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
-    autocmd InsertEnter        *                    call InsertToggle('enter')
-    autocmd InsertLeave        *                    call InsertToggle('leave')
+    autocmd InsertEnter        *                    call functions#InsertToggle('enter')
+    autocmd InsertLeave        *                    call functions#InsertToggle('leave')
 augroup END
-
-function! InsertToggle(toggle) abort
-  if a:toggle ==# 'enter'
-    GitGutterDisable
-  else
-    GitGutterEnable
-  endif
-endfunction
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
 
@@ -324,9 +299,9 @@ EnableStatusLine
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{ filetype specific plugin settings are in ftplugin folders
 " gitgutter setup {{{
-  let g:gitgutter_sign_modified_removed = '±'
-  nmap [h <Plug>GitGutterPrevHunk
-  nmap ]h <Plug>GitGutterNextHunk
+    let g:gitgutter_sign_modified_removed = '±'
+    nmap [h <Plug>GitGutterPrevHunk
+    nmap ]h <Plug>GitGutterNextHunk
 " }}}
 
 " neocomplete/ultisnips setup {{{
@@ -384,17 +359,13 @@ EnableStatusLine
               \ '\h\w*\%(\.\|->\)\w*'
         let g:neocomplete#force_omni_input_patterns.cpp =
               \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
-        let g:neocomplete#force_omni_input_patterns.objc =
-              \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)'
-        let g:neocomplete#force_omni_input_patterns.objcpp =
-              \ '\[\h\w*\s\h\?\|\h\w*\%(\.\|->\)\|\h\w*::\w*'
         let g:clang_verbose_pmenu = 1
     " }}}
 " }}}
 
 " netrw setup {{{
-  let g:loaded_netrw       = 1
-  let g:loaded_netrwPlugin = 1
+    let g:loaded_netrw       = 1
+    let g:loaded_netrwPlugin = 1
 " }}}
 
 " Easymotion setup {{{
@@ -413,23 +384,23 @@ EnableStatusLine
 " }}}
 
 " AutoPairs setup {{{
-  " we map this in the neocomplete setup section 
-  let g:AutoPairsMapCR = 0
+    " we map this in the neocomplete setup section 
+    let g:AutoPairsMapCR = 0
 " }}}
 
 " rainbow parens setup {{{
-  let g:rainbow_active = 1
+    let g:rainbow_active = 1
 
-  let g:rainbow_conf = {
-              \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
-              \ 'separately': {
-              \  'xml':         0,
-              \  'python':      0,
-              \  'sh':          0,
-              \  'c':           0,
-              \  'javascript':  0,
-              \  'json':        0
-              \  }
-              \}
+    let g:rainbow_conf = {
+                \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
+                \ 'separately': {
+                \  'xml':         0,
+                \  'python':      0,
+                \  'sh':          0,
+                \  'c':           0,
+                \  'javascript':  0,
+                \  'json':        0
+                \  }
+                \}
 " }}}
 " }}}
