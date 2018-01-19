@@ -71,11 +71,13 @@ function! functions#CCR() abort
 endfunction
 
 function! functions#InsertToggle(toggle) abort
-  if a:toggle ==# 'enter'
-    GitGutterDisable
-  else
-    GitGutterEnable
-  endif
+    if exists('*GitGutterDisable')
+        if a:toggle ==# 'enter'
+            GitGutterDisable
+        else
+            GitGutterEnable
+        endif
+    endif
 endfunction
 
 
