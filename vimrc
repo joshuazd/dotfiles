@@ -62,9 +62,10 @@ set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 set signcolumn=yes				" always have signcolumn on
+set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─
 if executable('ag')				" use ag when available
-  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
-  set grepformat=%f:%l:%c:%m,%f:%l:%m
+    set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
+    set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
     " set guifont=Literation\ Mono\ Powerline\ 10
@@ -83,7 +84,7 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              PLUGINS
 """"""""""""""""""""""""""""""""""""""""""""""""
-" Plugins {{{
+" {{{
 call plug#begin('~/.vim/bundle')
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'Konfekt/FastFold'
@@ -106,7 +107,7 @@ Plug 'tpope/vim-dispatch'
 Plug 'xtal8/traces.vim'
 Plug 'luochen1990/rainbow'
 if executable('ctags')
-  Plug 'ludovicchabant/vim-gutentags'
+    Plug 'ludovicchabant/vim-gutentags'
 endif
 " language specific plugins
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
@@ -201,122 +202,127 @@ command! -nargs=1 Search call functions#VimGrepAll(<f-args>)
 nnoremap <C-f> :Search 
 
 command! FormatJSON %!python -c 
-      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,
-      \object_pairs_hook=collections.OrderedDict), indent=2)"
+            \"import json, sys, collections; print json.dumps(json.load(sys.stdin,
+            \object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              STATUSLINE SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
+" {{{
+" normal statusline setup in $HOME/.vim/after/plugin/statusline.vim
+" this statusline only used if --noplugin specified
 set statusline=\ %{mode()}\ %F%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
+" }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
-" {{{ filetype specific plugin settings are in ftplugin folders
+" {{{
+" filetype specific plugin settings are in ftplugin folders
 " gitgutter setup {{{
-    let g:gitgutter_sign_modified_removed = '±'
-    nmap [h <Plug>GitGutterPrevHunk
-    nmap ]h <Plug>GitGutterNextHunk
+let g:gitgutter_sign_modified_removed = '±'
+nmap [h <Plug>GitGutterPrevHunk
+nmap ]h <Plug>GitGutterNextHunk
 " }}}
 
 " neocomplete/ultisnips setup {{{
 
-    let g:neocomplete#enable_at_startup = 1
-    let g:neocomplete#enable_smart_case = 1
-    let g:neocomplete#enable_refresh_always = 1
-    let g:neocomplete#auto_complete_delay = 0
-    let g:neocomplete#enable_auto_delimiter = 1
-    let g:UltiSnipsJumpForwardTrigger='<NOP>'
-    let g:UltiSnipsExpandTrigger='<NOP>'
-    let g:ulti_expand_or_jump_res = 0
-    let g:ulti_jump_forwards_res = 0
-    let g:ulti_jump_backwards_res = 0
-    call neocomplete#custom#source('ultisnips', 'rank', 1000)
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_smart_case = 1
+let g:neocomplete#enable_refresh_always = 1
+let g:neocomplete#auto_complete_delay = 0
+let g:neocomplete#enable_auto_delimiter = 1
+let g:UltiSnipsJumpForwardTrigger='<NOP>'
+let g:UltiSnipsExpandTrigger='<NOP>'
+let g:ulti_expand_or_jump_res = 0
+let g:ulti_jump_forwards_res = 0
+let g:ulti_jump_backwards_res = 0
+call neocomplete#custom#source('ultisnips', 'rank', 1000)
 
-    inoremap <silent> <expr><TAB> "<C-R>=functions#TabMapping()<CR>"
-    inoremap <silent> <expr><S-TAB> "<C-R>=functions#ReverseTabMapping()<CR>"
-    xnoremap <silent> <expr><TAB> ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
-    snoremap <silent> <expr><TAB> "<ESC>:call UltiSnips#JumpForwards()<cr>"
-    snoremap <silent> <expr><S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<cr>"
-    imap <silent> <CR> <C-R>=((functions#EnterMapping() > 0) ? "" : pumvisible() ? "\eo" : "\r")<CR><Plug>AutoPairsReturn
-    
-    if !exists('g:neocomplete#keyword_patterns')
-        let g:neocomplete#keyword_patterns = {}
-    endif
-    let g:neocomplete#keyword_patterns._ = '\h\w*'
+inoremap <silent> <expr><TAB> "<C-R>=functions#TabMapping()<CR>"
+inoremap <silent> <expr><S-TAB> "<C-R>=functions#ReverseTabMapping()<CR>"
+xnoremap <silent> <expr><TAB> ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
+snoremap <silent> <expr><TAB> "<ESC>:call UltiSnips#JumpForwards()<cr>"
+snoremap <silent> <expr><S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<cr>"
+imap <silent> <CR> <C-R>=((functions#EnterMapping() > 0) ? "" : pumvisible() ? "\eo" : "\r")<CR><Plug>AutoPairsReturn
 
-    if !exists('g:neocomplete#force_omni_input_patterns')
-        let g:neocomplete#force_omni_input_patterns = {}
-    endif
+if !exists('g:neocomplete#keyword_patterns')
+    let g:neocomplete#keyword_patterns = {}
+endif
+let g:neocomplete#keyword_patterns._ = '\h\w*'
 
-    " xml setup {{{
-        let g:neocomplete#keyword_patterns.xml =
-                    \'</\?\%([[:alnum:]_:-]\+\s*\)\?\%(/\?>\)\?\|&\h\%(\w*;\)\?'.
-                    \'\|\h[[:alnum:]_:-]*'
-        let g:neocomplete#force_omni_input_patterns.xml = '</\?'
-        call neocomplete#custom#source('omni', 'rank', 1000)
-    " }}}
+if !exists('g:neocomplete#force_omni_input_patterns')
+    let g:neocomplete#force_omni_input_patterns = {}
+endif
 
-    " python setup {{{
-        let g:jedi#completions_enabled = 0
-        let g:jedi#auto_vim_configuration = 0
-        let g:jedi#smart_auto_mappings = 0
-        let g:neocomplete#force_omni_input_patterns.python = 
-              \'\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|'.
-              \'^\s*from \|^\s*import \)\w*'
-    " }}}
+" xml setup {{{
+let g:neocomplete#keyword_patterns.xml =
+            \'</\?\%([[:alnum:]_:-]\+\s*\)\?\%(/\?>\)\?\|&\h\%(\w*;\)\?'.
+            \'\|\h[[:alnum:]_:-]*'
+let g:neocomplete#force_omni_input_patterns.xml = '</\?'
+call neocomplete#custom#source('omni', 'rank', 1000)
+" }}}
 
-    " clang setup {{{
-        let g:clang_auto = 0 " disable auto completion for vim-clang
-        let g:clang_c_completeopt = 'menuone,preview'
-        let g:clang_cpp_completeopt = 'menuone,preview'
-        let g:neocomplete#force_omni_input_patterns.c =
-              \ '\h\w*\%(\.\|->\)\w*'
-        let g:neocomplete#force_omni_input_patterns.cpp =
-              \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
-        let g:clang_verbose_pmenu = 1
-    " }}}
+" python setup {{{
+let g:jedi#completions_enabled = 0
+let g:jedi#auto_vim_configuration = 0
+let g:jedi#smart_auto_mappings = 0
+let g:neocomplete#force_omni_input_patterns.python = 
+            \'\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|'.
+            \'^\s*from \|^\s*import \)\w*'
+" }}}
+
+" clang setup {{{
+let g:clang_auto = 0 " disable auto completion for vim-clang
+let g:clang_c_completeopt = 'menuone,preview'
+let g:clang_cpp_completeopt = 'menuone,preview'
+let g:neocomplete#force_omni_input_patterns.c =
+            \ '\h\w*\%(\.\|->\)\w*'
+let g:neocomplete#force_omni_input_patterns.cpp =
+            \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
+let g:clang_verbose_pmenu = 1
+" }}}
 " }}}
 
 " netrw setup {{{
-    let g:loaded_netrw       = 1
-    let g:loaded_netrwPlugin = 1
+let g:loaded_netrw       = 1
+let g:loaded_netrwPlugin = 1
 " }}}
 
 " Easymotion setup {{{
-    map , <Plug>(easymotion-prefix)
-    map s <Plug>(easymotion-s2)
-    map f <Plug>(easymotion-f)
-    map F <Plug>(easymotion-F)
-    map t <Plug>(easymotion-t)
-    map T <Plug>(easymotion-T)
-    map / <Plug>(easymotion-sn)
-    map ? <Plug>(easymotion-sn)
-    omap / <Plug><easymotion-tn)
-    omap ? <Plug><easymotion-tn)
-    let g:EasyMotion_startofline = 0
-    let g:EasyMotion_smartcase = 1
+map , <Plug>(easymotion-prefix)
+map s <Plug>(easymotion-s2)
+map f <Plug>(easymotion-f)
+map F <Plug>(easymotion-F)
+map t <Plug>(easymotion-t)
+map T <Plug>(easymotion-T)
+map / <Plug>(easymotion-sn)
+map ? <Plug>(easymotion-sn)
+omap / <Plug><easymotion-tn)
+omap ? <Plug><easymotion-tn)
+let g:EasyMotion_startofline = 0
+let g:EasyMotion_smartcase = 1
 " }}}
 
 " AutoPairs setup {{{
-    " we map this in the neocomplete setup section 
-    let g:AutoPairsMapCR = 0
+" we map this in the neocomplete setup section 
+let g:AutoPairsMapCR = 0
 " }}}
 
 " rainbow parens setup {{{
-    let g:rainbow_active = 1
+let g:rainbow_active = 1
 
-    let g:rainbow_conf = {
-                \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
-                \ 'separately': {
-                \  'xml':         0,
-                \  'python':      0,
-                \  'sh':          0,
-                \  'c':           0,
-                \  'javascript':  0,
-                \  'json':        0
-                \  }
-                \}
+let g:rainbow_conf = {
+            \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
+            \ 'separately': {
+            \  'xml':         0,
+            \  'python':      0,
+            \  'sh':          0,
+            \  'c':           0,
+            \  'javascript':  0,
+            \  'json':        0
+            \  }
+            \}
 " }}}
 " }}}
