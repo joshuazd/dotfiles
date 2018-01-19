@@ -252,6 +252,14 @@ function! GitStatusLine() abort
   let l:gitline .= (l:gitline !=# '' ? ' ' : '')
   return l:gitline
 endfunction
+function! QfList() abort
+    let l:qflist = len(qf#GetList())
+    if l:qflist ==# '0'
+        return ''
+    else
+        return ' '.l:qflist.' '
+    endif
+endfunction
 function! s:updateStatusLineHighlight(nr,newMode) abort
   execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold'
   execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none'
@@ -278,7 +286,8 @@ function! BuildStatusLine(nr) abort
         \%{ObsessionStatus("$")}%{w:["lf_active"] ? gutentags#statusline() != "" ? " ".gutentags#statusline()." " : " " : " "}
         \%#StlGit#%{&syntax == "" ? "" : " ".&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? " ".line(".").":".virtcol(".")." " : ""}
-        \%#InactiveStl#%{w:["lf_active"] ? "" : " ".line(".").":".virtcol(".")." "}%#MainStl#'
+        \%#InactiveStl#%{w:["lf_active"] ? "" : " ".line(".").":".virtcol(".")." "}
+        \%#StlLinter#%{QfList()}%#MainStl#'
 endfunction
 function! s:enableStatusLine() abort
   set statusline=%!BuildStatusLine(winnr())
