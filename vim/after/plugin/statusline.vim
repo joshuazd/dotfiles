@@ -63,6 +63,9 @@ function! TagsStatusLine() abort
     endif
 endfunction
 function! QfList() abort
+    if !exists('*qf#GetList')
+        return ''
+    endif
     let l:qflist = len(qf#GetList())
     if l:qflist ==# '0'
         return ''

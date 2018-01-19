@@ -2,6 +2,7 @@
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+set nocompatible
 set runtimepath+=$SSHHOME/.sshrc.d/.vim,$SSHHOME/.sshrc.d/.vim/colors
 set ruler					" Always show current position
 set cmdheight=1					" Height of the command bar
@@ -62,6 +63,7 @@ set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 " set signcolumn=yes				" always have signcolumn on
+set cpoptions-=<
 if executable('ag')				" use ag when available
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
