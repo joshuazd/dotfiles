@@ -88,7 +88,6 @@ call plug#begin('~/.vim/bundle')
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'Konfekt/FastFold'
 Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
-Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'shougo/neocomplete.vim'
 Plug 'SirVer/ultisnips'
@@ -98,11 +97,12 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
-Plug 'romainl/vim-qf'
-Plug 'justinmk/vim-dirvish'
+Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-dispatch'
+Plug 'romainl/vim-qf'
+Plug 'justinmk/vim-dirvish'
 Plug 'xtal8/traces.vim'
 Plug 'luochen1990/rainbow'
 if executable('ctags')
@@ -123,6 +123,7 @@ runtime macros/matchit.vim
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 nnoremap ; :
+xnoremap ; :
 nnoremap , ;
 nnoremap 0 ^
 nnoremap ^ 0
@@ -131,9 +132,8 @@ nnoremap H ^
 
 nnoremap Y y$
 
-nnoremap <silent> <Space>v :vs\|bn<CR>
-nnoremap <silent> <Space>s :sp\|bn<CR>
-nnoremap <silent> <TAB> <c-w>w
+nnoremap <Space>v :vs\|bn<CR>
+nnoremap <Space>s :sp\|bn<CR>
 
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
@@ -194,12 +194,10 @@ augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
 
-command! -nargs=1 Search call functions#VimGrepAll(<f-args>)
-nnoremap <C-f> :Search 
+command! -nargs=1 Find call functions#VimGrepAll(<f-args>)
+nnoremap bf :Find 
 
-command! FormatJSON %!python -c 
-      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,
-      \object_pairs_hook=collections.OrderedDict), indent=2)"
+command! -range=% FormatJSON <line1>,<line2>!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
