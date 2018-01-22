@@ -287,14 +287,16 @@ let g:loaded_netrwPlugin = 1
 " }}}
 
 " Easymotion setup {{{
-nmap , <Plug>(easymotion-prefix)
-nmap s <Plug>(easymotion-s)
-nmap f <Plug>(easymotion-f)
-nmap F <Plug>(easymotion-F)
-nmap t <Plug>(easymotion-t)
-nmap T <Plug>(easymotion-T)
-nmap / <Plug>(easymotion-sn)
-nmap ? <Plug>(easymotion-sn)
+map , <Plug>(easymotion-prefix)
+map s <Plug>(easymotion-s)
+map f <Plug>(easymotion-f)
+map F <Plug>(easymotion-F)
+map t <Plug>(easymotion-t)
+map T <Plug>(easymotion-T)
+map / <Plug>(easymotion-sn)
+map ? <Plug>(easymotion-sn)
+omap / <Plug>(easymotion-tn)
+omap ? <Plug>(easymotion-tn)
 let g:EasyMotion_startofline = 0
 let g:EasyMotion_smartcase = 1
 " }}}
