@@ -4,6 +4,7 @@ setlocal softtabstop=2
 setlocal foldmethod=syntax
 setlocal smarttab
 setlocal conceallevel=0
+setlocal wrap
 set foldnestmax=2
 let g:xml_syntax_folding=1 " enable xml folding
 inoremap <buffer> </ </<C-x><C-o><C-y>
@@ -17,5 +18,7 @@ set path=.,*/src/main/synapse-config/**/
 nnoremap ,f zMza
 augroup XML
     autocmd!
-    autocmd BufWritePost *.xml,*.dbs silent Xmllint
+    if executable('xmllint')
+      autocmd BufWritePost *.xml,*.dbs silent Xmllint
+    endif
 augroup END

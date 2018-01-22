@@ -3,7 +3,9 @@ setlocal omnifunc=jedi#completions
 command! Pythonlint cexpr system('flake8 --max-line-length=100 ' . shellescape(expand('%')))
 augroup PYTHON
     autocmd!
-    autocmd BufWritePost *.py silent Pythonlint
+    if executable('flake8')
+      autocmd BufWritePost *.py silent Pythonlint
+    endif
 augroup END
 
 " Jedi setup {{{

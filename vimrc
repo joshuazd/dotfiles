@@ -23,8 +23,7 @@ set timeoutlen=500				" shorter timeout
 set splitbelow					" Make splits behave better
 set splitright
 set background=dark				" dark background
-syntax off					" turn syntax on
-syntax sync clear
+syntax enable					" turn syntax on
 colorscheme hybrid_material			" material color scheme
 set number					" show line numbers
 set relativenumber				" show relative line numbers
@@ -62,22 +61,22 @@ set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 set signcolumn=yes				" always have signcolumn on
-set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─
+set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
 if executable('ag')				" use ag when available
-    set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
-    set grepformat=%f:%l:%c:%m,%f:%l:%m
+  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
+  set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-    " set guifont=Literation\ Mono\ Powerline\ 10
-    " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
-    set guifont=DejaVu\ Sans\ Mono\ Book\ 10
-    set guioptions-=T
-    set guioptions+=e
-    set guioptions-=m
-    set guioptions-=r
-    set guioptions-=L
-    set guitablabel=%M\ %t
-    set lines=43 columns=120
+  " set guifont=Literation\ Mono\ Powerline\ 10
+  " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
+  set guifont=DejaVu\ Sans\ Mono\ Book\ 10
+  set guioptions-=T
+  set guioptions+=e
+  set guioptions-=m
+  set guioptions-=r
+  set guioptions-=L
+  set guitablabel=%M\ %t
+  set lines=43 columns=120
 endif
 " }}}
 
@@ -107,7 +106,7 @@ Plug 'tpope/vim-dispatch'
 Plug 'xtal8/traces.vim'
 Plug 'luochen1990/rainbow'
 if executable('ctags')
-    Plug 'ludovicchabant/vim-gutentags'
+  Plug 'ludovicchabant/vim-gutentags'
 endif
 " language specific plugins
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
@@ -153,13 +152,10 @@ nnoremap <Space>f :find *
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 
-nnoremap <Space>w :w<CR>
-nnoremap <C-q> :q<CR>
-
 inoremap jk <Esc>
 
-nnoremap <silent> <Space>z :set invlist<CR>
-nnoremap <silent> <Space>q :noh<return><esc>
+nnoremap <Space>z :set invlist<CR>
+nnoremap <Space>q :noh<return><esc>
 
 nnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
 xnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
@@ -184,16 +180,16 @@ nmap <silent> <Space>hp <Plug>GitGutterPreviewHunk
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 augroup EditVim
-    autocmd!
-    autocmd InsertLeave        *                    if pumvisible() == 0|pclose|endif
-    autocmd BufNewFile,BufRead *.zsh-theme          set filetype=zsh
-    autocmd BufNewFile,BufRead *.dbs                set filetype=xml
-    autocmd BufNewFile,BufRead *.dmc                set filetype=javascript
-    autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-    autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
-    autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
-    autocmd InsertEnter        *                    call functions#InsertToggle('enter')
-    autocmd InsertLeave        *                    call functions#InsertToggle('leave')
+  autocmd!
+  autocmd InsertLeave        *                    if pumvisible() == 0|pclose|endif
+  autocmd BufNewFile,BufRead *.zsh-theme          set filetype=zsh
+  autocmd BufNewFile,BufRead *.dbs                set filetype=xml
+  autocmd BufNewFile,BufRead *.dmc                set filetype=javascript
+  autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+  autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
+  autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
+  autocmd InsertEnter        *                    call functions#InsertToggle('enter')
+  autocmd InsertLeave        *                    call functions#InsertToggle('leave')
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
@@ -202,8 +198,8 @@ command! -nargs=1 Search call functions#VimGrepAll(<f-args>)
 nnoremap <C-f> :Search 
 
 command! FormatJSON %!python -c 
-            \"import json, sys, collections; print json.dumps(json.load(sys.stdin,
-            \object_pairs_hook=collections.OrderedDict), indent=2)"
+      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,
+      \object_pairs_hook=collections.OrderedDict), indent=2)"
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -212,7 +208,7 @@ command! FormatJSON %!python -c
 " {{{
 " normal statusline setup in $HOME/.vim/after/plugin/statusline.vim
 " this statusline only used if --noplugin specified
-set statusline=\ %{mode()}\ %F%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
+set statusline=\ %{mode()}\ %F%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -248,18 +244,18 @@ snoremap <silent> <expr><S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<cr>"
 imap <silent> <CR> <C-R>=((functions#EnterMapping() > 0) ? "" : pumvisible() ? "\eo" : "\r")<CR><Plug>AutoPairsReturn
 
 if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
+  let g:neocomplete#keyword_patterns = {}
 endif
 let g:neocomplete#keyword_patterns._ = '\h\w*'
 
 if !exists('g:neocomplete#force_omni_input_patterns')
-    let g:neocomplete#force_omni_input_patterns = {}
+  let g:neocomplete#force_omni_input_patterns = {}
 endif
 
 " xml setup {{{
 let g:neocomplete#keyword_patterns.xml =
-            \'</\?\%([[:alnum:]_:-]\+\s*\)\?\%(/\?>\)\?\|&\h\%(\w*;\)\?'.
-            \'\|\h[[:alnum:]_:-]*'
+      \'</\?\%([[:alnum:]_:-]\+\s*\)\?\%(/\?>\)\?\|&\h\%(\w*;\)\?'.
+      \'\|\h[[:alnum:]_:-]*'
 let g:neocomplete#force_omni_input_patterns.xml = '</\?'
 call neocomplete#custom#source('omni', 'rank', 1000)
 " }}}
@@ -269,8 +265,8 @@ let g:jedi#completions_enabled = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#smart_auto_mappings = 0
 let g:neocomplete#force_omni_input_patterns.python = 
-            \'\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|'.
-            \'^\s*from \|^\s*import \)\w*'
+      \'\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|'.
+      \'^\s*from \|^\s*import \)\w*'
 " }}}
 
 " clang setup {{{
@@ -278,9 +274,9 @@ let g:clang_auto = 0 " disable auto completion for vim-clang
 let g:clang_c_completeopt = 'menuone,preview'
 let g:clang_cpp_completeopt = 'menuone,preview'
 let g:neocomplete#force_omni_input_patterns.c =
-            \ '\h\w*\%(\.\|->\)\w*'
+      \ '\h\w*\%(\.\|->\)\w*'
 let g:neocomplete#force_omni_input_patterns.cpp =
-            \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
+      \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
 let g:clang_verbose_pmenu = 1
 " }}}
 " }}}
@@ -291,16 +287,14 @@ let g:loaded_netrwPlugin = 1
 " }}}
 
 " Easymotion setup {{{
-map , <Plug>(easymotion-prefix)
-map s <Plug>(easymotion-s2)
-map f <Plug>(easymotion-f)
-map F <Plug>(easymotion-F)
-map t <Plug>(easymotion-t)
-map T <Plug>(easymotion-T)
-map / <Plug>(easymotion-sn)
-map ? <Plug>(easymotion-sn)
-omap / <Plug><easymotion-tn)
-omap ? <Plug><easymotion-tn)
+nmap , <Plug>(easymotion-prefix)
+nmap s <Plug>(easymotion-s)
+nmap f <Plug>(easymotion-f)
+nmap F <Plug>(easymotion-F)
+nmap t <Plug>(easymotion-t)
+nmap T <Plug>(easymotion-T)
+nmap / <Plug>(easymotion-sn)
+nmap ? <Plug>(easymotion-sn)
 let g:EasyMotion_startofline = 0
 let g:EasyMotion_smartcase = 1
 " }}}
@@ -314,15 +308,15 @@ let g:AutoPairsMapCR = 0
 let g:rainbow_active = 1
 
 let g:rainbow_conf = {
-            \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
-            \ 'separately': {
-            \  'xml':         0,
-            \  'python':      0,
-            \  'sh':          0,
-            \  'c':           0,
-            \  'javascript':  0,
-            \  'json':        0
-            \  }
-            \}
+      \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
+      \ 'separately': {
+      \  'xml':         0,
+      \  'python':      0,
+      \  'sh':          0,
+      \  'c':           0,
+      \  'javascript':  0,
+      \  'json':        0
+      \  }
+      \}
 " }}}
 " }}}
