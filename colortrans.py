@@ -13,18 +13,19 @@ Resources:
 I'm not sure where this script was inspired from. I think I must have
 written it from scratch, though it's been several years now.
 """
+import sys
+import re
 
-__author__    = 'Micah Elliott http://MicahElliott.com'
-__version__   = '0.1'
+__author__ = 'Micah Elliott http://MicahElliott.com'
+__version__ = '0.1'
 __copyright__ = 'Copyright (C) 2011 Micah Elliott.  All rights reserved.'
-__license__   = 'WTFPL http://sam.zoy.org/wtfpl/'
+__license__ = 'WTFPL http://sam.zoy.org/wtfpl/'
 
-#---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 
-import sys, re
 
 CLUT = [  # color look-up table
-#    8-bit, RGB hex
+    #    8-bit, RGB hex
 
     # Primary 3-bit (8 colors). Unique representation!
     ('00',  '000000'),
@@ -291,14 +292,17 @@ CLUT = [  # color look-up table
     ('255', 'eeeeee'),
 ]
 
+
 def _str2hex(hexstr):
     return int(hexstr, 16)
+
 
 def _strip_hash(rgb):
     # Strip leading `#` if exists.
     if rgb.startswith('#'):
         rgb = rgb.lstrip('#')
     return rgb
+
 
 def _create_dicts():
     short2rgb_dict = dict(CLUT)
@@ -307,8 +311,10 @@ def _create_dicts():
         rgb2short_dict[v] = k
     return rgb2short_dict, short2rgb_dict
 
+
 def short2rgb(short):
     return SHORT2RGB_DICT[short]
+
 
 def print_all():
     """ Print all 256 xterm color codes.
@@ -320,6 +326,7 @@ def print_all():
         sys.stdout.write("\033[0m\n")
     print("Printed all codes.")
     print("You can translate a hex or 0-255 code by providing an argument.")
+
 
 def rgb2short(rgb):
     """ Find the closest xterm-256 approximation to the given RGB value.
@@ -336,36 +343,39 @@ def rgb2short(rgb):
     """
     rgb = _strip_hash(rgb)
     # Break 6-char RGB code into 3 integer vals.
-    parts = [ int(h, 16) for h in re.split(r'(..)(..)(..)', rgb)[1:4] ]
+    parts = [int(h, 16) for h in re.split(r'(..)(..)(..)', rgb)[1:4]]
 
     incs = [0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff]
 
     if parts[0] == parts[1] == parts[2]:
         gs_incs = list(range(0x08, 0xee, 10))
-        incs = sorted(incs + gs_incs + [0xee,])
+        incs = sorted(incs + gs_incs + [0xee, ])
 
     res = []
     for part in parts:
         i = 0
-        while i < len(incs)-1:
-            s, b = incs[i], incs[i+1]  # smaller, bigger
+        while i < len(incs) - 1:
+            s, b = incs[i], incs[i + 1]  # smaller, bigger
             if s <= part <= b:
                 s1 = abs(s - part)
                 b1 = abs(b - part)
-                if s1 < b1: closest = s
-                else: closest = b
+                if s1 < b1:
+                    closest = s
+                else:
+                    closest = b
                 res.append(closest)
                 break
             i += 1
-    #print '***', res
-    res = ''.join([ ('%02.x' % i) for i in res ])
-    equiv = RGB2SHORT_DICT[ res ]
-    #print '***', res, equiv
+    # print '***', res
+    res = ''.join([('%02.x' % i) for i in res])
+    equiv = RGB2SHORT_DICT[res]
+    # print '***', res, equiv
     return equiv, res
+
 
 RGB2SHORT_DICT, SHORT2RGB_DICT = _create_dicts()
 
-#---------------------------------------------------------------------
+# ---------------------------------------------------------------------
 
 if __name__ == '__main__':
     import doctest
@@ -376,9 +386,12 @@ if __name__ == '__main__':
     arg = sys.argv[1]
     if len(arg) < 4 and int(arg) < 256:
         rgb = short2rgb(arg)
-        sys.stdout.write('xterm color \033[38;5;%sm%s\033[0m -> RGB exact \033[38;5;%sm%s\033[0m' % (arg, arg, arg, rgb))
+        sys.stdout.write(
+            'xterm color \033[38;5;%sm%s\033[0m -> RGB exact' +
+            ' \033[38;5;%sm%s\033[0m' % (arg, arg, arg, rgb))
         sys.stdout.write("\033[0m\n")
     else:
         short, rgb = rgb2short(arg)
-        sys.stdout.write('RGB %s -> xterm color approx \033[38;5;%sm%s (%s)' % (arg, short, short, rgb))
+        sys.stdout.write(
+            'RGB %s -> xterm color approx \033[38;5;%sm%s (%s)' % (arg, short, short, rgb))
         sys.stdout.write("\033[0m\n")
