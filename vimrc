@@ -173,6 +173,8 @@ cnoremap <expr> <CR> functions#CCR()
 nmap <silent> <Space>hs <Plug>GitGutterStageHunk
 nmap <silent> <Space>hu <Plug>GitGutterUndoHunk
 nmap <silent> <Space>hp <Plug>GitGutterPreviewHunk
+
+imap <C-s> <Esc>gcca
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
