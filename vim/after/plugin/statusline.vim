@@ -93,7 +93,7 @@ function! BuildStatusLine(nr) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
         \%#StlGit#%{w:["lf_active"] ? GitStatusLine() : ""}
-        \%#MainStl# %t%m
+        \%#MainStl# %f%m
         \%#ReadOnlyStl# %{&readonly ? "RO" : ""}%#MainStl#
         \%=
         \%{ObsessionStatusLine()}%{w:["lf_active"] ? TagsStatusLine() != "" ? " ".TagsStatusLine()." " : " " : " "}
