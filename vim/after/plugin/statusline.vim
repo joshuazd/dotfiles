@@ -98,8 +98,8 @@ function! BuildStatusLine(nr) abort
         \%=
         \%{ObsessionStatusLine()}%{w:["lf_active"] ? TagsStatusLine() != "" ? " ".TagsStatusLine()." " : " " : " "}
         \%#StlGit#%{&syntax == "" ? "" : " ".&syntax." "}
-        \%#ModeNoBold#%{w:["lf_active"] ? " ".line(".").":".virtcol(".")." " : ""}
-        \%#InactiveStl#%{w:["lf_active"] ? "" : " ".line(".").":".virtcol(".")." "}
+        \%#ModeNoBold#%{w:["lf_active"] ? " ".line(".").":".printf("%02d",virtcol("."))." " : ""}
+        \%#InactiveStl#%{w:["lf_active"] ? "" : " ".line(".").":".printf("%02d",virtcol("."))." "}
         \%#StlLinter#%{QfList()}%#MainStl#'
 endfunction
 function! s:enableStatusLine() abort
