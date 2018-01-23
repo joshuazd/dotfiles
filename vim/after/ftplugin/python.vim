@@ -1,6 +1,7 @@
 setlocal foldmethod=indent
 setlocal omnifunc=jedi#completions
-command! Pythonlint cexpr system('flake8 --max-line-length=100 ' . shellescape(expand('%')))
+command! Pythonlint cexpr system('flake8 ' . shellescape(expand('%')))
+command! Fix silent !autopep8 -i -a -a -a %
 augroup PYTHON
     autocmd!
     if executable('flake8')
