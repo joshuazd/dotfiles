@@ -1,11 +1,12 @@
 let g:modemap = {
-      \ 'n' : ['N',       'NormalMode'],  'no': ['NO', 'NormalMode'],  'v' : ['V',     'VisualMode'],
-      \ 'V' : ['V',       'VisualMode'],  '': ['V',  'VisualMode'],  's' : ['S',     'VisualMode'],
-      \ 'S' : ['S',       'VisualMode'],  '': ['S',  'VisualMode'],  'i' : ['I',     'InsertMode'],
-      \ 'ic': ['COMPL',   'InsertMode'],  'ix': ['X',  'InsertMode'],  'R' : ['R',     'ReplaceMode'],
-      \ 'Rv': ['R',       'ReplaceMode'], 'c' : ['C',  'CommandMode'], 'cv': ['VIMEX', 'CommandMode'],
-      \ 'ce': ['EX',      'CommandMode'], 'r' : ['P',  'CommandMode'], 'rm': ['MORE',  'CommandMode'],
-      \ 'r?': ['CONFIRM', 'CommandMode'], '!' : ['SH', 'CommandMode'], 't' : ['TERM',  'CommandMode']}
+      \ 'n' : ['N',       'NormalMode'],  'no': ['NO',    'NormalMode'],  'v' : ['V',       'VisualMode'],
+      \ 'V' : ['V',       'VisualMode'],  '': ['V',     'VisualMode'],  's' : ['S',       'VisualMode'],
+      \ 'S' : ['S',       'VisualMode'],  '': ['S',     'VisualMode'],  'i' : ['I',       'InsertMode'],
+      \ 'ic': ['COMPL',   'InsertMode'],  'ix': ['X',     'InsertMode'],  'R' : ['R',       'ReplaceMode'],
+      \ 'Rc': ['RCOMPL',  'ReplaceMode'], 'Rv': ['R',     'ReplaceMode'], 'Rx': ['RX',      'ReplaceMode'],
+      \ 'c' : ['C',       'CommandMode'], 'cv': ['VIMEX', 'CommandMode'], 'ce': ['EX',      'CommandMode'],
+      \ 'r' : ['P',       'CommandMode'], 'rm': ['MORE',  'CommandMode'], 'r?': ['CONFIRM', 'CommandMode'],
+      \ '!' : ['SH',      'CommandMode'], 't' : ['TERM',  'CommandMode']}
 function! GetModeIndicator() abort
   if &filetype ==# 'help'        | return ['Help']
   elseif &filetype ==# 'netrw'   | return ['netrw']
