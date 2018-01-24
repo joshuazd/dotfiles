@@ -104,7 +104,7 @@ Plug 'tpope/vim-dispatch'
 Plug 'romainl/vim-qf'
 Plug 'justinmk/vim-dirvish'
 Plug 'xtal8/traces.vim'
-Plug 'luochen1990/rainbow'
+" Plug 'luochen1990/rainbow'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
@@ -151,6 +151,7 @@ nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
+nnoremap <Space>i :ilist /
 
 inoremap jk <Esc>
 
@@ -168,13 +169,11 @@ xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
 nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
-cnoremap <expr> <CR> functions#CCR()
-
-nmap <silent> <Space>hs <Plug>GitGutterStageHunk
-nmap <silent> <Space>hu <Plug>GitGutterUndoHunk
-nmap <silent> <Space>hp <Plug>GitGutterPreviewHunk
+cnoremap <expr> <CR> CCR()
 
 imap <C-s> <Esc>gcca
+
+nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -196,11 +195,47 @@ augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
 
-command! -nargs=1 Find call functions#VimGrepAll(<f-args>)
-nnoremap bf :Find 
+command! -nargs=1 BufferGrep call functions#VimGrepAll(<f-args>)
+nnoremap <Space>g :BufferGrep 
 
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+
+" make list-like commands more intuitive
+" including this here to avoid screwing up command mode
+function! CCR() abort
+  let cmdline = getcmdline()
+  if cmdline =~? '\v\C^(ls|files|buffers)'
+    " like :ls but prompts for a buffer command
+    return "\<CR>:b"
+  elseif cmdline =~? '\v\C/(#|nu|num|numb|numbe|number)$'
+    " like :g//# but prompts for a command
+    return "\<CR>:"
+  elseif cmdline =~? '\v\C^(dli|il)'
+    " like :dlist or :ilist but prompts for a count for :djump or :ijump
+    return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"
+  elseif cmdline =~? '\v\C^(cli|lli)'
+    " like :clist or :llist but prompts for an error/location number
+    return "\<CR>:sil " . repeat(cmdline[0], 2) . "\<Space>"
+  elseif cmdline =~? '\C^old'
+    " like :oldfiles but prompts for an old file to edit
+    return "\<CR>:e #<"
+  elseif cmdline =~? '\C^changes'
+    " like :changes but prompts for a change to jump to
+    return "\<CR>:norm! g;\<S-Left>"
+  elseif cmdline =~? '\C^ju'
+    " like :jumps but prompts for a position to jump to
+    return "\<CR>:norm! \<C-o>\<S-Left>"
+  elseif cmdline =~? '\C^marks'
+    " like :marks but prompts for a mark to jump to
+    return "\<CR>:norm! `"
+  elseif cmdline =~? '\C^undol'
+    " like :undolist but prompts for a change to undo
+    return "\<CR>:u "
+  else
+    return "\<CR>"
+  endif
+endfunction
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -216,11 +251,14 @@ set statusline=\ %{mode()}\ %F%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-" filetype specific plugin settings are in ftplugin folders
+" filetype specific plugin settings are in after/ftplugin folders
 " gitgutter setup {{{
 let g:gitgutter_sign_modified_removed = '±'
-nmap [h <Plug>GitGutterPrevHunk
-nmap ]h <Plug>GitGutterNextHunk
+nmap <silent> <Space>hs <Plug>GitGutterStageHunk
+nmap <silent> <Space>hu <Plug>GitGutterUndoHunk
+nmap <silent> <Space>hp <Plug>GitGutterPreviewHunk
+nmap <silent> [h <Plug>GitGutterPrevHunk
+nmap <silent> ]h <Plug>GitGutterNextHunk
 " }}}
 
 " neocomplete/ultisnips setup {{{
@@ -235,7 +273,7 @@ let g:UltiSnipsExpandTrigger='<NOP>'
 let g:ulti_expand_or_jump_res = 0
 let g:ulti_jump_forwards_res = 0
 let g:ulti_jump_backwards_res = 0
-call neocomplete#custom#source('ultisnips', 'rank', 1000)
+" call neocomplete#custom#source('ultisnips', 'rank', 1000)
 
 inoremap <silent> <expr><TAB> "<C-R>=functions#TabMapping()<CR>"
 inoremap <silent> <expr><S-TAB> "<C-R>=functions#ReverseTabMapping()<CR>"
@@ -258,7 +296,6 @@ let g:neocomplete#keyword_patterns.xml =
       \'</\?\%([[:alnum:]_:-]\+\s*\)\?\%(/\?>\)\?\|&\h\%(\w*;\)\?'.
       \'\|\h[[:alnum:]_:-]*'
 let g:neocomplete#force_omni_input_patterns.xml = '</\?'
-call neocomplete#custom#source('omni', 'rank', 1000)
 " }}}
 
 " python setup {{{
@@ -297,7 +334,7 @@ map T <Plug>(easymotion-T)
 map / <Plug>(easymotion-sn)
 map ? <Plug>(easymotion-sn)
 omap / <Plug>(easymotion-tn)
-omap ? <Plug>(easymotion-tn)
+omap ? <Plug>(easymotion-Tn)
 let g:EasyMotion_startofline = 0
 let g:EasyMotion_smartcase = 1
 " }}}
@@ -318,7 +355,8 @@ let g:rainbow_conf = {
       \  'sh':          0,
       \  'c':           0,
       \  'javascript':  0,
-      \  'json':        0
+      \  'json':        0,
+      \  'tags':        0
       \  }
       \}
 " }}}
