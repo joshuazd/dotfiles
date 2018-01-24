@@ -1,11 +1,11 @@
 setlocal foldmethod=indent
 setlocal omnifunc=jedi#completions
-command! Pythonlint cexpr system('flake8 ' . shellescape(expand('%')))
-command! Fix silent !autopep8 -i -a -a -a %
+command! Lint cexpr system('flake8 ' . shellescape(expand('%')))
+command! -bar Fix silent execute "!autopep8 -i -a -a -a %" | redraw!
 augroup PYTHON
     autocmd!
     if executable('flake8')
-      autocmd BufWritePost *.py silent Pythonlint
+      autocmd BufWritePost *.py silent Lint
     endif
 augroup END
 

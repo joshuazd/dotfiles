@@ -278,7 +278,7 @@ inoremap <silent> <expr><S-TAB> "<C-R>=functions#ReverseTabMapping()<CR>"
 xnoremap <silent> <expr><TAB> ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
 snoremap <silent> <expr><TAB> "<ESC>:call UltiSnips#JumpForwards()<cr>"
 snoremap <silent> <expr><S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<cr>"
-imap <silent> <CR> <C-R>=((functions#EnterMapping() > 0) ? "" : pumvisible() ? "\eo" : "\r")<CR><Plug>AutoPairsReturn
+imap <silent> <CR> <C-R>=((functions#EnterMapping() > 0) ? "" : pumvisible() ? "\r" : "\r")<CR><Plug>AutoPairsReturn
 
 if !exists('g:neocomplete#keyword_patterns')
   let g:neocomplete#keyword_patterns = {}
