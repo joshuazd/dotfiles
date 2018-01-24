@@ -24,7 +24,7 @@ set splitbelow					" Make splits behave better
 set splitright
 set background=dark				" dark background
 syntax enable					" turn syntax on
-colorscheme hybrid_material			" material color scheme
+colorscheme material				" material color scheme
 set number					" show line numbers
 set relativenumber				" show relative line numbers
 set numberwidth=1				" set min number column width

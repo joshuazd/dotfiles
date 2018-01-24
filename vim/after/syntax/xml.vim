@@ -117,11 +117,11 @@ hi def link xmlArgs Primitive
 highlight xmlArgs ctermfg=3 guifg=#ffb62c
 hi def link xmlFunction Function
 hi def link xmlSend Function
-hi def link xmlParam StringPunct
+hi def link xmlParam StringDelimiter
 highlight xmlConnection ctermfg=13 guifg=#945eb8
 highlight xmlLog ctermfg=7 guifg=#bbbbbb
 highlight link xmlProperty Constant
-hi def link xmlSequence StringPunct
+hi def link xmlSequence StringDelimiter
 hi def link xmlScriptTag xmlTag
 hi def link xmlEndScriptTag xmlTag
 highlight link xmlDb Identifier
