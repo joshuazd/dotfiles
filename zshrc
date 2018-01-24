@@ -41,6 +41,7 @@ source $ZSH/oh-my-zsh.sh
 
 # User configuration
 alias mvn-color='source $ZSH_CUSTOM/mvncolor.sh'
+source $ZSH_CUSTOM/mvncolor.sh
 
 autoload -U promptinit; promptinit
 prompt pure

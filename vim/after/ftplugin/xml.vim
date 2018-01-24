@@ -15,6 +15,7 @@ setlocal omnifunc=xmlcomplete#CompleteTags
 setlocal makeprg=mvn\ clean\ install\ -e\ -ff\ -T\ 16
 set syntax=xml
 set path=.,*/src/main/synapse-config/**/
+set suffixesadd+=.xml
 nnoremap ,f zMza
 augroup XML
     autocmd!
