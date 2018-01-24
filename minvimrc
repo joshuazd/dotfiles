@@ -81,6 +81,7 @@ if has('gui_running')
     set lines=43 columns=120
 endif
 filetype plugin indent on
+runtime macros/matchit.vim
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -88,6 +89,7 @@ filetype plugin indent on
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 nnoremap ; :
+xnoremap ; :
 nnoremap , ;
 nnoremap 0 ^
 nnoremap ^ 0
@@ -96,9 +98,8 @@ nnoremap H ^
 
 nnoremap Y y$
 
-nnoremap <silent> <Space>v :vs\|bn<CR>
-nnoremap <silent> <Space>s :sp\|bn<CR>
-nnoremap <silent> <TAB> <c-w>w
+nnoremap <Space>v :vs\|bn<CR>
+nnoremap <Space>s :sp\|bn<CR>
 
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
@@ -117,13 +118,11 @@ nnoremap <Space>f :find *
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 
-nnoremap <Space>w :w<CR>
-nnoremap <C-q> :q<CR>
 
 inoremap jk <Esc>
 
-nnoremap <silent> <Space>z :set invlist<CR>
-nnoremap <silent> <Space>q :noh<return><esc>
+nnoremap <Space>z :set invlist<CR>
+nnoremap <Space>q :noh<return><esc>
 
 nnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
 xnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
@@ -136,7 +135,9 @@ xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
 nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
-cnoremap <expr> <CR> functions#CCR()
+cnoremap <expr> <CR> CCR()
+
+nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -144,24 +145,59 @@ cnoremap <expr> <CR> functions#CCR()
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 augroup EditVim
-    autocmd!
-    autocmd InsertLeave        *                    if pumvisible() == 0|pclose|endif
-    autocmd BufNewFile,BufRead *.zsh-theme          set filetype=zsh
-    autocmd BufNewFile,BufRead *.dbs                set filetype=xml
-    autocmd BufNewFile,BufRead *.dmc                set filetype=javascript
-    autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-    autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
-    autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
+  autocmd!
+  autocmd InsertLeave        *                    if pumvisible() == 0|pclose|endif
+  autocmd BufNewFile,BufRead *.zsh-theme          set filetype=zsh
+  autocmd BufNewFile,BufRead *.dbs                set filetype=xml
+  autocmd BufNewFile,BufRead *.dmc                set filetype=javascript
+  autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+  autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
+  autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
 
-command! -nargs=1 Search call functions#VimGrepAll(<f-args>)
-nnoremap <C-f> :Search 
+command! -nargs=1 BufferGrep call functions#VimGrepAll(<f-args>)
+nnoremap <Space>g :BufferGrep 
 
-command! FormatJSON %!python -c 
-      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,
-      \object_pairs_hook=collections.OrderedDict), indent=2)"
+command! -range=% FormatJSON <line1>,<line2>!python -c
+      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+
+" make list-like commands more intuitive
+" including this here to avoid screwing up command mode
+function! CCR() abort
+  let cmdline = getcmdline()
+  if cmdline =~? '\v\C^(ls|files|buffers)'
+    " like :ls but prompts for a buffer command
+    return "\<CR>:b"
+  elseif cmdline =~? '\v\C/(#|nu|num|numb|numbe|number)$'
+    " like :g//# but prompts for a command
+    return "\<CR>:"
+  elseif cmdline =~? '\v\C^(dli|il)'
+    " like :dlist or :ilist but prompts for a count for :djump or :ijump
+    return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"
+  elseif cmdline =~? '\v\C^(cli|lli)'
+    " like :clist or :llist but prompts for an error/location number
+    return "\<CR>:sil " . repeat(cmdline[0], 2) . "\<Space>"
+  elseif cmdline =~? '\C^old'
+    " like :oldfiles but prompts for an old file to edit
+    return "\<CR>:e #<"
+  elseif cmdline =~? '\C^changes'
+    " like :changes but prompts for a change to jump to
+    return "\<CR>:norm! g;\<S-Left>"
+  elseif cmdline =~? '\C^ju'
+    " like :jumps but prompts for a position to jump to
+    return "\<CR>:norm! \<C-o>\<S-Left>"
+  elseif cmdline =~? '\C^marks'
+    " like :marks but prompts for a mark to jump to
+    return "\<CR>:norm! `"
+  elseif cmdline =~? '\C^undol'
+    " like :undolist but prompts for a change to undo
+    return "\<CR>:u "
+  else
+    return "\<CR>"
+  endif
+endfunction
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
