@@ -104,7 +104,6 @@ Plug 'tpope/vim-dispatch'
 Plug 'romainl/vim-qf'
 Plug 'justinmk/vim-dirvish'
 Plug 'xtal8/traces.vim'
-" Plug 'luochen1990/rainbow'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
@@ -273,7 +272,6 @@ let g:UltiSnipsExpandTrigger='<NOP>'
 let g:ulti_expand_or_jump_res = 0
 let g:ulti_jump_forwards_res = 0
 let g:ulti_jump_backwards_res = 0
-" call neocomplete#custom#source('ultisnips', 'rank', 1000)
 
 inoremap <silent> <expr><TAB> "<C-R>=functions#TabMapping()<CR>"
 inoremap <silent> <expr><S-TAB> "<C-R>=functions#ReverseTabMapping()<CR>"
@@ -342,22 +340,5 @@ let g:EasyMotion_smartcase = 1
 " AutoPairs setup {{{
 " we map this in the neocomplete setup section 
 let g:AutoPairsMapCR = 0
-" }}}
-
-" rainbow parens setup {{{
-let g:rainbow_active = 1
-
-let g:rainbow_conf = {
-      \ 'ctermfgs': [14, 11, 2, 9, 6, 5],
-      \ 'separately': {
-      \  'xml':         0,
-      \  'python':      0,
-      \  'sh':          0,
-      \  'c':           0,
-      \  'javascript':  0,
-      \  'json':        0,
-      \  'tags':        0
-      \  }
-      \}
 " }}}
 " }}}
