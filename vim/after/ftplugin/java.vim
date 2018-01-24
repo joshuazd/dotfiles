@@ -1,2 +1,2 @@
-set makeprg=mvn\ install
-set path=.,src/main/java/com/panera/**/
+setlocal makeprg=mvn\ install
+setlocal path=.,src/main/java/com/panera/**/
