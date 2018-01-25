@@ -1,3 +1,11 @@
+highlight clear
+if exists('syntax_on')
+    syntax reset
+endif
+
+set background=dark
+
+let g:colors_name='material'
 let s:bg           = '235'
 let s:red          = '203'
 let s:brightred    = '167'
@@ -23,13 +31,6 @@ let s:black        = '235'
 let s:white        = '254'
 let s:none         = 'none'
 
-highlight clear
-if exists('syntax_on')
-    syntax reset
-endif
-
-set background=dark
-let g:colors_name='material'
 "----------------------------------------------------------------------------------------------------
 " General settings                                                                                  |
 "----------------------------------------------------------------------------------------------------
@@ -73,7 +74,7 @@ exe 'hi! IncSearch       ctermfg='     .s:black        .' ctermbg='   .s:yellow 
 " -----------------
 " - Prompt/Status -
 " -----------------
-exe 'hi! StatusLine      ctermfg=245                      ctermbg=236                   cterm=none'
+exe 'hi! StatusLine      ctermfg=251                      ctermbg=236                   cterm=none'
 exe 'hi! StatusLineNC    ctermfg=245                      ctermbg=236                   cterm=none'
 exe 'hi! WildMenu        ctermfg='     .s:brightgreen  .' ctermbg='   .s:darkgrey    .' cterm=none'
 exe 'hi! Question        ctermfg='     .s:brightgreen  .' ctermbg='   .s:none        .' cterm=none'
@@ -85,7 +86,7 @@ exe 'hi! MoreMsg         ctermfg='     .s:brightgreen  .' ctermbg='   .s:none   
 " - Visual aid -
 " --------------
 exe 'hi! MatchParen      ctermfg='     .s:brightcyan   .' ctermbg='   .s:darkgrey    .' cterm=none'
-exe 'hi! Visual          ctermfg='     .s:none         .' ctermbg='   .s:darkgrey    .' cterm=none'
+exe 'hi! Visual          ctermfg='     .s:none         .' ctermbg=236                   cterm=none'
 " exe 'hi! VisualNOS     ctermfg='     .s:             .' ctermbg='   .s:none                 cterm=none
 exe 'hi! NonText         ctermfg='     .s:darkgrey     .' ctermbg='   .s:none        .' cterm=none'
 
