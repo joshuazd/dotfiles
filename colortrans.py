@@ -386,10 +386,9 @@ if __name__ == '__main__':
     arg = sys.argv[1]
     if len(arg) < 4 and int(arg) < 256:
         rgb = short2rgb(arg)
-        sys.stdout.write(
-            'xterm color \033[38;5;%sm%s\033[0m -> RGB exact' +
-            ' \033[38;5;%sm%s\033[0m' % (arg, arg, arg, rgb))
-        sys.stdout.write("\033[0m\n")
+        print(('xterm color \033[38;5;%sm%s\033[0m -> '
+               'RGB exact \033[38;5;%sm%s\033[0m') %
+              (arg, arg, arg, rgb))
     else:
         short, rgb = rgb2short(arg)
         sys.stdout.write(
