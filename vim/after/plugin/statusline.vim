@@ -35,19 +35,7 @@ function! GitHunks() abort
     let l:returnval .= (l:githunks[0] != 0 ? ' ' . l:githunks[0] . '+' : '')
     let l:returnval .= (l:githunks[1] != 0 ? ' ' . l:githunks[1] . '~' : '')
     let l:returnval .= (l:githunks[2] != 0 ? ' ' . l:githunks[2] . '-' : '')
-    return l:returnval ==# ' ' ? '' : l:returnval
-endfunction
-function! GitStatusLine() abort
-    if !exists('*fugitive#head')
-        return ''
-    endif
-    let l:gitstatus = (fugitive#head() !=# '' ? ' ' . fugitive#head() : '')
-    let l:githunks = GitHunks()
-    let l:gitline = ''
-    let l:gitline .= (l:githunks !=# '' ? l:githunks : '')
-    let l:gitline .= (l:gitstatus !=# '' ? (l:gitline ==# '' ? ' ' : '') . l:gitstatus : '')
-    let l:gitline .= (l:gitline !=# '' ? ' ' : '')
-    return l:gitline
+    return l:returnval ==# ' ' ? '' : l:returnval . ' '
 endfunction
 function! ObsessionStatusLine() abort
     if !exists('*ObsessionStatus')
@@ -93,7 +81,7 @@ endfunction
 function! BuildStatusLine(nr) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
-        \%#StlGit#%{w:["lf_active"] ? GitStatusLine() : ""}
+        \%#StlGit#%{w:["lf_active"] ? GitHunks() : ""}
         \%#MainStl# %f%m
         \%#ReadOnlyStl# %{&readonly ? "RO" : ""}%#MainStl#
         \%=

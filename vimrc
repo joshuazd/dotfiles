@@ -25,9 +25,6 @@ set splitright
 set background=dark				" dark background
 syntax enable					" turn syntax on
 colorscheme material				" material color scheme
-set number					" show line numbers
-set relativenumber				" show relative line numbers
-set numberwidth=1				" set min number column width
 set clipboard=unnamedplus			" make clipboard work better
 set softtabstop=4				" number of spaces when inserting/backspacing
 set shiftwidth=4				" shift 4 spaces for indentation
@@ -60,7 +57,7 @@ set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
-set signcolumn=yes				" always have signcolumn on
+set signcolumn=no				" don't have signcolumn on
 set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
 if executable('ag')				" use ag when available
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
@@ -152,6 +149,8 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
+nnoremap ,s :call functions#ToggleSignColumn()<CR>
+
 inoremap jk <Esc>
 
 nnoremap <Space>z :set invlist<CR>
@@ -167,7 +166,7 @@ xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
-nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
+nnoremap <silent> <Space>m :silent make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
 imap <C-s> <Esc>gcca
@@ -206,10 +205,7 @@ function! CCR() abort
   let cmdline = getcmdline()
   if cmdline =~? '\v\C^(ls|files|buffers)'
     " like :ls but prompts for a buffer command
-    return "\<CR>:b"
-  elseif cmdline =~? '\v\C/(#|nu|num|numb|numbe|number)$'
-    " like :g//# but prompts for a command
-    return "\<CR>:"
+    return "\<CR>:b "
   elseif cmdline =~? '\v\C^(dli|il)'
     " like :dlist or :ilist but prompts for a count for :djump or :ijump
     return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"
@@ -243,7 +239,7 @@ endfunction
 " {{{
 " normal statusline setup in $HOME/.vim/after/plugin/statusline.vim
 " this statusline only used if --noplugin specified
-set statusline=\ %{mode()}\ %F%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
+set statusline=\ %{mode()}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -251,7 +247,13 @@ set statusline=\ %{mode()}\ %F%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 " filetype specific plugin settings are in after/ftplugin folders
+" gutentags setup {{{
+" exclude vim plugins from tags
+let g:gutentags_ctags_exclude = ['vim/bundle/*']
+" }}}
+
 " gitgutter setup {{{
+let g:gitgutter_enabled = 0
 let g:gitgutter_sign_modified_removed = '±'
 nmap <silent> <Space>hs <Plug>GitGutterStageHunk
 nmap <silent> <Space>hu <Plug>GitGutterUndoHunk
@@ -324,7 +326,7 @@ let g:loaded_netrwPlugin = 1
 
 " Easymotion setup {{{
 map , <Plug>(easymotion-prefix)
-map s <Plug>(easymotion-s)
+map s <Plug>(easymotion-s2)
 map f <Plug>(easymotion-f)
 map F <Plug>(easymotion-F)
 map t <Plug>(easymotion-t)

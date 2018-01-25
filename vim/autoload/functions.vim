@@ -35,9 +35,21 @@ function! functions#VimRefresh() abort
   syntax sync fromstart
 endfunction
 
+function! functions#ToggleSignColumn() abort
+  if &signcolumn ==? 'no'
+    echo 'set signcolumn=yes'
+    set signcolumn=yes
+    GitGutterEnable
+  else
+    echo 'set signcolumn=no'
+    set signcolumn=no
+    GitGutterDisable
+  endif
+endfunction
+
 
 function! functions#InsertToggle(toggle) abort
-  if exists(':GitGutterDisable')
+  if exists(':GitGutterDisable') && &signcolumn !=? 'no'
     if a:toggle ==# 'enter'
       GitGutterDisable
     else
