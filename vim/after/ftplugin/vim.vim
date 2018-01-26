@@ -1,5 +1,5 @@
 setlocal shiftwidth=2
-setlocal foldmethod=marker foldlevel=0
+setlocal foldmethod=marker
 setlocal makeprg=vint\ %
 setlocal keywordprg=:help
 command! Lint cexpr system('vint ' . shellescape(expand('%')))
