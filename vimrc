@@ -20,6 +20,7 @@ set magic					" For regular expressions turn magic on
 set showmatch					" Show matching brackets when text indicator is over them
 set matchtime=2					" How many tenths of a second to blink when matching brackets
 set timeoutlen=500				" shorter timeout
+set ttimeoutlen=100				" shorter timeout
 set splitbelow					" Make splits behave better
 set splitright
 set background=dark				" dark background
@@ -30,7 +31,7 @@ set softtabstop=4				" number of spaces when inserting/backspacing
 set shiftwidth=4				" shift 4 spaces for indentation
 set expandtab					" expand tabs into spaces
 set autoindent					" use the previous lines indentation level
-set noshowmode					" don't show mode in the statusline
+" set noshowmode					" don't show mode in the statusline
 set nowrap					" don't wrap lines by default
 set linebreak					" wrap lines at words
 set laststatus=2				" always show statusline
@@ -172,6 +173,16 @@ cnoremap <expr> <CR> CCR()
 imap <C-s> <Esc>gcca
 
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
+
+" nnoremap ,j :call search('^' . matchstr(getline('.'), '\(^\s*\)') .'\%>' . line('.') . 'l\S', 'e')<CR>
+" nnoremap ,k :call search('^' . matchstr(getline('.'), '\(^\s*\)') .'\%<' . line('.') . 'l\S', 'be')<CR>
+nmap ,j <Plug>IndentMotionDown
+nmap ,k <Plug>IndentMotionUp
+
+xmap ,j <Plug>IndentMotionDown
+xmap ,k <Plug>IndentMotionUp
+" xnoremap ,j :<C-u>call search('^' . matchstr(getline(line("'>")), '\(^\s*\)') .'\%>' . line("'>") . 'l\S', 'e')<CR>m>gv
+" xnoremap ,k o:<C-u>call search('^' . matchstr(getline(line("'<")), '\(^\s*\)') .'\%<' . line("'<") . 'l\S', 'be')<CR>m<gvo
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -239,7 +250,7 @@ endfunction
 " {{{
 " normal statusline setup in $HOME/.vim/after/plugin/statusline.vim
 " this statusline only used if --noplugin specified
-set statusline=\ %{mode()}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
+set statusline=\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -269,8 +280,8 @@ let g:neocomplete#enable_smart_case = 1
 let g:neocomplete#enable_refresh_always = 1
 let g:neocomplete#auto_complete_delay = 0
 let g:neocomplete#enable_auto_delimiter = 1
-let g:UltiSnipsJumpForwardTrigger='<NOP>'
-let g:UltiSnipsExpandTrigger='<NOP>'
+let g:UltiSnipsJumpForwardTrigger="\<nop>"
+let g:UltiSnipsExpandTrigger="\<nop>"
 let g:ulti_expand_or_jump_res = 0
 let g:ulti_jump_forwards_res = 0
 let g:ulti_jump_backwards_res = 0
