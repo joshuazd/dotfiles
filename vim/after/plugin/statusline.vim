@@ -7,6 +7,7 @@ let g:modemap = {
       \ 'c' : ['C',       'CommandMode'], 'cv': ['VIMEX', 'CommandMode'], 'ce': ['EX',      'CommandMode'],
       \ 'r' : ['P',       'CommandMode'], 'rm': ['MORE',  'CommandMode'], 'r?': ['CONFIRM', 'CommandMode'],
       \ '!' : ['SH',      'CommandMode'], 't' : ['TERM',  'CommandMode']}
+
 function! GetModeIndicator() abort
   if &filetype ==# 'help'        | return ['Help']
   elseif &filetype ==# 'netrw'   | return ['netrw']
@@ -26,6 +27,7 @@ highlight ReadOnlyStl ctermbg=236 ctermfg=1   cterm=none
 highlight InactiveStl ctermbg=242 ctermfg=235 cterm=none
 highlight StatusLine  ctermbg=236 ctermfg=7   cterm=none
 highlight StlLinter   ctermbg=1   ctermfg=0   cterm=none
+
 function! GitHunks() abort
     if !exists('*GitGutterGetHunkSummary')
         return ''
@@ -37,6 +39,7 @@ function! GitHunks() abort
     let l:returnval .= (l:githunks[2] != 0 ? ' ' . l:githunks[2] . '-' : '')
     return l:returnval ==# ' ' ? '' : l:returnval . ' '
 endfunction
+
 function! ObsessionStatusLine() abort
     if !exists('*ObsessionStatus')
         return ''
@@ -44,6 +47,7 @@ function! ObsessionStatusLine() abort
         return ObsessionStatus('$')
     endif
 endfunction
+
 function! TagsStatusLine() abort
     if !exists('*gutentags#statusline')
         return ''
@@ -51,6 +55,7 @@ function! TagsStatusLine() abort
         return gutentags#statusline()
     endif
 endfunction
+
 function! QfList() abort
     if !exists('*qf#GetList')
         return ''
@@ -62,11 +67,13 @@ function! QfList() abort
         return ' '.l:qflist.' '
     endif
 endfunction
+
 function! s:updateStatusLineHighlight(nr,newMode) abort
   execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold'
   execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none'
   return 1
 endfunction
+
 function! SetupStatusLine(nr) abort
   return get(extend(w:, {
         \ 'lf_active': winnr() != a:nr
@@ -78,6 +85,7 @@ function! SetupStatusLine(nr) abort
         \ 'lf_winwd': winwidth(winnr())
         \ }), '', '')
 endfunction
+
 function! BuildStatusLine(nr) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
@@ -91,6 +99,7 @@ function! BuildStatusLine(nr) abort
         \%#InactiveStl#%{w:["lf_active"] ? "" : " ".line(".").":".printf("%02d",virtcol("."))." "}
         \%#StlLinter#%{QfList()}%#MainStl#'
 endfunction
+
 function! s:enableStatusLine() abort
   set statusline=%!BuildStatusLine(winnr())
 endfunction
