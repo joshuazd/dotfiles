@@ -31,7 +31,7 @@ set softtabstop=4				" number of spaces when inserting/backspacing
 set shiftwidth=4				" shift 4 spaces for indentation
 set expandtab					" expand tabs into spaces
 set autoindent					" use the previous lines indentation level
-" set noshowmode					" don't show mode in the statusline
+set noshowmode					" don't show mode in the statusline
 set nowrap					" don't wrap lines by default
 set linebreak					" wrap lines at words
 set laststatus=2				" always show statusline
@@ -174,15 +174,14 @@ imap <C-s> <Esc>gcca
 
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 
-" nnoremap ,j :call search('^' . matchstr(getline('.'), '\(^\s*\)') .'\%>' . line('.') . 'l\S', 'e')<CR>
-" nnoremap ,k :call search('^' . matchstr(getline('.'), '\(^\s*\)') .'\%<' . line('.') . 'l\S', 'be')<CR>
 nmap ,j <Plug>IndentMotionDown
 nmap ,k <Plug>IndentMotionUp
 
 xmap ,j <Plug>IndentMotionDown
 xmap ,k <Plug>IndentMotionUp
-" xnoremap ,j :<C-u>call search('^' . matchstr(getline(line("'>")), '\(^\s*\)') .'\%>' . line("'>") . 'l\S', 'e')<CR>m>gv
-" xnoremap ,k o:<C-u>call search('^' . matchstr(getline(line("'<")), '\(^\s*\)') .'\%<' . line("'<") . 'l\S', 'be')<CR>m<gvo
+
+omap ,j <Plug>IndentMotionDown
+omap ,k <Plug>IndentMotionUp
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
