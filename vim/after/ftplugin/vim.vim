@@ -4,11 +4,12 @@ setlocal foldmethod=marker
 setlocal makeprg=vint\ %
 setlocal keywordprg=:help
 command! Lint cexpr system('vint ' . shellescape(expand('%')))
+setlocal errorformat=%f:%l:%c:\ %t%n:\ %m
 nnoremap <buffer> ,l :Lint<CR>
 augroup VIM
     autocmd!
     if executable('vint')
-      autocmd BufWritePost *.vim,.vimrc,vimrc silent Lint
+      autocmd BufWritePost *.vim,.vimrc,vimrc silent! make|cwindow|redraw!
     endif
 augroup END
 
