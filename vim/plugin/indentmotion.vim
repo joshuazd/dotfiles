@@ -31,8 +31,13 @@ function! <SID>findSmallerIndent(line, dir) abort
   return l:curline
 endfunction
 
-function! <SID>indentMotionObject() abort
-  " code
+function! <SID>indentMotionObject(line, object) abort
+  let l:upper = <SID>findSmallerIndent(a:line, 'k')
+  let l:lower = <SID>findSmallerIndent(a:line, 'j') - 1
+  if a:object ==? 'ii'
+    let l:upper += 1
+  endif
+  execute 'normal! ' . l:upper . 'GV' . l:lower . 'G'
 endfunction
 
 function! <SID>indentMotionMove(dir, type, count) abort
@@ -66,3 +71,20 @@ xnoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', mode(),
 
 onoremap <silent> <expr> <Plug>IndentMotionDown <SID>indentMotionMove('j', 'o', v:count1)
 onoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', 'o', v:count1)
+
+onoremap <Plug>IndentMotionII :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
+onoremap <Plug>IndentMotionAI :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
+xnoremap <Plug>IndentMotionII :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
+xnoremap <Plug>IndentMotionAI :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
+if !hasmapto('<Plug>IndentMotionII', 'o')
+  omap ii <Plug>IndentMotionII
+endif
+if !hasmapto('<Plug>IndentMotionAI', 'o')
+  omap ai <Plug>IndentMotionAI
+endif
+if !hasmapto('<Plug>IndentMotionII', 'v')
+  xmap ii <Plug>IndentMotionII
+endif
+if !hasmapto('<Plug>IndentMotionAI', 'v')
+  xmap ai <Plug>IndentMotionAI
+endif

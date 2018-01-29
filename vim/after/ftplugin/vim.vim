@@ -1,4 +1,5 @@
 setlocal shiftwidth=2
+setlocal softtabstop=2
 setlocal foldmethod=marker
 setlocal makeprg=vint\ %
 setlocal keywordprg=:help
