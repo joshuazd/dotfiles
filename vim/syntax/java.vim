@@ -298,22 +298,20 @@ syn match javaComma ","
 hi def link javaComma PreProc
 
 " catch errors caused by wrong parenthesis
-syn region  javaParenT	transparent start="(" end=")" contains=@javaTop,javaParenT1
-syn region  javaParenT1 transparent start="(" end=")" contains=@javaTop,javaParenT2 contained
-syn region  javaParenT2 transparent start="(" end=")" contains=@javaTop,javaParenT  contained
+syn region  javaParenT	transparent matchgroup=javaParen  start="(" end=")" contains=@javaTop,javaParenT1
+syn region  javaParenT1 transparent matchgroup=javaParen1 start="(" end=")" contains=@javaTop,javaParenT2 contained
+syn region  javaParenT2 transparent matchgroup=javaParen2 start="(" end=")" contains=@javaTop,javaParenT  contained
 syn match   javaParenError	 ")"
 " catch errors caused by wrong square parenthesis
-syn region  javaParenT	transparent start="\[" end="\]" contains=@javaTop,javaParenT1
-syn region  javaParenT1 transparent start="\[" end="\]" contains=@javaTop,javaParenT2 contained
-syn region  javaParenT2 transparent start="\[" end="\]" contains=@javaTop,javaParenT  contained
+syn region  javaParenT	transparent matchgroup=javaParen  start="\[" end="\]" contains=@javaTop,javaParenT1
+syn region  javaParenT1 transparent matchgroup=javaParen1 start="\[" end="\]" contains=@javaTop,javaParenT2 contained
+syn region  javaParenT2 transparent matchgroup=javaParen2 start="\[" end="\]" contains=@javaTop,javaParenT  contained
 syn match   javaParenError	 "\]"
 
-syn cluster javaParen add=javaParenT,javaParenT1,javaParenT2
-
 hi def link javaParenError	javaError
-" hi def link javaParen           PreProc
-" hi def link javaParen1          PreProc
-" hi def link javaParen2          PreProc
+hi def link javaParen           PreProc
+hi def link javaParen1          PreProc
+hi def link javaParen2          PreProc
 
 
 if exists("java_highlight_functions")
