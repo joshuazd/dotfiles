@@ -21,8 +21,8 @@ set splitright
 set background=dark				" dark background
 syntax off					" turn syntax on
 syntax sync clear
-set number					" show line numbers
-set relativenumber				" show relative line numbers
+" set number					" show line numbers
+" set relativenumber				" show relative line numbers
 set numberwidth=1				" set min number column width
 set clipboard=unnamedplus			" make clipboard work better
 set softtabstop=4				" number of spaces when inserting/backspacing
@@ -104,4 +104,4 @@ xnoremap <silent> <Space>p p=']
 xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
-set statusline=\ %{mode()}\ %F%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
+set statusline=\ %{mode()}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
