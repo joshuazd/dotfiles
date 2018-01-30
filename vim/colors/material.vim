@@ -54,7 +54,7 @@ exe 'hi! CursorLineNR    ctermfg='     .s:brightcyan   .' ctermbg='   .s:bg     
 exe 'hi! CursorColumn    ctermfg='     .s:none         .' ctermbg='   .s:darkgrey   .' cterm=none'
 exe 'hi! FoldColumn      ctermfg='     .s:none         .' ctermbg='   .s:bg       .' cterm=none'
 exe 'hi! SignColumn      ctermfg='     .s:none         .' ctermbg='   .s:bg       .' cterm=none'
-exe 'hi! Folded          ctermfg='     .s:lightgrey    .' ctermbg=234                  cterm=none'
+exe 'hi! Folded          ctermfg='     .s:lightgrey    .' ctermbg=233                  cterm=none'
 
 " -------------------------
 " - Window/Tab delimiters - 
