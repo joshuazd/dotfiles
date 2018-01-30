@@ -13,10 +13,11 @@ command! Lint cexpr system('xmllint --noout ' . shellescape(expand('%')))
 nnoremap <buffer> ,l :Lint<CR>
 compiler ant
 setlocal omnifunc=xmlcomplete#CompleteTags
-setlocal makeprg=mvn\ clean\ install\ -e\ -ff\ -T\ 16
+setlocal makeprg=mvn\ clean\ install\ -e\ -ff\ -T\ 16\ -q
 setlocal syntax=xml
-setlocal path=.,*/src/main/synapse-config/**/
+setlocal path=.,*/src/main/synapse-config/*/
 setlocal suffixesadd+=.xml
+setlocal breakindentopt=shift:4
 nnoremap ,f zMza
 augroup XML
     autocmd!
