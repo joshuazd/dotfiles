@@ -52,7 +52,7 @@ set noswapfile
 set foldlevel=99				" don't fold things by default
 set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:$,nbsp:␣ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
-set completeopt+=menuone			" configure popup menu
+set completeopt+=menuone,noinsert,noselect,longest " configure popup menu
 set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
@@ -60,8 +60,11 @@ set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 set signcolumn=no				" don't have signcolumn on
 set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
-if executable('ag')				" use ag when available
-  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
+if executable('rg')				" use ripgrep when available
+  set grepprg=rg\ --vimgrep
+  set grepformat=%f:%l:%c:%m,%f:%l:%m
+elseif executable('ag')				" use ag when available and ripgrep is not
+  set grepprg=ag\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
@@ -85,7 +88,7 @@ Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'Konfekt/FastFold'
 Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 Plug 'airblade/vim-gitgutter'
-Plug 'shougo/neocomplete.vim'
+Plug 'ajh17/VimCompletesMe'
 Plug 'SirVer/ultisnips'
 Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
@@ -175,12 +178,6 @@ imap <C-s> <Esc>gcca
 
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 
-nmap ,j <Plug>IndentMotionDown
-nmap ,k <Plug>IndentMotionUp
-xmap ,j <Plug>IndentMotionDown
-xmap ,k <Plug>IndentMotionUp
-omap ,j <Plug>IndentMotionDown
-omap ,k <Plug>IndentMotionUp
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -239,107 +236,4 @@ endfunction
 " normal statusline setup in $HOME/.vim/after/plugin/statusline.vim
 " this statusline only used if --noplugin specified
 set statusline=\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
-" }}}
-
-""""""""""""""""""""""""""""""""""""""""""""""""
-"              PLUGIN SETUP
-""""""""""""""""""""""""""""""""""""""""""""""""
-" {{{
-" filetype specific plugin settings are in after/ftplugin folders
-" gutentags setup {{{
-" exclude vim plugins from tags
-let g:gutentags_ctags_exclude = ['vim/bundle/*']
-" }}}
-
-" gitgutter setup {{{
-let g:gitgutter_enabled = 0
-let g:gitgutter_sign_modified_removed = '±'
-nmap <silent> <Space>hs <Plug>GitGutterStageHunk
-nmap <silent> <Space>hu <Plug>GitGutterUndoHunk
-nmap <silent> <Space>hp <Plug>GitGutterPreviewHunk
-nmap <silent> [h <Plug>GitGutterPrevHunk
-nmap <silent> ]h <Plug>GitGutterNextHunk
-" }}}
-
-" neocomplete/ultisnips setup {{{
-
-let g:neocomplete#enable_at_startup = 1
-let g:neocomplete#enable_smart_case = 1
-let g:neocomplete#enable_refresh_always = 1
-let g:neocomplete#auto_complete_delay = 0
-let g:neocomplete#enable_auto_delimiter = 1
-let g:UltiSnipsJumpForwardTrigger="\<nop>"
-let g:UltiSnipsExpandTrigger="\<nop>"
-let g:ulti_expand_or_jump_res = 0
-let g:ulti_jump_forwards_res = 0
-let g:ulti_jump_backwards_res = 0
-
-inoremap <silent> <expr><TAB> "<C-R>=functions#TabMapping()<CR>"
-inoremap <silent> <expr><S-TAB> "<C-R>=functions#ReverseTabMapping()<CR>"
-xnoremap <silent> <expr><TAB> ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
-snoremap <silent> <expr><TAB> "<ESC>:call UltiSnips#JumpForwards()<cr>"
-snoremap <silent> <expr><S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<cr>"
-imap <silent> <CR> <C-R>=((functions#EnterMapping() > 0) ? "" : pumvisible() ? "\r" : "\r")<CR><Plug>AutoPairsReturn
-
-if !exists('g:neocomplete#keyword_patterns')
-  let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns._ = '\h\w*'
-
-if !exists('g:neocomplete#force_omni_input_patterns')
-  let g:neocomplete#force_omni_input_patterns = {}
-endif
-
-" xml setup {{{
-let g:neocomplete#keyword_patterns.xml =
-      \'</\?\%([[:alnum:]_:-]\+\s*\)\?\%(/\?>\)\?\|&\h\%(\w*;\)\?'.
-      \'\|\h[[:alnum:]_:-]*'
-let g:neocomplete#force_omni_input_patterns.xml = '</\?'
-" }}}
-
-" python setup {{{
-let g:jedi#completions_enabled = 0
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#smart_auto_mappings = 0
-let g:neocomplete#force_omni_input_patterns.python = 
-      \'\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|'.
-      \'^\s*from \|^\s*import \)\w*'
-" }}}
-
-" clang setup {{{
-let g:clang_auto = 0 " disable auto completion for vim-clang
-let g:clang_c_completeopt = 'menuone,preview'
-let g:clang_cpp_completeopt = 'menuone,preview'
-let g:neocomplete#force_omni_input_patterns.c =
-      \ '\h\w*\%(\.\|->\)\w*'
-let g:neocomplete#force_omni_input_patterns.cpp =
-      \ '\h\w*\%(\.\|->\)\w*\|\h\w*::\w*'
-let g:clang_verbose_pmenu = 1
-" }}}
-" }}}
-
-" netrw setup {{{
-let g:loaded_netrw       = 1
-let g:loaded_netrwPlugin = 1
-" }}}
-
-" Easymotion setup {{{
-map , <Plug>(easymotion-prefix)
-map s <Plug>(easymotion-s2)
-map f <Plug>(easymotion-f)
-map F <Plug>(easymotion-F)
-map t <Plug>(easymotion-tl)
-map T <Plug>(easymotion-Tl)
-map / <Plug>(easymotion-sn)
-map ? <Plug>(easymotion-sn)
-omap / <Plug>(easymotion-tn)
-omap ? <Plug>(easymotion-Tn)
-let g:EasyMotion_startofline = 0
-let g:EasyMotion_smartcase = 1
-" }}}
-
-" AutoPairs setup {{{
-" we map this in the neocomplete setup section 
-let g:AutoPairsMapCR = 0
-" }}}
 " }}}
