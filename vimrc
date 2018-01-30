@@ -102,6 +102,8 @@ Plug 'tpope/vim-dispatch'
 Plug 'romainl/vim-qf'
 Plug 'justinmk/vim-dirvish'
 Plug 'xtal8/traces.vim'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif

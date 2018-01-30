@@ -16,11 +16,11 @@ function! GetModeIndicator() abort
   endif
 endfunction
 let g:mode_hi = {
-      \'NormalMode'  : ' ctermbg=4   ctermfg=234 ',
-      \'InsertMode'  : ' ctermbg=3   ctermfg=234 ',
-      \'VisualMode'  : ' ctermbg=10  ctermfg=234 ',
-      \'ReplaceMode' : ' ctermbg=1   ctermfg=234 ',
-      \'CommandMode' : ' ctermbg=13  ctermfg=234 '}
+      \'NormalMode'  : ' ctermbg=68  ctermfg=234 ',
+      \'InsertMode'  : ' ctermbg=221 ctermfg=234 ',
+      \'VisualMode'  : ' ctermbg=107 ctermfg=234 ',
+      \'ReplaceMode' : ' ctermbg=167 ctermfg=234 ',
+      \'CommandMode' : ' ctermbg=176 ctermfg=234 '}
 highlight StlGit      ctermbg=235 ctermfg=242 cterm=none
 highlight MainStl     ctermbg=236 ctermfg=7   cterm=none
 highlight ReadOnlyStl ctermbg=236 ctermfg=1   cterm=none
