@@ -65,8 +65,6 @@ if executable('ag')				" use ag when available
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-  " set guifont=Literation\ Mono\ Powerline\ 10
-  " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
   set guifont=DejaVu\ Sans\ Mono\ Book\ 10
   set guioptions-=T
   set guioptions+=e
@@ -102,13 +100,15 @@ Plug 'tpope/vim-dispatch'
 Plug 'romainl/vim-qf'
 Plug 'justinmk/vim-dirvish'
 Plug 'xtal8/traces.vim'
+Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --all'}
+Plug 'junegunn/fzf.vim'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
 " language specific plugins
 Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
-Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
-Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
+" Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
+" Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 Plug 'Shougo/neco-vim', { 'for': 'vim' }
 call plug#end()
@@ -129,8 +129,8 @@ nnoremap H ^
 
 nnoremap Y y$
 
-nnoremap <Space>v :vs\|bn<CR>
-nnoremap <Space>s :sp\|bn<CR>
+nnoremap <Space>v :vs<CR>
+nnoremap <Space>s :sp<CR>
 
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
@@ -145,7 +145,12 @@ nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
 nnoremap <Space>a :argadd **/*
-nnoremap <Space>f :find *
+if !exists(':Files')
+  nnoremap <Space>f :find *
+else
+  nnoremap <Space>f :Files<CR>
+endif
+nnoremap <Space>e :e <C-r>=expand('%:h')<CR>/*<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
@@ -176,10 +181,8 @@ nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 nmap ,j <Plug>IndentMotionDown
 nmap ,k <Plug>IndentMotionUp
-
 xmap ,j <Plug>IndentMotionDown
 xmap ,k <Plug>IndentMotionUp
-
 omap ,j <Plug>IndentMotionDown
 omap ,k <Plug>IndentMotionUp
 " }}}
@@ -197,8 +200,6 @@ augroup EditVim
   autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
   autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
   autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
-  autocmd InsertEnter        *                    call functions#InsertToggle('enter')
-  autocmd InsertLeave        *                    call functions#InsertToggle('leave')
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
@@ -214,28 +215,20 @@ command! -range=% FormatJSON <line1>,<line2>!python -c
 function! CCR() abort
   let cmdline = getcmdline()
   if cmdline =~? '\v\C^(ls|files|buffers)'
-    " like :ls but prompts for a buffer command
     return "\<CR>:b "
   elseif cmdline =~? '\v\C^(dli|il)'
-    " like :dlist or :ilist but prompts for a count for :djump or :ijump
     return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"
   elseif cmdline =~? '\v\C^(cli|lli)'
-    " like :clist or :llist but prompts for an error/location number
     return "\<CR>:sil " . repeat(cmdline[0], 2) . "\<Space>"
   elseif cmdline =~? '\C^old'
-    " like :oldfiles but prompts for an old file to edit
     return "\<CR>:e #<"
   elseif cmdline =~? '\C^changes'
-    " like :changes but prompts for a change to jump to
     return "\<CR>:norm! g;\<S-Left>"
   elseif cmdline =~? '\C^ju'
-    " like :jumps but prompts for a position to jump to
     return "\<CR>:norm! \<C-o>\<S-Left>"
   elseif cmdline =~? '\C^marks'
-    " like :marks but prompts for a mark to jump to
     return "\<CR>:norm! `"
   elseif cmdline =~? '\C^undol'
-    " like :undolist but prompts for a change to undo
     return "\<CR>:u "
   else
     return "\<CR>"

@@ -45,3 +45,5 @@ export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls:l'
 if [ -f "${HOME}/.aliases" ]; then
   source "${HOME}/.aliases"
 fi
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

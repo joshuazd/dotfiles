@@ -102,3 +102,7 @@ setopt HIST_VERIFY
 if [[ -d ~/pebble-dev/pebble-sdk-4.5-linux64/bin ]]; then
     export PATH=$PATH:~/pebble-dev/pebble-sdk-4.5-linux64/bin
 fi
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+export FZF_DEFAULT_COMMAND='ag -l'
+export PATH=$PATH:/snap/bin/
