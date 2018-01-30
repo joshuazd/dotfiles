@@ -35,10 +35,15 @@ function! s:place_signs() abort
   endif
 
   if len(l:qflist) > 0
-    let s:orig_scl = &signcolumn
+    if s:orig_scl ==? ''
+      let s:orig_scl = &signcolumn
+    endif
     setlocal signcolumn=yes
   else
-    let &l:signcolumn=s:orig_scl
+    if s:orig_scl !=? ''
+      let &l:signcolumn=s:orig_scl
+      let s:orig_scl = ''
+    endif
   endif
 
   for l:error in l:qflist

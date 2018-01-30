@@ -24,7 +24,8 @@ function! <SID>findSmallerIndent(line, dir) abort
   let l:wspace = matchstr(getline(a:line), '\(^\s*\)')
   let l:curline = a:line + l:inc
   let l:temp_wspace = matchstr(getline(l:curline), '\(^\s*\)')
-  while len(l:wspace) <= len(l:temp_wspace) && l:curline > 0
+  while (len(getline(l:curline)) == 0 || len(l:wspace) <= len(l:temp_wspace))
+        \&& l:curline > 0 && l:curline <= line('$')
     let l:curline += l:inc
     let l:temp_wspace = matchstr(getline(l:curline), '\(^\s*\)')
   endwhile
@@ -87,4 +88,22 @@ if !hasmapto('<Plug>IndentMotionII', 'v')
 endif
 if !hasmapto('<Plug>IndentMotionAI', 'v')
   xmap ai <Plug>IndentMotionAI
+endif
+if !hasmapto('<Plug>IndentMotionDown', 'n')
+  nmap ,j <Plug>IndentMotionDown
+endif
+if !hasmapto('<Plug>IndentMotionUp', 'n')
+  nmap ,k <Plug>IndentMotionUp
+endif
+if !hasmapto('<Plug>IndentMotionDown', 'x')
+  xmap ,j <Plug>IndentMotionDown
+endif
+if !hasmapto('<Plug>IndentMotionUp', 'x')
+  xmap ,k <Plug>IndentMotionUp
+endif
+if !hasmapto('<Plug>IndentMotionDown', 'o')
+  omap ,j <Plug>IndentMotionDown
+endif
+if !hasmapto('<Plug>IndentMotionUp', 'o')
+  omap ,k <Plug>IndentMotionUp
 endif
