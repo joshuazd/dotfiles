@@ -38,7 +38,7 @@ function! s:place_signs() abort
     let s:orig_scl = &signcolumn
     setlocal signcolumn=yes
   else
-    let l:signcolumn=s:orig_scl
+    let &l:signcolumn=s:orig_scl
   endif
 
   for l:error in l:qflist
