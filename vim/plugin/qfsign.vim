@@ -46,12 +46,12 @@ function! s:place_signs() abort
       continue
     endif
     let s:sign_count = s:sign_count + 1
-    if l:error.type ==# 'E'
+    if l:error.type ==? 'E'
       let l:err_sign = 'sign place ' . s:sign_count
             \ . ' line=' . l:error.lnum
             \ . ' name=QFErr'
             \ . ' buffer=' . l:error.bufnr
-    elseif l:error.type ==# 'W'
+    elseif l:error.type ==? 'W'
       let l:err_sign = 'sign place ' . s:sign_count
             \ . ' line=' . l:error.lnum
             \ . ' name=QFWarn'
