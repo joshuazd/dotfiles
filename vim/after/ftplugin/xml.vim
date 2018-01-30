@@ -7,10 +7,9 @@ setlocal conceallevel=0
 setlocal wrap
 setlocal foldnestmax=2
 let g:xml_syntax_folding=1 " enable xml folding
-inoremap <buffer> </ </<C-x><C-o><C-y>
+inoremap <buffer> </ </<C-x><C-o><C-n><C-y>
 command! Tabs setlocal shiftwidth=2 softtabstop=2 foldmethod=syntax smarttab
 command! Lint cexpr system('xmllint --noout ' . shellescape(expand('%')))
-nnoremap <buffer> ,l :Lint<CR>
 compiler ant
 setlocal omnifunc=xmlcomplete#CompleteTags
 setlocal makeprg=mvn\ clean\ install\ -e\ -ff\ -T\ 16\ -q
