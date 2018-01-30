@@ -145,11 +145,7 @@ nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
 nnoremap <Space>a :argadd **/*
-if !exists(':Files')
-  nnoremap <Space>f :find *
-else
-  nnoremap <Space>f :Files<CR>
-endif
+nnoremap <Space>f :find *
 nnoremap <Space>e :e <C-r>=expand('%:h')<CR>/*<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
@@ -172,7 +168,7 @@ xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
-nnoremap <silent> <Space>m :silent make\|cwindow\|redraw!<CR>
+nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
 imap <C-s> <Esc>gcca
