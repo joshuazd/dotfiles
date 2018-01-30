@@ -47,18 +47,6 @@ function! functions#ToggleSignColumn() abort
   endif
 endfunction
 
-
-function! functions#InsertToggle(toggle) abort
-  if exists(':GitGutterDisable') && &signcolumn !=? 'no'
-    if a:toggle ==# 'enter'
-      GitGutterDisable
-    else
-      GitGutterEnable
-    endif
-  endif
-endfunction
-
-
 function! functions#TabMapping() abort
   if neocomplete#complete_common_string() !=? ''
     return neocomplete#complete_common_string()
