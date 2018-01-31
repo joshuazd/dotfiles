@@ -25,7 +25,8 @@ let s:purple       = '176'
 let s:brightpurple = '97'
 let s:darkpurple   = '53'
 let s:brown        = '137'
-let s:darkgrey     = '237'
+let s:darkgrey     = '236'
+let s:grey         = '239'
 let s:lightgrey    = '246'
 let s:black        = '235'
 let s:bg           = 'none'
@@ -45,15 +46,15 @@ let s:none         = 'none'
 exe 'hi! Normal          ctermfg='     .s:white        .' ctermbg='   .s:bg         .' cterm=none'
 exe 'hi! Cursor                                                                        cterm=reverse'
 exe 'hi! CursorLine      ctermfg='     .s:none         .' ctermbg='   .s:darkgrey   .' cterm=none'
-exe 'hi! LineNr          ctermfg='     .s:darkgrey     .' ctermbg='   .s:bg         .' cterm=none'
+exe 'hi! LineNr          ctermfg='     .s:grey         .' ctermbg='   .s:bg         .' cterm=none'
 exe 'hi! CursorLineNR    ctermfg='     .s:brightcyan   .' ctermbg='   .s:bg         .' cterm=none'
 
 " -----------------
 " - Number column -
 " -----------------
 exe 'hi! CursorColumn    ctermfg='     .s:none         .' ctermbg='   .s:darkgrey   .' cterm=none'
-exe 'hi! FoldColumn      ctermfg='     .s:none         .' ctermbg='   .s:bg       .' cterm=none'
-exe 'hi! SignColumn      ctermfg='     .s:none         .' ctermbg='   .s:bg       .' cterm=none'
+exe 'hi! FoldColumn      ctermfg='     .s:none         .' ctermbg='   .s:bg         .' cterm=none'
+exe 'hi! SignColumn      ctermfg='     .s:none         .' ctermbg='   .s:bg         .' cterm=none'
 exe 'hi! Folded          ctermfg='     .s:lightgrey    .' ctermbg=233                  cterm=none'
 
 " -------------------------
@@ -123,7 +124,7 @@ exe 'hi! Statement       ctermfg='     .s:purple       .' ctermbg='   .s:bg     
 exe 'hi! Operator        ctermfg='     .s:brown        .' ctermbg='   .s:bg          .' cterm=none'
 exe 'hi! Keyword         ctermfg='     .s:purple       .' ctermbg='   .s:bg          .' cterm=none'
 " exe 'hi! Exception     ctermfg='     .s:             .' ctermbg='   .s:bg          .' cterm=none'
-exe 'hi! Comment         ctermfg='     .s:darkgrey     .' ctermbg='   .s:bg          .' cterm=none'
+exe 'hi! Comment         ctermfg='     .s:grey         .' ctermbg='   .s:bg          .' cterm=none'
 exe 'hi! Language        ctermfg='     .s:pink         .' ctermbg='   .s:bg          .' cterm=none'
 
 exe 'hi! Special         ctermfg='     .s:red          .' ctermbg='   .s:bg          .' cterm=none'

@@ -54,3 +54,5 @@ xterm*saveLines: 50000
 xterm*jumpScroll: true
 xterm*scrollTtyOutput: false
 xterm*utf8Title: true
+XTerm*altIsNotMeta: true
+XTerm*altSendsEscape: true
