@@ -1,106 +1,56 @@
 *customization: -color
+
+*VT100*colorMode: on
+*VT100*dynamicColors: on
+
 !special
-*foreground:   #bbbbbb
-*background:   #212121
-*cursorColor:  #eeffff
+XTerm*foreground:   #bbbbbb
+XTerm*background:   #1c1c1c
+XTerm*cursorColor:  #eeffff
 
 !black
-*color0:       #212121
-*color8:       #3e515b
+XTerm*color0:       #1c1c1c
+XTerm*color8:       #3e515b
 
 !red
-*color1:       #e53935
-*color9:       #ff5370
+XTerm*color1:       #e53935
+XTerm*color9:       #ff5370
 
 !green
-*color2:       #91b859
-*color10:      #c3e88d
+XTerm*color2:       #c3e88d
+XTerm*color10:      #91b859
 
 !yellow
-*color3:       #ffb62c
-*color11:      #ffcb6b
+XTerm*color3:       #ffb62c
+XTerm*color11:      #ffcb6b
 
 !blue
-*color4:       #82aaff
-*color12:      #6182b8
+XTerm*color4:       #6182b8
+XTerm*color12:      #82aaff
 
 !magenta
-*color5:       #c792ea
-*color13:      #945eb8
+XTerm*color5:       #c792ea
+XTerm*color13:      #945eb8
 
 !cyan
-*color6:       #39adb5
-*color14:      #89ddff
+XTerm*color6:       #39adb5
+XTerm*color14:      #89ddff
 
 !white
-*color7:       #bbbbbb
-*color15:      #ffffff
+XTerm*color7:       #bbbbbb
+XTerm*color15:      #ffffff
 
 
 XTerm.termName: xterm-256color
 XTerm*ttyModes: start ^- stop ^-
 
-#ifdef FIXED
-XTerm.VT100.font:         FIXED-iso8859-1
-XTerm.font:               FIXED-iso8859-1
-XTerm*boldFont:           FIXED-iso8859-1
-XTerm*utf8Fonts.font:     FIXED-iso10646-1
-XTerm*utf8Fonts.boldFont: FIXED-iso10646-1
-#else
-XTerm.VT100.font:         -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
-XTerm.font:               -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
-XTerm*boldFont:           -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
-XTerm*utf8Fonts.font:     -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso10646-1
-XTerm*utf8Fonts.boldFont: -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso10646-1
-#endif
+XTerm*faceName: DejaVu Sans Mono:size=10:antialias=true
 
-#if WIDTH >= 1920
-XTerm*renderFont: true
-#endif
-XTerm.fontMenu.fontdefault.Label: Default
-XTerm.fontMenu.font1.Label: Tiny
-XTerm*font1:                -misc-fixed-medium-r-normal--6-*-*-*-c-*-iso8859-1
-XTerm*utf8Fonts.font1:      -misc-fixed-medium-r-normal--6-*-*-*-c-*-iso10646-1
-XTerm.fontMenu.font2.Label: Small
-XTerm*font2:                -misc-fixed-medium-r-normal--8-*-*-*-c-*-iso8859-1
-XTerm*utf8Fonts.font2:      -misc-fixed-medium-r-normal--8-*-*-*-c-*-iso10646-1
-XTerm.fontMenu.font3.Label: Semicondensed
-XTerm*font3:                -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso8859-1
-XTerm*utf8Fonts.font3:      -misc-fixed-medium-r-semicondensed--13-*-*-*-c-*-iso10646-1
-XTerm.fontMenu.font4.Label: Medium
-XTerm*font4:                -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso8859-1
-XTerm*utf8Fonts.font4:      -misc-fixed-medium-r-normal--14-*-*-*-c-*-iso10646-1
-XTerm.fontMenu.font5.Label: Large
-XTerm*font5:                -misc-fixed-medium-r-normal--18-*-*-*-c-*-iso8859-1
-XTerm*utf8Fonts.font5:      -misc-fixed-medium-r-normal--18-*-*-*-c-*-iso10646-1
-XTerm.fontMenu.font6.Label: Huge
-XTerm*font6:                -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso8859-1
-XTerm*utf8Fonts.font6:      -misc-fixed-medium-r-normal--20-*-*-*-c-*-iso10646-1
-XTerm*faceName: MONOSPACE:MEDIUM
-#ifdef MONOSIZE
-XTerm*faceSize: MONOSIZE
-#else
-XTerm*faceSize: 10
-#endif
-XTerm*faceSize1: 10
-XTerm*faceSize2: 12
-XTerm*faceSize3: 14
-XTerm*faceSize4: 17
-XTerm*faceSize5: 21
-XTerm*faceSize6: 24
-
-xterm*VT100*geometry: 94x28
-xterm*font:     *-fixed-*-*-*-18-*
-xterm*background: black
-xterm*foreground: lightblue
+xterm*VT100*geometry: 120x35
 xterm*scrollBar: false
-/* xterm*rightScrollBar: true */
 xterm*title: XTerm
 xterm*iconName: XTerm
 xterm*saveLines: 50000
 xterm*jumpScroll: true
 xterm*scrollTtyOutput: false
-/* xterm*scrollKey: true */
-xterm*alwaysUseMods: true
-xterm*metaSendsEscape: true
 xterm*utf8Title: true
