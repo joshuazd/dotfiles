@@ -16,16 +16,16 @@ function! GetModeIndicator() abort
   endif
 endfunction
 let g:mode_hi = {
-      \'NormalMode'  : ' ctermbg=68  ctermfg=234 ',
-      \'InsertMode'  : ' ctermbg=221 ctermfg=234 ',
-      \'VisualMode'  : ' ctermbg=107 ctermfg=234 ',
-      \'ReplaceMode' : ' ctermbg=167 ctermfg=234 ',
-      \'CommandMode' : ' ctermbg=176 ctermfg=234 '}
+      \'NormalMode'  : ' ctermfg=68  ctermbg=235 ',
+      \'InsertMode'  : ' ctermfg=221 ctermbg=235 ',
+      \'VisualMode'  : ' ctermfg=107 ctermbg=235 ',
+      \'ReplaceMode' : ' ctermfg=167 ctermbg=235 ',
+      \'CommandMode' : ' ctermfg=176 ctermbg=235 '}
 highlight StlGit      ctermbg=235 ctermfg=242 cterm=none
-highlight MainStl     ctermbg=236 ctermfg=7   cterm=none
-highlight ReadOnlyStl ctermbg=236 ctermfg=1   cterm=none
-highlight InactiveStl ctermbg=242 ctermfg=235 cterm=none
-highlight StatusLine  ctermbg=236 ctermfg=7   cterm=none
+highlight MainStl     ctermbg=235 ctermfg=7   cterm=none
+highlight ReadOnlyStl ctermbg=235 ctermfg=1   cterm=none
+highlight InactiveStl ctermbg=235 ctermfg=241 cterm=none
+highlight StatusLine  ctermbg=235 ctermfg=7   cterm=none
 highlight StlLinter   ctermbg=1   ctermfg=0   cterm=none
 
 function! GitHunks() abort

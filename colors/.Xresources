@@ -4,7 +4,7 @@
 *VT100*dynamicColors: on
 
 !special
-XTerm*foreground:   #bbbbbb
+XTerm*foreground:   #cccccc
 XTerm*background:   #1c1c1c
 XTerm*cursorColor:  #eeffff
 

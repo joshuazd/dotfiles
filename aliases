@@ -12,6 +12,7 @@ alias l='ls -lFh'
 alias mv='mv -i'
 alias cp='cp -i'
 alias j=jobs
+alias vi=vim
 
 alias python='python3'
 alias pip='pip3'
