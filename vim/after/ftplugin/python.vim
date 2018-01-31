@@ -1,8 +1,9 @@
 setlocal foldmethod=indent
 setlocal omnifunc=jedi#completions
+let b:vcm_tab_complete = 'omni'
+let b:vcm_omni_pattern = '\k[\k\.]\+'
 command! Lint cexpr system('flake8 ' . shellescape(expand('%')))
 set makeprg=flake8\ %
-nnoremap <buffer> ,l :Lint<CR>
 command! -bar Fix silent execute "!autopep8 -i -a -a -a %" | redraw!
 augroup PYTHON
     autocmd!

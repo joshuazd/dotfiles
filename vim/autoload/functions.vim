@@ -24,9 +24,9 @@ function! functions#ToggleConceal() abort
 endfunction
 
 function! functions#VimRefresh() abort
-  NeoCompleteClean
-  NeoCompleteBufferMakeCache
-  NeoCompleteMemberMakeCache
+  " NeoCompleteClean
+  " NeoCompleteBufferMakeCache
+  " NeoCompleteMemberMakeCache
   GutentagsUpdate!
   if &filetype ==? 'java'
     JCcacheClear
@@ -47,35 +47,9 @@ function! functions#ToggleSignColumn() abort
   endif
 endfunction
 
-
-function! functions#InsertToggle(toggle) abort
-  if exists(':GitGutterDisable') && &signcolumn !=? 'no'
-    if a:toggle ==# 'enter'
-      GitGutterDisable
-    else
-      GitGutterEnable
-    endif
-  endif
-endfunction
-
-
-function! functions#TabMapping() abort
-  if neocomplete#complete_common_string() !=? ''
-    return neocomplete#complete_common_string()
-  elseif pumvisible()
-    return "\<C-n>"
-  else
-    let l:snippet = UltiSnips#ExpandSnippetOrJump()
-    if g:ulti_expand_or_jump_res > 0
-      return l:snippet
-    else
-      return "\<TAB>"
-    endif
-  endif
-endfunction
 function! functions#ReverseTabMapping() abort
   if pumvisible()
-    return "\<C-p>"
+    return "\<Plug>vim_completes_me_backward"
   else
     let l:snippet = UltiSnips#JumpBackwards()
     if g:ulti_jump_backwards_res > 0

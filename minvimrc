@@ -26,10 +26,7 @@ set splitbelow					" Make splits behave better
 set splitright
 set background=dark				" dark background
 syntax enable					" turn syntax on
-colorscheme hybrid_material			" material color scheme
-set number					" show line numbers
-set relativenumber				" show relative line numbers
-set numberwidth=1				" set min number column width
+colorscheme material				" material color scheme
 set clipboard=unnamedplus			" make clipboard work better
 set softtabstop=4				" number of spaces when inserting/backspacing
 set shiftwidth=4				" shift 4 spaces for indentation
@@ -62,7 +59,6 @@ set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
-" set signcolumn=yes				" always have signcolumn on
 set cpoptions-=<
 if executable('ag')				" use ag when available
   set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
@@ -117,6 +113,7 @@ nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
+nnoremap <Space>i :ilist /
 
 
 inoremap jk <Esc>
@@ -134,7 +131,7 @@ xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
-nnoremap <silent> <F10> :silent make\|cwindow\|redraw!<CR>
+nnoremap <silent> <Space>m :silent make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
@@ -169,10 +166,7 @@ function! CCR() abort
   let cmdline = getcmdline()
   if cmdline =~? '\v\C^(ls|files|buffers)'
     " like :ls but prompts for a buffer command
-    return "\<CR>:b"
-  elseif cmdline =~? '\v\C/(#|nu|num|numb|numbe|number)$'
-    " like :g//# but prompts for a command
-    return "\<CR>:"
+    return "\<CR>:b "
   elseif cmdline =~? '\v\C^(dli|il)'
     " like :dlist or :ilist but prompts for a count for :djump or :ijump
     return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"

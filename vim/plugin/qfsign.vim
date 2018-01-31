@@ -35,10 +35,15 @@ function! s:place_signs() abort
   endif
 
   if len(l:qflist) > 0
-    let s:orig_scl = &signcolumn
+    if s:orig_scl ==? ''
+      let s:orig_scl = &signcolumn
+    endif
     setlocal signcolumn=yes
   else
-    let l:signcolumn=s:orig_scl
+    if s:orig_scl !=? ''
+      let &l:signcolumn=s:orig_scl
+      let s:orig_scl = ''
+    endif
   endif
 
   for l:error in l:qflist
@@ -46,12 +51,12 @@ function! s:place_signs() abort
       continue
     endif
     let s:sign_count = s:sign_count + 1
-    if l:error.type ==# 'E'
+    if l:error.type ==? 'E'
       let l:err_sign = 'sign place ' . s:sign_count
             \ . ' line=' . l:error.lnum
             \ . ' name=QFErr'
             \ . ' buffer=' . l:error.bufnr
-    elseif l:error.type ==# 'W'
+    elseif l:error.type ==? 'W'
       let l:err_sign = 'sign place ' . s:sign_count
             \ . ' line=' . l:error.lnum
             \ . ' name=QFWarn'
