@@ -3,7 +3,8 @@
 " let g:neocomplete#enable_refresh_always = 1
 " let g:neocomplete#auto_complete_delay = 0
 " let g:neocomplete#enable_auto_delimiter = 1
-let g:UltiSnipsJumpForwardTrigger="<C-\\>"
+let g:UltiSnipsJumpForwardTrigger="\<C-l>"
+let g:UltiSnipsJumpBackwardTrigger="\<C-h>"
 let g:UltiSnipsExpandTrigger="<C-\\>"
 let g:ulti_expand_or_jump_res = 0
 let g:ulti_jump_forwards_res = 0
@@ -12,8 +13,8 @@ let g:vcm_s_tab_behavior = 1
 let g:vcm_default_maps = 0
 
 imap <silent> <TAB> <Plug>vim_completes_me_forward
-imap <silent> <CR>  <C-R>=((functions#EnterMapping() > 0) ? "" : "\r")<CR><Plug>AutoPairsReturn
-inoremap <silent> <expr> <S-TAB> "<C-R>=functions#ReverseTabMapping()<CR>"
+imap <silent> <S-TAB> <Plug>vim_completes_me_backward
+imap <silent> <CR> <C-R>=((functions#EnterMapping() > 0) ? "" : "\r")<CR><Plug>AutoPairsReturn
 xnoremap <silent> <expr> <TAB>   ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
 snoremap <silent> <expr> <TAB>   "<ESC>:call UltiSnips#JumpForwards()<CR>"
 snoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
