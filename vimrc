@@ -152,15 +152,15 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
-nnoremap ,s :call functions#ToggleSignColumn()<CR>
+nnoremap =og :call functions#ToggleSignColumn()<CR>
 
 inoremap jk <Esc>
 
-nnoremap <Space>z :set invlist<CR>
+nnoremap =oz :set invlist<CR>
 nnoremap <Space>q :noh<return><esc>
 
-nnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
-xnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
+nnoremap <silent> =oq :call functions#ToggleConceal()<CR>
+xnoremap <silent> =oq :call functions#ToggleConceal()<CR>
 
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
