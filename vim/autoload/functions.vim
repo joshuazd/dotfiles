@@ -17,20 +17,16 @@ endfunction
 
 function! functions#ToggleConceal() abort
   if &conceallevel == 0
+    echo 'set conceallevel=2'
     set conceallevel=2
   else
+    echo 'set conceallevel=0'
     set conceallevel=0
   endif
 endfunction
 
 function! functions#VimRefresh() abort
-  " NeoCompleteClean
-  " NeoCompleteBufferMakeCache
-  " NeoCompleteMemberMakeCache
   GutentagsUpdate!
-  if &filetype ==? 'java'
-    JCcacheClear
-  endif
   redraw!
   syntax sync fromstart
 endfunction
@@ -47,19 +43,3 @@ function! functions#ToggleSignColumn() abort
   endif
 endfunction
 
-function! functions#ReverseTabMapping() abort
-  if pumvisible()
-    return "\<Plug>vim_completes_me_backward"
-  else
-    let l:snippet = UltiSnips#JumpBackwards()
-    if g:ulti_jump_backwards_res > 0
-      return l:snippet
-    else
-      return "\<TAB>"
-    endif
-  endif
-endfunction
-function! functions#EnterMapping() abort
-  call UltiSnips#ExpandSnippetOrJump()
-  return g:ulti_expand_or_jump_res
-endfunction
