@@ -85,7 +85,6 @@ endif
 " {{{
 call plug#begin('~/.vim/bundle')
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
-Plug 'Konfekt/FastFold'
 Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 Plug 'airblade/vim-gitgutter'
 Plug 'ajh17/VimCompletesMe'
@@ -111,7 +110,6 @@ Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 " Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
 " Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-Plug 'Shougo/neco-vim', { 'for': 'vim' }
 call plug#end()
 runtime macros/matchit.vim
 " }}}
