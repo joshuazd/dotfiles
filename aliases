@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 alias ls='ls -F --color=auto'
 alias ..="cd ..; ls"
 alias ...="cd ../..; ls"

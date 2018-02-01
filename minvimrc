@@ -22,6 +22,7 @@ set magic					" For regular expressions turn magic on
 set showmatch					" Show matching brackets when text indicator is over them
 set matchtime=2					" How many tenths of a second to blink when matching brackets
 set timeoutlen=500				" shorter timeout
+set ttimeoutlen=100				" shorter timeout
 set splitbelow					" Make splits behave better
 set splitright
 set background=dark				" dark background
@@ -53,28 +54,29 @@ set noswapfile
 set foldlevel=99				" don't fold things by default
 set listchars=tab:»\ ,trail:~,extends:>,eol:$,nbsp:␣ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
-set completeopt+=menuone			" configure popup menu
+set completeopt+=menuone,noinsert,noselect	" configure popup menu
 set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 set cpoptions-=<
-if executable('ag')				" use ag when available
-  set grepprg=ag\ --nogroup\ --nocolor\ --ignore-case\ --column\ --vimgrep
+if executable('rg')				" use ripgrep when available
+  set grepprg=rg\ --vimgrep
+  set grepformat=%f:%l:%c:%m,%f:%l:%m
+elseif executable('ag')				" use ag when available and ripgrep is not
+  set grepprg=ag\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-    " set guifont=Literation\ Mono\ Powerline\ 10
-    " set guifont=DejaVuSansMono\ Nerd\ Font\ Mono\ Book\ 10
-    set guifont=DejaVu\ Sans\ Mono\ Book\ 10
-    set guioptions-=T
-    set guioptions+=e
-    set guioptions-=m
-    set guioptions-=r
-    set guioptions-=L
-    set guitablabel=%M\ %t
-    set lines=43 columns=120
+  set guifont=DejaVu\ Sans\ Mono\ Book\ 10
+  set guioptions-=T
+  set guioptions+=e
+  set guioptions-=m
+  set guioptions-=r
+  set guioptions-=L
+  set guitablabel=%M\ %t
+  set lines=43 columns=120
 endif
 filetype plugin indent on
 runtime macros/matchit.vim
@@ -94,8 +96,8 @@ nnoremap H ^
 
 nnoremap Y y$
 
-nnoremap <Space>v :vs\|bn<CR>
-nnoremap <Space>s :sp\|bn<CR>
+nnoremap <Space>v :vs<CR>
+nnoremap <Space>s :sp<CR>
 
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
@@ -111,6 +113,7 @@ nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
+nnoremap <Space>e :e <C-r>=expand('%:h')<CR>/*<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
@@ -118,11 +121,11 @@ nnoremap <Space>i :ilist /
 
 inoremap jk <Esc>
 
-nnoremap <Space>z :set invlist<CR>
+nnoremap =oz :set invlist<CR>
 nnoremap <Space>q :noh<return><esc>
 
-nnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
-xnoremap <silent> <Space>c :call functions#ToggleConceal()<CR>
+nnoremap <silent> =oq :call functions#ToggleConceal()<CR>
+xnoremap <silent> =oq :call functions#ToggleConceal()<CR>
 
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
@@ -131,7 +134,7 @@ xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
-nnoremap <silent> <Space>m :silent make\|cwindow\|redraw!<CR>
+nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
@@ -165,28 +168,20 @@ command! -range=% FormatJSON <line1>,<line2>!python -c
 function! CCR() abort
   let cmdline = getcmdline()
   if cmdline =~? '\v\C^(ls|files|buffers)'
-    " like :ls but prompts for a buffer command
     return "\<CR>:b "
   elseif cmdline =~? '\v\C^(dli|il)'
-    " like :dlist or :ilist but prompts for a count for :djump or :ijump
     return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"
   elseif cmdline =~? '\v\C^(cli|lli)'
-    " like :clist or :llist but prompts for an error/location number
     return "\<CR>:sil " . repeat(cmdline[0], 2) . "\<Space>"
   elseif cmdline =~? '\C^old'
-    " like :oldfiles but prompts for an old file to edit
     return "\<CR>:e #<"
   elseif cmdline =~? '\C^changes'
-    " like :changes but prompts for a change to jump to
     return "\<CR>:norm! g;\<S-Left>"
   elseif cmdline =~? '\C^ju'
-    " like :jumps but prompts for a position to jump to
     return "\<CR>:norm! \<C-o>\<S-Left>"
   elseif cmdline =~? '\C^marks'
-    " like :marks but prompts for a mark to jump to
     return "\<CR>:norm! `"
   elseif cmdline =~? '\C^undol'
-    " like :undolist but prompts for a change to undo
     return "\<CR>:u "
   else
     return "\<CR>"

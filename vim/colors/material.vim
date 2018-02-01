@@ -26,6 +26,7 @@ let s:brightpurple = '97'
 let s:darkpurple   = '53'
 let s:brown        = '137'
 let s:darkgrey     = '236'
+let s:darkdarkgrey = '233'
 let s:grey         = '239'
 let s:lightgrey    = '246'
 let s:black        = '235'
@@ -152,9 +153,9 @@ exe 'hi! Structure       ctermfg='     .s:cyan         .' ctermbg='   .s:bg     
 " --------------------------------
 " Diff
 " --------------------------------
-exe 'hi! DiffAdd         ctermfg='     .s:brightgreen  .' ctermbg='   .s:darkgrey    .' cterm=none'
-exe 'hi! DiffChange      ctermfg='     .s:yellow       .' ctermbg='   .s:darkgrey    .' cterm=none'
-exe 'hi! DiffDelete      ctermfg='     .s:red          .' ctermbg='   .s:darkgrey    .' cterm=none'
+exe 'hi! DiffAdd         ctermfg='     .s:brightgreen  .' ctermbg='   .s:darkdarkgrey.' cterm=none'
+exe 'hi! DiffChange      ctermfg='     .s:yellow       .' ctermbg='   .s:darkdarkgrey.' cterm=none'
+exe 'hi! DiffDelete      ctermfg='     .s:red          .' ctermbg='   .s:darkdarkgrey.' cterm=none'
 exe 'hi! DiffText        ctermfg='     .s:black        .' ctermbg='   .s:lightgrey   .' cterm=none'
 exe 'hi! diffAdded       ctermfg='     .s:brightgreen  .' ctermbg='   .s:bg          .' cterm=none'
 
