@@ -25,6 +25,7 @@ snoremap <silent> <expr> <CR>    "<ESC>:call UltiSnips#JumpForwards()<CR>"
 let g:jedi#completions_enabled = 0
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#smart_auto_mappings = 0
+let g:jedi#show_call_signatures = 1
 " }}}
 
 " clang setup {{{
@@ -34,3 +35,25 @@ let g:clang_cpp_completeopt = 'menuone,preview'
 let g:clang_verbose_pmenu = 1
 " }}}
 
+set completefunc=SnippetComplete
+function! SnippetComplete(findstart, base)
+  if a:findstart
+    let line = getline('.')
+    let start = col('.') - 1
+    while start > 0 && line[start - 1] =~? '\a'
+      let start -= 1
+    endwhile
+    return start
+  else
+    let suggestions = []
+    let snippets = UltiSnips#SnippetsInCurrentScope()
+    for entry in keys(snippets)
+      if entry =~# '^'.a:base
+        call add(suggestions, {'word': entry, 'menu':snippets[entry], 'kind':'S'})
+      endif
+    endfor
+    return suggestions
+  endif
+endfunction
+inoremap <expr> <C-s> (pumvisible() ? "\<C-u>" : "\<C-x>\<C-u>")
+inoremap <C-f> <C-x><C-f>
