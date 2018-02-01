@@ -21,12 +21,14 @@ let g:mode_hi = {
       \'VisualMode'  : ' ctermfg=107 ctermbg=235 ',
       \'ReplaceMode' : ' ctermfg=167 ctermbg=235 ',
       \'CommandMode' : ' ctermfg=176 ctermbg=235 '}
-highlight StlGit      ctermbg=235 ctermfg=242 cterm=none
-highlight MainStl     ctermbg=235 ctermfg=7   cterm=none
-highlight ReadOnlyStl ctermbg=235 ctermfg=1   cterm=none
-highlight InactiveStl ctermbg=235 ctermfg=241 cterm=none
-highlight StatusLine  ctermbg=235 ctermfg=7   cterm=none
-highlight StlLinter   ctermbg=1   ctermfg=0   cterm=none
+highlight StlGit       ctermbg=235 ctermfg=242 cterm=none
+highlight StlGitNC     ctermbg=242 ctermfg=235 cterm=none
+highlight MainStl      ctermbg=235 ctermfg=252 cterm=none
+highlight ReadOnlyStl  ctermbg=235 ctermfg=167 cterm=none
+highlight InactiveStl  ctermbg=235 ctermfg=241 cterm=none
+highlight StatusLine   ctermbg=235 ctermfg=252 cterm=none
+highlight StatusLineNC ctermbg=242 ctermfg=234 cterm=none
+highlight StlLinter    ctermbg=1   ctermfg=234 cterm=none
 
 function! GitHunks() abort
     if !exists('*GitGutterGetHunkSummary')
@@ -90,14 +92,15 @@ function! BuildStatusLine(nr) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
         \%#StlGit#%{w:["lf_active"] ? GitHunks() : ""}
-        \%#MainStl# %f%m
-        \%#ReadOnlyStl# %{&readonly ? "RO" : ""}%#MainStl#
+        \%0* %f%m
+        \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? " RO" : ""}%0*
         \%=
         \%{ObsessionStatusLine()}%{w:["lf_active"] ? TagsStatusLine() != "" ? " ".TagsStatusLine()." " : " " : " "}
-        \%#StlGit#%{&syntax == "" ? "" : " ".&syntax." "}
+        \%#StlGit#%{&syntax == "" ? "" : w:["lf_active"] ? " ".&syntax." " : ""}
+        \%#StlGitNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? " ".line(".").":".printf("%02d",virtcol("."))." " : ""}
-        \%#InactiveStl#%{w:["lf_active"] ? "" : " ".line(".").":".printf("%02d",virtcol("."))." "}
-        \%#StlLinter#%{QfList()}%#MainStl#'
+        \%0*%{w:["lf_active"] ? "" : " ".line(".").":".printf("%02d",virtcol("."))." "}
+        \%#StlLinter#%{QfList()}%0*'
 endfunction
 
 function! s:enableStatusLine() abort
