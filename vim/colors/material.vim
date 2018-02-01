@@ -113,6 +113,7 @@ exe 'hi! Float           ctermfg='     .s:cyan         .' ctermbg='   .s:bg     
 
 exe 'hi! Identifier      ctermfg='     .s:yellow       .' ctermbg='   .s:bg          .' cterm=none'
 exe 'hi! Function        ctermfg='     .s:blue         .' ctermbg='   .s:bg          .' cterm=none'
+exe 'hi! Primitive       ctermfg='     .s:brightyellow .' ctermbg='   .s:bg          .' cterm=italic'
 
 " --------------------------------
 " Language constructs
