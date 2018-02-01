@@ -5,17 +5,14 @@ let b:vcm_omni_pattern = '\k[\k\.]\+'
 imap <buffer> <silent> . .<TAB>
 command! Lint cexpr system('flake8 ' . shellescape(expand('%')))
 set makeprg=flake8\ %
+set errorformat=%f:%l:%c:\ %t%n\ %m
 command! -bar Fix silent execute "!autopep8 -i -a -a -a %" | redraw!
 augroup PYTHON
     autocmd!
     if executable('flake8')
-      autocmd BufWritePost *.py silent Lint
+      autocmd BufWritePost *.py silent! make|cwindow|redraw!
     endif
 augroup END
-
-" Jedi setup {{{
-    let g:jedi#show_call_signatures = 2
-" }}}
 
 " ipython setup {{{
   let g:ipy_perform_mappings = 0 "make our own mappings
