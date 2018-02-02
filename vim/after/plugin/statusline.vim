@@ -21,53 +21,35 @@ let g:mode_hi = {
       \'VisualMode'  : ' ctermfg=107 ctermbg=235 ',
       \'ReplaceMode' : ' ctermfg=167 ctermbg=235 ',
       \'CommandMode' : ' ctermfg=176 ctermbg=235 '}
-highlight StlGit       ctermbg=235 ctermfg=242 cterm=none
-highlight StlGitNC     ctermbg=242 ctermfg=235 cterm=none
-highlight MainStl      ctermbg=235 ctermfg=252 cterm=none
+highlight StlDim       ctermbg=235 ctermfg=242 cterm=none
+highlight StlDimNC     ctermbg=242 ctermfg=235 cterm=none
 highlight ReadOnlyStl  ctermbg=235 ctermfg=167 cterm=none
-highlight InactiveStl  ctermbg=235 ctermfg=241 cterm=none
 highlight StatusLine   ctermbg=235 ctermfg=252 cterm=none
 highlight StatusLineNC ctermbg=242 ctermfg=234 cterm=none
 highlight StlLinter    ctermbg=1   ctermfg=234 cterm=none
 
 function! GitHunks() abort
-    if !exists('*GitGutterGetHunkSummary')
-        return ''
-    endif
-    let l:githunks = GitGutterGetHunkSummary()
-    let l:returnval = ' '
-    let l:returnval .= (l:githunks[0] != 0 ? ' ' . l:githunks[0] . '+' : '')
-    let l:returnval .= (l:githunks[1] != 0 ? ' ' . l:githunks[1] . '~' : '')
-    let l:returnval .= (l:githunks[2] != 0 ? ' ' . l:githunks[2] . '-' : '')
-    return l:returnval ==# ' ' ? '' : l:returnval . ' '
-endfunction
-
-function! ObsessionStatusLine() abort
-    if !exists('*ObsessionStatus')
-        return ''
-    else
-        return ObsessionStatus('$')
-    endif
+  if !exists('*GitGutterGetHunkSummary')
+    return ''
+  endif
+  let l:githunks = GitGutterGetHunkSummary()
+  let l:returnval = ' '
+  let l:returnval .= (l:githunks[0] != 0 ? ' ' . l:githunks[0] . '+' : '')
+  let l:returnval .= (l:githunks[1] != 0 ? ' ' . l:githunks[1] . '~' : '')
+  let l:returnval .= (l:githunks[2] != 0 ? ' ' . l:githunks[2] . '-' : '')
+  return l:returnval ==# ' ' ? '' : l:returnval . ' '
 endfunction
 
 function! TagsStatusLine() abort
-    if !exists('*gutentags#statusline')
-        return ''
-    else
-        return gutentags#statusline()
-    endif
+  return (!exists('*gutentags#statusline') ? '' : gutentags#statusline())
 endfunction
 
 function! QfList() abort
-    if !exists('*qf#GetList')
-        return ''
-    endif
-    let l:qflist = len(qf#GetList())
-    if l:qflist ==# '0'
-        return ''
-    else
-        return ' '.l:qflist.' '
-    endif
+  if !exists('*qf#GetList')
+    return ''
+  endif
+  let l:qflist = len(qf#GetList())
+  return (l:qflist ==# '0' ? '' : ' '.l:qflist.' ')
 endfunction
 
 function! s:updateStatusLineHighlight(nr,newMode) abort
@@ -79,11 +61,11 @@ endfunction
 function! SetupStatusLine(nr) abort
   return get(extend(w:, {
         \ 'lf_active': winnr() != a:nr
-          \ ? 0
-          \ : (mode(1) ==# get(g:, 'lf_cached_mode', '')
-            \ ? 1
-            \ : s:updateStatusLineHighlight(a:nr,get(extend(g:, { 'lf_cached_mode': mode(1) }), 'lf_cached_mode'))
-            \ ),
+        \ ? 0
+        \ : (mode(1) ==# get(g:, 'lf_cached_mode', '')
+        \ ? 1
+        \ : s:updateStatusLineHighlight(a:nr,get(extend(g:, { 'lf_cached_mode': mode(1) }), 'lf_cached_mode'))
+        \ ),
         \ 'lf_winwd': winwidth(winnr())
         \ }), '', '')
 endfunction
@@ -91,20 +73,16 @@ endfunction
 function! BuildStatusLine(nr) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
-        \%#StlGit#%{w:["lf_active"] ? GitHunks() : ""}
+        \%#StlDim#%{w:["lf_active"] ? GitHunks() : ""}
         \%0* %f%m
         \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? " RO" : ""}%0*
         \%=
-        \%{ObsessionStatusLine()}%{w:["lf_active"] ? TagsStatusLine() != "" ? " ".TagsStatusLine()." " : " " : " "}
-        \%#StlGit#%{&syntax == "" ? "" : w:["lf_active"] ? " ".&syntax." " : ""}
-        \%#StlGitNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
-        \%#ModeNoBold#%{w:["lf_active"] ? " ".line(".").":".printf("%02d",virtcol("."))." " : ""}
-        \%0*%{w:["lf_active"] ? "" : " ".line(".").":".printf("%02d",virtcol("."))." "}
+        \%{w:["lf_active"] ? TagsStatusLine() != "" ? " ".TagsStatusLine()." " : " " : " "}
+        \%#StlDim#%{&syntax == "" ? "" : w:["lf_active"] ? " ".&syntax." " : ""}
+        \%#StlDimNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
+        \%#ModeNoBold#%{w:["lf_active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}
+        \%0*%{w:["lf_active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}
         \%#StlLinter#%{QfList()}%0*'
 endfunction
 
-function! s:enableStatusLine() abort
-  set statusline=%!BuildStatusLine(winnr())
-endfunction
-command! -nargs=0 EnableStatusLine call <SID>enableStatusLine()
-EnableStatusLine
+set statusline=%!BuildStatusLine(winnr())

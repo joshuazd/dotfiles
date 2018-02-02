@@ -17,11 +17,11 @@ endfunction
 
 function! functions#ToggleConceal() abort
   if &conceallevel == 0
-    echo 'set conceallevel=2'
-    set conceallevel=2
+    echo 'setlocal conceallevel=2'
+    setlocal conceallevel=2
   else
-    echo 'set conceallevel=0'
-    set conceallevel=0
+    echo 'setlocal conceallevel=0'
+    setlocal conceallevel=0
   endif
 endfunction
 
@@ -33,13 +33,12 @@ endfunction
 
 function! functions#ToggleSignColumn() abort
   if &signcolumn ==? 'no'
-    echo 'set signcolumn=yes'
-    set signcolumn=yes
+    echo 'setlocal signcolumn=yes'
+    setlocal signcolumn=yes
     GitGutterEnable
   else
-    echo 'set signcolumn=no'
-    set signcolumn=no
+    echo 'setlocal signcolumn=no'
+    setlocal signcolumn=no
     GitGutterDisable
   endif
 endfunction
-

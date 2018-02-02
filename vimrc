@@ -2,8 +2,6 @@
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-set ruler					" Always show current position
-set cmdheight=1					" Height of the command bar
 set hidden					" A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent			" Configure backspace so it acts as it should act
 set whichwrap+=<,>,h,l				" arrow keys and h,l move to the next line
@@ -14,16 +12,13 @@ set ignorecase					" Ignore case when searching
 set smartcase					" When searching try to be smart about cases
 set hlsearch					" Highlight search results
 set incsearch					" Makes search act like search in modern browsers
-set wrapscan					" Search commands wrap around end of buffer
 set lazyredraw					" Don't redraw while executing macros
-set magic					" For regular expressions turn magic on
 set showmatch					" Show matching brackets when text indicator is over them
 set matchtime=2					" How many tenths of a second to blink when matching brackets
 set timeoutlen=500				" shorter timeout
 set ttimeoutlen=100				" shorter timeout
 set splitbelow					" Make splits behave better
 set splitright
-set background=dark				" dark background
 syntax enable					" turn syntax on
 colorscheme material				" material color scheme
 set clipboard=unnamedplus			" make clipboard work better
