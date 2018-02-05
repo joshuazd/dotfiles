@@ -6,7 +6,6 @@ endif
 set background=dark
 
 let g:colors_name  = 'material'
-let s:bg           = '235'
 let s:red          = '203'
 let s:brightred    = '167'
 let s:pink         = '210'
@@ -29,7 +28,7 @@ let s:darkgrey     = '236'
 let s:darkdarkgrey = '233'
 let s:grey         = '239'
 let s:lightgrey    = '246'
-let s:black        = '235'
+let s:black        = '234'
 let s:bg           = 'none'
 let s:white        = '254'
 let s:none         = 'none'
@@ -61,7 +60,7 @@ exe 'hi! Folded          ctermfg='     .s:lightgrey    .' ctermbg=233           
 " -------------------------
 " - Window/Tab delimiters - 
 " -------------------------
-exe 'hi! VertSplit       ctermfg=236                      ctermbg=236                   cterm=none'
+exe 'hi! VertSplit       ctermfg=235                      ctermbg=235                   cterm=none'
 exe 'hi! ColorColumn     ctermfg='     .s:none         .' ctermbg='   .s:darkgrey    .' cterm=none'
 " exe 'hi! TabLine         ctermfg='     .s:             .' ctermbg='   .s:bg           cterm=none
 " exe 'hi! TabLineFill     ctermfg='     .s:             .' ctermbg='   .s:bg           cterm=none
