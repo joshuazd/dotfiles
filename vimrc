@@ -140,7 +140,7 @@ nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
-nnoremap <Space>e :e <C-r>=expand('%:h')<CR>/*<C-d>
+nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/*<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
