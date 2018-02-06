@@ -14,7 +14,7 @@ endfunction
 
 imap <silent> <TAB> <Plug>vim_completes_me_forward
 imap <silent> <S-TAB> <Plug>vim_completes_me_backward
-imap <silent> <CR> <C-R>=((UltiSnips_ExpandJump() > 0) ? "" : "\r")<CR><Plug>AutoPairsReturn
+imap <silent> <CR> <C-R>=((UltiSnips_ExpandJump() > 0) ? "" : "\r")<CR>
 xnoremap <silent> <expr> <TAB>   ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
 snoremap <silent> <expr> <TAB>   "<ESC>:call UltiSnips#JumpForwards()<CR>"
 snoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
