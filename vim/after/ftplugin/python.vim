@@ -4,7 +4,7 @@ let b:vcm_tab_complete = 'omni'
 let b:vcm_omni_pattern = '\k[\k\.]\+'
 imap <buffer> <silent> . .<TAB>
 command! Lint cexpr system('flake8 ' . shellescape(expand('%')))
-set makeprg=flake8\ %
+set makeprg=flake8\ %:S
 set errorformat=%f:%l:%c:\ %t%n\ %m
 command! -bar Fix silent execute "!autopep8 -i -a -a -a %" | redraw!
 augroup PYTHON

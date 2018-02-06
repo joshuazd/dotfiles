@@ -12,7 +12,7 @@ command! Tabs setlocal shiftwidth=2 softtabstop=2 foldmethod=syntax smarttab
 command! Lint cexpr system('xmllint --noout ' . shellescape(expand('%')))
 setlocal omnifunc=xmlcomplete#CompleteTags
 compiler xmllint
-setlocal makeprg=xmllint\ --noout\ %
+setlocal makeprg=xmllint\ --noout\ %:S
 setlocal syntax=xml
 setlocal path=.,*/src/main/synapse-config/*/
 setlocal suffixesadd+=.xml
