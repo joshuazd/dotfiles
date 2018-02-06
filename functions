@@ -42,3 +42,12 @@ function custom_vim() {
     fi
     return true
 }
+
+function getssl() {
+openssl s_client -showcerts -connect $1 </dev/null 2>/dev/null|openssl x509 -outform PEM >$2
+}
+
+function buildp() {
+    mvnc clean install -T 2.0C -P$1; mcar
+}
+
