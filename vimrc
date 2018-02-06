@@ -63,7 +63,7 @@ elseif executable('ag')				" use ag when available and ripgrep is not
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-  set guifont=DejaVu\ Sans\ Mono\ Book\ 10
+  set guifont=DejaVu\ Sans\ Mono\ 10
   set guioptions-=T
   set guioptions+=e
   set guioptions-=m

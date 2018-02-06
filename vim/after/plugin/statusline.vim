@@ -16,17 +16,17 @@ function! GetModeIndicator() abort
   endif
 endfunction
 let g:mode_hi = {
-      \'NormalMode'  : ' ctermfg=68  ctermbg=235 ',
-      \'InsertMode'  : ' ctermfg=221 ctermbg=235 ',
-      \'VisualMode'  : ' ctermfg=107 ctermbg=235 ',
-      \'ReplaceMode' : ' ctermfg=167 ctermbg=235 ',
-      \'CommandMode' : ' ctermfg=176 ctermbg=235 '}
-highlight StlDim       ctermbg=235 ctermfg=242 cterm=none
-highlight StlDimNC     ctermbg=242 ctermfg=235 cterm=none
-highlight ReadOnlyStl  ctermbg=235 ctermfg=167 cterm=none
-highlight StatusLine   ctermbg=235 ctermfg=252 cterm=none
-highlight StatusLineNC ctermbg=242 ctermfg=234 cterm=none
-highlight StlLinter    ctermbg=1   ctermfg=234 cterm=none
+      \'NormalMode'  : ' ctermfg=68  guifg=#6182b8 ctermbg=235 guibg=#262626',
+      \'InsertMode'  : ' ctermfg=221 guifg=#ffcb6b ctermbg=235 guibg=#262626',
+      \'VisualMode'  : ' ctermfg=107 guifg=#91b859 ctermbg=235 guibg=#262626',
+      \'ReplaceMode' : ' ctermfg=167 guifg=#d75f5f ctermbg=235 guibg=#262626',
+      \'CommandMode' : ' ctermfg=176 guifg=#c792ea ctermbg=235 guibg=#262626'}
+highlight StlDim       ctermbg=235 guibg=#262626 ctermfg=242 guifg=#6c6c6c cterm=NONE gui=NONE
+highlight StlDimNC     ctermbg=242 guibg=#6c6c6c ctermfg=235 guifg=#262626 cterm=NONE gui=NONE
+highlight ReadOnlyStl  ctermbg=235 guibg=#262626 ctermfg=167 guifg=#d75f5f cterm=NONE gui=NONE
+highlight StatusLine   ctermbg=235 guibg=#262626 ctermfg=252 guifg=#d0d0d0 cterm=NONE gui=NONE
+highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
+highlight StlLinter    ctermbg=1   guibg=#e53935 ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
 
 function! GitHunks() abort
   if !exists('*GitGutterGetHunkSummary')
@@ -53,8 +53,8 @@ function! QfList() abort
 endfunction
 
 function! s:updateStatusLineHighlight(nr,newMode) abort
-  execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold'
-  execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none'
+  execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold gui=bold'
+  execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none gui=none'
   return 1
 endfunction
 
