@@ -20,7 +20,7 @@ export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="true"
 
 COMPLETION_WAITING_DOTS="true"
 
@@ -35,18 +35,23 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 # Would you like to use another custom folder than $ZSH/custom?
 ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 
-plugins=(git tmux ansible z history-substring-search zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git tmux ansible history-substring-search zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
-alias mvn-color='source $ZSH_CUSTOM/mvncolor.sh'
 source $ZSH_CUSTOM/mvncolor.sh
 
-autoload -U promptinit; promptinit
+autoload -Uz promptinit
+promptinit
 prompt pure
+
+# Use modern completion system
+autoload -Uz compinit
+compinit
+
 # You may need to manually set your language environment
-# export LANG=en_US.UTF-8
+export LANG=en_US.UTF-8
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -82,7 +87,7 @@ export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=none,fg=magenta,bold'
 
 export EDITOR=vim
 export VISUAL=vim
-# bindkey -v
+bindkey -e
 export KEYTIMEOUT=1
 bindkey '^x^e' edit-command-line
 
