@@ -36,7 +36,7 @@ set sidescrolloff=15				" scroll within 15 characters
 set foldmethod=syntax				" fold based on syntax
 set wildmenu					" Turn on the wild menu
 set wildmode=list:longest,list:full
-set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/*,tags	" Ignore compiled files
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/*,tags,Session.vim	" Ignore compiled files
 set wildignorecase				" ignore case in wildmenu
 set sessionoptions-=options			" make sessions work better with plugins
 set sessionoptions-=folds
@@ -55,6 +55,7 @@ set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 set signcolumn=no				" don't have signcolumn on
 set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
+set tags=./tags,tags
 if executable('rg')				" use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -63,7 +64,7 @@ elseif executable('ag')				" use ag when available and ripgrep is not
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-  set guifont=DejaVu\ Sans\ Mono\ 10
+  set guifont=DejaVu\ Sans\ Mono\ 9
   set guioptions-=T
   set guioptions+=e
   set guioptions-=m
@@ -122,15 +123,15 @@ nnoremap H ^
 
 nnoremap Y y$
 
-nnoremap <Space>v :vs<CR>
-nnoremap <Space>s :sp<CR>
-
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
 nnoremap <silent> <Space><Space> :b#<CR>
 nnoremap <silent> <Space>x :bn\|bd #<CR>
+
+nnoremap <TAB> <C-w>w
+nnoremap <S-TAB> <C-w>W
 
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
@@ -145,14 +146,13 @@ nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
 nnoremap =og :call functions#ToggleSignColumn()<CR>
+nnoremap =oz :setlocal invlist<CR>
+nnoremap =oq :call functions#ToggleConceal()<CR>
+xnoremap =oq :call functions#ToggleConceal()<CR>
 
 inoremap jk <Esc>
 
-nnoremap =oz :set invlist<CR>
 nnoremap <Space>q :noh<return><esc>
-
-nnoremap <silent> =oq :call functions#ToggleConceal()<CR>
-xnoremap <silent> =oq :call functions#ToggleConceal()<CR>
 
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
@@ -167,6 +167,12 @@ cnoremap <expr> <CR> CCR()
 imap <C-s> <Esc>gcca
 
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
+nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
+
+nnoremap <C-]> g<C-]>
+nnoremap <expr> g<C-]> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
+nnoremap g"<C-]> :stjump <C-r><C-w><CR>
+nnoremap g%<C-]> :vertical stjump <C-r><C-w><CR>
 
 " }}}
 

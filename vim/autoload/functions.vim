@@ -29,6 +29,7 @@ function! functions#VimRefresh() abort
   GutentagsUpdate!
   redraw!
   syntax sync fromstart
+  echo 'Vim is refreshed'
 endfunction
 
 function! functions#ToggleSignColumn() abort
