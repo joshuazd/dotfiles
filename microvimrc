@@ -10,9 +10,7 @@ set breakindentopt=shift:2
 set ignorecase					" Ignore case when searching
 set smartcase					" When searching try to be smart about cases
 set hlsearch					" Highlight search results
-set wrapscan					" Search commands wrap around end of buffer
 set lazyredraw					" Don't redraw while executing macros
-set magic					" For regular expressions turn magic on
 set showmatch					" Show matching brackets when text indicator is over them
 set matchtime=2					" How many tenths of a second to blink when matching brackets
 set timeoutlen=500				" shorter timeout
@@ -22,9 +20,6 @@ set splitright
 set background=dark				" dark background
 syntax off					" turn syntax on
 syntax sync clear
-" set number					" show line numbers
-" set relativenumber				" show relative line numbers
-set numberwidth=1				" set min number column width
 set clipboard=unnamedplus			" make clipboard work better
 set softtabstop=4				" number of spaces when inserting/backspacing
 set shiftwidth=4				" shift 4 spaces for indentation
@@ -76,15 +71,15 @@ nnoremap H ^
 
 nnoremap Y y$
 
-nnoremap <Space>v :vs<CR>
-nnoremap <Space>s :sp<CR>
-
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
 nnoremap <silent> <Space><Space> :b#<CR>
 nnoremap <silent> <Space>x :bn<bar>bd #<CR>
+
+nnoremap <TAB> <C-w>w
+nnoremap <S-TAB> <C-w>W
 
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
@@ -93,15 +88,15 @@ nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
-nnoremap <Space>e :e <C-r>=expand('%:h')<CR>/*<C-d>
+nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/*<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
+nnoremap =oz :set invlist<CR>
 
 inoremap jk <esc>
 
-nnoremap =oz :set invlist<CR>
 nnoremap <Space>q :noh<return><esc>
 
 nnoremap <silent> <Space>p p=']
