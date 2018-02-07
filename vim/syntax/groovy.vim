@@ -45,8 +45,8 @@
 " when I have time
 
 " quit when a syntax file was already loaded
-if !exists("main_syntax")
-  if exists("b:current_syntax")
+if !exists('main_syntax')
+  if exists('b:current_syntax')
     finish
   endif
   " we define it here so that included files can test for it
@@ -92,7 +92,7 @@ syn match   groovyUserLabelRef    "\k\+" contained
 syn keyword groovyScopeDecl       public protected private abstract
 
 
-if exists("groovy_highlight_groovy_lang_ids") || exists("groovy_highlight_groovy_lang") || exists("groovy_highlight_all")
+if exists('groovy_highlight_groovy_lang_ids') || exists('groovy_highlight_groovy_lang') || exists('groovy_highlight_all')
   " groovy.lang.*
   syn keyword groovyLangClass  Closure MetaMethod GroovyObject
 
@@ -172,11 +172,11 @@ syn cluster groovyTop add=groovyJDKBuiltin,groovyJDKOperOverl,groovyJDKMethods
  " source <sfile>:p:h/groovyid.vim
 "endif
 
-if exists("groovy_space_errors")
-  if !exists("groovy_no_trail_space_error")
+if exists('groovy_space_errors')
+  if !exists('groovy_no_trail_space_error')
     syn match   groovySpaceError  "\s\+$"
   endif
-  if !exists("groovy_no_tab_space_error")
+  if !exists('groovy_no_tab_space_error')
     syn match   groovySpaceError  " \+\t"me=e-1
   endif
 endif
@@ -186,7 +186,7 @@ syn region  groovyLabelRegion     transparent matchgroup=groovyLabel start="\<ca
 syn match   groovyUserLabel       "^\s*[_$a-zA-Z][_$a-zA-Z0-9_]*\s*:"he=e-1 contains=groovyLabel
 syn keyword groovyLabel           default
 
-if !exists("groovy_allow_cpp_keywords")
+if !exists('groovy_allow_cpp_keywords')
   syn keyword groovyError auto delete extern friend inline redeclared
   syn keyword groovyError register signed sizeof struct template typedef union
   syn keyword groovyError unsigned operator
@@ -198,7 +198,7 @@ syn cluster groovyTop add=groovyExternal,groovyError,groovyError,groovyBranch,gr
 
 " Comments
 syn keyword groovyTodo             contained TODO FIXME XXX
-if exists("groovy_comment_strings")
+if exists('groovy_comment_strings')
   syn region  groovyCommentString    contained start=+"+ end=+"+ end=+$+ end=+\*/+me=s-1,he=s-1 contains=groovySpecial,groovyCommentStar,groovySpecialChar,@Spell
   syn region  groovyComment2String   contained start=+"+  end=+$\|"+  contains=groovySpecial,groovySpecialChar,@Spell
   syn match   groovyCommentCharacter contained "'\\[^']\{1,6\}'" contains=groovySpecialChar
@@ -217,7 +217,7 @@ hi def link groovyCommentCharacter groovyCharacter
 
 syn cluster groovyTop add=groovyComment,groovyLineComment
 
-if !exists("groovy_ignore_groovydoc") && main_syntax != 'jsp'
+if !exists('groovy_ignore_groovydoc') && main_syntax !=? 'jsp'
   syntax case ignore
   " syntax coloring for groovydoc comments (HTML)
   " syntax include @groovyHtml <sfile>:p:h/html.vim
@@ -242,14 +242,14 @@ syn match   groovySpecialError     contained "\\."
 syn match   groovySpecialCharError contained "[^']"
 syn match   groovySpecialChar      contained "\\\([4-9]\d\|[0-3]\d\d\|[\"\\'ntbrf]\|u\x\{4\}\|\$\)"
 syn match   groovyRegexChar        contained "\\."
-syn region  groovyString          start=+"+ end=+"+ end=+$+ contains=groovySpecialChar,groovySpecialError,@Spell,groovyELExpr
-syn region  groovyString          start=+'+ end=+'+ end=+$+ contains=groovySpecialChar,groovySpecialError,@Spell
-syn region  groovyString          start=+"""+ end=+"""+ contains=groovySpecialChar,groovySpecialError,@Spell,groovyELExpr
-syn region  groovyString          start=+'''+ end=+'''+ contains=groovySpecialChar,groovySpecialError,@Spell
-if exists("groovy_regex_strings")
+syn region  groovyString          matchgroup=groovyStringDelimiter start=+"+ end=+"+ end=+$+ contains=groovySpecialChar,groovySpecialError,@Spell,groovyELExpr
+syn region  groovyString          matchgroup=groovyStringDelimiter start=+'+ end=+'+ end=+$+ contains=groovySpecialChar,groovySpecialError,@Spell
+syn region  groovyString          matchgroup=groovyStringDelimiter start=+"""+ end=+"""+ contains=groovySpecialChar,groovySpecialError,@Spell,groovyELExpr
+syn region  groovyString          matchgroup=groovyStringDelimiter start=+'''+ end=+'''+ contains=groovySpecialChar,groovySpecialError,@Spell
+if exists('groovy_regex_strings')
   " regex strings interfere with the division operator and thus are disabled
   " by default
-  syn region groovyString         start='/[^/*]' end='/' contains=groovySpecialChar,groovyRegexChar,groovyELExpr
+  syn region groovyString         start='/[^/*]' end='/' matchgroup=groovyStringDelimiter contains=groovySpecialChar,groovyRegexChar,groovyELExpr
 endif
 " syn region groovyELExpr start=+${+ end=+}+ keepend contained
 syn match groovyELExpr /\${.\{-}}/ contained
@@ -278,8 +278,8 @@ syn match   groovySpecial "\\u\d\{4\}"
 
 syn cluster groovyTop add=groovyString,groovyCharacter,groovyNumber,groovySpecial,groovyStringError
 
-if exists("groovy_highlight_functions")
-  if groovy_highlight_functions == "indent"
+if exists('groovy_highlight_functions')
+  if groovy_highlight_functions ==? 'indent'
     syn match  groovyFuncDef "^\(\t\| \{8\}\)[_$a-zA-Z][_$a-zA-Z0-9_. \[\]]*([^-+*/()]*)" contains=groovyScopeDecl,groovyType,groovyStorageClass,@groovyClasses
     syn region groovyFuncDef start=+^\(\t\| \{8\}\)[$_a-zA-Z][$_a-zA-Z0-9_. \[\]]*([^-+*/()]*,\s*+ end=+)+ contains=groovyScopeDecl,groovyType,groovyStorageClass,@groovyClasses
     syn match  groovyFuncDef "^  [$_a-zA-Z][$_a-zA-Z0-9_. \[\]]*([^-+*/()]*)" contains=groovyScopeDecl,groovyType,groovyStorageClass,@groovyClasses
@@ -295,7 +295,7 @@ if exists("groovy_highlight_functions")
   syn cluster groovyTop add=groovyFuncDef,groovyBraces
 endif
 
-if exists("groovy_highlight_debug")
+if exists('groovy_highlight_debug')
 
   " Strings and constants
   syn match   groovyDebugSpecial          contained "\\\d\d\d\|\\."
@@ -341,10 +341,10 @@ endif
 syn match groovyExceptions        "\<Exception\>\|\<[A-Z]\{1,}[a-zA-Z0-9]*Exception\>"
 
 
-if !exists("groovy_minlines")
+if !exists('groovy_minlines')
   let groovy_minlines = 10
 endif
-exec "syn sync ccomment groovyComment minlines=" . groovy_minlines
+exec 'syn sync ccomment groovyComment minlines=' . groovy_minlines
 
 
 " ###################
@@ -366,7 +366,7 @@ exec "syn sync ccomment groovyComment minlines=" . groovy_minlines
 " syn match  groovyBraces		"[\[\]]"
 " syn match  groovyBraces		"[\|]"
 
-if exists("groovy_mark_braces_in_parens_as_errors")
+if exists('groovy_mark_braces_in_parens_as_errors')
   syn match groovyInParen          contained "[{}]"
   hi def link groovyInParen        groovyError
   syn cluster groovyTop add=groovyInParen
@@ -390,6 +390,9 @@ syn match   groovyParenError       "\]"
 hi def link groovyFuncDef		Function
 hi def link groovyBraces		Function
 hi def link groovyBranch		Conditional
+hi def link groovyParen			PreProc
+hi def link groovyParen1		PreProc
+hi def link groovyParen2		PreProc
 hi def link groovyUserLabelRef	groovyUserLabel
 hi def link groovyLabel		Label
 hi def link groovyUserLabel		Label
@@ -406,6 +409,7 @@ hi def link groovySpecial		Special
 hi def link groovySpecialError	Error
 hi def link groovySpecialCharError	Error
 hi def link groovyString		String
+hi def link groovyStringDelimiter	StringDelimiter
 hi def link groovyRegexChar		String
 hi def link groovyCharacter		Character
 hi def link groovySpecialChar	SpecialChar
@@ -437,12 +441,12 @@ hi def link groovyJDKOperOverl       Operator
 hi def link groovyJDKMethods         Function
 
 
-let b:current_syntax = "groovy"
-if main_syntax == 'groovy'
+let b:current_syntax = 'groovy'
+if main_syntax ==? 'groovy'
   unlet main_syntax
 endif
 
-let b:spell_options="contained"
+let b:spell_options='contained'
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
