@@ -36,6 +36,20 @@ snippet     dbl "dblookup" b
 </dblookup>${0}
 endsnippet
 
+snippet     dbl "dbreport" b
+<dbreport>
+	<connection>
+		<pool>
+			<dsName>jdbc/${1:db name}</dsName>
+		</pool>
+	</connection>
+	<statement>
+		<sql>${2:SQL Statement}</sql>
+		<parameter expression="${3:param expression}" type="${4:STRING}"/>
+	</statement>
+</dbreport>${0}
+endsnippet
+
 snippet     ep "endpoint" b
 <endpoint xmlns="http://ws.apache.org/ns/synapse" name="conf/${1}">
 	<http method="${2:get}" uri-template="${3}"/>
@@ -44,7 +58,7 @@ endsnippet
 
 snippet     epa "anonymous endpoint" b
 <endpoint>
-	<http method="${2:get}" uri-template="${3}"/>
+	<http method="${1:get}" uri-template="${2}"/>
 </endpoint>${0}
 endsnippet
 
@@ -59,11 +73,33 @@ snippet     enr "enrich" b
 </enrich>${0}
 endsnippet
 
+snippet     enrb "enrich from body" b
+<enrich>
+	<source clone="true" type="body"/>
+	<target property="PAYLOAD" type="property"/>
+</enrich>${0}
+endsnippet
+
+snippet     enrp "enrich from property" b
+<enrich>
+	<source type="property" property="PAYLOAD" clone="true"/>
+	<target type="body"/>
+</enrich>${0}
+endsnippet
+
 snippet     fault "makefault" b
 <makefault version="pox">
 	<reason value="${1:reason}" />
 	<detail ${2:expression="${3:detail}"} />
 </makefault>${0}
+endsnippet
+
+snippet     fils "filter source" b
+<filter source="${1:get-property('axis2','HTTP_SC')}" regex="${2:20[0-9]}">
+	<then>
+		${0}
+	</then>
+</filter>
 endsnippet
 
 snippet     fil "filter" b
@@ -142,6 +178,20 @@ snippet     valof "value-of" b
 <xsl:value-of select="${1}"/>${0}
 endsnippet
 
+snippet     tvo "tag value-of" b
+<${1:tag}>
+	<xsl:value-of select="${2}"/>${0}
+</${1/([\w:._-]+).*/$1/}>
+endsnippet
+
+snippet     tct "tag call-template" b
+<${1:tag}>
+	<xsl:call-template name="nilElement">
+		<xsl:with-param name="value" select="${2}"/>
+	</xsl:call-template>${0}
+</${1/([\w:._-]+).*/$1/}>
+endsnippet
+
 snippet     xct "xsl call-template" b
 <xsl:call-template name="nilElement">
 	<xsl:with-param name="value" select="${1}"/>
@@ -175,7 +225,10 @@ endsnippet
 
 snippet     resource "resource" b
 <resource methods="${1}" faultSequence="${2:CustomErrorSequence}" url-mapping="${3}">
-	${0}
+	<inSequence>${0}
+	</inSequence>
+	<outSequence>
+	</outSequence>
 </resource>
 endsnippet
 

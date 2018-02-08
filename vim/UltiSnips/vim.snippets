@@ -14,23 +14,24 @@ if ${1:condition}
 	${2}
 else
 	${3}
+endif
 endsnippet
 
 snippet func "function" b
 function! ${1:name}($2) abort
-	${3:" code}
+	${3:${VISUAL:" code}}
 endfunction
 endsnippet
 
 snippet for "for in endfor" b
 for ${1:var} in ${2:list}
-	${0}
+	${0:${VISUAL}}
 endfor
 endsnippet
 
 snippet while "while endwhile" b
 while ${1:condition}
-	${0}
+	${0:${VISUAL}}
 endwhile
 endsnippet
 
