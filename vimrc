@@ -36,7 +36,7 @@ set sidescrolloff=15				" scroll within 15 characters
 set foldmethod=syntax				" fold based on syntax
 set wildmenu					" Turn on the wild menu
 set wildmode=list:longest,list:full
-set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*target/*,*bin/*,*build/*,tags	" Ignore compiled files
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*target/*,*bin/*,*build/*,tags,Session.vim	" Ignore compiled files
 set wildignorecase				" ignore case in wildmenu
 set sessionoptions-=options			" make sessions work better with plugins
 set sessionoptions-=folds
@@ -93,10 +93,10 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-dispatch'
 Plug 'romainl/vim-qf'
 Plug 'justinmk/vim-dirvish'
 Plug 'xtal8/traces.vim'
+Plug 'sgur/vim-editorconfig'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif

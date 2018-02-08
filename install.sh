@@ -64,6 +64,12 @@ if [ -f $HOME/.tmux.conf ]; then
 fi
 ln -s $PWD/tmux.conf $HOME/.tmux.conf
 
+if [ -f $HOME/.editorconfig ]; then
+    echo "Backing up existing editorconfig to .editorconfig.old"
+    mv $HOME/.editorconfig $HOME/.editorconfig.old
+fi
+ln -s $PWD/editorconfig $HOME/.editorconfig
+
 echo "Creating symlinks for theme"
 if [ -f /usr/local/share/zsh/site-functions/prompt_pure_setup ]; then
     rm /usr/local/share/zsh/site-functions/prompt_pure_setup
