@@ -43,3 +43,21 @@ function! functions#ToggleSignColumn() abort
     GitGutterDisable
   endif
 endfunction
+
+function! functions#AnsibleEdit() abort
+  silent! new
+  silent! put! a
+  silent! keeppatterns %s/^\s\+//
+  silent! execute 'write!' fnameescape(tempname())
+  silent! !cp % temp
+  silent! !ansible-vault view temp >| %
+  silent! !rm temp
+  silent! redraw!
+endfunction
+
+function! functions#AnsibleEncrypt() abort
+  silent! set buftype=
+  silent! execute 'write!' fnameescape(tempname())
+  silent! !ansible-vault encrypt %
+  redraw!
+endfunction

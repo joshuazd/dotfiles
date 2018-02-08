@@ -199,6 +199,10 @@ nnoremap <Space>g :BufferGrep
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
 
+
+command! -range=% AE <line1>,<line2>yank a|silent! call functions#AnsibleEdit()
+command! AC call functions#AnsibleEncrypt()
+
 " make list-like commands more intuitive
 " including this here to avoid screwing up command mode
 function! CCR() abort
@@ -223,6 +227,7 @@ function! CCR() abort
     return "\<CR>"
   endif
 endfunction
+
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""

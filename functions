@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/sh
 
 function git_update() {
     if ! git diff-index --quiet HEAD --; then
