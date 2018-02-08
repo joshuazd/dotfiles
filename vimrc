@@ -164,16 +164,15 @@ noremap <silent> <F5> :call functions#VimRefresh()<CR>
 nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
-imap <C-s> <Esc>gcca
-
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 nnoremap <C-]> g<C-]>
 nnoremap <expr> g<C-]> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
-nnoremap g"<C-]> :stjump <C-r><C-w><CR>
-nnoremap g%<C-]> :vertical stjump <C-r><C-w><CR>
-
+nnoremap <C-_> :stjump <C-r><C-w><CR>
+nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
+nnoremap <expr> g<C-_> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>" : ":stjump \<C-r>\<C-w>\<CR>")
+nnoremap <expr> g<C-Bslash> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -198,7 +197,6 @@ nnoremap <Space>g :BufferGrep
 
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
-
 
 command! -range=% AE <line1>,<line2>yank a|silent! call functions#AnsibleEdit()
 command! AC call functions#AnsibleEncrypt()

@@ -53,11 +53,13 @@ function! functions#AnsibleEdit() abort
   silent! !ansible-vault view temp >| %
   silent! !rm temp
   silent! redraw!
+  echo 'Ansible vault decrypted'
 endfunction
 
 function! functions#AnsibleEncrypt() abort
   silent! set buftype=
   silent! execute 'write!' fnameescape(tempname())
   silent! !ansible-vault encrypt %
-  redraw!
+  silent! redraw!
+  echo 'Ansible vault encrypted'
 endfunction

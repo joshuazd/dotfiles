@@ -1,6 +1,6 @@
 let g:UltiSnipsJumpForwardTrigger="\<C-l>"
 let g:UltiSnipsJumpBackwardTrigger="\<C-h>"
-let g:UltiSnipsExpandTrigger="<C-\\>"
+let g:UltiSnipsExpandTrigger='<C-Esb>'
 let g:ulti_expand_or_jump_res = 0
 let g:ulti_jump_forwards_res = 0
 let g:ulti_jump_backwards_res = 0
