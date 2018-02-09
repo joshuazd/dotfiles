@@ -47,7 +47,7 @@ set noswapfile
 set foldlevel=99				" don't fold things by default
 set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:$,nbsp:␣ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
-set completeopt+=menuone,noinsert,noselect,longest " configure popup menu
+set completeopt+=menuone,noselect,longest " configure popup menu
 set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
