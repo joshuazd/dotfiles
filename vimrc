@@ -56,6 +56,7 @@ set path=.,**					" set path to all subdirectories
 set signcolumn=no				" don't have signcolumn on
 set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
 set tags=./tags,tags
+set spellfile=~/.vim/spell/en.utf-8.add
 if executable('rg')				" use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
