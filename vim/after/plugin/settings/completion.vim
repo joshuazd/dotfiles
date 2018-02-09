@@ -1,24 +1,26 @@
-let g:UltiSnipsJumpForwardTrigger="\<C-l>"
-let g:UltiSnipsJumpBackwardTrigger="\<C-h>"
-let g:UltiSnipsExpandTrigger='<C-Esb>'
-let g:ulti_expand_or_jump_res = 0
-let g:ulti_jump_forwards_res = 0
-let g:ulti_jump_backwards_res = 0
-let g:vcm_s_tab_behavior = 1
-let g:vcm_default_maps = 0
+if exists(':UltiSnipsEdit')
+  let g:UltiSnipsJumpForwardTrigger="\<C-l>"
+  let g:UltiSnipsJumpBackwardTrigger="\<C-h>"
+  let g:UltiSnipsExpandTrigger='<C-Esb>'
+  let g:ulti_expand_or_jump_res = 0
+  let g:ulti_jump_forwards_res = 0
+  let g:ulti_jump_backwards_res = 0
+  let g:vcm_s_tab_behavior = 1
+  let g:vcm_default_maps = 0
 
-function! UltiSnips_ExpandJump() abort
-  call UltiSnips#ExpandSnippetOrJump()
-  return g:ulti_expand_or_jump_res
-endfunction
+  function! UltiSnips_ExpandJump() abort
+    call UltiSnips#ExpandSnippetOrJump()
+    return g:ulti_expand_or_jump_res
+  endfunction
 
-imap <silent> <TAB> <Plug>vim_completes_me_forward
-imap <silent> <S-TAB> <Plug>vim_completes_me_backward
-imap <silent> <CR> <C-R>=((UltiSnips_ExpandJump() > 0) ? "" : "\r")<CR>
-xnoremap <silent> <expr> <TAB>   ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
-snoremap <silent> <expr> <TAB>   "<ESC>:call UltiSnips#JumpForwards()<CR>"
-snoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
-snoremap <silent> <expr> <CR>    "<ESC>:call UltiSnips#JumpForwards()<CR>"
+  imap <silent> <TAB> <Plug>vim_completes_me_forward
+  imap <silent> <S-TAB> <Plug>vim_completes_me_backward
+  imap <silent> <CR> <C-R>=((UltiSnips_ExpandJump() > 0) ? "" : "\r")<CR>
+  xnoremap <silent> <expr> <TAB>   ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
+  snoremap <silent> <expr> <TAB>   "<ESC>:call UltiSnips#JumpForwards()<CR>"
+  snoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
+  snoremap <silent> <expr> <CR>    "<ESC>:call UltiSnips#JumpForwards()<CR>"
+endif
 
 
 " python setup {{{
