@@ -21,7 +21,7 @@ alias search='find . -type f -name'
 alias mcar='cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
 alias build='mvnc install -T 2.0C; mcar'
 
-alias cvi='vi -u ~/dotfiles/microvimrc'
+alias cvi='vi -u ~/dotfiles/microvimrc --noplugin'
 alias mvi='vi -u ~/dotfiles/minvimrc'
 
 if [[ $(uname -s) == CYGWIN* ]]; then
