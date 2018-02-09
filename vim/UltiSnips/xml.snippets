@@ -235,3 +235,19 @@ endsnippet
 snippet     seq "sequence" b
 <sequence key="${1}"/>${0}
 endsnippet
+
+snippet	    ept "endpoint timeouts" b
+<timeout>
+	<duration>${1:30000}</duration>
+	<responseAction>fault</responseAction>
+</timeout>
+<suspendOnFailure>
+	<errorCodes>-1</errorCodes>
+	<initialDuration>0</initialDuration>
+	<progressionFactor>1.0</progressionFactor>
+	<maximumDuration>0</maximumDuration>
+</suspendOnFailure>
+<markForSuspension>
+	<errorCodes>-1</errorCodes>
+</markForSuspension>
+endsnippet
