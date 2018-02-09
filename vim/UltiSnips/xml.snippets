@@ -62,8 +62,12 @@ snippet     epa "anonymous endpoint" b
 </endpoint>${0}
 endsnippet
 
-snippet     epk "endpoint with key" b
+snippet     epkc "endpoint with conf key" b
 <endpoint key="conf:/${1}.xml"/>${0}
+endsnippet
+
+snippet     epk "endpoint with key" b
+<endpoint key="${1}"/>${0}
 endsnippet
 
 snippet     enr "enrich" b
