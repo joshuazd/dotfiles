@@ -57,6 +57,7 @@ set signcolumn=no				" don't have signcolumn on
 set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
 set tags=./tags,tags
 set spellfile=~/.vim/spell/en.utf-8.add
+set modeline
 if executable('rg')				" use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -136,6 +137,8 @@ nnoremap <S-TAB> <C-w>W
 
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
+nnoremap gj j
+nnoremap gk k
 
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
