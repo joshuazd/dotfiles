@@ -218,9 +218,11 @@ function! CCR() abort
   elseif cmdline =~? '\C^old'
     return "\<CR>:e #<"
   elseif cmdline =~? '\C^changes'
-    return "\<CR>:norm! g;\<S-Left>"
+    set nomore
+    return "\<CR>:set more|norm! g;\<S-Left>"
   elseif cmdline =~? '\C^ju'
-    return "\<CR>:norm! \<C-o>\<S-Left>"
+    set nomore
+    return "\<CR>:set more|norm! \<C-o>\<S-Left>"
   elseif cmdline =~? '\C^marks'
     return "\<CR>:norm! `"
   elseif cmdline =~? '\C^undol'
