@@ -260,9 +260,16 @@ let g:UltiSnipsJumpBackwardTrigger="\<C-h>"
 let g:mucomplete#enable_auto_at_startup = 1
 let g:mucomplete#no_popup_mappings = 1
 let g:mucomplete#always_use_completeopt = 1
+let g:mucomplete#can_complete = {}
+let g:mucomplete#can_complete.xml = {
+      \  'tags': {
+      \     t -> g:mucomplete_with_key
+      \   }
+      \ }
 let g:mucomplete#chains = {
-      \ 'default' : ['path', 'omni', 'c-n', 'dict', 'uspl', 'ulti'],
-      \ 'vim'     : ['path', 'cmd', 'ulti', 'c-n']
+      \ 'default' : ['path', 'omni', 'keyn', 'dict', 'uspl', 'ulti'],
+      \ 'vim'     : ['path', 'cmd', 'ulti', 'keyn'],
+      \ 'xml'     : ['tags', 'ulti']
       \ }
 " }}}
 " jedi {{{
