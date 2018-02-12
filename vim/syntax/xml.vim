@@ -86,7 +86,6 @@ syn match   xmlAttrib
     \ contains=xmlAttribPunct,@xmlAttribHook
     \ display
 
-" syn match xmlOperator "=" contained
 
 " namespace spec
 "
@@ -187,7 +186,7 @@ if exists('g:xml_syntax_folding')
         \ end=+</\z1\_\s\{-}>+
         \ matchgroup=xmlTagPunct end=+/>+
         \ fold
-        \ contains=xmlGroovyRegion,xmlPayloadRegion,xmlSqlRegion,xmlJavaScriptRegion,xmlTag,xmlEndTag,xmlCdata,xmlRegion,xmlComment,xmlOperator,xmlEntity,xmlProcessing,@xmlRegionHook,@Spell
+        \ contains=xmlGroovyRegion,xmlSqlRegion,xmlJavaScriptRegion,xmlTag,xmlEndTag,xmlCdata,xmlRegion,xmlComment,xmlEntity,xmlProcessing,@xmlRegionHook,@Spell
         \ keepend
         \ extend
 
