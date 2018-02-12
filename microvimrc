@@ -53,6 +53,10 @@ set autowrite					" automatically save before :next, :make, etc
 set autoread					" automatically reread changed files
 set path=.,**					" set path to all subdirectories
 set cpoptions-=<
+set tags=./tags,tags
+set spellfile=~/.vim/spell/en.utf-8.add
+set modeline
+set shortmess+=c
 if executable('rg')				" use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -83,6 +87,8 @@ nnoremap <S-TAB> <C-w>W
 
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
+nnoremap gj j
+nnoremap gk k
 
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>b :buffer *<C-d>
@@ -104,5 +110,17 @@ nnoremap <silent> <Space>P P=']
 xnoremap <silent> <Space>p p=']
 xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
+
+nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
+
+nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
+nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
+
+nnoremap <C-]> g<C-]>
+nnoremap <expr> g<C-]> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
+nnoremap <C-_> :stjump <C-r><C-w><CR>
+nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
+nnoremap <expr> g<C-_> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>" : ":stjump \<C-r>\<C-w>\<CR>")
+nnoremap <expr> g<C-Bslash> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
 
 set statusline=\ %{mode()}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
