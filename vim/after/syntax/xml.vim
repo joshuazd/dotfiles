@@ -12,16 +12,16 @@ syn match xmlArgs 'args' contained
 syn match xmlEnrich 'enrich\|xslt\|value-of\|schema\|datamapper' contained
 syn match xmlSqlTag '\<\(sql\|script\)\>' contained
 
-let s:cur_syntax = b:current_syntax
-unlet! b:current_syntax
-syn include @xmlSQL syntax/sql.vim
-syn region xmlSqlRegion
-    \ start=+\%(<sql>\)+
-    \ keepend
-    \ end=+\%(</sql>\)+
-    \ contained
-    \ contains=xmlTag,,xmlEndTag,@xmlSQL
-let b:current_syntax = s:cur_syntax
+" let s:cur_syntax = b:current_syntax
+" unlet! b:current_syntax
+" syn include @xmlSQL syntax/sql.vim
+" syn region xmlSqlRegion
+"     \ start=+\%(<sql>\)+
+"     \ keepend
+"     \ end=+\%(</sql>\)+
+"     \ contained
+"     \ contains=xmlTag,,xmlEndTag,@xmlSQL
+" let b:current_syntax = s:cur_syntax
 
 " let s:cur_syntax = b:current_syntax
 " unlet! b:current_syntax
@@ -46,39 +46,39 @@ let b:current_syntax = s:cur_syntax
 "             \ contains=xmlJsonRegion,xmlPayloadTag,xmlPayloadEndTag,xmlPayloadArgsRegion,xmlPayloadArgsTag
 " let b:current_syntax = s:cur_syntax
 
-let s:cur_syntax = b:current_syntax
-unlet! b:current_syntax
-syn include @xmlJavaScript syntax/javascript.vim
-syn region xmlJavaScriptRegion
-    \ start=+<script language="js">+
-    \ keepend
-    \ end=+</script>+
-    \ contained
-    \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlJavaScript
-let b:current_syntax = s:cur_syntax
+" let s:cur_syntax = b:current_syntax
+" unlet! b:current_syntax
+" syn include @xmlJavaScript syntax/javascript.vim
+" syn region xmlJavaScriptRegion
+"     \ start=+<script language="js">+
+"     \ keepend
+"     \ end=+</script>+
+"     \ contained
+"     \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlJavaScript
+" let b:current_syntax = s:cur_syntax
 
-let s:cur_syntax = b:current_syntax
-unlet! b:current_syntax
-syn include @xmlGroovy syntax/groovy.vim
-syn region xmlGroovyRegion
-    \ start=+<script language="groovy">+
-    \ keepend
-    \ end=+</script>+
-    \ contained
-    \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlGroovy
-let b:current_syntax = s:cur_syntax
+" let s:cur_syntax = b:current_syntax
+" unlet! b:current_syntax
+" syn include @xmlGroovy syntax/groovy.vim
+" syn region xmlGroovyRegion
+"     \ start=+<script language="groovy">+
+"     \ keepend
+"     \ end=+</script>+
+"     \ contained
+"     \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataEnd,@xmlGroovy
+" let b:current_syntax = s:cur_syntax
 
-syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
-syn match xmlEndScriptTag +</script>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+" syn match xmlScriptTag +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
+" syn match xmlEndScriptTag +</script>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 " syn match xmlFormatTag +<format[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
 " syn match xmlFormatEndTag +</format>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 " syn match xmlPayloadTag +<payloadFactory[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook
 " syn match xmlPayloadEndTag +</payloadFactory>+ contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
 " syn match xmlPayloadArgsTag +<args/>+ contains=xmlTag,xmlTagName,@xmlTagHook
 " syn match xmlArgTag +<arg [^/]/>+ contains=@xmlTagHook
-syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
-syn keyword  xmlCdataCdata CDATA          contained
-syn match    xmlCdataEnd   +]]>+          contained
+" syn match    xmlCdataStart +<!\[CDATA\[+  contained contains=xmlCdataCdata
+" syn keyword  xmlCdataCdata CDATA          contained
+" syn match    xmlCdataEnd   +]]>+          contained
 
 " let s:cur_syntax = b:current_syntax
 " unlet! b:current_syntax
