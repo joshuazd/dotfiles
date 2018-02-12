@@ -11,4 +11,3 @@ augroup VIM
       autocmd BufWritePost *.vim,.vimrc,vimrc silent! make|cwindow|redraw!
     endif
 augroup END
-
