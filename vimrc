@@ -47,7 +47,7 @@ set noswapfile
 set foldlevel=99				" don't fold things by default
 set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:$,nbsp:␣ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
-set completeopt+=menuone,noselect,noinsert	" configure popup menu
+set completeopt+=menuone,noselect,longest " configure popup menu
 set concealcursor+=n				" conceal characters in normal mode
 set conceallevel=2				" conceal characters by default
 set autowrite					" automatically save before :next, :make, etc
@@ -58,7 +58,6 @@ set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for fol
 set tags=./tags,tags
 set spellfile=~/.vim/spell/en.utf-8.add
 set modeline
-set shortmess+=c
 if executable('rg')				" use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -86,7 +85,7 @@ call plug#begin('~/.vim/bundle')
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 Plug 'airblade/vim-gitgutter'
-Plug 'lifepillar/vim-mucomplete'
+Plug 'ajh17/VimCompletesMe'
 Plug 'SirVer/ultisnips'
 Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
@@ -242,44 +241,4 @@ endfunction
 " normal statusline setup in $HOME/.vim/after/plugin/statusline.vim
 " this statusline only used if --noplugin specified
 set statusline=\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
-" }}}
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""
-"              PLUGIN SETUP
-""""""""""""""""""""""""""""""""""""""""""""""""
-" {{{
-" most of the configs are in the after/plugin/settings folder
-" these are here to prevent plugins from mapping things I don't want mapped
-" ultisnips {{{
-let g:UltiSnipsExpandTrigger="\<nop>"
-let g:UltiSnipsJumpForwardTrigger="\<C-l>"
-let g:UltiSnipsJumpBackwardTrigger="\<C-h>"
-" }}}
-" mucomplete {{{
-let g:mucomplete#enable_auto_at_startup = 1
-let g:mucomplete#no_popup_mappings = 1
-let g:mucomplete#always_use_completeopt = 1
-let g:mucomplete#chains = {
-      \ 'default' : ['path', 'omni', 'c-n', 'dict', 'uspl', 'ulti'],
-      \ 'vim'     : ['path', 'cmd', 'ulti', 'c-n']
-      \ }
-" }}}
-" jedi {{{
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#show_call_signatures = 1
-let g:jedi#show_call_signatures_delay = 50
-" }}}
-" clang {{{
-let g:clang_auto = 0
-let g:clang_c_completeopt = 'menuone,preview'
-let g:clang_cpp_completeopt = 'menuone,preview'
-let g:clang_verbose_pmenu = 1
-" }}}
-" ipython {{{
-let g:ipy_perform_mappings = 0 "make our own mappings
-" }}}
-" tmux-navigator {{{
-let g:tmux_navigator_no_mappings = 1
-" }}}
 " }}}
