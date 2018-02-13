@@ -6,7 +6,7 @@ if exists(':UltiSnipsEdit')
     return g:ulti_expand_or_jump_res
   endfunction
 
-  imap <silent> <CR> <C-R>=(UltiSnips_ExpandJump() > 0 ? "" : pumvisible() ? "\<c-e>\r" : "\r")<CR>
+  inoremap <silent> <CR> <C-R>=((UltiSnips_ExpandJump() > 0) ? "" : (pumvisible() ? "<C-e>\r\r" : "\r"))<CR>
   xnoremap <silent> <expr> <TAB>   ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
   snoremap <silent> <expr> <TAB>   "<ESC>:call UltiSnips#JumpForwards()<CR>"
   snoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
@@ -14,7 +14,6 @@ if exists(':UltiSnipsEdit')
 endif
 
 if exists('g:mucomplete#chains')
-  let g:mucomplete#chains.default += ['ulti']
   imap <c-e> <plug>(MUcompleteCte)
   imap <c-y> <plug>(MUcompleteCty)
 endif
