@@ -65,7 +65,7 @@ syn region  xmlString contained matchgroup=xmlQuote start=+'+ end=+'+ contains=x
 " punctuation (within attributes) e.g. <tag xml:foo.attribute ...>
 "                                              ^   ^
 " syn match   xmlAttribPunct +[-:._]+ contained display
-syn match   xmlAttribPunct +[:.]+ contained display
+syn match   xmlAttribPunct +[:]+ contained display
 
 " no highlighting for xmlEqual (xmlEqual has no highlighting group)
 syn match   xmlEqual +=+ display

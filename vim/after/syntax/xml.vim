@@ -1,7 +1,7 @@
 syn match xmlFunction 'makefault\|template\( \|>\)\@=\|validate' contained
 syn match xmlLog 'call-template\|log' contained
 syn match xmlDb 'dblookup\|dbreport\|class\|payloadFactory\|arg \|http[ >]\@=' contained
-syn match xmlFilter '\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)' contained
+syn match xmlFilter '\<\(filter\|then\|else\|on-fail\|drop\|respond\|store\|choose\|when\|otherwise\)\>' contained
 syn match xmlSend '\<\(send\|call\(>\)\@=\)' contained
 syn match xmlProperty '\<\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\( \|>\)\@=' contained
 syn match xmlSequence '\<sequence\>' contained
