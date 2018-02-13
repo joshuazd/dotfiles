@@ -1,3 +1,4 @@
+let g:in_snippet = 0
 let g:modemap = {
       \ 'n' : ['N',       'NormalMode'],  'no': ['NO',    'NormalMode'],  'v' : ['V',       'VisualMode'],
       \ 'V' : ['V',       'VisualMode'],  '': ['V',     'VisualMode'],  's' : ['S',       'VisualMode'],
@@ -77,7 +78,7 @@ function! BuildStatusLine(nr) abort
         \%0* %f%m
         \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? " RO" : ""}%0*
         \%=
-        \%{w:["lf_active"] ? TagsStatusLine() != "" ? " ".TagsStatusLine()." " : " " : " "}
+        \%{g:in_snippet > 0 ? "snippet" : ""} %{w:["lf_active"] ? TagsStatusLine() != "" ? " ".TagsStatusLine()." " : " " : " "}
         \%#StlDim#%{&syntax == "" ? "" : w:["lf_active"] ? " ".&syntax." " : ""}
         \%#StlDimNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}

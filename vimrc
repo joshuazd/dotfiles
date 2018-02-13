@@ -118,7 +118,6 @@ runtime macros/matchit.vim
 " {{{
 nnoremap ; :
 xnoremap ; :
-nnoremap , ;
 nnoremap 0 ^
 nnoremap ^ 0
 nnoremap L $
@@ -193,6 +192,8 @@ augroup EditVim
   autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
   autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
   autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
+  autocmd User UltiSnipsEnterFirstSnippet         let g:in_snippet = 1
+  autocmd User UltiSnipsExitLastSnippet           let g:in_snippet = 0
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
