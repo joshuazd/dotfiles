@@ -48,6 +48,6 @@ function getssl() {
 }
 
 function buildp() {
-    mvnc clean install -T 2.0C -P$1; mcar
+    mvnc clean install -P$1; mcar
 }
 
