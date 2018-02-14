@@ -11,6 +11,7 @@ syn match xmlConnection 'connection\|statement\|resource\( \|>\)\@=\|stylesheet'
 syn match xmlArgs 'args' contained
 syn match xmlEnrich 'enrich\|xslt\|value-of\|schema\|datamapper' contained
 syn match xmlSqlTag '\<\(sql\|script\)\>' contained
+syn keyword xmlInSequence inSequence outSequence faultSequence contained
 
 " let s:cur_syntax = b:current_syntax
 " unlet! b:current_syntax
@@ -103,15 +104,29 @@ syn match xmlSqlTag '\<\(sql\|script\)\>' contained
 "     highlight! xmlXpathRegion cterm=italic
 " endif
 
-syn keyword xmlNs ns0
-syn keyword xmlXsl xsl
+syn keyword xmlExpression expression regex contained
+syn keyword xmlValue value contained
+syn keyword xmlSelect select contained
+syn keyword xmlName name contained
+syn match xmlUrl "\(url-mapping\|uri-template\|uri\)" contained
 
-syn cluster xmlTagHook add=callTemplate,xmlDb,xmlFilter,xmlProperty,xmlSequence,xmlConnection,xmlParam,xmlFunction,xmlArgs,xmlEnrich,xmlSqlTag,xmlSend,xmlLog,xmlLogParam
+syn keyword xmlNs ns0 contained
+syn keyword xmlXsl xsl contained
+
+syn cluster xmlTagHook add=callTemplate,xmlDb,xmlFilter,xmlProperty,xmlSequence,xmlConnection,xmlParam,xmlFunction,xmlArgs,xmlEnrich,xmlSqlTag,xmlSend,xmlLog,xmlLogParam,xmlInSequence
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
+syn cluster xmlAttribHook add=xmlExpression,xmlValue,xmlSelect,xmlName,xmlUrl
 
 highlight link xmlNs Identifier
 highlight xmlXsl ctermfg=1 guifg=#ff5370
 
+hi xmlExpression ctermfg=203 guifg=#ff5f5f cterm=italic gui=italic
+hi def link xmlValue xmlExpression
+hi xmlSelect ctermfg=221 guifg=#ffcb6b cterm=italic gui=italic
+hi xmlName ctermfg=152 guifg=#afd7d7
+hi xmlUrl ctermfg=36 guifg=#00af87 cterm=italic gui=italic
+
+hi def link xmlInSequence Identifier
 hi def link xmlEnrich Operator
 hi def link xmlArgs Primitive
 highlight xmlArgs ctermfg=3 guifg=#ffb62c
@@ -119,12 +134,12 @@ hi def link xmlFunction Function
 hi def link xmlSend Function
 hi def link xmlParam StringDelimiter
 highlight xmlConnection ctermfg=13 guifg=#945eb8
-highlight xmlLog ctermfg=7 guifg=#bbbbbb
+highlight xmlLog ctermfg=245 guifg=#bbbbbb
 highlight link xmlProperty Constant
 hi def link xmlSequence StringDelimiter
 hi def link xmlScriptTag xmlTag
 hi def link xmlEndScriptTag xmlTag
 highlight link xmlDb Identifier
 highlight link xmlFilter Keyword
-highlight xmlSqlTag ctermfg=209 guifg=#ff5f00
-highlight xmlLogParam ctermfg=245 guifg=#8a8a8a
+highlight xmlSqlTag ctermfg=208 guifg=#ff5f00
+highlight xmlLogParam ctermfg=243 guifg=#8a8a8a

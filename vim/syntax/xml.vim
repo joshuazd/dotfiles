@@ -327,7 +327,7 @@ hi def link xmlOperator         PreProc
 
 hi def link xmlAttribPunct	Comment
 hi def link xmlAttrib		Type
-highlight xmlAttrib ctermfg=152 guifg=#afd7d7
+highlight xmlAttrib ctermfg=245 guifg=#afd7d7
 
 hi def link xmlString		String
 hi def link xmlComment		Comment
