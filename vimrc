@@ -104,7 +104,6 @@ if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
 " language specific plugins
-Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
 " Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
 " Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
@@ -194,6 +193,7 @@ augroup EditVim
   autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
   autocmd User UltiSnipsEnterFirstSnippet         let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet           let g:in_snippet = 0
+  autocmd BufNewFile,BufRead *.md                 set filetype=markdown
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
