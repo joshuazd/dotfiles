@@ -74,7 +74,7 @@ endfunction
 function! BuildStatusLine(nr) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
-        \%#StlDim#%{w:["lf_active"] ? GitHunks() : ""}
+        \%<%#StlDim#%{w:["lf_active"] ? GitHunks() : ""}
         \%0* %f%m
         \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? " RO" : ""}%0*
         \%=
