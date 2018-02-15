@@ -12,3 +12,13 @@ minvimrc and microvimrc are smaller vim configs that can be used if you don't wa
 They are aliased to mvi and cvi, respectively
 
 [oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) will be installed only if a zsh executable could be found
+
+## Misc Features
+
+- The 256-colors.sh script will print out all 256 term colors, both as background and as foreground colors.
+
+  Run it using `bash 256-colors.sh`
+
+
+- The colortrans.py script will convert between hex codes and term colors.  
+  It can also match hex codes to their nearest term color equivalent
