@@ -205,5 +205,5 @@ endfunction
 "              STATUSLINE SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-set statusline=\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%03v]
+set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
 " }}}
