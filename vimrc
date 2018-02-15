@@ -84,7 +84,6 @@ endif
 " {{{
 call plug#begin('~/.vim/bundle')
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
-Plug 'godlygeek/tabular', { 'on': 'Tabularize' }
 Plug 'airblade/vim-gitgutter'
 Plug 'lifepillar/vim-mucomplete'
 Plug 'SirVer/ultisnips'
@@ -104,8 +103,7 @@ if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
 " language specific plugins
-" Plug 'joshuazd/vim-ipython', { 'on': 'IPython' }
-" Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
+Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 call plug#end()
 runtime macros/matchit.vim
