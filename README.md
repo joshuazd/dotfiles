@@ -1,6 +1,7 @@
 # Installation
 
 `git clone https://github.com/joshuazd/dotfiles.git`
+
 `./dotfiles/install.sh`
 
 This will clone the repository into the dotfiles folder, and run the installation script
