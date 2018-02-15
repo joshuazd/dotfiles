@@ -10,16 +10,17 @@ augroup PYTHON
       autocmd BufWritePost *.py silent! make|cwindow|redraw!
     endif
 augroup END
+let g:jedi#goto_command = ',d'
 
 " ipython setup {{{
 
-    nmap  <buffer> <silent> <F10>          <Plug>(IPython-RunFile)
-    nmap  <buffer> <silent> <LocalLeader>d <Plug>(IPython-OpenPyDoc)
-    nmap  <buffer> <silent> <LocalLeader>r <Plug>(IPython-UpdateShell)
-    nmap  <buffer> <silent> <C-Return>     <Plug>(IPython-RunFile)
-    nmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLine)
-    nmap  <buffer> <silent> <Esc>s         <Plug>(IPython-RunLineAsTopLevel)
-    xmap  <buffer> <silent> <LocalLeader>s <Plug>(IPython-RunLines)
+    nmap  <buffer> <silent> <F10>       <Plug>(IPython-RunFile)
+    " nmap  <buffer> <silent> ,d          <Plug>(IPython-OpenPyDoc)
+    nmap  <buffer> <silent> ,r          <Plug>(IPython-UpdateShell)
+    nmap  <buffer> <silent> <C-Return>  <Plug>(IPython-RunFile)
+    nmap  <buffer> <silent> ,s          <Plug>(IPython-RunLine)
+    nmap  <buffer> <silent> <Esc>s      <Plug>(IPython-RunLineAsTopLevel)
+    xmap  <buffer> <silent> ,s          <Plug>(IPython-RunLines)
 
 " }}}
 
