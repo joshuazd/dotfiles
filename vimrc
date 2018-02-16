@@ -269,9 +269,9 @@ let g:jedi#auto_vim_configuration = 0
 let g:jedi#show_call_signatures = 1
 let g:jedi#show_call_signatures_delay = 50
 " clang
-let g:clang_auto = 0
-let g:clang_c_completeopt = 'menuone,preview'
-let g:clang_cpp_completeopt = 'menuone,preview'
+" let g:clang_auto = 0
+let g:clang_c_completeopt = 'menuone,preview,noinsert,noselect'
+let g:clang_cpp_completeopt = 'menuone,preview,noinsert,noselect'
 let g:clang_verbose_pmenu = 1
 " tmux-navigator
 let g:tmux_navigator_no_mappings = 1
