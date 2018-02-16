@@ -58,8 +58,8 @@ syn match xmlError "[<&]"
 "
 " <tag foo.attribute = "value">
 "                      ^^^^^^^
-syn region  xmlString contained matchgroup=xmlQuote start=+"+ end=+"+ contains=xmlEntity,@Spell display
-syn region  xmlString contained matchgroup=xmlQuote start=+'+ end=+'+ contains=xmlEntity,@Spell display
+syn region  xmlString contained matchgroup=xmlQuote start=+"+ end=+"+ contains=xmlEntity,@Spell,@xmlStringHook display
+syn region  xmlString contained matchgroup=xmlQuote start=+'+ end=+'+ contains=xmlEntity,@Spell,@xmlStringHook display
 
 
 " punctuation (within attributes) e.g. <tag xml:foo.attribute ...>

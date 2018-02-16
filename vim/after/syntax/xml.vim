@@ -14,6 +14,8 @@ syn match xmlSqlTag '\<\(sql\|script\)\>' contained
 syn keyword xmlInSequence inSequence outSequence faultSequence contained
 syn match xsltStatement 'for-each' contained
 
+syn match xmlFile "\(\k\+_Logger\|\k\+_XSLT\|\k\+_EP\)" contained
+
 " let s:cur_syntax = b:current_syntax
 " unlet! b:current_syntax
 " syn include @xmlSQL syntax/sql.vim
@@ -120,6 +122,7 @@ syn cluster xmlTagHook        add=xmlSqlTag,xmlSend,xmlLog,xmlLogParam,xmlInSequ
 syn cluster xmlTagHook        add=xsltStatement
 syn cluster xmlNamespaceHook  add=xmlNs,xmlXsl
 syn cluster xmlAttribHook     add=xmlExpression,xmlValue,xmlSelect,xmlName,xmlUrl
+syn cluster xmlStringHook     add=xmlFile
 
 hi def link xmlNs Identifier
 highlight xmlXsl ctermfg=1 guifg=#ff5370
@@ -131,10 +134,12 @@ highlight  xmlName        ctermfg=152  guifg=#afd7d7
 highlight  xmlLog         ctermfg=245  guifg=#bbbbbb
 highlight  xmlSqlTag      ctermfg=208  guifg=#ff5f00
 highlight  xmlLogParam    ctermfg=243  guifg=#8a8a8a
+highlight  xmlFile        ctermfg=103  guifg=#8787af  cterm=bold    gui=bold
 
 hi def link  xmlArgs          Primitive
 hi def link  xmlConnection    StorageClass
 hi def link  xmlValue         xmlExpression
+hi def link  xmlFile          diffAdded
 hi def link  xmlInSequence    Identifier
 hi def link  xmlEnrich        Operator
 hi def link  xmlFunction      Function
