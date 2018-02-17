@@ -5,7 +5,7 @@
 
 !special
 XTerm*foreground:   #cccccc
-XTerm*background:   #1c1c1c
+XTerm*background:   #121212
 XTerm*cursorColor:  #eeffff
 
 !black
