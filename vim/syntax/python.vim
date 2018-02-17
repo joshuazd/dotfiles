@@ -307,7 +307,7 @@ hi link  pythonFunction     Function
 hi link  pythonFunctionCall Function
 hi link  pythonClass        Function
 " highlight pythonClass ctermfg=4 guifg=#82aaff cterm=none
-highlight pythonClass ctermfg=67 cterm=bold gui=bold
+highlight pythonClass ctermfg=67 guifg=#5f87af cterm=bold gui=bold
 hi link  pythonParameters   Normal
 hi link  pythonParam        Identifier
 hi link  pythonBrackets     PreProc

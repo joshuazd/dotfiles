@@ -25,16 +25,16 @@ XTerm*color3:       #ffb62c
 XTerm*color11:      #ffcb6b
 
 !blue
-XTerm*color4:       #6182b8
-XTerm*color12:      #82aaff
+XTerm*color4:       #82aaff
+XTerm*color12:      #6182b8
 
 !magenta
 XTerm*color5:       #c792ea
 XTerm*color13:      #945eb8
 
 !cyan
-XTerm*color6:       #39adb5
-XTerm*color14:      #89ddff
+XTerm*color6:       #89ddff
+XTerm*color14:      #39adb5
 
 !white
 XTerm*color7:       #bbbbbb

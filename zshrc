@@ -13,7 +13,7 @@ ZSH_THEME=""
 # CASE_SENSITIVE="true"
 
 HYPHEN_INSENSITIVE="true"
-export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94:ln=01;36'
+export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94:ln=01;36:*.mp4=01;35:*.tar=01,31:*.tgz=01;31:*.zip=01;31:*.rar=01;31:*.jar=01;31:*.war=01;31:*.gz=01;31:*.bz2=01;31:*.png=01;35:*.jpg=01;35:*.jpeg=01;35:*.bmp=01;35:*.gif=01;35'
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
 
 # Uncomment the following line to disable auto-setting terminal title.
