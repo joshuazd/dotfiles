@@ -26,6 +26,7 @@ alias mvi='vi -u ~/dotfiles/minvimrc'
 
 alias grep='grep --color=auto --exclude-dir=.git'
 alias history='fc -il 1'
+alias md='mkdir -p'
 
 if [[ $(uname -s) == CYGWIN* ]]; then
     alias home='cd /c/Users/jzinkduda'
