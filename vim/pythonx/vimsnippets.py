@@ -83,11 +83,12 @@ def get_comment_format():
 
 def make_box(twidth, bwidth=None):
     b, m, e, i = (s.strip() for s in get_comment_format())
-    bwidth_inner = bwidth - 3 - max(len(b), len(i + e)) if bwidth else twidth + 2
+    bwidth_inner = bwidth - 3 - max(len(b),
+                                    len(i + e)) if bwidth else twidth + 2
     sline = b + m + bwidth_inner * m[0] + 2 * m[0]
     nspaces = (bwidth_inner - twidth) // 2
     mlines = i + m + " " + " " * nspaces
-    mlinee = " " + " "*(bwidth_inner - twidth - nspaces) + m
+    mlinee = " " + " " * (bwidth_inner - twidth - nspaces) + m
     eline = i + m + bwidth_inner * m[0] + 2 * m[0] + e
     return sline, mlines, mlinee, eline
 
