@@ -30,25 +30,13 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # HIST_STAMPS="mm/dd/yyyy"
-export VIRTUAL_ENV_DISABLE_PROMPT=1
 
-# Would you like to use another custom folder than $ZSH/custom?
-ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
-
-plugins=(git tmux ansible history-substring-search zsh-autosuggestions zsh-syntax-highlighting)
-
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-source $ZSH_CUSTOM/mvncolor.sh
+source $HOME/dotfiles/zsh_custom/mvncolor.sh
+export ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 
 autoload -Uz promptinit
 promptinit
 prompt pure
-
-# Use modern completion system
-autoload -Uz compinit
-compinit
 
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
@@ -58,14 +46,6 @@ export LANG=en_US.UTF-8
 
 # ssh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
-
-if [ -f "${HOME}/.aliases" ]; then
-      source "${HOME}/.aliases"
-fi
-
-if [ -f "${HOME}/.functions" ]; then
-      source "${HOME}/.functions"
-fi
 
 # Options
 setopt AUTO_CD
@@ -81,15 +61,16 @@ setopt GLOB_COMPLETE
 
 stty -ixon
 
-bindkey '^P' history-substring-search-up
-bindkey '^N' history-substring-search-down
-export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=none,fg=magenta,bold'
+bindkey -e
 
 export EDITOR=vim
 export VISUAL=vim
-bindkey -e
 export KEYTIMEOUT=1
+autoload -U edit-command-line
+zle -N edit-command-line
 bindkey '^x^e' edit-command-line
+bindkey '^xe' edit-command-line
+bindkey -M emacs ' ' magic-space
 
 change-first-word() {
     zle beginning-of-line -N
@@ -98,12 +79,6 @@ change-first-word() {
 zle -N change-first-word
 bindkey -M emacs "\ea" change-first-word
 
-export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
-setopt INC_APPEND_HISTORY
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_IGNORE_SPACE
-setopt HIST_REDUCE_BLANKS
-setopt HIST_VERIFY
 if [[ -d ~/pebble-dev/pebble-sdk-4.5-linux64/bin ]]; then
     export PATH=$PATH:~/pebble-dev/pebble-sdk-4.5-linux64/bin
 fi
@@ -124,3 +99,50 @@ elif type ag > /dev/null; then
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
 
+if [ -f "${HOME}/.aliases" ]; then
+      source "${HOME}/.aliases"
+fi
+
+if [ -f "${HOME}/.functions" ]; then
+      source "${HOME}/.functions"
+fi
+
+source "${ZSH_CUSTOM}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+source "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+source "${ZSH_CUSTOM}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+zle -N history-substring-search-up
+zle -N history-substring-search-down
+bindkey '^P' history-substring-search-up
+bindkey '^N' history-substring-search-down
+bindkey -M emacs '^P' history-substring-search-up
+bindkey -M emacs '^N' history-substring-search-down
+export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=none,fg=magenta,bold'
+export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
+export HISTSIZE=5000
+export HISTFILE=~/.zsh_history
+export SAVEHIST=5000
+setopt append_history
+setopt extended_history
+setopt share_history
+setopt inc_append_history
+setopt hist_ignore_all_dups
+setopt hist_ignore_space
+setopt hist_reduce_blanks
+
+zstyle ':completion:*' auto-description 'specify: %d'
+zstyle ':completion:*' completer _expand _complete _ignored
+zstyle ':completion:*' ignore-parents parent pwd .. directory
+zstyle ':completion:*' menu select=1
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' matcher-list 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=* r:|=* l:|=*'
+zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
+zstyle ':completion:*' use-compctl false
+zstyle ':completion:*' verbose true
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+zstyle ':completion:*:(rm|cp|kill|diff|scp):*' ignore-line yes
+zstyle :compinstall filename '/home/vagrant/.zshrc'
+autoload -Uz compinit
+compinit

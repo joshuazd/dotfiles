@@ -12,6 +12,7 @@ How to install
 * Ubuntu: `zsh-syntax-highlighting` package [in Xenial][ubuntu-package] (or in [OBS repository][obs-repository])
 * RHEL / CentOS / Scientific Linux: `zsh-syntax-highlighting` package in [OBS repository][obs-repository]
 * openSUSE / SLE: `zsh-syntax-highlighting` package in [OBS repository][obs-repository]
+* Void Linux: `zsh-syntax-highlighting package` [in XBPS][void-package]
 
 [arch-package]: https://www.archlinux.org/packages/zsh-syntax-highlighting
 [AUR-package]: https://aur.archlinux.org/packages/zsh-syntax-highlighting-git
@@ -23,6 +24,9 @@ How to install
 [fedora-package]: https://apps.fedoraproject.org/packages/zsh-syntax-highlighting
 [fedora-package-alt]: https://bodhi.fedoraproject.org/updates/?packages=zsh-syntax-highlighting
 [obs-repository]: https://software.opensuse.org//download.html?project=shells%3Azsh-users%3Azsh-syntax-highlighting&package=zsh-syntax-highlighting
+[void-package]: https://github.com/voidlinux/void-packages/tree/master/srcpkgs/zsh-syntax-highlighting
+
+See also [repology's cross-distro index](https://repology.org/metapackage/zsh-syntax-highlighting/versions)
 
 
 ### In your ~/.zshrc
@@ -51,9 +55,10 @@ Note that `zsh-syntax-highlighting` must be the last plugin sourced.
 The zsh-syntax-highlighting authors recommend manual installation over the use
 of a framework or plugin manager.
 
-This list is incomplete as there are too many [frameworks / plugin managers]
-(https://github.com/unixorn/awesome-zsh-plugins#frameworks) to list them all
-here.
+This list is incomplete as there are too many
+[frameworks / plugin managers][framework-list] to list them all here.
+
+[framework-list]: https://github.com/unixorn/awesome-zsh-plugins#frameworks
 
 #### [Antigen](https://github.com/zsh-users/antigen)
 
@@ -76,9 +81,10 @@ your `.zshrc`.
 
 #### [Prezto](https://github.com/sorin-ionescu/prezto)
 
-Zsh-syntax-highlighting is included with Prezto. See the [Prezto documentation]
-(https://github.com/sorin-ionescu/prezto/tree/master/modules/syntax-highlighting)
-to enable and configure highlighters.
+Zsh-syntax-highlighting is included with Prezto. See the
+[Prezto documentation][prezto-docs] to enable and configure highlighters.
+
+[prezto-docs]: https://github.com/sorin-ionescu/prezto/tree/master/modules/syntax-highlighting
 
 #### [zgen](https://github.com/tarjoilija/zgen)
 

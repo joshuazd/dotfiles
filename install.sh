@@ -69,16 +69,3 @@ sudo ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async
 
 echo "To install vim plugins, open vim and run :PlugInstall"
 
-# install oh my zsh
-if [ -f /bin/zsh -o -f /usr/bin/zsh -o -f /bin/zsh.exe -o -f /usr/bin/zsh.exe ]; then
-    echo "Installing oh my zsh"
-    if [[ ! -d $HOME/.oh-my-zsh/ ]]; then
-        sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-        echo "Installed oh my zsh"
-    elif
-        echo "oh my zsh already installed"
-    fi
-elif
-    echo "Could not find zsh executable"
-fi
-
