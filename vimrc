@@ -261,7 +261,7 @@ let g:mucomplete#always_use_completeopt = 1
 let g:mucomplete#chains = {
       \ 'default' : ['path', 'omni', 'dict', 'uspl', 'ulti', 'keyn'],
       \ 'vim'     : ['path', 'cmd', 'ulti', 'keyn'],
-      \ 'xml'     : ['tags', 'ulti', 'keyn'],
+      \ 'xml'     : ['ulti', 'tags', 'keyn'],
       \ 'sql'     : ['keyn', 'ulti']
       \ }
 " jedi
