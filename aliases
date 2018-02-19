@@ -24,6 +24,9 @@ alias build='mvnc clean install; mcar'
 alias cvi='vi -u ~/dotfiles/microvimrc --noplugin'
 alias mvi='vi -u ~/dotfiles/minvimrc'
 
+alias grep='grep --color=auto --exclude-dir=.git'
+alias history='fc -il 1'
+
 if [[ $(uname -s) == CYGWIN* ]]; then
     alias home='cd /c/Users/jzinkduda'
     alias documents='cd /c/Users/jzinkduda/Documents'
@@ -40,14 +43,6 @@ if [[ $(uname -s) == CYGWIN* ]]; then
     alias esblog='less +F /c/apps/wso2esb-5.0.0/repository/logs/wso2carbon.log'
     alias subl='/c/Program\ Files/Sublime\ Text\ 3/subl.exe'
 fi
-
-# Git aliases
-# Query/use custom command for `git`.
-
-#
-# Aliases
-# (sorted alphabetically)
-#
 
 alias g='git'
 
