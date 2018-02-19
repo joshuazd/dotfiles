@@ -1,6 +1,9 @@
 rename-window home
 split-window -h -l 31 vi ~/todo.md -c 'nnoremap q :q<CR>'
 new-window -c ~/projects/esb/SalesForce -n Salesforce
+split-window -h -t 2 -p 25 -c ~/projects/esb/SalesForce
+select-pane -t 1
+resize-pane -Z
 if 'ps aux | grep "ssh -f -q jump keepalive" | grep -v "grep" -q' 'run-shell >/dev/null' 'run-shell -b "ssh -f -q jump keepalive"'
 new-window -n ESB-Test 'sshrc t1xesbapp03'
 split-window -h -t 3 'sshrc t1xesbapp04'
