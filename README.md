@@ -11,8 +11,6 @@ The bashrc, zshrc, inputrc, tmux.conf, aliases, functions, editorconfig and vim 
 minvimrc and microvimrc are smaller vim configs that can be used if you don't want plugins, or need to open huge files.
 They are aliased to mvi and cvi, respectively
 
-[oh-my-zsh](https://github.com/robbyrussell/oh-my-zsh) will be installed only if a zsh executable could be found
-
 ## Misc Features
 
 - The 256-colors.sh script will print out all 256 term colors, both as background and as foreground colors.
