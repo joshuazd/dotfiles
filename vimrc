@@ -90,7 +90,6 @@ Plug 'SirVer/ultisnips'
 Plug 'easymotion/vim-easymotion'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-surround'
-Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-obsession'
@@ -146,10 +145,20 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
+nnoremap =ow :call functions#ToggleSettings('wrap')<CR>
+nnoremap =oc :call functions#ToggleSettings('cursorline')<CR>
+nnoremap =oz :call functions#ToggleSettings('list')<CR>
+nnoremap =on :call functions#ToggleSettings('number')<CR>
+nnoremap =or :call functions#ToggleSettings('relativenumber')<CR>
+nnoremap =os :call functions#ToggleSettings('spell')<CR>
+nnoremap =ou :call functions#ToggleSettings('cursorcolumn')<CR>
+nnoremap =ox :call functions#ToggleSettings('cursorcolumn')<CR>:call functions#ToggleSettings('cursorline')<CR>
 nnoremap =og :call functions#ToggleSignColumn()<CR>
-nnoremap =oz :setlocal invlist<CR>
 nnoremap =oq :call functions#ToggleConceal()<CR>
-xnoremap =oq :call functions#ToggleConceal()<CR>
+nnoremap ]q :cnext<CR>
+nnoremap [q :cprevious<CR>
+nnoremap [Q :cfirst<CR>
+nnoremap ]Q :clast<CR>
 
 inoremap jk <Esc>
 
