@@ -15,9 +15,10 @@ setlocal omnifunc=xmlcomplete#CompleteTags
 compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
 setlocal syntax=xml
-setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/
+setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/,*_DataMapper/
 setlocal suffixesadd+=.xml
 setlocal breakindentopt=shift:4
+setlocal isfname-=/
 nnoremap ,f zMza
 augroup XML
     autocmd!
