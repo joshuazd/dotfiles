@@ -119,10 +119,20 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
-nnoremap =og :call functions#ToggleSignColumn()<CR>
-nnoremap =oz :setlocal invlist<CR>
-nnoremap =oq :call functions#ToggleConceal()<CR>
-xnoremap =oq :call functions#ToggleConceal()<CR>
+nnoremap =ow :setlocal <C-R>=ToggleSettings('wrap')<CR><CR>
+nnoremap =oc :setlocal <C-R>=ToggleSettings('cursorline')<CR><CR>
+nnoremap =oz :setlocal <C-R>=ToggleSettings('list')<CR><CR>
+nnoremap =on :setlocal <C-R>=ToggleSettings('number')<CR><CR>
+nnoremap =or :setlocal <C-R>=ToggleSettings('relativenumber')<CR><CR>
+nnoremap =os :setlocal <C-R>=ToggleSettings('spell')<CR><CR>
+nnoremap =ou :setlocal <C-R>=ToggleSettings('cursorcolumn')<CR><CR>
+nnoremap =ox :setlocal <C-R>=ToggleSettings(['cursorline','cursorcolumn'])<CR><CR>
+nnoremap =og :call ToggleSignColumn()<CR>
+nnoremap =oq :call ToggleConceal()<CR>
+nnoremap ]q :cnext<CR>
+nnoremap [q :cprevious<CR>
+nnoremap [Q :cfirst<CR>
+nnoremap ]Q :clast<CR>
 
 inoremap jk <Esc>
 
@@ -134,7 +144,6 @@ xnoremap <silent> <Space>p p=']
 xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
-noremap <silent> <F5> :call functions#VimRefresh()<CR>
 nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
@@ -165,10 +174,16 @@ augroup EditVim
   autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
 augroup END
 
-command! TrimWhiteSpace call functions#TrimWhiteSpace()
-
-command! -nargs=1 BufferGrep call functions#VimGrepAll(<f-args>)
-nnoremap <Space>g :BufferGrep 
+command! TrimWhiteSpace call TrimWhiteSpace()
+function! TrimWhiteSpace() abort
+  if !&binary && &filetype !=? 'diff'
+    let l:save = winsaveview()
+    " vint: -ProhibitCommandRelyOnUser -ProhibitCommandWithUnintendedSideEffect
+    keeppatterns %s/\s\+$//e
+    " vint: +ProhibitCommandRelyOnUser +ProhibitCommandWithUnintendedSideEffect
+    call winrestview(l:save)
+  endif
+endfunction
 
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
@@ -197,6 +212,38 @@ function! CCR() abort
     return "\<CR>:u "
   else
     return "\<CR>"
+  endif
+endfunction
+
+function! ToggleConceal() abort
+  if &conceallevel == 0
+    echo ':setlocal conceallevel=2'
+    setlocal conceallevel=2
+  else
+    echo ':setlocal conceallevel=0'
+    setlocal conceallevel=0
+  endif
+endfunction
+
+function! ToggleSettings(setting) abort
+  if type(a:setting) == v:t_string
+    if execute('set ' . a:setting . '?') =~? 'no'
+      return a:setting
+    else
+      return 'no' . a:setting
+    endif
+  elseif type(a:setting) == v:t_list
+    let l:result = ''
+    for s in a:setting
+      if execute('set ' . s . '?') =~? 'no'
+        let l:result .= s . ' '
+      else
+        let l:result .= 'no' . s . ' '
+      endif
+    endfor
+    return l:result
+  else
+    return a:setting
   endif
 endfunction
 " }}}
