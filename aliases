@@ -1,5 +1,5 @@
 #!/bin/sh
-alias ls='ls -F --color=auto'
+alias ls='ls --color=auto'
 alias ..="cd ..; ls"
 alias ...="cd ../..; ls"
 alias ....="cd ../../..; ls"
@@ -7,7 +7,7 @@ alias .....="cd ../../../..; ls"
 alias ......="cd ../../../../..; ls"
 alias lt='ls -lrt'
 alias l='ls -lFh'
-alias la='ls -lah'
+alias la='ls -lAh'
 
 alias mv='mv -i'
 alias cp='cp -i'
