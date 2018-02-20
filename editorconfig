@@ -3,21 +3,22 @@ root = true
 [*]
 end_of_line = lf
 insert_final_newline = true
-
-[*.py]
 indent_style = space
 indent_size = 4
 
+[*.py]
+indent_size = 4
+
 [*.vim]
-indent_style = space
 indent_size = 2
 
 [*.xml]
-indent_style = space
 indent_size = 2
 
 [*.yml]
-indent_style = space
+indent_size = 2
+
+[{*.js,*.dmc}]
 indent_size = 2
 
 [{COMMIT_EDITMSG}]
