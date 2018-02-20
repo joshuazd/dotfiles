@@ -209,6 +209,9 @@ command! TrimWhiteSpace call functions#TrimWhiteSpace()
 command! -nargs=1 BufferGrep call functions#VimGrepAll(<f-args>)
 nnoremap <Space>g :BufferGrep 
 
+command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+		  \ | wincmd p | diffthis
+
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
 
