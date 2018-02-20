@@ -1,20 +1,13 @@
 set nocompatible
-set ruler					" Always show current position
-set cmdheight=1					" Height of the command bar
 set hidden					" A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent			" Configure backspace so it acts as it should act
 set whichwrap+=<,>,h,l				" arrow keys and h,l move to the next line
-set showcmd					" show keystrokes
 set breakindent					" Indent wrapped lines by 2
 set breakindentopt=shift:2
 set ignorecase					" Ignore case when searching
 set smartcase					" When searching try to be smart about cases
 set hlsearch					" Highlight search results
 set lazyredraw					" Don't redraw while executing macros
-set showmatch					" Show matching brackets when text indicator is over them
-set matchtime=2					" How many tenths of a second to blink when matching brackets
-set timeoutlen=500				" shorter timeout
-set ttimeoutlen=100				" shorter timeout
 set splitbelow					" Make splits behave better
 set splitright
 set background=dark				" dark background
@@ -38,9 +31,6 @@ set wildmenu					" Turn on the wild menu
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*/target/*,*/bin/*,tags	" Ignore compiled files
 set wildignorecase				" ignore case in wildmenu
-set sessionoptions-=options			" make sessions work better with plugins
-set sessionoptions-=folds
-set sessionoptions-=blank
 let g:is_posix = 1				" make vim recognize posix compatible shells
 set backupdir=/tmp				" Better backups
 set noswapfile
@@ -56,7 +46,6 @@ set path=.,**					" set path to all subdirectories
 set cpoptions-=<
 set tags=./tags,tags
 set spellfile=~/.vim/spell/en.utf-8.add
-set modeline
 set shortmess+=c
 if executable('rg')				" use ripgrep when available
   set grepprg=rg\ --vimgrep
@@ -97,7 +86,6 @@ nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/*<C-d>
 nnoremap <Space>j :tjump /
-nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
 nnoremap =oz :set invlist<CR>
@@ -106,51 +94,6 @@ inoremap jk <esc>
 
 nnoremap <Space>q :noh<return><esc>
 
-nnoremap <silent> <Space>p p=']
-nnoremap <silent> <Space>P P=']
-xnoremap <silent> <Space>p p=']
-xnoremap <silent> <Space>P P=']
-xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
-
-nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
-cnoremap <expr> <CR> CCR()
-
-nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
-nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
-
 nnoremap <C-]> g<C-]>
-nnoremap <expr> g<C-]> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
-nnoremap <C-_> :stjump <C-r><C-w><CR>
-nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
-nnoremap <expr> g<C-_> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>" : ":stjump \<C-r>\<C-w>\<CR>")
-nnoremap <expr> g<C-Bslash> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
-
-
-" make list-like commands more intuitive
-" including this here to avoid screwing up command mode
-function! CCR() abort
-  let cmdline = getcmdline()
-  if cmdline =~? '\v\C^(ls|files|buffers)'
-    return "\<CR>:b "
-  elseif cmdline =~? '\v\C^(dli|il)'
-    return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"
-  elseif cmdline =~? '\v\C^(cli|lli)'
-    return "\<CR>:sil " . repeat(cmdline[0], 2) . "\<Space>"
-  elseif cmdline =~? '\C^old'
-    return "\<CR>:e #<"
-  elseif cmdline =~? '\C^changes'
-    set nomore
-    return "\<CR>:set more|norm! g;\<S-Left>"
-  elseif cmdline =~? '\C^ju'
-    set nomore
-    return "\<CR>:set more|norm! \<C-o>\<S-Left>"
-  elseif cmdline =~? '\C^marks'
-    return "\<CR>:norm! `"
-  elseif cmdline =~? '\C^undol'
-    return "\<CR>:u "
-  else
-    return "\<CR>"
-  endif
-endfunction
 
 set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
