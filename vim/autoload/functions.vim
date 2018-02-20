@@ -26,12 +26,24 @@ function! functions#ToggleConceal() abort
 endfunction
 
 function! functions#ToggleSettings(setting) abort
-  if execute('set ' . a:setting . '?') =~? 'no'
-    echo ':setlocal ' . a:setting
-    execute('setlocal ' . a:setting)
+  if type(a:setting) == v:t_string
+    if execute('set ' . a:setting . '?') =~? 'no'
+      return a:setting
+    else
+      return 'no' . a:setting
+    endif
+  elseif type(a:setting) == v:t_list
+    let l:result = ''
+    for s in a:setting
+      if execute('set ' . s . '?') =~? 'no'
+        let l:result .= s . ' '
+      else
+        let l:result .= 'no' . s . ' '
+      endif
+    endfor
+    return l:result
   else
-    echo ':setlocal no' . a:setting
-    execute('setlocal no' . a:setting)
+    return a:setting
   endif
 endfunction
 

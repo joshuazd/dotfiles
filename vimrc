@@ -145,14 +145,14 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
-nnoremap =ow :call functions#ToggleSettings('wrap')<CR>
-nnoremap =oc :call functions#ToggleSettings('cursorline')<CR>
-nnoremap =oz :call functions#ToggleSettings('list')<CR>
-nnoremap =on :call functions#ToggleSettings('number')<CR>
-nnoremap =or :call functions#ToggleSettings('relativenumber')<CR>
-nnoremap =os :call functions#ToggleSettings('spell')<CR>
-nnoremap =ou :call functions#ToggleSettings('cursorcolumn')<CR>
-nnoremap =ox :call functions#ToggleSettings('cursorcolumn')<CR>:call functions#ToggleSettings('cursorline')<CR>
+nnoremap =ow :setlocal <C-R>=functions#ToggleSettings('wrap')<CR><CR>
+nnoremap =oc :setlocal <C-R>=functions#ToggleSettings('cursorline')<CR><CR>
+nnoremap =oz :setlocal <C-R>=functions#ToggleSettings('list')<CR><CR>
+nnoremap =on :setlocal <C-R>=functions#ToggleSettings('number')<CR><CR>
+nnoremap =or :setlocal <C-R>=functions#ToggleSettings('relativenumber')<CR><CR>
+nnoremap =os :setlocal <C-R>=functions#ToggleSettings('spell')<CR><CR>
+nnoremap =ou :setlocal <C-R>=functions#ToggleSettings('cursorcolumn')<CR><CR>
+nnoremap =ox :setlocal <C-R>=functions#ToggleSettings(['cursorline','cursorcolumn'])<CR><CR>
 nnoremap =og :call functions#ToggleSignColumn()<CR>
 nnoremap =oq :call functions#ToggleConceal()<CR>
 nnoremap ]q :cnext<CR>
