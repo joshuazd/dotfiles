@@ -126,7 +126,7 @@ nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
-nnoremap <silent> <Space><Space> :b#<CR>
+nnoremap <BS> <C-^>
 nnoremap <silent> <Space>x :bn\|bd #<CR>
 
 nnoremap <TAB> <C-w>w
