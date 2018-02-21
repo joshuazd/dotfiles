@@ -2,67 +2,67 @@
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-set hidden					" A buffer becomes hidden when it is abandoned
-set backspace=eol,start,indent			" Configure backspace so it acts as it should act
-set whichwrap+=<,>,h,l				" arrow keys and h,l move to the next line
-set showcmd					" show keystrokes
-set breakindent					" Indent wrapped lines by 2
+set hidden                                    " A buffer becomes hidden when it is abandoned
+set backspace=eol,start,indent                " Configure backspace so it acts as it should act
+set whichwrap+=<,>,h,l                        " arrow keys and h,l move to the next line
+set showcmd                                   " show keystrokes
+set breakindent                               " Indent wrapped lines by 2
 set breakindentopt=shift:2
-set ignorecase					" Ignore case when searching
-set smartcase					" When searching try to be smart about cases
-set hlsearch					" Highlight search results
-set incsearch					" Makes search act like search in modern browsers
-set lazyredraw					" Don't redraw while executing macros
-set showmatch					" Show matching brackets when text indicator is over them
-set matchtime=2					" How many tenths of a second to blink when matching brackets
-set timeoutlen=500				" shorter timeout
-set ttimeoutlen=100				" shorter timeout
-set splitbelow					" Make splits behave better
+set ignorecase                                " Ignore case when searching
+set smartcase                                 " When searching try to be smart about cases
+set hlsearch                                  " Highlight search results
+set incsearch                                 " Makes search act like search in modern browsers
+set lazyredraw                                " Don't redraw while executing macros
+set showmatch                                 " Show matching brackets when text indicator is over them
+set matchtime=2                               " How many tenths of a second to blink when matching brackets
+set timeoutlen=500                            " shorter timeout
+set ttimeoutlen=100                           " shorter timeout
+set splitbelow                                " Make splits behave better
 set splitright
-syntax enable					" turn syntax on
-colorscheme material				" material color scheme
-set clipboard=unnamedplus			" make clipboard work better
-set softtabstop=4				" number of spaces when inserting/backspacing
-set shiftwidth=4				" shift 4 spaces for indentation
-set expandtab					" expand tabs into spaces
-set autoindent					" use the previous lines indentation level
-set noshowmode					" don't show mode in the statusline
-set nowrap					" don't wrap lines by default
-set linebreak					" wrap lines at words
-set laststatus=2				" always show statusline
-set scrolloff=999				" Set 999 lines to the cursor - when moving vertically using j/k
-set sidescroll=1				" scroll 1 character at a time
-set sidescrolloff=15				" scroll within 15 characters
-set foldmethod=syntax				" fold based on syntax
-set wildmenu					" Turn on the wild menu
+syntax enable                                 " turn syntax on
+colorscheme material                          " material color scheme
+set clipboard=unnamedplus                     " make clipboard work better
+set softtabstop=4                             " number of spaces when inserting/backspacing
+set shiftwidth=4                              " shift 4 spaces for indentation
+set expandtab                                 " expand tabs into spaces
+set autoindent                                " use the previous lines indentation level
+set noshowmode                                " don't show mode in the statusline
+set nowrap                                    " don't wrap lines by default
+set linebreak                                 " wrap lines at words
+set laststatus=2                              " always show statusline
+set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically using j/k
+set sidescroll=1                              " scroll 1 character at a time
+set sidescrolloff=15                          " scroll within 15 characters
+set foldmethod=syntax                         " fold based on syntax
+set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full
-set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*target/*,*bin/*,*build/*,tags,Session.vim	" Ignore compiled files
-set wildignorecase				" ignore case in wildmenu
-set sessionoptions-=options			" make sessions work better with plugins
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*target/*,*bin/*,*build/*,tags,Session.vim    " Ignore compiled files
+set wildignorecase                            " ignore case in wildmenu
+set sessionoptions-=options                   " make sessions work better with plugins
 set sessionoptions-=folds
 set sessionoptions-=blank
-let g:is_posix = 1				" make vim recognize posix compatible shells
-set backupdir=/tmp				" Better backups
+let g:is_posix = 1                            " make vim recognize posix compatible shells
+set backupdir=/tmp                            " Better backups
 set noswapfile
-set foldlevel=99				" don't fold things by default
+set foldlevel=99                              " don't fold things by default
 set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:$,nbsp:␣ " what to show for whitespace chars
-set omnifunc=syntaxcomplete#Complete		" enable omnicompletion
-set completeopt+=menuone,noselect,noinsert	" configure popup menu
-set concealcursor+=n				" conceal characters in normal mode
-set conceallevel=2				" conceal characters by default
-set autowrite					" automatically save before :next, :make, etc
-set autoread					" automatically reread changed files
-set path=.,**					" set path to all subdirectories
-set signcolumn=no				" don't have signcolumn on
+set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
+set completeopt+=menuone,noselect,noinsert    " configure popup menu
+set concealcursor+=n                          " conceal characters in normal mode
+set conceallevel=2                            " conceal characters by default
+set autowrite                                 " automatically save before :next, :make, etc
+set autoread                                  " automatically reread changed files
+set path=.,**                                 " set path to all subdirectories
+set signcolumn=no                             " don't have signcolumn on
 set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
 set tags=./tags,tags
 set spellfile=~/.vim/spell/en.utf-8.add
 set modeline
 set shortmess+=c
-if executable('rg')				" use ripgrep when available
+if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
-elseif executable('ag')				" use ag when available and ripgrep is not
+elseif executable('ag')                       " use ag when available and ripgrep is not
   set grepprg=ag\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
@@ -210,7 +210,7 @@ command! -nargs=1 BufferGrep call functions#VimGrepAll(<f-args>)
 nnoremap <Space>g :BufferGrep 
 
 command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-		  \ | wincmd p | diffthis
+            \ | wincmd p | diffthis
 
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
@@ -222,26 +222,15 @@ command! AC call functions#AnsibleEncrypt()
 " including this here to avoid screwing up command mode
 function! CCR() abort
   let cmdline = getcmdline()
-  if cmdline =~? '\v\C^(ls|files|buffers)'
-    return "\<CR>:b "
-  elseif cmdline =~? '\v\C^(dli|il)'
-    return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"
-  elseif cmdline =~? '\v\C^(cli|lli)'
-    return "\<CR>:sil " . repeat(cmdline[0], 2) . "\<Space>"
-  elseif cmdline =~? '\C^old'
-    return "\<CR>:e #<"
-  elseif cmdline =~? '\C^changes'
-    set nomore
-    return "\<CR>:set more|norm! g;\<S-Left>"
-  elseif cmdline =~? '\C^ju'
-    set nomore
-    return "\<CR>:set more|norm! \<C-o>\<S-Left>"
-  elseif cmdline =~? '\C^marks'
-    return "\<CR>:norm! `"
-  elseif cmdline =~? '\C^undol'
-    return "\<CR>:u "
-  else
-    return "\<CR>"
+  if cmdline =~? '\v\C^(ls|files|buffers)' | return "\<CR>:b "
+  elseif cmdline =~? '\v\C^(dli|il)' | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
+  elseif cmdline =~? '\v\C^(cli|lli)' | return "\<CR>:sil ".repeat(cmdline[0], 2)."\<Space>"
+  elseif cmdline =~? '\C^old' | return "\<CR>:e #<"
+  elseif cmdline =~? '\C^changes' | set nomore | return "\<CR>:set more|norm! g;\<S-Left>"
+  elseif cmdline =~? '\C^ju' | set nomore | return "\<CR>:set more|norm! \<C-o>\<S-Left>"
+  elseif cmdline =~? '\C^marks' | return "\<CR>:norm! `"
+  elseif cmdline =~? '\C^undol' | return "\<CR>:u "
+  else | return "\<CR>"
   endif
 endfunction
 
@@ -288,4 +277,6 @@ let g:clang_cpp_completeopt = 'menuone,preview,noinsert,noselect'
 let g:clang_verbose_pmenu = 1
 " tmux-navigator
 let g:tmux_navigator_no_mappings = 1
+" lion
+let g:lion_squeeze_spaces = 1 
 " }}}
