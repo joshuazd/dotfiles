@@ -98,6 +98,7 @@ compinit
 # plugins
 fpath=($fpath ${ZSH_CUSTOM}/plugins/git)
 source "${ZSH_CUSTOM}/plugins/git/git.plugin.zsh"
+source "${ZSH_CUSTOM}/my_scripts.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
