@@ -18,7 +18,7 @@ syn match xmlFile       '\k\+_\(Logger\|XSLT\|EP\|DM\|outputSchema\|OutputSchema
 
 syn keyword xmlExpression expression regex contained
 syn keyword xmlValue      value action     contained
-syn keyword xmlSelect     select           contained
+syn keyword xmlSelect     select source    contained
 syn keyword xmlName       name             contained
 syn match xmlUrl "\(url-mapping\|uri-template\|uri\)" contained
 
@@ -32,6 +32,29 @@ syn cluster xmlTagHook       add=xsltStatement
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
 syn cluster xmlAttribHook    add=xmlExpression,xmlValue,xmlSelect,xmlName,xmlUrl
 syn cluster xmlStringHook    add=xmlFile
+
+let s:cur_syntax = b:current_syntax
+unlet! b:current_syntax
+syn include @xmlXpath syntax/xpath.vim
+syn region Xpath
+    \ matchgroup=xmlQuote start=+\(xpath=\|source=\|expression=\)\@<="+
+    \ keepend
+    \ end=+"+
+    \ contained
+    \ contains=@xmlXpath
+let b:current_syntax = s:cur_syntax
+
+" let s:cur_syntax = b:current_syntax
+" unlet! b:current_syntax
+" syn include @xmlXpath syntax/xpath.vim
+" syn region xmlXpathRegion
+"     \ matchgroup=xmlQuote start=+\(select=\| source=\|when test=\|xpath=\|if test=\|expression=\)\@<="+
+    " \ matchgroup=xmlQuote start=+\(expression=\)\@<="+
+"     \ keepend
+"     \ end=+"+
+"     \ contained
+"     \ contains=@xmlXpath
+" let b:current_syntax = s:cur_syntax
 
 hi def link xmlNs           Identifier
 highlight xmlXsl        ctermfg=1   guifg=#ff5370

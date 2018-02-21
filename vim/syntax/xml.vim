@@ -144,7 +144,7 @@ if exists('g:xml_syntax_folding')
         \ matchgroup=xmlTagPunct start=+<[^ /!?<>"']\@=+
         \ matchgroup=xmlTagPunct end=+>+
         \ contained
-        \ contains=xmlError,xmlXpathRegion,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,@xmlStartTagHook
+        \ contains=xmlError,Xpath,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,@xmlStartTagHook
 
 
     " highlight the end tag
