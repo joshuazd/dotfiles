@@ -8,8 +8,11 @@ This will clone the repository into the dotfiles folder, and run the installatio
 
 The bashrc, zshrc, inputrc, tmux.conf, aliases, functions, editorconfig and vim config will be backed up before installing each file
 
-minvimrc and microvimrc are smaller vim configs that can be used if you don't want plugins, or need to open huge files.
-They are aliased to mvi and cvi, respectively
+minvimrc is a drop-in replacement that can be used as a single file vim config, e.g. on remote servers. 
+It has no plugins, but contains useful functions, maps, and settings.  It is aliased to mvi
+
+microvimrc is a smaller config that disables syntax highlighting. It is aliased to cvi, which also disables plugins. 
+It is suitable for editing large files
 
 ## Misc Features
 
