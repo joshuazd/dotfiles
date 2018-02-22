@@ -3,4 +3,5 @@ setlocal formatoptions-=c
 setlocal comments=b:-\ [\ ]
 setlocal comments+=b:*,b:+,b:-
 setlocal comments+=b:>
-let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'html', 'xml']
+setlocal formatoptions+=o
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh']
