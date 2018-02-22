@@ -35,8 +35,11 @@ endfunction
 function! <SID>indentMotionObject(line, object) abort
   let l:upper = <SID>findSmallerIndent(a:line, 'k')
   let l:lower = <SID>findSmallerIndent(a:line, 'j') - 1
-  if a:object ==? 'ii'
+  if a:object ==# 'ii'
     let l:upper += 1
+  endif
+  if a:object ==# 'aI'
+    let l:lower += 1
   endif
   execute 'normal! ' . l:upper . 'GV' . l:lower . 'G'
 endfunction
@@ -73,21 +76,29 @@ xnoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', mode(),
 onoremap <silent> <expr> <Plug>IndentMotionDown <SID>indentMotionMove('j', 'o', v:count1)
 onoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', 'o', v:count1)
 
-onoremap <Plug>IndentMotionII :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
-onoremap <Plug>IndentMotionAI :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
-xnoremap <Plug>IndentMotionII :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
-xnoremap <Plug>IndentMotionAI :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
-if !hasmapto('<Plug>IndentMotionII', 'o')
-  omap ii <Plug>IndentMotionII
+onoremap <Plug>IndentMotionii :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
+onoremap <Plug>IndentMotionai :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
+onoremap <Plug>IndentMotionaI :<C-u>call <SID>indentMotionObject(line('.'), 'aI')<CR>
+xnoremap <Plug>IndentMotionii :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
+xnoremap <Plug>IndentMotionai :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
+xnoremap <Plug>IndentMotionaI :<C-u>call <SID>indentMotionObject(line('.'), 'aI')<CR>
+if !hasmapto('<Plug>IndentMotionii', 'o')
+  omap ii <Plug>IndentMotionii
 endif
-if !hasmapto('<Plug>IndentMotionAI', 'o')
-  omap ai <Plug>IndentMotionAI
+if !hasmapto('<Plug>IndentMotionai', 'o')
+  omap ai <Plug>IndentMotionai
 endif
-if !hasmapto('<Plug>IndentMotionII', 'v')
-  xmap ii <Plug>IndentMotionII
+if !hasmapto('<Plug>IndentMotionaI', 'o')
+  omap aI <Plug>IndentMotionaI
 endif
-if !hasmapto('<Plug>IndentMotionAI', 'v')
-  xmap ai <Plug>IndentMotionAI
+if !hasmapto('<Plug>IndentMotionii', 'v')
+  xmap ii <Plug>IndentMotionii
+endif
+if !hasmapto('<Plug>IndentMotionai', 'v')
+  xmap ai <Plug>IndentMotionai
+endif
+if !hasmapto('<Plug>IndentMotionaI', 'v')
+  xmap aI <Plug>IndentMotionaI
 endif
 if !hasmapto('<Plug>IndentMotionDown', 'n')
   nmap ,j <Plug>IndentMotionDown
