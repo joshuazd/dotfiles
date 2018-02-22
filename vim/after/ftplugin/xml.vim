@@ -4,7 +4,6 @@ setlocal softtabstop=2
 setlocal foldmethod=syntax
 setlocal smarttab
 setlocal conceallevel=0
-setlocal wrap
 setlocal foldnestmax=2
 setlocal iskeyword+=-
 let g:xml_syntax_folding=1 " enable xml folding
@@ -16,7 +15,7 @@ compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
 setlocal syntax=xml
 setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/,*_DataMapper/
-setlocal suffixesadd+=.xml
+set suffixesadd+=.xml
 setlocal breakindentopt=shift:4
 setlocal isfname-=/
 nnoremap ,f zMza
