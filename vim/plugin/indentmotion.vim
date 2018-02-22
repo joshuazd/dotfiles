@@ -80,45 +80,9 @@ xnoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', mode(),
 onoremap <silent> <expr> <Plug>IndentMotionDown <SID>indentMotionMove('j', 'o', v:count1)
 onoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', 'o', v:count1)
 
-onoremap <Plug>IndentMotionii :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
-onoremap <Plug>IndentMotionai :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
-onoremap <Plug>IndentMotionaI :<C-u>call <SID>indentMotionObject(line('.'), 'aI')<CR>
-xnoremap <Plug>IndentMotionii :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
-xnoremap <Plug>IndentMotionai :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
-xnoremap <Plug>IndentMotionaI :<C-u>call <SID>indentMotionObject(line('.'), 'aI')<CR>
-if !hasmapto('<Plug>IndentMotionii', 'o')
-  omap ii <Plug>IndentMotionii
-endif
-if !hasmapto('<Plug>IndentMotionai', 'o')
-  omap ai <Plug>IndentMotionai
-endif
-if !hasmapto('<Plug>IndentMotionaI', 'o')
-  omap aI <Plug>IndentMotionaI
-endif
-if !hasmapto('<Plug>IndentMotionii', 'v')
-  xmap ii <Plug>IndentMotionii
-endif
-if !hasmapto('<Plug>IndentMotionai', 'v')
-  xmap ai <Plug>IndentMotionai
-endif
-if !hasmapto('<Plug>IndentMotionaI', 'v')
-  xmap aI <Plug>IndentMotionaI
-endif
-if !hasmapto('<Plug>IndentMotionDown', 'n')
-  nmap ,j <Plug>IndentMotionDown
-endif
-if !hasmapto('<Plug>IndentMotionUp', 'n')
-  nmap ,k <Plug>IndentMotionUp
-endif
-if !hasmapto('<Plug>IndentMotionDown', 'x')
-  xmap ,j <Plug>IndentMotionDown
-endif
-if !hasmapto('<Plug>IndentMotionUp', 'x')
-  xmap ,k <Plug>IndentMotionUp
-endif
-if !hasmapto('<Plug>IndentMotionDown', 'o')
-  omap ,j <Plug>IndentMotionDown
-endif
-if !hasmapto('<Plug>IndentMotionUp', 'o')
-  omap ,k <Plug>IndentMotionUp
-endif
+onoremap <Plug>IndentMotionInner :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
+onoremap <Plug>IndentMotionUpper :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
+onoremap <Plug>IndentMotionAround :<C-u>call <SID>indentMotionObject(line('.'), 'aI')<CR>
+xnoremap <Plug>IndentMotionInner :<C-u>call <SID>indentMotionObject(line('.'), 'ii')<CR>
+xnoremap <Plug>IndentMotionUpper :<C-u>call <SID>indentMotionObject(line('.'), 'ai')<CR>
+xnoremap <Plug>IndentMotionAround :<C-u>call <SID>indentMotionObject(line('.'), 'aI')<CR>

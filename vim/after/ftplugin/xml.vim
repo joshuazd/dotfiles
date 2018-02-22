@@ -16,9 +16,12 @@ setlocal makeprg=xmllint\ --noout\ %:S
 setlocal syntax=xml
 setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/,*_DataMapper/
 set suffixesadd+=.xml
-setlocal breakindentopt=shift:4
 setlocal isfname-=/
 nnoremap ,f zMza
+xmap ai <Plug>IndentMotionAround
+xmap aI <Plug>IndentMotionUpper
+omap ai <Plug>IndentMotionAround
+omap aI <Plug>IndentMotionUpper
 augroup XML
     autocmd!
     if executable('xmllint')
