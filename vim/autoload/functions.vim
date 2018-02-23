@@ -8,13 +8,6 @@ function! functions#TrimWhiteSpace() abort
   endif
 endfunction
 
-function! functions#VimGrepAll(pattern) abort
-  call setqflist([])
-  exe 'bufdo silent vimgrepadd ' . a:pattern . ' %'
-  cwindow
-  exe 'normal '
-endfunction
-
 function! functions#ToggleConceal() abort
   if &conceallevel == 0
     echo ':setlocal conceallevel=2'

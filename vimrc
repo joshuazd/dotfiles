@@ -19,7 +19,7 @@ set timeoutlen=500                            " shorter timeout
 set ttimeoutlen=100                           " shorter timeout
 set splitbelow                                " Make splits behave better
 set splitright
-syntax enable                                 " turn syntax on
+syntax on                                     " turn syntax on
 colorscheme material                          " material color scheme
 set clipboard=unnamedplus                     " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
@@ -84,14 +84,13 @@ endif
 " {{{
 call plug#begin('~/.vim/bundle')
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
-Plug 'airblade/vim-gitgutter'
+" Plug 'airblade/vim-gitgutter'
 Plug 'lifepillar/vim-mucomplete'
 Plug 'SirVer/ultisnips'
 Plug 'easymotion/vim-easymotion'
-Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-fugitive'
+" Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-repeat'
 Plug 'tommcdo/vim-lion'
@@ -201,18 +200,14 @@ augroup EditVim
   autocmd BufNewFile,BufRead *.zsh-theme          set filetype=zsh
   autocmd BufNewFile,BufRead *.dbs                set filetype=xml
   autocmd BufNewFile,BufRead *.dmc                set filetype=javascript
+  autocmd BufNewFile,BufRead *.md                 set filetype=markdown
   autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-  autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
   autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
   autocmd User UltiSnipsEnterFirstSnippet         let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet           let g:in_snippet = 0
-  autocmd BufNewFile,BufRead *.md                 set filetype=markdown
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
-
-command! -nargs=1 BufferGrep call functions#VimGrepAll(<f-args>)
-nnoremap <Space>g :BufferGrep 
 
 command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
             \ | wincmd p | diffthis
