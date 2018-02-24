@@ -55,10 +55,10 @@ set autoread                                  " automatically reread changed fil
 set path=.,**                                 " set path to all subdirectories
 set signcolumn=no                             " don't have signcolumn on
 set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
-set tags=./tags,tags
-set spellfile=~/.vim/spell/en.utf-8.add
-set modeline
-set shortmess+=c
+set tags=./tags,tags                          " where to find tag files
+set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
+set modeline                                  " read modelines
+set shortmess+=c                              " don't show completion errors
 if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -84,13 +84,11 @@ endif
 " {{{
 call plug#begin('~/.vim/bundle')
 Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
-" Plug 'airblade/vim-gitgutter'
 Plug 'lifepillar/vim-mucomplete'
 Plug 'SirVer/ultisnips'
-Plug 'easymotion/vim-easymotion'
+Plug 'justinmk/vim-sneak'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
-" Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-repeat'
 Plug 'tommcdo/vim-lion'
@@ -279,4 +277,8 @@ let g:clang_verbose_pmenu = 1
 let g:tmux_navigator_no_mappings = 1
 " lion
 let g:lion_squeeze_spaces = 1 
+" sneak
+let g:sneak#label = 1
+let g:sneak#s_next = 1
+let g:sneak#use_ic_scs = 1
 " }}}
