@@ -9,7 +9,7 @@ indent_size = 4
 [*.py]
 indent_size = 4
 
-[*.vim]
+[{*.vim,vimrc}]
 indent_size = 2
 
 [*.xml]
