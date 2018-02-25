@@ -16,6 +16,7 @@ function! GetModeIndicator() abort
   else                           | return g:modemap[mode()]
   endif
 endfunction
+
 let g:mode_hi = {
       \'NormalMode'  : ' ctermfg=68  guifg=#6182b8 ctermbg=235 guibg=#262626',
       \'InsertMode'  : ' ctermfg=221 guifg=#ffcb6b ctermbg=235 guibg=#262626',
@@ -28,18 +29,6 @@ highlight ReadOnlyStl  ctermbg=235 guibg=#262626 ctermfg=167 guifg=#d75f5f cterm
 highlight StatusLine   ctermbg=235 guibg=#262626 ctermfg=252 guifg=#d0d0d0 cterm=NONE gui=NONE
 highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
 highlight StlLinter    ctermbg=1   guibg=#e53935 ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
-
-function! GitHunks() abort
-  if !exists('*GitGutterGetHunkSummary')
-    return ''
-  endif
-  let l:githunks = GitGutterGetHunkSummary()
-  let l:returnval = ' '
-  let l:returnval .= (l:githunks[0] != 0 ? ' ' . l:githunks[0] . '+' : '')
-  let l:returnval .= (l:githunks[1] != 0 ? ' ' . l:githunks[1] . '~' : '')
-  let l:returnval .= (l:githunks[2] != 0 ? ' ' . l:githunks[2] . '-' : '')
-  return l:returnval ==# ' ' ? '' : l:returnval . ' '
-endfunction
 
 function! TagsStatusLine() abort
   return (!exists('*gutentags#statusline') ? '' : gutentags#statusline())
@@ -66,7 +55,6 @@ endfunction
 function! BuildStatusLine(nr) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
-        \%<%#StlDim#%{w:["lf_active"] ? GitHunks() : ""}
         \%0* %f%m
         \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? " RO" : ""}%0*
         \%=
