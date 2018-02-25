@@ -38,7 +38,7 @@ function! s:place_signs() abort
     if s:orig_scl ==? ''
       let s:orig_scl = &signcolumn
     endif
-    setlocal signcolumn=yes
+    setlocal signcolumn=auto
   else
     if s:orig_scl !=? ''
       let &l:signcolumn=s:orig_scl

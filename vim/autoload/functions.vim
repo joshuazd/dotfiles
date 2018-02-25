@@ -8,16 +8,6 @@ function! functions#TrimWhiteSpace() abort
   endif
 endfunction
 
-function! functions#ToggleConceal() abort
-  if &conceallevel == 0
-    echo ':setlocal conceallevel=2'
-    setlocal conceallevel=2
-  else
-    echo ':setlocal conceallevel=0'
-    setlocal conceallevel=0
-  endif
-endfunction
-
 function! functions#ToggleSettings(setting) abort
   if type(a:setting) == v:t_string
     if execute('set ' . a:setting . '?') =~? 'no'
@@ -45,18 +35,6 @@ function! functions#VimRefresh() abort
   redraw!
   syntax sync fromstart
   echo 'Vim is refreshed'
-endfunction
-
-function! functions#ToggleSignColumn() abort
-  if &signcolumn ==? 'no'
-    echo ':setlocal signcolumn=yes'
-    setlocal signcolumn=yes
-    GitGutterEnable
-  else
-    echo ':setlocal signcolumn=no'
-    setlocal signcolumn=no
-    GitGutterDisable
-  endif
 endfunction
 
 function! functions#AnsibleEdit() abort

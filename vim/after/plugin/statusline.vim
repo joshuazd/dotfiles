@@ -45,14 +45,6 @@ function! TagsStatusLine() abort
   return (!exists('*gutentags#statusline') ? '' : gutentags#statusline())
 endfunction
 
-function! QfList() abort
-  if !exists('*qf#GetList')
-    return ''
-  endif
-  let l:qflist = len(qf#GetList())
-  return (l:qflist ==# '0' ? '' : ' '.l:qflist.' ')
-endfunction
-
 function! s:updateStatusLineHighlight(nr,newMode) abort
   execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold gui=bold'
   execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none gui=none'
@@ -83,7 +75,7 @@ function! BuildStatusLine(nr) abort
         \%#StlDimNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}
         \%0*%{w:["lf_active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}
-        \%#StlLinter#%{QfList()}%0*'
+        \%0*'
 endfunction
 
 set statusline=%!BuildStatusLine(winnr())

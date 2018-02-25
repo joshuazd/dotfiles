@@ -151,8 +151,8 @@ nnoremap =or :setlocal <C-R>=functions#ToggleSettings('relativenumber')<CR><CR>
 nnoremap =os :setlocal <C-R>=functions#ToggleSettings('spell')<CR><CR>
 nnoremap =ou :setlocal <C-R>=functions#ToggleSettings('cursorcolumn')<CR><CR>
 nnoremap =ox :setlocal <C-R>=functions#ToggleSettings(['cursorline','cursorcolumn'])<CR><CR>
-nnoremap =og :call functions#ToggleSignColumn()<CR>
-nnoremap =oq :call functions#ToggleConceal()<CR>
+nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
+nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
 nnoremap ]q :cnext<CR>
 nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
@@ -206,9 +206,6 @@ augroup EditVim
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
-
-command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
-            \ | wincmd p | diffthis
 
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
