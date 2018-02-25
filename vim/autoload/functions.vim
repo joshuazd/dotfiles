@@ -31,7 +31,9 @@ function! functions#ToggleSettings(setting) abort
 endfunction
 
 function! functions#VimRefresh() abort
-  GutentagsUpdate!
+  if exists('g:loaded_gutentags') && g:loaded_gutentags == 1
+    GutentagsUpdate!
+  endif
   redraw!
   syntax sync fromstart
   echo 'Vim is refreshed'
