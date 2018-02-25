@@ -141,13 +141,13 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
-nnoremap =ow :setlocal <C-R>=(&wrap ? 'nowrap' : 'wrap')<CR><CR>
-nnoremap =oc :setlocal <C-R>=(&cursorline ? 'nocursorline' : 'cursorline')<CR><CR>
-nnoremap =oz :setlocal <C-R>=(&list ? 'nolist' : 'list')<CR><CR>
-nnoremap =on :setlocal <C-R>=(&number ? 'nonumber' : 'number')<CR><CR>
+nnoremap =ow :setlocal <C-R>=(&wrap           ? 'nowrap'           : 'wrap')<CR><CR>
+nnoremap =oc :setlocal <C-R>=(&cursorline     ? 'nocursorline'     : 'cursorline')<CR><CR>
+nnoremap =oz :setlocal <C-R>=(&list           ? 'nolist'           : 'list')<CR><CR>
+nnoremap =on :setlocal <C-R>=(&number         ? 'nonumber'         : 'number')<CR><CR>
 nnoremap =or :setlocal <C-R>=(&relativenumber ? 'norelativenumber' : 'relativenumber')<CR><CR>
-nnoremap =os :setlocal <C-R>=(&spell ? 'nospell' : 'spell')<CR><CR>
-nnoremap =ou :setlocal <C-R>=(&cursorcolumn ? 'nocursorcolumn' : 'cursorcolumn')<CR><CR>
+nnoremap =os :setlocal <C-R>=(&spell          ? 'nospell'          : 'spell')<CR><CR>
+nnoremap =ou :setlocal <C-R>=(&cursorcolumn   ? 'nocursorcolumn'   : 'cursorcolumn')<CR><CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
 nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
 nnoremap ]q :cnext<CR>
