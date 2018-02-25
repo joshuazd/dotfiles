@@ -172,12 +172,20 @@ nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 nnoremap <C-]> g<C-]>
-nnoremap <expr> <C-w><C-]> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
-nnoremap <expr> <C-w>] (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
+nnoremap <expr> <C-w><C-]> len(getwininfo()) > 1
+      \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
+      \: ":vertical stjump \<C-r>\<C-w>\<CR>"
+nnoremap <expr> <C-w>] len(getwininfo()) > 1
+      \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
+      \: ":vertical stjump \<C-r>\<C-w>\<CR>"
 nnoremap <C-_> :stjump <C-r><C-w><CR>
 nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
-nnoremap <expr> g<C-_> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>" : ":stjump \<C-r>\<C-w>\<CR>")
-nnoremap <expr> g<C-Bslash> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
+nnoremap <expr> g<C-_> len(getwininfo()) > 1
+      \? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>"
+      \: ":stjump \<C-r>\<C-w>\<CR>"
+nnoremap <expr> g<C-Bslash> len(getwininfo()) > 1
+      \? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>"
+      \: ":vertical stjump \<C-r>\<C-w>\<CR>"
 
 nnoremap <silent> <expr> <C-w>f len(getwininfo()) > 1
             \? ":let fname=\"\<C-r>\<C-f>\"\|execute \"normal! \\<lt>C-w>p\"\<CR>:find \<C-r>=fname\<CR>\<CR>"
@@ -203,8 +211,9 @@ augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
 
-command! -range=% FormatJSON <line1>,<line2>!python -c
-      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+command! -range=% FormatJSON <line1>,<line2>!python2 -c
+      \"import json, sys, collections; print ".
+      \"json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
 
 command! -range=% AE <line1>,<line2>yank a|silent! call functions#AnsibleEdit()
 command! AC call functions#AnsibleEncrypt()
@@ -214,14 +223,14 @@ command! AC call functions#AnsibleEncrypt()
 function! CCR() abort
   let cmdline = getcmdline()
   if cmdline =~? '\v\C^(ls|files|buffers)' | return "\<CR>:b "
-  elseif cmdline =~? '\v\C^(dli|il)' | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
-  elseif cmdline =~? '\v\C^(cli|lli)' | return "\<CR>:sil ".repeat(cmdline[0], 2)."\<Space>"
-  elseif cmdline =~? '\C^old' | return "\<CR>:e #<"
-  elseif cmdline =~? '\C^changes' | set nomore | return "\<CR>:set more|norm! g;\<S-Left>"
-  elseif cmdline =~? '\C^ju' | set nomore | return "\<CR>:set more|norm! \<C-o>\<S-Left>"
-  elseif cmdline =~? '\C^marks' | return "\<CR>:norm! `"
-  elseif cmdline =~? '\C^undol' | return "\<CR>:u "
-  else | return "\<CR>"
+  elseif cmdline =~? '\v\C^(dli|il)'       | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
+  elseif cmdline =~? '\v\C^(cli|lli)'      | return "\<CR>:sil ".repeat(cmdline[0], 2)."\<Space>"
+  elseif cmdline =~? '\C^old'              | return "\<CR>:e #<"
+  elseif cmdline =~? '\C^changes'          | set nomore | return "\<CR>:set more|norm! g;\<S-Left>"
+  elseif cmdline =~? '\C^ju'               | set nomore | return "\<CR>:set more|norm! \<C-o>\<S-Left>"
+  elseif cmdline =~? '\C^marks'            | return "\<CR>:norm! `"
+  elseif cmdline =~? '\C^undol'            | return "\<CR>:u "
+  else                                     | return "\<CR>"
   endif
 endfunction
 
