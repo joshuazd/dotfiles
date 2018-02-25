@@ -126,9 +126,6 @@ nnoremap <Esc>a :bp<CR>
 nnoremap <BS> <C-^>
 nnoremap <silent> <Space>x :bn\|bd #<CR>
 
-nnoremap <TAB> <C-w>w
-nnoremap <S-TAB> <C-w>W
-
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
@@ -177,7 +174,7 @@ nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 nnoremap <C-]> g<C-]>
 nnoremap <expr> <C-w><C-]> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
-nnoremap <expr> <C-w>] (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
+nmap <C-w>] <C-w><C-]>
 nnoremap <C-_> :stjump <C-r><C-w><CR>
 nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
 nnoremap <expr> g<C-_> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>" : ":stjump \<C-r>\<C-w>\<CR>")
@@ -245,8 +242,7 @@ set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-" most of the configs are in the after/plugin/settings folder
-" these are here to prevent plugins from mapping things I don't want mapped
+" Plugin mappings are specified in the after/plugin/settings folder
 " ultisnips
 let g:UltiSnipsExpandTrigger="\<nop>"
 let g:UltiSnipsJumpForwardTrigger="\<C-l>"

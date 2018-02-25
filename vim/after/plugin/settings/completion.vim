@@ -17,26 +17,3 @@ if exists('g:mucomplete#chains')
   imap <c-e> <plug>(MUcompleteCte)
   imap <c-y> <plug>(MUcompleteCty)
 endif
-
-set completefunc=SnippetComplete
-function! SnippetComplete(findstart, base)
-  if a:findstart
-    let line = getline('.')
-    let start = col('.') - 1
-    while start > 0 && line[start - 1] =~? '\a'
-      let start -= 1
-    endwhile
-    return start
-  else
-    let suggestions = []
-    let snippets = UltiSnips#SnippetsInCurrentScope()
-    for entry in keys(snippets)
-      if entry =~# '^'.a:base
-        call add(suggestions, {'word': entry, 'menu':snippets[entry], 'kind':'S'})
-      endif
-    endfor
-    return suggestions
-  endif
-endfunction
-inoremap <expr> <C-s> (pumvisible() ? "\<C-u>" : "\<C-x>\<C-u>")
-inoremap <C-f> <C-x><C-f>
