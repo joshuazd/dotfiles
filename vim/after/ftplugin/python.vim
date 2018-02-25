@@ -1,5 +1,9 @@
 setlocal foldmethod=indent
-setlocal omnifunc=jedi#completions
+if exists(':JediDebugInfo')
+  setlocal omnifunc=jedi#completions
+else
+  setlocal omnifunc=python3complete#Complete
+endif
 command! Lint cexpr system('flake8 ' . shellescape(expand('%')))
 set makeprg=flake8\ %:S
 set errorformat=%f:%l:%c:\ %t%n\ %m
