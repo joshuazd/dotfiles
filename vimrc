@@ -35,7 +35,7 @@ set sidescroll=1                              " scroll 1 character at a time
 set sidescrolloff=15                          " scroll within 15 characters
 set foldmethod=syntax                         " fold based on syntax
 set wildmenu                                  " Turn on the wild menu
-set wildmode=list:longest,list:full
+set wildmode=list:longest,list:full           " setup wildmenu
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*target/*,*bin/*,*build/*,tags,Session.vim    " Ignore compiled files
 set wildignorecase                            " ignore case in wildmenu
 set sessionoptions-=options                   " make sessions work better with plugins
@@ -262,12 +262,9 @@ let g:jedi#auto_vim_configuration = 0
 let g:jedi#show_call_signatures = 1
 let g:jedi#show_call_signatures_delay = 50
 " clang
-" let g:clang_auto = 0
 let g:clang_c_completeopt = 'menuone,preview,noinsert,noselect'
 let g:clang_cpp_completeopt = 'menuone,preview,noinsert,noselect'
 let g:clang_verbose_pmenu = 1
-" tmux-navigator
-let g:tmux_navigator_no_mappings = 1
 " lion
 let g:lion_squeeze_spaces = 1 
 " sneak
