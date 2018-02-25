@@ -271,4 +271,7 @@ let g:lion_squeeze_spaces = 1
 let g:sneak#label = 1
 let g:sneak#s_next = 1
 let g:sneak#use_ic_scs = 1
+" netrw
+let g:loaded_netrw       = 1
+let g:loaded_netrwPlugin = 1
 " }}}
