@@ -28,9 +28,9 @@ set noshowmode                                " don't show mode in the commandli
 set nowrap                                    " don't wrap lines by default
 set linebreak                                 " wrap lines at words
 set laststatus=2                              " always show statusline
-set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically using j/k
+set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically
 set sidescroll=1                              " scroll 1 character at a time
-set sidescrolloff=15                          " scroll within 15 characters
+set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
 set foldmethod=syntax                         " fold based on syntax
 set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full           " setup wildmenu
@@ -141,14 +141,13 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
-nnoremap =ow :setlocal <C-R>=functions#ToggleSettings('wrap')<CR><CR>
-nnoremap =oc :setlocal <C-R>=functions#ToggleSettings('cursorline')<CR><CR>
-nnoremap =oz :setlocal <C-R>=functions#ToggleSettings('list')<CR><CR>
-nnoremap =on :setlocal <C-R>=functions#ToggleSettings('number')<CR><CR>
-nnoremap =or :setlocal <C-R>=functions#ToggleSettings('relativenumber')<CR><CR>
-nnoremap =os :setlocal <C-R>=functions#ToggleSettings('spell')<CR><CR>
-nnoremap =ou :setlocal <C-R>=functions#ToggleSettings('cursorcolumn')<CR><CR>
-nnoremap =ox :setlocal <C-R>=functions#ToggleSettings(['cursorline','cursorcolumn'])<CR><CR>
+nnoremap =ow :setlocal <C-R>=(&wrap ? 'nowrap' : 'wrap')<CR><CR>
+nnoremap =oc :setlocal <C-R>=(&cursorline ? 'nocursorline' : 'cursorline')<CR><CR>
+nnoremap =oz :setlocal <C-R>=(&list ? 'nolist' : 'list')<CR><CR>
+nnoremap =on :setlocal <C-R>=(&number ? 'nonumber' : 'number')<CR><CR>
+nnoremap =or :setlocal <C-R>=(&relativenumber ? 'norelativenumber' : 'relativenumber')<CR><CR>
+nnoremap =os :setlocal <C-R>=(&spell ? 'nospell' : 'spell')<CR><CR>
+nnoremap =ou :setlocal <C-R>=(&cursorcolumn ? 'nocursorcolumn' : 'cursorcolumn')<CR><CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
 nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
 nnoremap ]q :cnext<CR>
@@ -175,7 +174,7 @@ nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 nnoremap <C-]> g<C-]>
 nnoremap <expr> <C-w><C-]> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
-nmap <C-w>] <C-w><C-]>
+nnoremap <expr> <C-w>] (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
 nnoremap <C-_> :stjump <C-r><C-w><CR>
 nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
 nnoremap <expr> g<C-_> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>" : ":stjump \<C-r>\<C-w>\<CR>")
