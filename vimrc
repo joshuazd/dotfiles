@@ -188,8 +188,8 @@ nnoremap <expr> g<C-Bslash> len(getwininfo()) > 1
       \: ":vertical stjump \<C-r>\<C-w>\<CR>"
 
 nnoremap <silent> <expr> <C-w>f len(getwininfo()) > 1
-            \? ":let fname=\"\<C-r>\<C-f>\"\|execute \"normal! \\<lt>C-w>p\"\<CR>:find \<C-r>=fname\<CR>\<CR>"
-            \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
+      \? ":let fname=\"\<C-r>\<C-f>\"\|execute \"normal! \\<lt>C-w>p\"\<CR>:find \<C-r>=fname\<CR>\<CR>"
+      \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
