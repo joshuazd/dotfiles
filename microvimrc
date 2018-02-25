@@ -47,6 +47,7 @@ set cpoptions-=<
 set tags=./tags,tags
 set spellfile=~/.vim/spell/en.utf-8.add
 set shortmess+=c
+filetype plugin indent on
 if executable('rg')				" use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
