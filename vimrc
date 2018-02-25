@@ -84,7 +84,6 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 call plug#begin('~/.vim/bundle')
-Plug 'gerw/vim-HiLinkTrace', { 'on': ['HLT','HLT!'] }
 Plug 'lifepillar/vim-mucomplete'
 Plug 'SirVer/ultisnips'
 Plug 'justinmk/vim-sneak'
