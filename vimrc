@@ -34,7 +34,9 @@ set sidescrolloff=15                          " scroll within 15 characters
 set foldmethod=syntax                         " fold based on syntax
 set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full           " setup wildmenu
-set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*target/*,*bin/*,*build/*,tags,Session.vim    " Ignore compiled files
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup " Ignore compiled files
+set wildignore+=*target/*,*bin/*,*build/*     " Ignore build artifacts
+set wildignore+=tags,Session.vim              " Ignore tags and session files
 set wildignorecase                            " ignore case in wildmenu
 set sessionoptions-=options                   " make sessions work better with plugins
 set sessionoptions-=blank
