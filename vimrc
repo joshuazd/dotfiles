@@ -19,8 +19,6 @@ set timeoutlen=500                            " shorter timeout
 set ttimeoutlen=100                           " shorter timeout
 set splitbelow                                " Make splits behave better
 set splitright
-syntax on                                     " turn syntax on
-colorscheme material                          " material color scheme
 set clipboard^=unnamedplus                    " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
@@ -59,6 +57,7 @@ set modeline                                  " read modelines
 set shortmess+=c                              " don't show completion errors
 set winminheight=0                            " minimum window size 0x0
 set winminwidth=0
+colorscheme material                          " material color scheme
 if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
