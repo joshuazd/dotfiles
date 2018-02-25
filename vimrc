@@ -21,12 +21,12 @@ set splitbelow                                " Make splits behave better
 set splitright
 syntax on                                     " turn syntax on
 colorscheme material                          " material color scheme
-set clipboard=unnamedplus                     " make clipboard work better
+set clipboard^=unnamedplus                    " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
 set autoindent                                " use the previous lines indentation level
-set noshowmode                                " don't show mode in the statusline
+set noshowmode                                " don't show mode in the commandline
 set nowrap                                    " don't wrap lines by default
 set linebreak                                 " wrap lines at words
 set laststatus=2                              " always show statusline
@@ -39,9 +39,7 @@ set wildmode=list:longest,list:full           " setup wildmenu
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup,*target/*,*bin/*,*build/*,tags,Session.vim    " Ignore compiled files
 set wildignorecase                            " ignore case in wildmenu
 set sessionoptions-=options                   " make sessions work better with plugins
-set sessionoptions-=folds
 set sessionoptions-=blank
-let g:is_posix = 1                            " make vim recognize posix compatible shells
 set backupdir=/tmp                            " Better backups
 set noswapfile
 set foldlevel=99                              " don't fold things by default
@@ -59,6 +57,8 @@ set tags=./tags,tags                          " where to find tag files
 set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 set modeline                                  " read modelines
 set shortmess+=c                              " don't show completion errors
+set winminheight=0                            " minimum window size 0x0
+set winminwidth=0
 if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
