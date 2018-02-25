@@ -11,12 +11,13 @@ augroup PYTHON
     endif
 augroup END
 let g:jedi#goto_command = ',d'
+let g:jedi#rename_command = ',r'
 
 " ipython setup {{{
 
     nmap  <buffer> <silent> <F10>       <Plug>(IPython-RunFile)
     " nmap  <buffer> <silent> ,d          <Plug>(IPython-OpenPyDoc)
-    nmap  <buffer> <silent> ,r          <Plug>(IPython-UpdateShell)
+    nmap  <buffer> <silent> ,l          <Plug>(IPython-UpdateShell)
     nmap  <buffer> <silent> <C-Return>  <Plug>(IPython-RunFile)
     nmap  <buffer> <silent> ,s          <Plug>(IPython-RunLine)
     nmap  <buffer> <silent> <Esc>s      <Plug>(IPython-RunLineAsTopLevel)
