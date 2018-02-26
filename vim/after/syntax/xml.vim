@@ -13,12 +13,11 @@ syn match xmlEnrich     '\<\(enrich\|xslt\|value-of\|schema\|datamapper\)\>'    
 syn match xmlSqlTag     '\<\(sql\|script\)\>'                                                                          contained
 syn match xmlInSequence '\<\(inSequence\|outSequence\|faultSequence\)\>'                                               contained
 syn match xsltStatement '\<for-each\>'                                                                                 contained
-
 syn match xmlFile       '\k\+_\(Logger\|XSLT\|EP\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)'          contained
-syn keyword xmlMethod GET POST PUT PATCH DELETE get post put patch delete
+syn match   xmlUrl      '\(url-mapping\|uri-template\)'                                                                contained
 
-syn keyword xmlName expression value regex name action select source contained
-syn match   xmlUrl  '\(url-mapping\|uri-template\)' contained
+syn keyword xmlMethod GET POST PUT PATCH DELETE get post put patch delete contained
+syn keyword xmlName   expression value regex name action select source    contained
 
 syn keyword xmlNs  ns0 contained
 syn keyword xmlXsl xsl contained
