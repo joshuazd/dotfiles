@@ -4,67 +4,62 @@
 " {{{
 set nocompatible
 set runtimepath+=$SSHHOME/.sshrc.d/.vim,$SSHHOME/.sshrc.d/.vim/colors
-set hidden					                  " A buffer becomes hidden when it is abandoned
-set backspace=eol,start,indent			      " Configure backspace so it acts as it should act
-set whichwrap+=<,>,h,l				          " arrow keys and h,l move to the next line
-set showcmd					                  " show keystrokes
-set breakindent					              " Indent wrapped lines by 2
+set hidden                                    " A buffer becomes hidden when it is abandoned
+set backspace=eol,start,indent                " Configure backspace so it acts as it should act
+set whichwrap+=<,>,h,l                        " arrow keys and h,l move to the next line
+set showcmd                                   " show keystrokes
+set breakindent                               " Indent wrapped lines by 2
 set breakindentopt=shift:2
-set ignorecase					              " Ignore case when searching
-set smartcase					              " When searching try to be smart about cases
-set hlsearch					              " Highlight search results
-set incsearch					              " Makes search act like search in modern browsers
-set lazyredraw					              " Don't redraw while executing macros
-set showmatch					              " Show matching brackets when text indicator is over them
-set matchtime=2					              " How many tenths of a second to blink when matching brackets
-set timeoutlen=500				              " shorter timeout
-set ttimeoutlen=100				              " shorter timeout
-set splitbelow					              " Make splits behave better
+set ignorecase                                " Ignore case when searching
+set smartcase                                 " When searching try to be smart about cases
+set hlsearch                                  " Highlight search results
+set incsearch                                 " Makes search act like search in modern browsers
+set lazyredraw                                " Don't redraw while executing macros
+set showmatch                                 " Show matching brackets when text indicator is over them
+set matchtime=2                               " How many tenths of a second to blink when matching brackets
+set timeoutlen=500                            " shorter timeout
+set ttimeoutlen=100                           " shorter timeout
+set splitbelow                                " Make splits behave better
 set splitright
-syntax enable					              " turn syntax on
-colorscheme default				              " material color scheme
-set clipboard=unnamedplus			          " make clipboard work better
-set softtabstop=4				              " number of spaces when inserting/backspacing
-set shiftwidth=4				              " shift 4 spaces for indentation
-set expandtab					              " expand tabs into spaces
-set autoindent					              " use the previous lines indentation level
-set noshowmode					              " don't show mode in the statusline
-set nowrap					                  " don't wrap lines by default
-set linebreak					              " wrap lines at words
-set laststatus=2				              " always show statusline
-set scrolloff=999				              " Set 999 lines to the cursor - when moving vertically using j/k
-set sidescroll=1				              " scroll 1 character at a time
-set sidescrolloff=15				          " scroll within 15 characters
-set foldmethod=syntax				          " fold based on syntax
-set wildmenu					              " Turn on the wild menu
+set clipboard^=unnamedplus                    " make clipboard work better
+set softtabstop=4                             " number of spaces when inserting/backspacing
+set shiftwidth=4                              " shift 4 spaces for indentation
+set expandtab                                 " expand tabs into spaces
+set autoindent                                " use the previous lines indentation level
+set noshowmode                                " don't show mode in the statusline
+set nowrap                                    " don't wrap lines by default
+set linebreak                                 " wrap lines at words
+set laststatus=2                              " always show statusline
+set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically using j/k
+set sidescroll=1                              " scroll 1 character at a time
+set sidescrolloff=15                          " scroll within 15 characters
+set foldmethod=syntax                         " fold based on syntax
+set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup " Ignore compiled files
 set wildignore+=*target/*,*bin/*,*build/*     " Ignore build artifacts
 set wildignore+=tags,Session.vim              " Ignore tags and session files
-set wildignorecase				              " ignore case in wildmenu
-set sessionoptions-=options			          " make sessions work better with plugins
+set wildignorecase                            " ignore case in wildmenu
+set sessionoptions-=options                   " make sessions work better
 set sessionoptions-=blank
-let g:is_posix = 1				              " make vim recognize posix compatible shells
-set backupdir=/tmp				              " Better backups
+set backupdir=/tmp                            " Better backups
 set noswapfile
-set foldlevel=99				              " don't fold things by default
-set listchars=tab:»\ ,trail:~,extends:>,eol:$,nbsp:␣ " what to show for whitespace chars
-set omnifunc=syntaxcomplete#Complete		 " enable omnicompletion
-set completeopt+=menuone,longest		     " configure popup menu
-set concealcursor+=n				         " conceal characters in normal mode
-set conceallevel=2				             " conceal characters by default
-set autowrite					             " automatically save before :next, :make, etc
-set autoread					             " automatically reread changed files
-set path=.,**					             " set path to all subdirectories
+set foldlevel=99                              " don't fold things by default
+set listchars=tab:->,trail:~,extends:>,eol:$  " what to show for whitespace chars
+set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
+set completeopt+=menuone,longest              " configure popup menu
+set concealcursor+=n                          " conceal characters in normal mode
+set conceallevel=2                            " conceal characters by default
+set autowrite                                 " automatically save before :next, :make, etc
+set autoread                                  " automatically reread changed files
+set path=.,**                                 " set path to all subdirectories
 set cpoptions-=<
 set tags=./tags,tags                          " where to find tag files
-set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 set modeline                                  " read modelines
-set shortmess+=c                              " don't show completion errors
-if executable('rg')				              " use ripgrep when available
+if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
-elseif executable('ag')				          " use ag when available and ripgrep is not
+elseif executable('ag')                       " use ag when available and ripgrep is not
   set grepprg=ag\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
@@ -79,6 +74,8 @@ if has('gui_running')
   set lines=43 columns=120
 endif
 filetype plugin indent on
+syntax enable
+colorscheme default
 runtime macros/matchit.vim
 " }}}
 
@@ -145,7 +142,6 @@ xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
-cnoremap <expr> <CR> CCR()
 
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
@@ -165,13 +161,8 @@ nnoremap <expr> g<C-Bslash> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>l:tjump \<C-r>
 " {{{
 augroup EditVim
   autocmd!
-  autocmd InsertLeave        *                    if pumvisible() == 0|pclose|endif
-  autocmd BufNewFile,BufRead *.zsh-theme          set filetype=zsh
-  autocmd BufNewFile,BufRead *.dbs                set filetype=xml
-  autocmd BufNewFile,BufRead *.dmc                set filetype=javascript
-  autocmd BufReadPost        *                    if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-  autocmd BufNewFile,BufRead pom.xml,artifact.xml setlocal foldmethod=syntax foldnestmax=10 conceallevel=0
-  autocmd FileType           *                    set formatoptions-=o       " Don't insert comment when using 'o'
+  autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 augroup END
 
 command! TrimWhiteSpace call TrimWhiteSpace()
@@ -187,33 +178,6 @@ endfunction
 
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
-
-" make list-like commands more intuitive
-" including this here to avoid screwing up command mode
-function! CCR() abort
-  let cmdline = getcmdline()
-  if cmdline =~? '\v\C^(ls|files|buffers)'
-    return "\<CR>:b "
-  elseif cmdline =~? '\v\C^(dli|il)'
-    return "\<CR>:" . cmdline[0] . 'j  ' . split(cmdline, ' ')[1] . "\<S-Left>\<Left>"
-  elseif cmdline =~? '\v\C^(cli|lli)'
-    return "\<CR>:sil " . repeat(cmdline[0], 2) . "\<Space>"
-  elseif cmdline =~? '\C^old'
-    return "\<CR>:e #<"
-  elseif cmdline =~? '\C^changes'
-    set nomore
-    return "\<CR>:set more|norm! g;\<S-Left>"
-  elseif cmdline =~? '\C^ju'
-    set nomore
-    return "\<CR>:set more|norm! \<C-o>\<S-Left>"
-  elseif cmdline =~? '\C^marks'
-    return "\<CR>:norm! `"
-  elseif cmdline =~? '\C^undol'
-    return "\<CR>:u "
-  else
-    return "\<CR>"
-  endif
-endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              STATUSLINE SETUP

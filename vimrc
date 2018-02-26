@@ -119,6 +119,7 @@ nnoremap H ^
 
 nnoremap Y y$
 
+nnoremap <CR> i<CR><Esc>
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
