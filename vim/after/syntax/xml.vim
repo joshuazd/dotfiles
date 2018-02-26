@@ -15,8 +15,10 @@ syn match xmlInSequence '\<\(inSequence\|outSequence\|faultSequence\)\>'        
 syn match xsltStatement '\<for-each\>'                                                                                 contained
 
 syn match xmlFile       '\k\+_\(Logger\|XSLT\|EP\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)'          contained
+syn keyword xmlMethod GET POST PUT PATCH DELETE get post put patch delete
 
 syn keyword xmlName expression value regex name action select source contained
+syn match   xmlUrl  '\(url-mapping\|uri-template\)' contained
 
 syn keyword xmlNs  ns0 contained
 syn keyword xmlXsl xsl contained
@@ -27,7 +29,7 @@ syn cluster xmlTagHook       add=xmlSqlTag,xmlSend,xmlLog,xmlLogParam,xmlInSeque
 syn cluster xmlTagHook       add=xsltStatement
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
 syn cluster xmlAttribHook    add=xmlExpression,xmlValue,xmlSelect,xmlName,xmlUrl
-syn cluster xmlStringHook    add=xmlFile
+syn cluster xmlStringHook    add=xmlFile,xmlMethod
 
 let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
@@ -51,6 +53,7 @@ highlight xmlLog        ctermfg=245 guifg=#bbbbbb
 highlight xmlSqlTag     ctermfg=208 guifg=#ff5f00
 highlight xmlLogParam   ctermfg=243 guifg=#8a8a8a
 highlight xmlFile       ctermfg=103 guifg=#8787af cterm=bold   gui=bold
+highlight xmlMethod     ctermfg=203 guifg=#ff5f5f cterm=bold   gui=bold
 
 hi def link xmlArgs         Primitive
 hi def link xmlConnection   StorageClass
