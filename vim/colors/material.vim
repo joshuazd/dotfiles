@@ -62,135 +62,135 @@ let s:g_black   = '#121212'
 let s:g_bg      = '#121212'
 let s:g_white   = '#ffffff'
 let s:g_none    = 'NONE'
-"------------------------------------------------------------------------------------------------------------------------------------------
-" General settings |
-"------------------------------------------------------------------------------------------------------------------------------------------
-"------------------------------------------------------------------------------------------------------------------------------------------
-" Syntax group | Foreground | Background | Style |
-"------------------------------------------------------------------------------------------------------------------------------------------
+"---------------------------------------------------------------------------------------------------------------------------------------------------------
+"                                                                General settings                                                                        |
+"---------------------------------------------------------------------------------------------------------------------------------------------------------
+"---------------------------------------------------------------------------------------------------------------------------------------------------------
+"    Syntax group       |                  Foreground                  |                   Background                    |          Style                |
+"---------------------------------------------------------------------------------------------------------------------------------------------------------
 
 " --------------------------------
 " Editor settings
 " --------------------------------
-exe 'hi! Normal          ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-" exe 'hi! Cursor                                                                                                              cterm=reverse'
-exe 'hi! CursorLine      ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none'
-exe 'hi! LineNr          ctermfg=' .s:t_grey    .' guifg=' .s:g_grey    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! CursorLineNR    ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
+exe 'hi! Normal          ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+" exe 'hi! Cursor                                                                                                              cterm=reverse gui=reverse'
+exe 'hi! CursorLine      ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
+exe 'hi! LineNr          ctermfg=' .s:t_grey    .' guifg=' .s:g_grey    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! CursorLineNR    ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
 " -----------------
 " - Number column -
 " -----------------
-exe 'hi! CursorColumn    ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none'
-exe 'hi! FoldColumn      ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! SignColumn      ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Folded          ctermfg=' .s:t_lgrey   .' guifg=' .s:g_lgrey   .' ctermbg=233                                       cterm=none'
+exe 'hi! CursorColumn    ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
+exe 'hi! FoldColumn      ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! SignColumn      ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Folded          ctermfg=' .s:t_lgrey   .' guifg=' .s:g_lgrey   .' ctermbg=233                                       cterm=none gui=none'
 
 " -------------------------
 " - Window/Tab delimiters - 
 " -------------------------
-exe 'hi! VertSplit       ctermfg=' .s:t_mgrey   .' guifg=' .s:g_mgrey   .' ctermbg=' .s:t_mgrey   .' guibg=' .s:g_mgrey   .' cterm=none'
-exe 'hi! ColorColumn     ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none'
-" exe 'hi! TabLine         ctermfg=' .s:t_ .' guifg=' .s:g_             .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg           cterm=none
-" exe 'hi! TabLineFill     ctermfg=' .s:t_ .' guifg=' .s:g_             .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg           cterm=none
-" exe 'hi! TabLineSel      ctermfg=' .s:t_ .' guifg=' .s:g_             .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg           cterm=none
+exe 'hi! VertSplit       ctermfg=' .s:t_mgrey   .' guifg=' .s:g_mgrey   .' ctermbg=' .s:t_mgrey   .' guibg=' .s:g_mgrey   .' cterm=none gui=none'
+exe 'hi! ColorColumn     ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
+" exe 'hi! TabLine         ctermfg=' .s:t_ .' guifg=' .s:g_             .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg           cterm=non gui=none'
+" exe 'hi! TabLineFill     ctermfg=' .s:t_ .' guifg=' .s:g_             .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg           cterm=non gui=none'
+" exe 'hi! TabLineSel      ctermfg=' .s:t_ .' guifg=' .s:g_             .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg           cterm=non gui=none'
 
 " -------------------------------
 " - File Navigation / Searching -
 " -------------------------------
-exe 'hi! Directory       ctermfg=' .s:t_blue    .' guifg=' .s:g_blue    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Search          ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_yellow  .' guibg=' .s:g_yellow  .' cterm=none'
-exe 'hi! IncSearch       ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_yellow  .' guibg=' .s:g_yellow  .' cterm=none'
+exe 'hi! Directory       ctermfg=' .s:t_blue    .' guifg=' .s:g_blue    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Search          ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_yellow  .' guibg=' .s:g_yellow  .' cterm=none gui=none'
+exe 'hi! IncSearch       ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_yellow  .' guibg=' .s:g_yellow  .' cterm=none gui=none'
 
 " -----------------
 " - Prompt/Status -
 " -----------------
-exe 'hi! WildMenu        ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none'
-exe 'hi! Question        ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Title           ctermfg=' .s:t_yellow  .' guifg=' .s:g_yellow  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! ModeMsg         ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! MoreMsg         ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
+exe 'hi! WildMenu        ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
+exe 'hi! Question        ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Title           ctermfg=' .s:t_yellow  .' guifg=' .s:g_yellow  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! ModeMsg         ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! MoreMsg         ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
 " --------------
 " - Visual aid -
 " --------------
-exe 'hi! MatchParen      ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none'
-exe 'hi! Visual          ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none'
-exe 'hi! NonText         ctermfg=' .s:t_dgrey   .' guifg=' .s:g_dgrey   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
+exe 'hi! MatchParen      ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
+exe 'hi! Visual          ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
+exe 'hi! NonText         ctermfg=' .s:t_dgrey   .' guifg=' .s:g_dgrey   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
-exe 'hi! Todo            ctermfg=' .s:t_green   .' guifg=' .s:g_green   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=bold'
-exe 'hi! Underlined      ctermfg=' .s:t_blue    .' guifg=' .s:g_blue    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=underline'
-exe 'hi! Error           ctermfg=' .s:t_dpurple .' guifg=' .s:g_dpurple .' ctermbg=' .s:t_bred    .' guibg=' .s:g_bred    .' cterm=underline'
-exe 'hi! ErrorMsg        ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_red     .' guibg=' .s:g_red     .' cterm=none'
-exe 'hi! WarningMsg      ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_orange  .' guibg=' .s:g_orange  .' cterm=none'
-exe 'hi! Ignore          ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! SpecialKey      ctermfg=' .s:t_dgrey   .' guifg=' .s:g_dgrey   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
+exe 'hi! Todo            ctermfg=' .s:t_green   .' guifg=' .s:g_green   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=bold gui=bold'
+exe 'hi! Underlined      ctermfg=' .s:t_blue    .' guifg=' .s:g_blue    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=underline gui=underline'
+exe 'hi! Error           ctermfg=' .s:t_dpurple .' guifg=' .s:g_dpurple .' ctermbg=' .s:t_bred    .' guibg=' .s:g_bred    .' cterm=underline gui=underline'
+exe 'hi! ErrorMsg        ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_red     .' guibg=' .s:g_red     .' cterm=none gui=none'
+exe 'hi! WarningMsg      ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_orange  .' guibg=' .s:g_orange  .' cterm=none gui=none'
+exe 'hi! Ignore          ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! SpecialKey      ctermfg=' .s:t_dgrey   .' guifg=' .s:g_dgrey   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
 " --------------------------------
 " Variable types
 " --------------------------------
-exe 'hi! Constant        ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! String          ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! StringDelimiter ctermfg=' .s:t_green   .' guifg=' .s:g_green   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Character       ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Number          ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Boolean         ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Float           ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Identifier      ctermfg=' .s:t_yellow  .' guifg=' .s:g_yellow  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Function        ctermfg=' .s:t_blue    .' guifg=' .s:g_blue    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Primitive       ctermfg=' .s:t_byellow .' guifg=' .s:g_byellow .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=italic'
+exe 'hi! Constant        ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! String          ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! StringDelimiter ctermfg=' .s:t_green   .' guifg=' .s:g_green   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Character       ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Number          ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Boolean         ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Float           ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Identifier      ctermfg=' .s:t_yellow  .' guifg=' .s:g_yellow  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Function        ctermfg=' .s:t_blue    .' guifg=' .s:g_blue    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Primitive       ctermfg=' .s:t_byellow .' guifg=' .s:g_byellow .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=italic gui=italic'
 
 " --------------------------------
 " Language constructs
 " --------------------------------
-exe 'hi! Statement       ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Conditional     ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Repeat          ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Label           ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Operator        ctermfg=' .s:t_brown   .' guifg=' .s:g_brown   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Keyword         ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Comment         ctermfg=' .s:t_grey    .' guifg=' .s:g_grey    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Language        ctermfg=' .s:t_pink    .' guifg=' .s:g_pink    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Special         ctermfg=' .s:t_red     .' guifg=' .s:g_red     .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! SpecialChar     ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=bold'
-exe 'hi! Tag             ctermfg=' .s:t_red     .' guifg=' .s:g_red     .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Delimiter       ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
+exe 'hi! Statement       ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Conditional     ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Repeat          ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Label           ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Operator        ctermfg=' .s:t_brown   .' guifg=' .s:g_brown   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Keyword         ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Comment         ctermfg=' .s:t_grey    .' guifg=' .s:g_grey    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Language        ctermfg=' .s:t_pink    .' guifg=' .s:g_pink    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Special         ctermfg=' .s:t_red     .' guifg=' .s:g_red     .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! SpecialChar     ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=bold gui=bold'
+exe 'hi! Tag             ctermfg=' .s:t_red     .' guifg=' .s:g_red     .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Delimiter       ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
 " ----------
 " - C like -
 " ----------
-exe 'hi! PreProc         ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Include         ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Type            ctermfg=' .s:t_yellow  .' guifg=' .s:g_yellow  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! StorageClass    ctermfg=' .s:t_bpurple .' guifg=' .s:g_bpurple .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
-exe 'hi! Structure       ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
+exe 'hi! PreProc         ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Include         ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Type            ctermfg=' .s:t_yellow  .' guifg=' .s:g_yellow  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! StorageClass    ctermfg=' .s:t_bpurple .' guifg=' .s:g_bpurple .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! Structure       ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
 " --------------------------------
 " Diff
 " --------------------------------
-exe 'hi! DiffAdd         ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_ddgrey  .' guibg=' .s:g_ddgrey  .' cterm=none'
-exe 'hi! DiffChange      ctermfg=' .s:t_yellow  .' guifg=' .s:g_yellow  .' ctermbg=' .s:t_ddgrey  .' guibg=' .s:g_ddgrey  .' cterm=none'
-exe 'hi! DiffDelete      ctermfg=' .s:t_red     .' guifg=' .s:g_red     .' ctermbg=' .s:t_ddgrey  .' guibg=' .s:g_ddgrey  .' cterm=none'
-exe 'hi! DiffText        ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_lgrey   .' guibg=' .s:g_lgrey   .' cterm=none'
-exe 'hi! diffAdded       ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none'
+exe 'hi! DiffAdd         ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_ddgrey  .' guibg=' .s:g_ddgrey  .' cterm=none gui=none'
+exe 'hi! DiffChange      ctermfg=' .s:t_yellow  .' guifg=' .s:g_yellow  .' ctermbg=' .s:t_ddgrey  .' guibg=' .s:g_ddgrey  .' cterm=none gui=none'
+exe 'hi! DiffDelete      ctermfg=' .s:t_red     .' guifg=' .s:g_red     .' ctermbg=' .s:t_ddgrey  .' guibg=' .s:g_ddgrey  .' cterm=none gui=none'
+exe 'hi! DiffText        ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_lgrey   .' guibg=' .s:g_lgrey   .' cterm=none gui=none'
+exe 'hi! diffAdded       ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
 " --------------------------------
 " Completion menu
 " --------------------------------
-exe 'hi! Pmenu           ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none'
-exe 'hi! PmenuSel        ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=reverse'
+exe 'hi! Pmenu           ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
+exe 'hi! PmenuSel        ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=reverse gui=reverse'
 
 " --------------------------------
 " Spelling
 " --------------------------------
-exe 'hi! SpellBad        ctermfg=' .s:t_dpurple .' guifg=' .s:g_dpurple .' ctermbg=' .s:t_bred    .' guibg=' .s:g_bred    .' cterm=none'
-exe 'hi! SpellCap        ctermfg=' .s:t_dpurple .' guifg=' .s:g_dpurple .' ctermbg=' .s:t_bblue   .' guibg=' .s:g_bblue   .' cterm=none'
-exe 'hi! SpellLocal      ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bcyan   .' guibg=' .s:g_bcyan   .' cterm=none'
-exe 'hi! SpellRare       ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bpurple .' guibg=' .s:g_bpurple .' cterm=none'
+exe 'hi! SpellBad        ctermfg=' .s:t_dpurple .' guifg=' .s:g_dpurple .' ctermbg=' .s:t_bred    .' guibg=' .s:g_bred    .' cterm=none gui=none'
+exe 'hi! SpellCap        ctermfg=' .s:t_dpurple .' guifg=' .s:g_dpurple .' ctermbg=' .s:t_bblue   .' guibg=' .s:g_bblue   .' cterm=none gui=none'
+exe 'hi! SpellLocal      ctermfg=' .s:t_cyan    .' guifg=' .s:g_cyan    .' ctermbg=' .s:t_bcyan   .' guibg=' .s:g_bcyan   .' cterm=none gui=none'
+exe 'hi! SpellRare       ctermfg=' .s:t_purple  .' guifg=' .s:g_purple  .' ctermbg=' .s:t_bpurple .' guibg=' .s:g_bpurple .' cterm=none gui=none'
 
 " --------------------------------
 " Sneak
 " --------------------------------
-exe 'hi! Sneak           ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_spurple .' guibg=' .s:g_spurple .' cterm=none'
-exe 'hi! SneakLabel      ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_spurple .' guibg=' .s:g_spurple .' cterm=none'
-exe 'hi! SneakLabelMask  ctermfg=' .s:t_spurple .' guifg=' .s:g_spurple .' ctermbg=' .s:t_spurple .' guibg=' .s:g_spurple .' cterm=none'
+exe 'hi! Sneak           ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_spurple .' guibg=' .s:g_spurple .' cterm=none gui=none'
+exe 'hi! SneakLabel      ctermfg=' .s:t_white   .' guifg=' .s:g_white   .' ctermbg=' .s:t_spurple .' guibg=' .s:g_spurple .' cterm=none gui=none'
+exe 'hi! SneakLabelMask  ctermfg=' .s:t_spurple .' guifg=' .s:g_spurple .' ctermbg=' .s:t_spurple .' guibg=' .s:g_spurple .' cterm=none gui=none'
