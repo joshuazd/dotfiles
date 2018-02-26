@@ -10,7 +10,7 @@ set breakindent                               " Indent wrapped lines by 2
 set breakindentopt=shift:2
 set ignorecase                                " Ignore case when searching
 set smartcase                                 " When searching try to be smart about cases
-set hlsearch                                  " Highlight search results
+" set hlsearch                                  " Highlight search results
 set incsearch                                 " Makes search act like search in modern browsers
 set lazyredraw                                " Don't redraw while executing macros
 set showmatch                                 " Show matching brackets when text indicator is over them
@@ -116,6 +116,9 @@ nnoremap 0 ^
 nnoremap ^ 0
 nnoremap L $
 nnoremap H ^
+
+nnoremap n :set hlsearch<CR>n
+nnoremap N :set hlsearch<CR>N
 
 nnoremap Y y$
 
