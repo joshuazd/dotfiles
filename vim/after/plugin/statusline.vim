@@ -23,12 +23,22 @@ let g:mode_hi = {
       \'VisualMode'  : ' ctermfg=107 guifg=#91b859 ctermbg=235 guibg=#262626',
       \'ReplaceMode' : ' ctermfg=167 guifg=#d75f5f ctermbg=235 guibg=#262626',
       \'CommandMode' : ' ctermfg=176 guifg=#c792ea ctermbg=235 guibg=#262626'}
-highlight StlDim       ctermbg=235 guibg=#262626 ctermfg=242 guifg=#6c6c6c cterm=NONE gui=NONE
-highlight StlDimNC     ctermbg=242 guibg=#6c6c6c ctermfg=235 guifg=#262626 cterm=NONE gui=NONE
-highlight ReadOnlyStl  ctermbg=235 guibg=#262626 ctermfg=167 guifg=#d75f5f cterm=NONE gui=NONE
-highlight StatusLine   ctermbg=235 guibg=#262626 ctermfg=252 guifg=#d0d0d0 cterm=NONE gui=NONE
-highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
-highlight StlLinter    ctermbg=1   guibg=#e53935 ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
+
+function! StatusLineColors() abort
+  highlight StlDim       ctermbg=235 guibg=#262626 ctermfg=242 guifg=#6c6c6c cterm=NONE gui=NONE
+  highlight StlDimNC     ctermbg=242 guibg=#6c6c6c ctermfg=235 guifg=#262626 cterm=NONE gui=NONE
+  highlight ReadOnlyStl  ctermbg=235 guibg=#262626 ctermfg=167 guifg=#d75f5f cterm=NONE gui=NONE
+  highlight StatusLine   ctermbg=235 guibg=#262626 ctermfg=252 guifg=#d0d0d0 cterm=NONE gui=NONE
+  highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
+  highlight StlLinter    ctermbg=1   guibg=#e53935 ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
+endfunction
+
+call StatusLineColors()
+
+augroup statusline
+  autocmd!
+  autocmd ColorScheme * call StatusLineColors()
+augroup END
 
 function! TagsStatusLine() abort
   return (!exists('*gutentags#statusline') ? '' : gutentags#statusline())
@@ -43,11 +53,11 @@ endfunction
 function! SetupStatusLine(nr) abort
   return get(extend(w:, {
         \ 'lf_active': winnr() != a:nr
-        \ ? 0
-        \ : (mode(1) ==# get(g:, 'lf_cached_mode', '')
-        \ ? 1
-        \ : s:updateStatusLineHighlight(a:nr,get(extend(g:, { 'lf_cached_mode': mode(1) }), 'lf_cached_mode'))
-        \ ),
+          \ ? 0
+          \ : (mode(1) ==# get(g:, 'lf_cached_mode', '')
+            \ ? 1
+            \ : s:updateStatusLineHighlight(a:nr,get(extend(g:, { 'lf_cached_mode': mode(1) }), 'lf_cached_mode'))
+            \ ),
         \ 'lf_winwd': winwidth(winnr())
         \ }), '', '')
 endfunction
