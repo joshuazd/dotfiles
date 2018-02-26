@@ -40,7 +40,7 @@
 
 
 " Quit when a syntax file was already loaded
-if exists("b:current_syntax")
+if exists('b:current_syntax')
     finish
 endif
 
@@ -58,8 +58,8 @@ syn match xmlError "[<&]"
 "
 " <tag foo.attribute = "value">
 "                      ^^^^^^^
-syn region  xmlString contained matchgroup=xmlQuote start=+"+ end=+"+ contains=xmlEntity,@Spell,@xmlStringHook display
-syn region  xmlString contained matchgroup=xmlQuote start=+'+ end=+'+ contains=xmlEntity,@Spell,@xmlStringHook display
+syn region xmlString contained matchgroup=xmlQuote start=+"+ end=+"+ contains=xmlEntity,@Spell,@xmlStringHook display
+syn region xmlString contained matchgroup=xmlQuote start=+'+ end=+'+ contains=xmlEntity,@Spell,@xmlStringHook display
 
 
 " punctuation (within attributes) e.g. <tag xml:foo.attribute ...>
@@ -68,7 +68,7 @@ syn region  xmlString contained matchgroup=xmlQuote start=+'+ end=+'+ contains=x
 syn match   xmlAttribPunct +[:]+ contained display
 
 " no highlighting for xmlEqual (xmlEqual has no highlighting group)
-syn match   xmlEqual +=+ display
+syn match   xmlEqual +=+ display contained
 
 
 " attribute, everything before the '='
@@ -81,7 +81,7 @@ syn match   xmlEqual +=+ display
 "      ^^^^^^^^^^^^^
 "
 syn match   xmlAttrib
-    \ +[-'"<]\@1<!\<[a-zA-Z:_][-.0-9a-zA-Z:_]*\>\%(['">]\@!\|$\)+
+    \ "[-'\"<]\@1<!\<[a-zA-Z:_][-.0-9a-zA-Z:_]*\>\%(['\">]\@!\|$\)"
     \ contained
     \ contains=xmlAttribPunct,@xmlAttribHook
     \ display
@@ -96,7 +96,7 @@ syn match   xmlAttrib
 " <xsl:for-each select = "lola">
 "  ^^^
 "
-if exists("g:xml_namespace_transparent")
+if exists('g:xml_namespace_transparent')
 syn match   xmlNamespace
     \ +\(<\|</\)\@2<=[^ /!?<>"':]\+[:]\@=+
     \ contained
@@ -199,7 +199,7 @@ else
     syn region   xmlTag
         \ matchgroup=xmlTagPunct start=+<[^ /!?<>"']\@=+
         \ matchgroup=xmlTagPunct end=+>+
-        \ contains=xmlError,Xpath,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,@xmlStartTagHook
+        \ contains=xmlError,Xpath,xmlTagName,xmlAttrib,xmlAttribPunct,xmlEqual,xmlOperator,xmlString,@xmlStartTagHook
 
     syn region   xmlEndTag
         \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
@@ -314,10 +314,8 @@ hi def link xmlTodo		Todo
 hi def link xmlTag		Comment
 hi def link xmlTagPunct		Comment
 hi def link xmlEndTag		Tag
-" highlight xmlEndTag ctermfg=203 guifg=#f07178
 hi def link xmlTagName		Tag
-" highlight xmlTagName ctermfg=203 guifg=#f07178
-if !exists("g:xml_namespace_transparent")
+if !exists('g:xml_namespace_transparent')
     hi def link xmlNamespace	Tag
 endif
 hi def link xmlEntity		Statement
@@ -351,7 +349,7 @@ hi def link xmlDocTypeKeyword	Statement
 hi def link xmlInlineDTD	Function
 highlight xmlQuote ctermfg=156 guifg=#afff87
 
-let b:current_syntax = "xml"
+let b:current_syntax = 'xml'
 
 let &cpo = s:xml_cpo_save
 unlet s:xml_cpo_save
