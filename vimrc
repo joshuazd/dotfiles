@@ -151,6 +151,7 @@ nnoremap =on :setlocal <C-R>=(&number         ? 'nonumber'         : 'number')<C
 nnoremap =or :setlocal <C-R>=(&relativenumber ? 'norelativenumber' : 'relativenumber')<CR><CR>
 nnoremap =os :setlocal <C-R>=(&spell          ? 'nospell'          : 'spell')<CR><CR>
 nnoremap =ou :setlocal <C-R>=(&cursorcolumn   ? 'nocursorcolumn'   : 'cursorcolumn')<CR><CR>
+nnoremap =oh :setlocal <C-R>=(&hlsearch       ? 'nohlsearch'       : 'hlsearch')<CR><CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
 nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
 nnoremap ]q :cnext<CR>
@@ -160,7 +161,7 @@ nnoremap ]Q :clast<CR>
 
 inoremap jk <Esc>
 
-nnoremap <Space>q :noh<return><esc>
+nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
