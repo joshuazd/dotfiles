@@ -198,8 +198,8 @@ else
     "
     syn region   xmlTag
         \ matchgroup=xmlTagPunct start=+<[^ /!?<>"']\@=+
-        \ matchgroup=xmlTagPunct end=+/\=>+
-        \ contains=xmlError,xmlTagName,xmlAttrib,xmlEqual,xmlString,Xpath,@xmlTagHook,@xmlStringHook
+        \ matchgroup=xmlTagPunct end=+>+
+        \ contains=xmlError,Xpath,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,@xmlStartTagHook
 
     syn region   xmlEndTag
         \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
