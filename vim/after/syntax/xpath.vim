@@ -4,17 +4,17 @@ endif
 
 syn iskeyword @,48-57,192-255,_,-
 
-syn match xpathParam "\w\+" display
+syn match xpathParam     "\w\+"                    display
 syn match xpathReference "\$\@<=\w[a-zA-Z0-9\-_]*" display
-syn match xpathOperator "\$" display
-syn keyword xpathLangVar body ctx trp
-syn match xpathNameSpace '\w\+:\@=' display
-syn match xpathPunct "[,/\[\]()]" display
-syn match xpathP2 "[:\.]" display
-syn match xpathOperator "[=\*@+]" display
+syn match xpathOperator  "\$"                      display
+syn match xpathNameSpace '\w\+:\@='                display
+syn match xpathPunct     "[,/\[\]()]"              display
+syn match xpathP2        "[:\.]"                   display
+syn match xpathOperator  "[=\*@+]"                 display
+syn match xpathNumber    "\<[0-9]\+\>"             display
+syn match xpathOperator  "[!=\>\<]\+"              display
 syn keyword xpathOperator or and xor
-syn match xpathOperator "[!=\>\<]\+" display
-syn match xpathNumber "\<[0-9]\+\>" display
+syn keyword xpathLangVar body ctx trp
 
 syn match xpathSpec "fn"
 
@@ -39,23 +39,30 @@ syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+ display
 hi def link xmlEntity		Statement
 hi def link xmlEntityPunct	PreProc
 
-hi def link xpathFuncError Error
+function! s:hi(group, target) abort
+  let l:t_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'cterm') 
+  let l:t_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'cterm') 
+  let l:g_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'gui') 
+  let l:g_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'gui') 
+  let l:t_fg = l:t_fg ==? '' ? 'NONE' : l:t_fg
+  let l:t_bg = l:t_bg ==? '' ? 'NONE' : l:t_bg
+  let l:g_fg = l:t_fg ==? '' ? 'NONE' : l:g_fg
+  let l:g_bg = l:t_bg ==? '' ? 'NONE' : l:g_bg
+  execute 'highlight ' . a:group . ' ctermfg=' . l:t_fg . ' ctermbg=' . l:t_bg .
+        \ ' guifg=' . l:g_fg . ' guibg=' . l:g_bg .
+        \ ' cterm=italic gui=italic'
+endfunction
 
-highlight xpathQuote ctermfg=156 cterm=italic
-" hi def link xpathString String
-highlight xpathString ctermfg=10 cterm=italic guifg=#91b859 gui=italic
-" hi def link xpathFunction Function
-highlight xpathFuncName ctermfg=12 cterm=italic guifg=#82aaff gui=italic
-" hi def link xpathNumber Constant
-highlight xpathNumber ctermfg=6 cterm=italic guifg=#39adb5 gui=italic
-" hi def link xpathParam Identifier
-highlight xpathParam ctermfg=11 cterm=italic guifg=#ffcb6b gui=italic
-"hi def link xpathPunct PreProc
-highlight xpathPunct ctermfg=14 cterm=italic guifg=#89ddff gui=italic
-" hi def link xpathLangVar Type
-highlight xpathLangVar ctermfg=3 cterm=italic guifg=#ffb62c gui=italic
-highlight xpathReference ctermfg=156 cterm=italic guifg=#afff87 gui=italic
-highlight xpathOperator ctermfg=137 cterm=italic guifg=#ab7967 gui=italic
-highlight xpathP2 ctermfg=8 cterm=italic guifg=#3e515b gui=italic
-highlight xpathSpec ctermfg=1 cterm=italic guifg=#e53935 gui=italic
-hi def link xpathNameSpace Primitive
+call <SID>hi('xpathFuncError', 'Error')
+call <SID>hi('xpathQuote',     'StringDelimiter')
+call <SID>hi('xpathString',    'String')
+call <SID>hi('xpathFuncName',  'Function')
+call <SID>hi('xpathNumber',    'Constant')
+call <SID>hi('xpathParam',     'Identifier')
+call <SID>hi('xpathPunct',     'PreProc')
+call <SID>hi('xpathLangVar',   'Primitive')
+call <SID>hi('xpathReference', 'StringDelimiter')
+call <SID>hi('xpathOperator',  'Operator')
+call <SID>hi('xpathP2',        'Comment')
+call <SID>hi('xpathSpec',      'Special')
+call <SID>hi('xpathNameSpace', 'Primitive')
