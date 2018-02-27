@@ -5,9 +5,10 @@ else
   setlocal omnifunc=python3complete#Complete
 endif
 command! Lint cexpr system('flake8 ' . shellescape(expand('%')))
-set makeprg=flake8\ %:S
-set errorformat=%f:%l:%c:\ %t%n\ %m
-command! -bar Fix silent execute "!autopep8 -i -a -a -a %" | redraw!
+setlocal makeprg=flake8\ %:S
+setlocal errorformat=%f:%l:%c:\ %t%n\ %m
+setlocal formatprg=autopep8\ -a\ -a\ -
+command! -bar Fix silent execute "!autopep8 -i -a -a %" | redraw!
 augroup PYTHON
     autocmd!
     if executable('flake8')
