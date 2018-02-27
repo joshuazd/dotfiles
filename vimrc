@@ -10,7 +10,6 @@ set breakindent                               " Indent wrapped lines by 2
 set breakindentopt=shift:2
 set ignorecase                                " Ignore case when searching
 set smartcase                                 " When searching try to be smart about cases
-" set hlsearch                                  " Highlight search results
 set incsearch                                 " Makes search act like search in modern browsers
 set lazyredraw                                " Don't redraw while executing macros
 set showmatch                                 " Show matching brackets when text indicator is over them
@@ -52,7 +51,7 @@ set autowrite                                 " automatically save before :next,
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
 set signcolumn=no                             " don't have signcolumn on
-set fillchars=stl:\ ,stlnc:\ ,vert:│,fold:─,diff:─ " use box chars for folds, etc
+set fillchars=stl:\ ,stlnc:\ ,fold:─,diff:─   " use box chars for folds, etc
 set tags=./tags,tags                          " where to find tag files
 set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 set modeline                                  " read modelines
@@ -119,6 +118,7 @@ nnoremap H ^
 
 nnoremap n :set hlsearch<CR>n
 nnoremap N :set hlsearch<CR>N
+nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 
 nnoremap Y y$
 
@@ -160,8 +160,6 @@ nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
 
 inoremap jk <Esc>
-
-nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
@@ -247,7 +245,7 @@ endfunction
 " {{{
 " normal statusline setup in $HOME/.vim/after/plugin/statusline.vim
 " this statusline only used if --noplugin specified
-set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
+" set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
 " }}}
 
 
