@@ -240,16 +240,6 @@ endfunction
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
-"              STATUSLINE SETUP
-""""""""""""""""""""""""""""""""""""""""""""""""
-" {{{
-" normal statusline setup in $HOME/.vim/after/plugin/statusline.vim
-" this statusline only used if --noplugin specified
-" set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
-" }}}
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""
 "              PLUGIN SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
