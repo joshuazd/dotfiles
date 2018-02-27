@@ -111,8 +111,6 @@ runtime macros/matchit.vim
 " {{{
 nnoremap ; :
 xnoremap ; :
-nnoremap 0 ^
-nnoremap ^ 0
 nnoremap L $
 nnoremap H ^
 
