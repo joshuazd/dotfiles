@@ -2,6 +2,7 @@ if exists('b:current_syntax')
     finish
 endif
 
+syn iskeyword @,48-57,192-255,_,-
 
 syn match xpathParam "\w\+" display
 syn match xpathReference "\$\@<=\w[a-zA-Z0-9\-_]*" display
@@ -20,33 +21,41 @@ syn match xpathSpec "fn"
 syn match   xmlEntity                 "&[^; \t]*;" contains=xmlEntityPunct display
 syn match   xmlEntityPunct  contained "[&.;]" display
 
-syn match xpathFunction "\(substring\|string\-join\|string\-length\|upper\-case\|lower\-case\|escape\-uri\|starts\-with\|ends\-with\)(\@=" display
-syn match xpathFunction "\(substring\-before\|substring\-after\|index\-of\|get\-property\|json\-eval\|contains\)(\@=" display
-syn match xpathFunction "\(number\|abs\|ceiling\|floor\|round\|string\|compare\|concat\|adjust-dateTime-to-timezone\)(\@=" display
-syn match xpathFunction "\(matches\|replace\|boolean\|not\|true\|false\|dateTime\|name\|root\|remove\|empty\|exists\|reverse\)(\@=" display
-syn match xpathFunction "\(subsequence\|count\|avg\|max\|min\|sum\|id\|position\|last\|translate\|text\|format-dateTime\)(\@=" display
-syn match xpathFunction "\(dayTimeDuration\)" display
+syn match xpathFunction "\k\+(\@=" contains=xpathFuncName,xpathFuncError display
+
+syn keyword xpathFuncName substring string-join string-length upper-case lower-case escape-uri starts-with ends-with contained
+syn keyword xpathFuncName substring-before substring-after index-of get-property json-eval contained
+syn match xpathFuncName "\<contains\>" contained
+syn keyword xpathFuncName number abs ceiling floor round string compare concat adjust-dateTime-to-timezone contained
+syn keyword xpathFuncName matches replce boolean not true false dateTime name root remove empty exists reverse contained
+syn keyword xpathFuncName subsequence count avg max min sum id position last translate text format-dateTime contained
+syn keyword xpathFuncName dayTimeDuration contained
+
+syn match xpathFuncError "\k\+" contained
 
 " STRINGS
 syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+ display
 
 hi def link xmlEntity		Statement
 hi def link xmlEntityPunct	PreProc
-exe 'highlight xpathQuote ctermfg=156 cterm=italic'
+
+hi def link xpathFuncError Error
+
+highlight xpathQuote ctermfg=156 cterm=italic
 " hi def link xpathString String
-exe 'highlight xpathString ctermfg=10 cterm=italic' ' guifg=#91b859 gui=italic'
+highlight xpathString ctermfg=10 cterm=italic guifg=#91b859 gui=italic
 " hi def link xpathFunction Function
-exe 'highlight xpathFunction ctermfg=12 cterm=italic guifg=#82aaff gui=italic'
+highlight xpathFuncName ctermfg=12 cterm=italic guifg=#82aaff gui=italic
 " hi def link xpathNumber Constant
-exe 'highlight xpathNumber ctermfg=6 cterm=italic guifg=#39adb5 gui=italic'
+highlight xpathNumber ctermfg=6 cterm=italic guifg=#39adb5 gui=italic
 " hi def link xpathParam Identifier
-exe 'highlight xpathParam ctermfg=11 cterm=italic guifg=#ffcb6b gui=italic'
+highlight xpathParam ctermfg=11 cterm=italic guifg=#ffcb6b gui=italic
 "hi def link xpathPunct PreProc
-exe 'highlight xpathPunct ctermfg=14 cterm=italic guifg=#89ddff gui=italic'
+highlight xpathPunct ctermfg=14 cterm=italic guifg=#89ddff gui=italic
 " hi def link xpathLangVar Type
-exe 'highlight xpathLangVar ctermfg=3 cterm=italic guifg=#ffb62c gui=italic'
-exe 'highlight xpathReference ctermfg=156 cterm=italic guifg=#afff87 gui=italic'
-exe 'highlight xpathOperator ctermfg=137 cterm=italic guifg=#ab7967 gui=italic'
-exe 'highlight xpathP2 ctermfg=8 cterm=italic guifg=#3e515b gui=italic'
-exe 'highlight xpathSpec ctermfg=1 cterm=italic guifg=#e53935 gui=italic'
+highlight xpathLangVar ctermfg=3 cterm=italic guifg=#ffb62c gui=italic
+highlight xpathReference ctermfg=156 cterm=italic guifg=#afff87 gui=italic
+highlight xpathOperator ctermfg=137 cterm=italic guifg=#ab7967 gui=italic
+highlight xpathP2 ctermfg=8 cterm=italic guifg=#3e515b gui=italic
+highlight xpathSpec ctermfg=1 cterm=italic guifg=#e53935 gui=italic
 hi def link xpathNameSpace Primitive

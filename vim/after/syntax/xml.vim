@@ -1,20 +1,28 @@
-syn match xmlFunction   '\<\(makefault\|template\|validate\)\>'                                                        display contained
-syn match xmlLog        '\<\(call-template\|log\)\>'                                                                   display contained
-syn match xmlDb         '\<\(dblookup\|dbreport\|class\|payloadFactory\|arg\|http\)\>'                                 display contained
-syn match xmlFilter     '\<\(filter\|then\|else\|on-fail\|drop\|respond\|store\|if\|sort\|choose\|when\|otherwise\)\>' display contained
-syn match xmlSend       '\<\(send\|call>\@=\)'                                                                         display contained
-syn match xmlProperty   '\<\(property\|address\|header\|endpoint\|attribute\|reason\|detail\|code\)\>'                 display contained
-syn match xmlSequence   '\<sequence\>'                                                                                 display contained
-syn match xmlParam      '\<\(parameter\|result\|dsName\|target\|format\|source\|param\)\>'                             display contained
-syn match xmlLogParam   '\<with-param\>'                                                                               display contained
-syn match xmlConnection '\<\(connection\|statement\|resource\|stylesheet\)\>'                                          display contained
-syn match xmlArgs       '\<args\>'                                                                                     display contained
-syn match xmlEnrich     '\<\(enrich\|xslt\|value-of\|schema\|datamapper\)\>'                                           display contained
-syn match xmlSqlTag     '\<\(sql\|script\)\>'                                                                          display contained
-syn match xmlInSequence '\<\(inSequence\|outSequence\|faultSequence\)\>'                                               display contained
-syn match xsltStatement '\<for-each\>'                                                                                 display contained
-syn match xmlFile       '\k\+_\(Logger\|XSLT\|EP\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)'          display contained
-syn match xmlUrl        '\(url-mapping\|uri-template\)'                                                                display contained
+" XML Tag Names
+syn keyword xmlFunction   makefault template validate                                               contained
+syn keyword xmlLog        log                                                                       contained
+syn match   xmlLog        '\<call-template\>'                                               display contained
+syn keyword xmlDb         dblookup dbreport class payloadFactory arg http                           contained
+syn keyword xmlFilter     filter then else drop respond store if sort choose when otherwise         contained
+syn match   xmlFilter     '\<on-fail\>'                                                     display contained
+syn keyword xmlSend       send call                                                                 contained
+syn keyword xmlProperty   property address header endpoint attribute reason detail code             contained
+syn keyword xmlSequence   sequence                                                                  contained
+syn keyword xmlParam      parameter result dsName target format source param                        contained
+syn match   xmlLogParam   '\<with-param\>'                                                  display contained
+syn keyword xmlConnection connection statement resource stylesheet                                  contained
+syn keyword xmlArgs       args                                                                      contained
+syn keyword xmlEnrich     enrich xslt schema datamapper                                             contained
+syn match   xmlEnrich     '\<value-of\>'                                                    display contained
+syn keyword xmlSqlTag     sql script                                                                contained
+syn keyword xmlInSequence inSequence outSequence faultSequence                                      contained
+syn match   xsltStatement '\<for-each\>'                                                    display contained
+
+" XML Strings
+syn match   xmlFile '\k\+_\(Logger\|XSLT\|EP\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)' display contained
+
+" XML Attributes
+syn match   xmlUrl '\(url-mapping\|uri-template\)' display contained
 
 syn keyword xmlMethod GET POST PUT PATCH DELETE get post put patch delete contained
 syn keyword xmlName   expression value regex name action select source    contained
