@@ -66,3 +66,7 @@ call <SID>hi('xpathOperator',  'Operator')
 call <SID>hi('xpathP2',        'Comment')
 call <SID>hi('xpathSpec',      'Special')
 call <SID>hi('xpathNameSpace', 'Primitive')
+
+syn iskeyword clear
+
+let b:current_syntax = 'xpath'

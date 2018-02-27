@@ -6,7 +6,6 @@ setlocal smarttab
 setlocal conceallevel=0
 setlocal foldnestmax=2
 setlocal iskeyword+=-
-" let g:xml_syntax_folding=1 " enable xml folding
 inoremap <buffer> </ </<C-x><C-o><C-n><C-y>
 command! Tabs setlocal shiftwidth=2 softtabstop=2 foldmethod=syntax smarttab
 command! Lint cexpr system('xmllint --noout ' . shellescape(expand('%')))
