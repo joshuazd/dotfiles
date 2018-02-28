@@ -13,7 +13,6 @@ set noswapfile
 set tags=./tags,tags
 filetype plugin indent on
 syntax on
-nnoremap ; :
 nnoremap L $
 nnoremap H ^
 nnoremap Y y$
