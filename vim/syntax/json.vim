@@ -4,9 +4,9 @@
 " Last Change:	2014 Aug 23
 " Version:      0.12
 
-if !exists("main_syntax")
+if !exists('main_syntax')
   " quit when a syntax file was already loaded
-  if exists("b:current_syntax")
+  if exists('b:current_syntax')
     finish
   endif
   let main_syntax = 'json'
@@ -32,9 +32,9 @@ syn region  jsonStringSQError oneline  start=+'+  skip=+\\\\\|\\"+  end=+'+
 " Separated into a match and region because a region by itself is always greedy
 syn match  jsonKeywordMatch /"\([^"]\|\\\"\)\+"[[:blank:]\r\n]*\:/ contains=jsonKeyword,jsonNoise transparent
 if has('conceal')
-   syn region  jsonKeyword matchgroup=jsonQuote start=/"/  end=/"\ze[[:blank:]\r\n]*\:/ concealends contained transparent
+   syn region  jsonKeyword matchgroup=jsonQuote start=/"/  end=/"\ze[[:blank:]\r\n]*\:/ concealends contained transparent display
 else
-   syn region  jsonKeyword matchgroup=jsonQuote start=/"/  end=/"\ze[[:blank:]\r\n]*\:/ contained transparent
+   syn region  jsonKeyword matchgroup=jsonQuote start=/"/  end=/"\ze[[:blank:]\r\n]*\:/ contained transparent display
 endif
 
 " Syntax: Escape sequences
@@ -45,7 +45,7 @@ syn match   jsonEscape    "\\u\x\{4}" contained
 syn match   jsonNumber    "-\=\<\%(0\|[1-9]\d*\)\%(\.\d\+\)\=\%([eE][-+]\=\d\+\)\=\>\ze[[:blank:]\r\n]*[,}\]]"
 
 " ERROR WARNINGS **********************************************
-if (!exists("g:vim_json_warnings") || g:vim_json_warnings==1)
+if (!exists('g:vim_json_warnings') || g:vim_json_warnings==1)
 	" Syntax: Strings should always be enclosed with quotes.
 	syn match   jsonNoQuotesError  "\<[[:alpha:]][[:alnum:]]*\>"
 	syn match   jsonTripleQuotesError  /"""/
@@ -95,7 +95,7 @@ syn region  jsonFold3 matchgroup=jsonBraces start="{" end=/}\(\_s\+\ze\("\|{\)\)
 syn region  jsonFold4 matchgroup=jsonBraces start="{" end=/}\(\_s\+\ze\("\|{\)\)\@!/ fold contained contains=jsonFold5,@jsonAll
 syn region  jsonFold5 matchgroup=jsonBraces start="{" end=/}\(\_s\+\ze\("\|{\)\)\@!/ fold contained contains=jsonFold6,@jsonAll
 syn region  jsonFold6 matchgroup=jsonBraces start="{" end=/}\(\_s\+\ze\("\|{\)\)\@!/ fold contained contains=jsonFold7,@jsonAll
-syn region  jsonFold matchgroup=jsonBraces start="\[" end=/]\(\_s\+\ze"\)\@!/ transparent fold
+syn region  jsonFold  matchgroup=jsonBraces start="\[" end=/]\(\_s\+\ze"\)\@!/ transparent fold
 highlight jsonFold1 ctermfg=5
 highlight jsonFold2 ctermfg=11
 highlight jsonFold3 ctermfg=12
@@ -106,31 +106,31 @@ highlight jsonFold6 ctermfg=173
 syn cluster jsonAll add=jsonNull,jsonBoolean,jsonString,jsonKeywordMatch,jsonEscape,jsonNumber,jsonNoise,jsonFold
 " Define the default highlighting.
 " Only when an item doesn't have highlighting yet
-hi def link jsonPadding         Operator
-hi def link jsonString          String
-hi def link jsonTest          Label
-hi def link jsonEscape          Special
-hi def link jsonNumber          Number
-hi def link jsonBraces          Delimiter
-hi def link jsonNull            Function
-hi def link jsonBoolean         Boolean
+hi def link jsonPadding Operator
+hi def link jsonString  String
+hi def link jsonTest    Label
+hi def link jsonEscape  Special
+hi def link jsonNumber  Number
+hi def link jsonBraces  Delimiter
+hi def link jsonNull    Function
+hi def link jsonBoolean Boolean
 " hi def link jsonKeyword         Label
 
-if (!exists("g:vim_json_warnings") || g:vim_json_warnings==1)
-hi def link jsonNumError        Error
-hi def link jsonCommentError    Error
-hi def link jsonSemicolonError  Error
-hi def link jsonTrailingCommaError     Error
-hi def link jsonMissingCommaError      Error
-hi def link jsonStringSQError        	Error
-hi def link jsonNoQuotesError        	Error
-hi def link jsonTripleQuotesError     	Error
+if (!exists('g:vim_json_warnings') || g:vim_json_warnings==1)
+  hi def link jsonNumError           Error
+  hi def link jsonCommentError       Error
+  hi def link jsonSemicolonError     Error
+  hi def link jsonTrailingCommaError Error
+  hi def link jsonMissingCommaError  Error
+  hi def link jsonStringSQError      Error
+  hi def link jsonNoQuotesError      Error
+  hi def link jsonTripleQuotesError  Error
 endif
-hi def link jsonQuote           Quote
+hi def link jsonQuote           StringDelimiter
 hi def link jsonNoise           PreProc
 
-let b:current_syntax = "json"
-if main_syntax == 'json'
+let b:current_syntax = 'json'
+if main_syntax ==# 'json'
   unlet main_syntax
 endif
 
