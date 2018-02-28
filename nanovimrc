@@ -1,0 +1,26 @@
+set nocompatible
+set hidden
+set ignorecase
+set smartcase
+set splitbelow
+set splitright
+set clipboard^=unnamedplus
+set laststatus=2
+set scrolloff=999
+set wildmenu
+set noswapfile
+set tags=./tags,tags
+colorscheme material
+filetype plugin indent on
+syntax on
+
+nnoremap ; :
+nnoremap L $
+nnoremap H ^
+nnoremap n :set hlsearch<CR>n
+nnoremap N :set hlsearch<CR>N
+nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
+nnoremap Y y$
+nnoremap gb :ls<CR>:b<space>
+inoremap jk <esc>
+set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]

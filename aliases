@@ -23,6 +23,7 @@ alias build='mvnc clean install; mcar'
 
 alias cvi='vi -u ~/dotfiles/microvimrc --noplugin'
 alias mvi='vi -u ~/dotfiles/minvimrc'
+alias nvi='vi -u ~/dotfiles/nanovimrc'
 
 alias grep='grep --color=auto --exclude-dir=.git'
 alias history='fc -il 1'
