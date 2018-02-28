@@ -16,9 +16,6 @@ syntax on
 nnoremap ; :
 nnoremap L $
 nnoremap H ^
-nnoremap n :set hlsearch<CR>n
-nnoremap N :set hlsearch<CR>N
-nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 nnoremap Y y$
 nnoremap gb :ls<CR>:b<space>
 inoremap jk <esc>

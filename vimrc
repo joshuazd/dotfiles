@@ -22,6 +22,7 @@ set clipboard^=unnamedplus                    " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
+set smarttab                                  " use shiftwidth with <TAB>
 set autoindent                                " use the previous lines indentation level
 set noshowmode                                " don't show mode in the commandline
 set nowrap                                    " don't wrap lines by default
