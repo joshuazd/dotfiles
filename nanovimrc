@@ -1,10 +1,10 @@
 set nocompatible
-set runtimepath=/usr/share/vim/vim80
+set runtimepath-=$HOME/.vim
+set runtimepath-=$HOME/.vim/after
+set backspace=indent,eol,start
 set hidden
-set ignorecase
-set smartcase
-set splitbelow
-set splitright
+set ignorecase smartcase
+set splitbelow splitright
 set clipboard^=unnamedplus
 set laststatus=2
 set scrolloff=999
@@ -13,7 +13,6 @@ set noswapfile
 set tags=./tags,tags
 filetype plugin indent on
 syntax on
-
 nnoremap ; :
 nnoremap L $
 nnoremap H ^
