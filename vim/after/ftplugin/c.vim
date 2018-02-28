@@ -1,1 +1,2 @@
 setlocal omnifunc=ClangComplete
+setlocal foldmethod=marker
