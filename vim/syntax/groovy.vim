@@ -82,6 +82,9 @@ syn keyword groovyExceptions      throw try catch finally
 syn keyword groovyAssert          assert
 syn keyword groovyMethodDecl      synchronized throws
 syn keyword groovyClassDecl       extends implements interface
+syn match   groovySemicolon       ";"
+syn match   groovyOperator        "[<>=!+-]"
+syn match   groovyOperator        "&"
 " to differentiate the keyword class from MyClass.class we use a match here
 syn match   groovyTypedef         "\.\s*\<class\>"ms=s+1
 syn keyword groovyClassDecl         enum
@@ -91,6 +94,18 @@ syn keyword groovyBranch          break continue nextgroup=groovyUserLabelRef sk
 syn match   groovyUserLabelRef    "\k\+" contained
 syn keyword groovyScopeDecl       public protected private abstract
 
+" function calls
+syn match groovyFuncName "[a-zA-Z_][a-zA-Z0-9_]*(\@=" contains=groovyLangObject contained
+hi def link groovyFuncName Function
+syn match groovyFuncCall "[a-zA-Z_][a-zA-Z0-9_]*(\@=" contains=groovyFuncName nextgroup=groovyFuncArgs
+syn cluster groovyTop add=groovyFuncCall
+syn region groovyFuncArgs start="(\@<=" end=")\@=" contains=groovyArgs,groovyComma contained
+syn match groovyArgs "[^,)]*" contains=@groovyTop,groovyFuncCall contained skipwhite
+
+" accessor
+syn match groovyAccessor "\."
+syn cluster groovyTop add=groovyAccessor
+hi def link groovyAccessor Comment
 
 if exists('groovy_highlight_groovy_lang_ids') || exists('groovy_highlight_groovy_lang') || exists('groovy_highlight_all')
   " groovy.lang.*
@@ -399,6 +414,7 @@ hi def link groovyUserLabel		Label
 hi def link groovyConditional	Conditional
 hi def link groovyRepeat		Repeat
 hi def link groovyExceptions		Exception
+hi def link groovySemicolon             PreProc
 hi def link groovyAssert 		Statement
 hi def link groovyStorageClass	StorageClass
 hi def link groovyMethodDecl		groovyStorageClass
