@@ -21,5 +21,3 @@ if exists('g:loaded_sneak_plugin') && g:loaded_sneak_plugin == 1
     omap T <Plug>Sneak_T
 
 endif
-
-
