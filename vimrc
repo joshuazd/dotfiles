@@ -203,9 +203,9 @@ augroup EditVim
   autocmd BufNewFile,BufRead *.zsh-theme  set filetype=zsh
   autocmd BufNewFile,BufRead *.dbs        set filetype=xml
   autocmd BufNewFile,BufRead *.dmc        set filetype=javascript
-  autocmd BufNewFile,BufRead *.md         set filetype=markdown
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
   autocmd FileType           *            set formatoptions-=o       " Don't insert comment when using 'o'
+  autocmd FileType           markdown     set syntax=markdown
   autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
 augroup END
