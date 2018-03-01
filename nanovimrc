@@ -4,7 +4,7 @@ set runtimepath-=$HOME/.vim/after
 set backspace=indent,eol,start
 set hidden
 set ignorecase smartcase
-set splitbelow splitright
+set nowrap
 set clipboard^=unnamedplus
 set laststatus=2
 set scrolloff=999

@@ -31,7 +31,7 @@ set laststatus=2                              " always show statusline
 set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically
 set sidescroll=1                              " scroll 1 character at a time
 set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
-set foldmethod=syntax                         " fold based on syntax
+set foldmethod=marker                         " fold based on syntax
 set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full           " setup wildmenu
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup " Ignore compiled files
@@ -133,6 +133,8 @@ nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
 nnoremap gk k
+
+xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
