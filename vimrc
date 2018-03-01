@@ -110,18 +110,22 @@ runtime macros/matchit.vim
 "              KEYBINDINGS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+" for convenience
 nnoremap ; :
 xnoremap ; :
 nnoremap L $
 nnoremap H ^
+nnoremap <CR> i<CR><Esc>
 
+" set hlsearch and nohlsearch dynamically-ish
 nnoremap n :set hlsearch<CR>n
 nnoremap N :set hlsearch<CR>N
 nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 
+" map Y behave like D and C
 nnoremap Y y$
 
-nnoremap <CR> i<CR><Esc>
+" buffer navigation
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
@@ -129,6 +133,7 @@ nnoremap <Esc>a :bp<CR>
 nnoremap <BS> <C-^>
 nnoremap <silent> <Space>x :bn\|bd #<CR>
 
+" make j and k smarter
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
@@ -136,6 +141,7 @@ nnoremap gk k
 
 xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 
+" file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
@@ -144,6 +150,7 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
+" settings toggles
 nnoremap =ow :setlocal <C-R>=(&wrap           ? 'nowrap'           : 'wrap')<CR><CR>
 nnoremap =oc :setlocal <C-R>=(&cursorline     ? 'nocursorline'     : 'cursorline')<CR><CR>
 nnoremap =oz :setlocal <C-R>=(&list           ? 'nolist'           : 'list')<CR><CR>
@@ -159,21 +166,26 @@ nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
 
+" easier to exit insert more
 inoremap jk <Esc>
 
+" smarter pasting
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
 xnoremap <silent> <Space>p p=']
 xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
+" misc functions
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
 nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
+" [I ]I smarter
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
+" better tag jumping
 nnoremap <C-]> g<C-]>
 nnoremap <expr> <C-w><C-]> len(getwininfo()) > 1
       \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
@@ -190,6 +202,7 @@ nnoremap <expr> g<C-Bslash> len(getwininfo()) > 1
       \? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>"
       \: ":vertical stjump \<C-r>\<C-w>\<CR>"
 
+" better file jumping
 nnoremap <silent> <expr> <C-w>f len(getwininfo()) > 1
       \? ":let fname=\"\<C-r>\<C-f>\"\|execute \"normal! \\<lt>C-w>p\"\<CR>:find \<C-r>=fname\<CR>\<CR>"
       \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
