@@ -10,6 +10,7 @@ set laststatus=2
 set scrolloff=999
 set wildmenu
 set noswapfile
+set showcmd
 set tags=./tags,tags
 filetype plugin indent on
 syntax on

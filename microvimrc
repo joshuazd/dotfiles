@@ -71,8 +71,6 @@ nnoremap <Space>i :ilist /
 
 inoremap jk <esc>
 
-nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
-
 nnoremap <C-]> g<C-]>
 
 set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
