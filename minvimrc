@@ -26,21 +26,21 @@ set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
 set smarttab                                  " use shiftwidth with <TAB>
 set autoindent                                " use the previous lines indentation level
-set noshowmode                                " don't show mode in the statusline
+set noshowmode                                " don't show mode in the commandline
 set nowrap                                    " don't wrap lines by default
 set linebreak                                 " wrap lines at words
 set laststatus=2                              " always show statusline
-set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically using j/k
+set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically
 set sidescroll=1                              " scroll 1 character at a time
-set sidescrolloff=15                          " scroll within 15 characters
-set foldmethod=syntax                         " fold based on syntax
+set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
+set foldmethod=marker                         " fold based on syntax
 set wildmenu                                  " Turn on the wild menu
-set wildmode=list:longest,list:full
+set wildmode=list:longest,list:full           " setup wildmenu
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup " Ignore compiled files
 set wildignore+=*target/*,*bin/*,*build/*     " Ignore build artifacts
 set wildignore+=tags,Session.vim              " Ignore tags and session files
 set wildignorecase                            " ignore case in wildmenu
-set sessionoptions-=options                   " make sessions work better
+set sessionoptions-=options                   " make sessions work better with plugins
 set sessionoptions-=blank
 set backupdir=/tmp                            " Better backups
 set noswapfile
@@ -54,8 +54,13 @@ set autowrite                                 " automatically save before :next,
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
 set cpoptions-=<
+set fillchars=stl:\ ,stlnc:\ ,fold:─,diff:─   " use box chars for folds, etc
 set tags=./tags,tags                          " where to find tag files
+set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 set modeline                                  " read modelines
+set shortmess+=c                              " don't show completion errors
+set winminheight=0                            " minimum window size 0x0
+set winminwidth=0
 if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -64,7 +69,7 @@ elseif executable('ag')                       " use ag when available and ripgre
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-  set guifont=DejaVu\ Sans\ Mono\ Book\ 10
+  set guifont=DejaVu\ Sans\ Mono\ 10
   set guioptions-=T
   set guioptions+=e
   set guioptions-=m
@@ -83,35 +88,36 @@ runtime macros/matchit.vim
 "              KEYBINDINGS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+" for convenience
 nnoremap ; :
 xnoremap ; :
-nnoremap , ;
-nnoremap 0 ^
-nnoremap ^ 0
 nnoremap L $
 nnoremap H ^
+nnoremap <CR> i<CR><Esc>
 
+" set hlsearch and nohlsearch dynamically-ish
 nnoremap n :set hlsearch<CR>n
 nnoremap N :set hlsearch<CR>N
 nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 
+" map Y behave like D and C
 nnoremap Y y$
 
+" buffer navigation
 nnoremap <M-d> :bn<CR>
 nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
-nnoremap <silent> <Space><Space> :b#<CR>
+nnoremap <BS> <C-^>
 nnoremap <silent> <Space>x :bn\|bd #<CR>
 
-nnoremap <TAB> <C-w>w
-nnoremap <S-TAB> <C-w>W
-
+" make j and k smarter
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
 nnoremap gk k
 
+" file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find *
@@ -120,6 +126,7 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
+" settings toggles
 nnoremap =ow :setlocal <C-R>=(&wrap           ? 'nowrap'           : 'wrap')<CR><CR>
 nnoremap =oc :setlocal <C-R>=(&cursorline     ? 'nocursorline'     : 'cursorline')<CR><CR>
 nnoremap =oz :setlocal <C-R>=(&list           ? 'nolist'           : 'list')<CR><CR>
@@ -127,6 +134,7 @@ nnoremap =on :setlocal <C-R>=(&number         ? 'nonumber'         : 'number')<C
 nnoremap =or :setlocal <C-R>=(&relativenumber ? 'norelativenumber' : 'relativenumber')<CR><CR>
 nnoremap =os :setlocal <C-R>=(&spell          ? 'nospell'          : 'spell')<CR><CR>
 nnoremap =ou :setlocal <C-R>=(&cursorcolumn   ? 'nocursorcolumn'   : 'cursorcolumn')<CR><CR>
+nnoremap =oh :setlocal <C-R>=(&hlsearch       ? 'nohlsearch'       : 'hlsearch')<CR><CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
 nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
 nnoremap ]q :cnext<CR>
@@ -134,28 +142,45 @@ nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
 
+" easier to exit insert more
 inoremap jk <Esc>
 
-nnoremap <Space>q :noh<return><esc>
-
+" smarter pasting
 nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
 xnoremap <silent> <Space>p p=']
 xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
+" misc functions
 nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
+cnoremap <expr> <CR> CCR()
 
+" [I ]I smarter
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
+" better tag jumping
 nnoremap <C-]> g<C-]>
-nnoremap <expr> g<C-]> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
+nnoremap <expr> <C-w><C-]> len(getwininfo()) > 1
+      \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
+      \: ":vertical stjump \<C-r>\<C-w>\<CR>"
+nnoremap <expr> <C-w>] len(getwininfo()) > 1
+      \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
+      \: ":vertical stjump \<C-r>\<C-w>\<CR>"
 nnoremap <C-_> :stjump <C-r><C-w><CR>
 nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
-nnoremap <expr> g<C-_> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>" : ":stjump \<C-r>\<C-w>\<CR>")
-nnoremap <expr> g<C-Bslash> (len(getwininfo()) > 1 ? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>" : ":vertical stjump \<C-r>\<C-w>\<CR>")
+nnoremap <expr> g<C-_> len(getwininfo()) > 1
+      \? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>"
+      \: ":stjump \<C-r>\<C-w>\<CR>"
+nnoremap <expr> g<C-Bslash> len(getwininfo()) > 1
+      \? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>"
+      \: ":vertical stjump \<C-r>\<C-w>\<CR>"
 
+" better file jumping
+nnoremap <silent> <expr> <C-w>f len(getwininfo()) > 1
+      \? ":let fname=\"\<C-r>\<C-f>\"\|execute \"normal! \\<lt>C-w>p\"\<CR>:find \<C-r>=fname\<CR>\<CR>"
+      \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -181,6 +206,25 @@ endfunction
 
 command! -range=% FormatJSON <line1>,<line2>!python -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+
+
+" make list-like commands more intuitive
+" including this here to avoid screwing up command mode
+function! CCR() abort
+  let cmdline = getcmdline()
+  if cmdline =~? '\v\C^(ls|files|buffers)' | return "\<CR>:b "
+  elseif cmdline =~? '\v\C^(dli|il)'       | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
+  elseif cmdline =~? '\v\C^(cli|lli)'      | return "\<CR>:sil ".repeat(cmdline[0], 2)."\<Space>"
+  elseif cmdline =~? '\C^old'              | return "\<CR>:e #<"
+  elseif cmdline =~? '\C^changes'          | set nomore | return "\<CR>:set more|norm! g;\<S-Left>"
+  elseif cmdline =~? '\C^ju'               | set nomore | return "\<CR>:set more|norm! \<C-o>\<S-Left>"
+  elseif cmdline =~? '\C^marks'            | return "\<CR>:norm! `"
+  elseif cmdline =~? '\C^undol'            | return "\<CR>:u "
+  else                                     | return "\<CR>"
+  endif
+endfunction
+
+" }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              STATUSLINE SETUP

@@ -2,6 +2,7 @@
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
+
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
 set whichwrap+=<,>,h,l                        " arrow keys and h,l move to the next line
