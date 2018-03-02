@@ -5,10 +5,12 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 battery_interpolation=(
 	"\#{battery_percentage}"
 	"\#{battery_status_fg}"
+    "\#{battery_remain}"
 )
 battery_commands=(
 	"#($CURRENT_DIR/battery_percentage.sh)"
 	"#($CURRENT_DIR/tmux_battery.sh)"
+    "#($CURRENT_DIR/battery_remain.sh)"
 )
 
 get_tmux_option() {
