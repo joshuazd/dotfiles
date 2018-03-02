@@ -6,8 +6,9 @@ export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94:ln=01;36:*.mp4=01;35:*.tar
 export LANG=en_US.UTF-8
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
 export ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
+export TMUX_CUSTOM=$HOME/dotfiles/tmux
 
-source $HOME/dotfiles/zsh_custom/mvncolor.sh
+source $ZSH_CUSTOM/mvncolor.sh
 
 # setup prompt
 autoload -Uz promptinit
