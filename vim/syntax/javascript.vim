@@ -13,13 +13,13 @@
 " tuning parameters:
 " unlet javaScript_fold
 
-if !exists("main_syntax")
+if !exists('main_syntax')
   " quit when a syntax file was already loaded
-  if exists("b:current_syntax")
+  if exists('b:current_syntax')
     finish
   endif
   let main_syntax = 'javascript'
-elseif exists("b:current_syntax") && b:current_syntax == "javascript"
+elseif exists('b:current_syntax') && b:current_syntax ==# 'javascript'
   finish
 endif
 
@@ -35,8 +35,8 @@ syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommen
 syn match   javaScriptCommentSkip      "^[ \t]*\*\($\|[ \t]\+\)"
 syn region  javaScriptComment	       start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo
 syn match   javaScriptSpecial	       "\\\d\d\d\|\\."
-syn region  javaScriptStringD	    matchgroup=StringPunct   start=+"+  skip=+\\\\\|\\"+  end=+"\|$+	contains=javaScriptSpecial,@htmlPreproc
-syn region  javaScriptStringS	    matchgroup=StringPunct   start=+'+  skip=+\\\\\|\\'+  end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
+syn region  javaScriptStringD	    matchgroup=StringDelimiter start=+"+  skip=+\\\\\|\\"+  end=+"\|$+	contains=javaScriptSpecial,@htmlPreproc
+syn region  javaScriptStringS	    matchgroup=StringDelimiter start=+'+  skip=+\\\\\|\\'+  end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
 
 syn match javaScriptPunct ",\|;"
 syn match javaScriptArg "\h\w*" contained
@@ -79,7 +79,7 @@ syn match javaScriptItemAccess "\h\w*\[\@="
 syn match javaScriptField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9(\[]\|$\)\@="
 syn match javaScriptField "\.\@<=\h\w*\(\.\h\w*[(\[]\)\@="
 
-if exists("javaScript_fold")
+if exists('javaScript_fold')
     syn match	javaScriptFunction	"\<function\>"
     syn match   javaScriptFunction      "\<function\>" nextgroup=javaScriptFuncParams
     syn region	javaScriptFunctionFold	start="\<function\>.*[^};]$" end="^\z1}.*$" transparent fold keepend
@@ -99,7 +99,7 @@ endif
 syn sync fromstart
 syn sync maxlines=100
 
-if main_syntax == "javascript"
+if main_syntax ==# 'javascript'
   syn sync ccomment javaScriptComment
 endif
 
@@ -150,8 +150,8 @@ hi def link javaScriptItemAccess        Special
 highlight javaScriptField ctermfg=250 guifg=#bcbcbc
 
 
-let b:current_syntax = "javascript"
-if main_syntax == 'javascript'
+let b:current_syntax = 'javascript'
+if main_syntax ==# 'javascript'
   unlet main_syntax
 endif
 let &cpo = s:cpo_save
