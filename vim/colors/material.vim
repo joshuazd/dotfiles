@@ -84,7 +84,7 @@ exe 'hi! CursorLineNR    ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' cterm
 exe 'hi! CursorColumn    ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
 exe 'hi! FoldColumn      ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 exe 'hi! SignColumn      ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
-exe 'hi! Folded          ctermfg=' .s:t_lgrey   .' guifg=' .s:g_lgrey   .' ctermbg=233                                       cterm=none gui=none'
+exe 'hi! Folded          ctermfg=' .s:t_lgrey   .' guifg=' .s:g_lgrey   .' ctermbg=232               guibg=#080808           cterm=none gui=none'
 
 " -------------------------
 " - Window/Tab delimiters - 

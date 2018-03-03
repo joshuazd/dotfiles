@@ -53,13 +53,14 @@ set autowrite                                 " automatically save before :next,
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
 set signcolumn=no                             " don't have signcolumn on
-set fillchars=stl:\ ,stlnc:\ ,fold:─,diff:─   " use box chars for folds, etc
+" set fillchars=stl:\ ,stlnc:\ ,fold:─,diff:─   " use box chars for folds, etc
 set tags=./tags,tags                          " where to find tag files
 set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 set modeline                                  " read modelines
 set shortmess+=c                              " don't show completion errors
 set winminheight=0                            " minimum window size 0x0
 set winminwidth=0
+set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 colorscheme material                          " material color scheme
 if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
@@ -250,6 +251,7 @@ function! CCR() abort
   else                                     | return "\<CR>"
   endif
 endfunction
+
 
 " }}}
 
