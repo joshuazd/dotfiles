@@ -2,7 +2,6 @@
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
 set whichwrap+=<,>,h,l                        " arrow keys and h,l move to the next line
@@ -33,6 +32,7 @@ set scrolloff=999                             " Set 999 lines to the cursor - wh
 set sidescroll=1                              " scroll 1 character at a time
 set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
 set foldmethod=marker                         " fold based on syntax
+set formatoptions-=o                          " Don't insert comment leader on `o`
 set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full           " setup wildmenu
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup " Ignore compiled files
@@ -41,9 +41,8 @@ set wildignore+=tags,Session.vim              " Ignore tags and session files
 set wildignorecase                            " ignore case in wildmenu
 set sessionoptions-=options                   " make sessions work better with plugins
 set sessionoptions-=blank
-set backupdir=/tmp                            " Better backups
-set noswapfile
-set foldlevel=99                              " don't fold things by default
+set noswapfile                                " do not create swap files
+set foldlevel=4                               " don't fold things by default
 set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:$,nbsp:␣ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
 set completeopt+=menuone,noselect,noinsert    " configure popup menu
@@ -53,7 +52,6 @@ set autowrite                                 " automatically save before :next,
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
 set signcolumn=no                             " don't have signcolumn on
-" set fillchars=stl:\ ,stlnc:\ ,fold:─,diff:─   " use box chars for folds, etc
 set tags=./tags,tags                          " where to find tag files
 set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 set modeline                                  " read modelines
@@ -221,7 +219,7 @@ augroup EditVim
   autocmd BufNewFile,BufRead *.dbs        set filetype=xml
   autocmd BufNewFile,BufRead *.dmc        set filetype=javascript
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-  autocmd FileType           *            set formatoptions-=o       " Don't insert comment when using 'o'
+  " autocmd FileType           *            set formatoptions-=o       " Don't insert comment when using 'o'
   autocmd FileType           markdown     set syntax=markdown
   autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
