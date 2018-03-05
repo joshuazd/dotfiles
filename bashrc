@@ -30,7 +30,7 @@ function parse_git_branch() {
     fi
 }
 
-export PS1="\[\e[32m\]\u\[\e[m\] \[\e[33m\]\W\[\e[m\] \[\e[31m\]\`parse_git_branch\`\[\e[m\]\[\e[34m\]\\$\[\e[m\] "
+export PS1="\[\e[92m\]\u\[\e[m\] \[\e[94m\]\W\[\e[m\] \[\e[91m\]\`parse_git_branch\`\[\e[m\]\[\e[33m\]\\$\[\e[m\] "
 # History Options
 #
 # Don't put duplicate lines in the history.
