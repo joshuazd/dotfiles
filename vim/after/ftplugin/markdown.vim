@@ -1,6 +1,8 @@
 setlocal formatoptions+=r
+setlocal formatoptions+=o
 setlocal formatoptions-=c
 setlocal comments=b:-\ [\ ]
+setlocal comments+=b:*\ [\ ]
 setlocal comments+=b:*,b:+,b:-
 setlocal comments+=b:>
 setlocal formatoptions+=o
