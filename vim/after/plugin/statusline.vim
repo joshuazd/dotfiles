@@ -24,6 +24,12 @@ let g:mode_hi = {
       \'ReplaceMode' : ' ctermfg=167 guifg=#d75f5f ctermbg=235 guibg=#262626',
       \'CommandMode' : ' ctermfg=176 guifg=#c792ea ctermbg=235 guibg=#262626'}
 
+function! s:updateStatusLineHighlight(nr,newMode) abort
+  execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold gui=bold'
+  execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none gui=none'
+  return 1
+endfunction
+
 function! StatusLineColors() abort
   highlight StlDim       ctermbg=235 guibg=#262626 ctermfg=242 guifg=#6c6c6c cterm=NONE gui=NONE
   highlight StlDimNC     ctermbg=242 guibg=#6c6c6c ctermfg=235 guifg=#262626 cterm=NONE gui=NONE
@@ -31,6 +37,7 @@ function! StatusLineColors() abort
   highlight StatusLine   ctermbg=235 guibg=#262626 ctermfg=252 guifg=#d0d0d0 cterm=NONE gui=NONE
   highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
   highlight StlLinter    ctermbg=1   guibg=#e53935 ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
+  call s:updateStatusLineHighlight(winnr(),mode())
 endfunction
 
 call StatusLineColors()
@@ -42,12 +49,6 @@ augroup END
 
 function! TagsStatusLine() abort
   return (!exists('*gutentags#statusline') ? '' : gutentags#statusline())
-endfunction
-
-function! s:updateStatusLineHighlight(nr,newMode) abort
-  execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold gui=bold'
-  execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none gui=none'
-  return 1
 endfunction
 
 function! SetupStatusLine(nr) abort
