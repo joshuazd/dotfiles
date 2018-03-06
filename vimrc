@@ -93,6 +93,7 @@ Plug 'tpope/vim-obsession'
 Plug 'tpope/vim-repeat'
 Plug 'tommcdo/vim-lion'
 Plug 'romainl/vim-qf'
+Plug 'romainl/vim-qlist'
 Plug 'justinmk/vim-dirvish'
 Plug 'xtal8/traces.vim'
 Plug 'sgur/vim-editorconfig'
@@ -115,7 +116,6 @@ nnoremap ; :
 xnoremap ; :
 nnoremap L $
 nnoremap H ^
-nnoremap <CR> i<CR><Esc>
 
 " set hlsearch and nohlsearch dynamically-ish
 nnoremap n :set hlsearch<CR>n
@@ -180,10 +180,6 @@ xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
 nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
-
-" [I ]I smarter
-nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
-nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 " better tag jumping
 nnoremap <C-]> g<C-]>

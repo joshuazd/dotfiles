@@ -42,3 +42,8 @@ if exists('g:mucomplete#chains')
   imap <c-y> <plug>(MUcompleteCty)
 endif
 
+if exists("g:loaded_qlist") && g:loaded_qlist == 1
+  
+  nnoremap <Space>i :Ilist<space>
+
+endif

@@ -39,8 +39,6 @@ set cpoptions-=<
 set tags=./tags,tags
 filetype indent on
 
-nnoremap ; :
-xnoremap ; :
 nnoremap L $
 nnoremap H ^
 
@@ -72,5 +70,8 @@ nnoremap <Space>i :ilist /
 inoremap jk <esc>
 
 nnoremap <C-]> g<C-]>
+
+nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
+nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]

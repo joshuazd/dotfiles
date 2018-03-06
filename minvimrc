@@ -89,11 +89,8 @@ runtime macros/matchit.vim
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 " for convenience
-nnoremap ; :
-xnoremap ; :
 nnoremap L $
 nnoremap H ^
-nnoremap <CR> i<CR><Esc>
 
 " set hlsearch and nohlsearch dynamically-ish
 nnoremap n :set hlsearch<CR>n
