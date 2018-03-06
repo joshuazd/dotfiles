@@ -1,10 +1,16 @@
 setlocal formatoptions+=r
 setlocal formatoptions+=o
 setlocal formatoptions-=c
-setlocal comments=b:-\ [\ ]
+setlocal comments=b:[\ ]
+setlocal comments+=b:-\ [\ ]
 setlocal comments+=b:*\ [\ ]
 setlocal comments+=b:*,b:+,b:-
 setlocal comments+=b:>
 setlocal formatoptions+=o
 setlocal foldexpr=MarkdownFold()
 setlocal foldmethod=expr
+" setlocal statusline+=%{wordcount()['words']}
+" let &statusline .= ' %{wordcount()["words"]}'
+" let b:statl = ' %{wordcount()["words"]}'
+let extra="%{wordcount()['words']} words "
+setlocal statusline=%!BuildStatusLine(winnr(),extra)

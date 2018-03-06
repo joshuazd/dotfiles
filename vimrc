@@ -112,8 +112,6 @@ runtime macros/matchit.vim
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 " for convenience
-nnoremap ; :
-xnoremap ; :
 nnoremap L $
 nnoremap H ^
 

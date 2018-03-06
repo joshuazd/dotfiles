@@ -63,7 +63,7 @@ function! SetupStatusLine(nr) abort
         \ }), '', '')
 endfunction
 
-function! BuildStatusLine(nr) abort
+function! BuildStatusLine(nr, extra) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
         \%0* %f%m
@@ -74,7 +74,7 @@ function! BuildStatusLine(nr) abort
         \%#StlDimNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}
         \%0*%{w:["lf_active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}
-        \%0*'
+        \%0*' . a:extra
 endfunction
 
-set statusline=%!BuildStatusLine(winnr())
+set statusline=%!BuildStatusLine(winnr(),'')
