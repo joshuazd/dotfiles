@@ -220,7 +220,6 @@ augroup EditVim
   autocmd BufNewFile,BufRead *.dmc        set filetype=javascript
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
   " autocmd FileType           *            set formatoptions-=o       " Don't insert comment when using 'o'
-  autocmd FileType           markdown     set syntax=markdown
   autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
 augroup END
@@ -289,4 +288,6 @@ let g:sneak#use_ic_scs = 1
 " netrw
 let g:loaded_netrw       = 1
 let g:loaded_netrwPlugin = 1
+" markdown
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh']
 " }}}
