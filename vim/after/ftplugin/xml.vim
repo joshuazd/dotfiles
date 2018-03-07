@@ -12,6 +12,7 @@ command! Lint cexpr system('xmllint --noout ' . shellescape(expand('%')))
 setlocal omnifunc=xmlcomplete#CompleteTags
 compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
+setlocal formatprg=xmllint\ --format\ -
 setlocal syntax=xml
 setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/,*_DataMapper/
 set suffixesadd+=.xml
