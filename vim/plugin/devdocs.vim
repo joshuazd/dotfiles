@@ -1,13 +1,14 @@
 function! s:Get_env() abort
-    if has('win64') || has('win32') || has('win16')
-        return 'WINDOWS'
-    else
-        return toupper(substitute(system('uname'), '\n', '', ''))
-    endif
+  if has('win64') || has('win32') || has('win16')
+    return 'WINDOWS'
+  elseif has('unix')
+    return 'LINUX'
+    " return toupper(substitute(system('uname'), '\n', '', ''))
+  endif
 endfunction
 
 " What command to use on what system
-let s:cmds = {"DARWIN": "open", "LINUX": "xdg-open", "WINDOWS": "start"}
+let s:cmds = {'DARWIN': 'open', 'LINUX': 'xdg-open', 'WINDOWS': 'start'}
 
 " Build the URL stub
 let s:stub = s:cmds[<SID>Get_env()] . " 'http://devdocs.io/?q="
