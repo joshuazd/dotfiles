@@ -116,7 +116,8 @@ exe 'hi! MoreMsg         ctermfg=' .s:t_bgreen  .' guifg=' .s:g_bgreen  .' cterm
 " --------------
 exe 'hi! MatchParen      ctermfg=' .s:t_bcyan   .' guifg=' .s:g_bcyan   .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
 exe 'hi! Visual          ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_dgrey   .' guibg=' .s:g_dgrey   .' cterm=none gui=none'
-exe 'hi! NonText         ctermfg=' .s:t_dgrey   .' guifg=' .s:g_dgrey   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+" exe 'hi! NonText         ctermfg=' .s:t_dgrey   .' guifg=' .s:g_dgrey   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! NonText         ctermfg=60'            .' guifg=#5f5f87'       .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
 exe 'hi! Todo            ctermfg=' .s:t_green   .' guifg=' .s:g_green   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=bold gui=bold'
 exe 'hi! Underlined      ctermfg=' .s:t_blue    .' guifg=' .s:g_blue    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=underline gui=underline'
@@ -124,7 +125,7 @@ exe 'hi! Error           ctermfg=' .s:t_dpurple .' guifg=' .s:g_dpurple .' cterm
 exe 'hi! ErrorMsg        ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_red     .' guibg=' .s:g_red     .' cterm=none gui=none'
 exe 'hi! WarningMsg      ctermfg=' .s:t_black   .' guifg=' .s:g_black   .' ctermbg=' .s:t_orange  .' guibg=' .s:g_orange  .' cterm=none gui=none'
 exe 'hi! Ignore          ctermfg=' .s:t_none    .' guifg=' .s:g_none    .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
-exe 'hi! SpecialKey      ctermfg=' .s:t_dgrey   .' guifg=' .s:g_dgrey   .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
+exe 'hi! SpecialKey      ctermfg=60'            .' guifg=#5f5f87'       .' ctermbg=' .s:t_bg      .' guibg=' .s:g_bg      .' cterm=none gui=none'
 
 " --------------------------------
 " Variable types
