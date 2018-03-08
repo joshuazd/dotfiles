@@ -43,7 +43,7 @@ set sessionoptions-=options                   " make sessions work better with p
 set sessionoptions-=blank
 set noswapfile                                " do not create swap files
 set foldlevel=4                               " don't fold things by default
-set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:$,nbsp:␣ " what to show for whitespace chars
+set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:¬,nbsp:␣ " what to show for whitespace chars
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
 set completeopt+=menuone,noselect,noinsert    " configure popup menu
 set concealcursor+=n                          " conceal characters in normal mode
