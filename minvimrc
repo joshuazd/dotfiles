@@ -229,3 +229,9 @@ endfunction
 " {{{
 set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
 " }}}
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+"              VARIABLES
+""""""""""""""""""""""""""""""""""""""""""""""""
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh']
