@@ -145,6 +145,8 @@ prompt_pure_preprompt_render() {
 	# 	preprompt+=$'\n'
 	# fi
 
+    local symbol_color_first="203"
+    local symbol_color_middle="221"
 	local symbol_color="%(?.${PURE_PROMPT_SYMBOL_COLOR:-magenta}.red)"
 
 	# username and machine if applicable
@@ -157,7 +159,9 @@ prompt_pure_preprompt_render() {
 	preprompt+=" %F{$STATUS_COLOR}%c%f"
 	preprompt2+=" %c"
 	# begin with symbol, colored by previous command exit code
-	preprompt+=" %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}%f"
+	preprompt+=" %F{$symbol_color_first}${PURE_PROMPT_SYMBOL:-❯}"
+	preprompt+="%F{$symbol_color_middle}${PURE_PROMPT_SYMBOL:-❯}"
+	preprompt+="%F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}%f"
 	# git info
 	postprompt+="%F{$git_color}${vcs_info_msg_0_}${prompt_pure_git_dirty}%f"
 	# git pull/push arrows
