@@ -145,8 +145,8 @@ prompt_pure_preprompt_render() {
 	# 	preprompt+=$'\n'
 	# fi
 
-    local symbol_color_first="203"
-    local symbol_color_middle="221"
+    local symbol_color_first="%(?.203.red)"
+    local symbol_color_middle="%(?.221.red)"
 	local symbol_color="%(?.${PURE_PROMPT_SYMBOL_COLOR:-magenta}.red)"
 
 	# username and machine if applicable
