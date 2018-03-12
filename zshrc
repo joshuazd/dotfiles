@@ -2,7 +2,7 @@ case "$TERM" in
     xterm*) TERM=xterm-256color
 esac
 
-export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94:ln=01;36:*.mp4=01;35:*.tar=01,31:*.tgz=01;31:*.zip=01;31:*.rar=01;31:*.jar=01;31:*.car=01;31:*.war=01;31:*.gz=01;31:*.bz2=01;31:*.png=01;35:*.jpg=01;35:*.jpeg=01;35:*.bmp=01;35:*.gif=01;35'
+export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94:ln=01;36:*.mp4=00;35:*.tar=00,31:*.tgz=00;31:*.zip=00;31:*.rar=00;31:*.jar=00;31:*.car=00;31:*.war=00;31:*.gz=00;31:*.bz2=00;31:*.png=00;35:*.jpg=00;35:*.jpeg=00;35:*.bmp=00;35:*.gif=00;35:*.vim=00;93:*vimrc=00;93:*.py=00;95:*.xml=00;91:*.md=00;97'
 export WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
 export LANG=en_US.UTF-8
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
