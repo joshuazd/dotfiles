@@ -1,6 +1,6 @@
 set nocompatible
-" set runtimepath-=$HOME/.vim
-" set runtimepath-=$HOME/.vim/after
+set runtimepath-=$HOME/.vim
+set runtimepath-=$HOME/.vim/after
 set backspace=indent,eol,start
 set hidden
 set ignorecase smartcase
