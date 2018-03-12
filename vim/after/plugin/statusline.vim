@@ -67,13 +67,13 @@ function! BuildStatusLine(nr, extra) abort
   return '%{SetupStatusLine('.a:nr.')}
         \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
         \%0* %f%m
-        \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? " RO" : ""}%0*
+        \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? "  RO" : ""}%0*
         \%=
-        \%{g:in_snippet > 0 ? "snippet" : ""} %{w:["lf_active"] ? TagsStatusLine() != "" ? " ".TagsStatusLine()." " : " " : " "}
-        \%#StlDim#%{&syntax == "" ? "" : w:["lf_active"] ? " ".&syntax." " : ""}
-        \%#StlDimNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
-        \%#ModeNoBold#%{w:["lf_active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}
-        \%0*%{w:["lf_active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}
+        \%{g:in_snippet > 0 ? "snippet" : ""} %{w:["lf_active"] ? TagsStatusLine() != "" ? "  ".TagsStatusLine()." " : " " : " "}
+        \%#StlDim#%{&syntax == "" ? "" : w:["lf_active"] ? " ".&syntax." " : ""}
+        \%#StlDimNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
+        \%#ModeNoBold#%{w:["lf_active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}
+        \%0*%{w:["lf_active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}
         \%0*' . a:extra . '%#Normal#'
 endfunction
 
