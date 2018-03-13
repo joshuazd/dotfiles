@@ -23,14 +23,13 @@ function parse_git_branch() {
     BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
     if [ ! "${BRANCH}" == "" ]
     then
-        #STAT=`parse_git_dirty`
         echo "[${BRANCH}] "
     else
         echo ""
     fi
 }
 
-export PS1="\[\e[92m\]\u\[\e[m\] \[\e[94m\]\W\[\e[m\] \[\e[91m\]\`parse_git_branch\`\[\e[91m\]❯\[\e[m\]\[\e[93m\]❯\[\e[m\]\[\e[92m\]❯\[\e[m\] "
+export PS1=" \[\e[94m\]\W\[\e[m\] \[\e[35m\]\`parse_git_branch\`\[\e[91m\]❯\[\e[m\]\[\e[93m\]❯\[\e[m\]\[\e[92m\]❯\[\e[m\] "
 # History Options
 #
 # Don't put duplicate lines in the history.
