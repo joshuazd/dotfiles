@@ -207,7 +207,6 @@ nnoremap <silent> <expr> <C-w>f len(getwininfo()) > 1
 " {{{
 augroup EditVim
   autocmd!
-  autocmd InsertLeave        *            if pumvisible() == 0|pclose|endif
   autocmd BufNewFile,BufRead *.zsh-theme  set filetype=zsh
   autocmd BufNewFile,BufRead *.dbs        set filetype=xml
   autocmd BufNewFile,BufRead *.dmc        set filetype=javascript

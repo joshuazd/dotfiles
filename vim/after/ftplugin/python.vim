@@ -1,10 +1,12 @@
 setlocal foldmethod=indent
 if exists(':JediDebugInfo')
   setlocal omnifunc=jedi#completions
+  nunmap <buffer> K
 else
   setlocal omnifunc=python3complete#Complete
   inoremap <buffer> <silent> . .<C-x><C-o>
 endif
+setlocal keywordprg=pydoc
 command! Lint cexpr system('flake8 ' . shellescape(expand('%')))
 setlocal makeprg=flake8\ %:S
 setlocal errorformat=%f:%l:%c:\ %t%n\ %m
