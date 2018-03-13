@@ -1,37 +1,37 @@
 if !hasmapto('<Plug>IndentMotionInner', 'o')
-  omap ii <Plug>IndentMotionInner
+  omap <silent> ii <Plug>IndentMotionInner
 endif
 if !hasmapto('<Plug>IndentMotionUpper', 'o')
-  omap ai <Plug>IndentMotionUpper
+  omap <silent> ai <Plug>IndentMotionUpper
 endif
 if !hasmapto('<Plug>IndentMotionAround', 'o')
-  omap aI <Plug>IndentMotionAround
+  omap <silent> aI <Plug>IndentMotionAround
 endif
 if !hasmapto('<Plug>IndentMotionInner', 'v')
-  xmap ii <Plug>IndentMotionInner
+  xmap <silent> ii <Plug>IndentMotionInner
 endif
 if !hasmapto('<Plug>IndentMotionUpper', 'v')
-  xmap ai <Plug>IndentMotionUpper
+  xmap <silent> ai <Plug>IndentMotionUpper
 endif
 if !hasmapto('<Plug>IndentMotionAround', 'v')
-  xmap aI <Plug>IndentMotionAround
+  xmap <silent> aI <Plug>IndentMotionAround
 endif
 if !hasmapto('<Plug>IndentMotionDown', 'n')
-  nmap ,j <Plug>IndentMotionDown
+  nmap <silent> ,j <Plug>IndentMotionDown
 endif
 if !hasmapto('<Plug>IndentMotionUp', 'n')
-  nmap ,k <Plug>IndentMotionUp
+  nmap <silent> ,k <Plug>IndentMotionUp
 endif
 if !hasmapto('<Plug>IndentMotionDown', 'x')
-  xmap ,j <Plug>IndentMotionDown
+  xmap <silent> ,j <Plug>IndentMotionDown
 endif
 if !hasmapto('<Plug>IndentMotionUp', 'x')
-  xmap ,k <Plug>IndentMotionUp
+  xmap <silent> ,k <Plug>IndentMotionUp
 endif
 if !hasmapto('<Plug>IndentMotionDown', 'o')
-  omap ,j <Plug>IndentMotionDown
+  omap <silent> ,j <Plug>IndentMotionDown
 endif
 if !hasmapto('<Plug>IndentMotionUp', 'o')
-  omap ,k <Plug>IndentMotionUp
+  omap <silent> ,k <Plug>IndentMotionUp
 endif
 
