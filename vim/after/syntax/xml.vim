@@ -22,7 +22,7 @@ syn match   xsltStatement '\<for-each\>'                                        
 syn match   xmlFile '\k\+_\(Logger\|XSLT\|EP\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)' display contained
 
 " XML Attributes
-syn match   xmlUrl '\(url-mapping\|uri-template\)' display contained
+" syn match   xmlUrl '\(url-mapping\|uri-template\)' display contained
 
 syn keyword xmlMethod GET POST PUT PATCH DELETE get post put patch delete contained
 syn keyword xmlName   expression value regex name action select source    contained
@@ -55,16 +55,17 @@ highlight xmlXsl        ctermfg=1   guifg=#ff5370
 
 highlight xmlExpression ctermfg=203 guifg=#ff5f5f cterm=italic gui=italic
 highlight xmlSelect     ctermfg=221 guifg=#ffcb6b cterm=italic gui=italic
-highlight xmlUrl        ctermfg=36  guifg=#00af87 cterm=italic gui=italic
+" highlight xmlUrl        ctermfg=66  guifg=#00af87 cterm=italic gui=italic
 highlight xmlName       ctermfg=152 guifg=#afd7d7
 highlight xmlLog        ctermfg=245 guifg=#bbbbbb
-highlight xmlSqlTag     ctermfg=208 guifg=#ff5f00
+highlight xmlSqlTag     ctermfg=209 guifg=#ff5f00
 highlight xmlLogParam   ctermfg=243 guifg=#8a8a8a
 highlight xmlFile       ctermfg=103 guifg=#8787af cterm=bold   gui=bold
 highlight xmlMethod     ctermfg=203 guifg=#ff5f5f cterm=bold   gui=bold
 
 hi def link xmlArgs         Primitive
 hi def link xmlConnection   StorageClass
+hi def link xmlSqlTag       Builtin
 hi def link xmlValue        xmlExpression
 hi def link xmlFile         diffAdded
 hi def link xmlInSequence   Identifier

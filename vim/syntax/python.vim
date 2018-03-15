@@ -374,11 +374,12 @@ hi link  pythonBuiltinType  StringDelimiter
 "highlight pythonBuiltinType ctermfg=156
 hi link  pythonBuiltinObj   Structure
 hi link  pythonBuiltinFunc  Function
-highlight pythonBuiltinFunc ctermfg=208 guifg=#ff8700
+" highlight pythonBuiltinFunc ctermfg=209 guifg=#ff8700
+hi link  pythonBuiltinFunc  Builtin
 
 hi link  pythonPreProc      PreProc
 hi link  pythonItemAccess   Special
-highlight pythonField ctermfg=250 guifg=#bcbcbc
+highlight pythonField ctermfg=245 guifg=#8a8a8a
 
 hi link  pythonExClass      Structure
 hi link  pythonJedi         Type
