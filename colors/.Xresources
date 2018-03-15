@@ -92,6 +92,9 @@ URxvt*altSendsEscape: true
 URxvt*BorderWidth: 0
 URxvt.lineSpace: 0
 URxvt.letterSpace: 0
+URxvt*scrollTtyOutput:      false
+URxvt*scrollWithBuffer:     true
+URxvt*scrollTtyKeypress:    true
 
 urxvt*depth: 32
 urxvt*background: [95]#262626
