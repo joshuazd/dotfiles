@@ -24,7 +24,9 @@
 # \e[2K => clear everything on the current line
 
 PURER_PROMPT_COMMAND_COUNT=0
-PURE_PROMPT_SYMBOL_COLOR='107'
+PURE_PROMPT_SYMBOL_COLOR_LAST='108'
+PURE_PROMPT_SYMBOL_COLOR_MIDDLE='222'
+PURE_PROMPT_SYMBOL_COLOR_FIRST='203'
 STATUS_COLOR='111'
 
 
@@ -145,9 +147,9 @@ prompt_pure_preprompt_render() {
 	# 	preprompt+=$'\n'
 	# fi
 
-    local symbol_color_first="%(?.203.red)"
-    local symbol_color_middle="%(?.221.red)"
-	local symbol_color="%(?.${PURE_PROMPT_SYMBOL_COLOR:-magenta}.red)"
+    local symbol_color_first="%(?.${PURE_PROMPT_SYMBOL_COLOR_FIRST}.red)"
+    local symbol_color_middle="%(?.${PURE_PROMPT_SYMBOL_COLOR_MIDDLE}.red)"
+	local symbol_color="%(?.${PURE_PROMPT_SYMBOL_COLOR_LAST}.red)"
 
 	# username and machine if applicable
 	preprompt+=$prompt_pure_username
