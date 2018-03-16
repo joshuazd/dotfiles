@@ -218,8 +218,7 @@ augroup END
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
 
 command! -range=% FormatJSON <line1>,<line2>!python2 -c
-      \"import json, sys, collections; print ".
-      \"json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
 
 command! -range=% AE <line1>,<line2>yank a|silent! call functions#AnsibleEdit()
 command! AC call functions#AnsibleEncrypt()

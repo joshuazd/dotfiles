@@ -310,11 +310,12 @@ hi link  pythonClass        Function
 highlight pythonClass ctermfg=67 guifg=#5f87af cterm=bold gui=bold
 hi link  pythonParameters   Normal
 hi link  pythonParam        Identifier
-hi link  pythonBrackets     PreProc
+hi link  pythonBrackets     Delimiter
 hi link  pythonClassParameters Normal
 hi link  pythonSelf         Identifier
-highlight pythonSelf ctermfg=3 guifg=#ffb62c cterm=italic gui=italic
+" highlight pythonSelf ctermfg=3 guifg=#ffb62c cterm=italic gui=italic
 " highlight pythonSelf ctermfg=214 cterm=italic gui=italic
+hi link  pythonSelf         Primitive
 
 hi link  pythonMagic        Language
 
@@ -371,13 +372,10 @@ hi link  pythonHexError     Error
 hi link  pythonBinError     Error
 
 hi link  pythonBuiltinType  StringDelimiter
-"highlight pythonBuiltinType ctermfg=156
 hi link  pythonBuiltinObj   Structure
 hi link  pythonBuiltinFunc  Function
-" highlight pythonBuiltinFunc ctermfg=209 guifg=#ff8700
 hi link  pythonBuiltinFunc  Builtin
 
-hi link  pythonPreProc      PreProc
 hi link  pythonItemAccess   Special
 highlight pythonField ctermfg=245 guifg=#8a8a8a
 

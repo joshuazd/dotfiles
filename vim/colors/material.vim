@@ -13,14 +13,15 @@ let s:red          = {'term' : '203', 'gui' : '#ff5f5f'}
 let s:boldred      = {'term' : '167', 'gui' : '#d75f5f'}
 let s:pink         = {'term' : '210', 'gui' : '#f07178'}
 let s:orange       = {'term' : '209', 'gui' : '#f76d47'}
-let s:yellow       = {'term' : '221', 'gui' : '#ffcb6b'}
-let s:boldyellow   = {'term' : '214', 'gui' : '#ffb62c'}
+let s:yellow       = {'term' : '222', 'gui' : '#ffcb6b'}
+let s:boldyellow   = {'term' : '215', 'gui' : '#ffb62c'}
 let s:green        = {'term' : '114', 'gui' : '#87d787'}
 let s:boldgreen    = {'term' : '108', 'gui' : '#87af87'}
 let s:blue         = {'term' : '111', 'gui' : '#82aaff'}
 let s:boldblue     = {'term' : '68',  'gui' : '#6182b8'}
 let s:cyan         = {'term' : '73',  'gui' : '#39adb5'}
 let s:boldcyan     = {'term' : '117', 'gui' : '#89ddff'}
+let s:bluegrey     = {'term' : '59',  'gui' : '#5f5f5f'}
 let s:purple       = {'term' : '140', 'gui' : '#af87d7'}
 let s:boldpurple   = {'term' : '97',  'gui' : '#945eb8'}
 let s:darkpurple   = {'term' : '53',  'gui' : '#5f005f'}
@@ -104,7 +105,7 @@ call s:h('Language',        s:pink,       s:background,   'none')
 call s:h('Special',         s:red,        s:background,   'none')
 call s:h('SpecialChar',     s:cyan,       s:background,   'bold')
 call s:h('Tag',             s:red,        s:background,   'none')
-call s:h('Delimiter',       s:boldcyan,   s:background,   'none')
+call s:h('Delimiter',       s:bluegrey,   s:background,   'none')
 
 call s:h('PreProc',         s:boldcyan,   s:background,   'none')
 call s:h('Include',         s:purple,     s:background,   'none')
