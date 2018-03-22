@@ -68,7 +68,7 @@ hi def link xmlConnection   StorageClass
 hi def link xmlSqlTag       Builtin
 hi def link xmlValue        xmlExpression
 hi def link xmlFile         diffAdded
-hi def link xmlInSequence   Identifier
+hi def link xmlInSequence   Normal
 hi def link xmlEnrich       Operator
 hi def link xmlFunction     Function
 hi def link xmlSend         Function

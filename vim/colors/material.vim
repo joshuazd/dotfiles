@@ -20,7 +20,7 @@ let s:boldgreen    = {'term' : '108', 'gui' : '#87af87'}
 let s:blue         = {'term' : '111', 'gui' : '#82aaff'}
 let s:boldblue     = {'term' : '68',  'gui' : '#6182b8'}
 let s:cyan         = {'term' : '73',  'gui' : '#39adb5'}
-let s:boldcyan     = {'term' : '117', 'gui' : '#89ddff'}
+let s:boldcyan     = {'term' : '116', 'gui' : '#87d7d7'}
 let s:bluegrey     = {'term' : '59',  'gui' : '#5f5f5f'}
 let s:purple       = {'term' : '140', 'gui' : '#af87d7'}
 let s:boldpurple   = {'term' : '97',  'gui' : '#945eb8'}
@@ -126,6 +126,9 @@ call s:h('SpellBad',        s:darkpurple, s:boldred,      'none')
 call s:h('SpellCap',        s:darkpurple, s:boldblue,     'none')
 call s:h('SpellLocal',      s:cyan,       s:boldcyan,     'none')
 call s:h('SpellRare',       s:purple,     s:boldpurple,   'none')
+
+call s:h('StatusLine',      s:white,      s:darkgrey,     'none')
+call s:h('StatusLineNC',    s:black,      s:lightgrey,    'none')
 
 call s:h('Sneak',           s:white,      s:magenta,      'none')
 call s:h('SneakLabel',      s:white,      s:magenta,      'none')
