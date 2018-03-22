@@ -143,7 +143,7 @@ xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! 
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
-nnoremap <Space>f :find *
+nnoremap <Space>f :find<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
