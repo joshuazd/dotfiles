@@ -130,6 +130,10 @@ call s:h('SpellRare',       s:purple,     s:boldpurple,   'none')
 call s:h('StatusLine',      s:white,      s:darkgrey,     'none')
 call s:h('StatusLineNC',    s:black,      s:lightgrey,    'none')
 
+call s:h('TabLine',         s:black,      s:lightgrey,    'none')
+call s:h('TabLineFill',     s:black,      s:lightgrey,    'none')
+call s:h('TabLineSel',      s:white,      s:mediumgrey,   'bold')
+
 call s:h('Sneak',           s:white,      s:magenta,      'none')
 call s:h('SneakLabel',      s:white,      s:magenta,      'none')
 call s:h('SneakLabelMask',  s:magenta,    s:magenta,      'none')
