@@ -1,8 +1,5 @@
 set nocompatible
-set runtimepath-=$HOME/.vim
-set runtimepath-=$HOME/.vim/after
 set backspace=indent,eol,start
-set hidden
 set ignorecase smartcase
 set nowrap
 set clipboard^=unnamedplus
@@ -14,9 +11,10 @@ set showcmd
 set tags=./tags,tags
 filetype plugin indent on
 syntax on
+colorscheme material
 nnoremap L $
 nnoremap H ^
 nnoremap Y y$
 nnoremap gb :ls<CR>:b<space>
 inoremap jk <esc>
-set statusline=\ %f%m%r%h%w%=[%L][%{&ff}]%y[%03p%%][%04l,%04v]
+set statusline=\ %f%m%r%h%w%=%{&ff}\ \ %{&ft}\ \ %03p%%\ \ %04l,%04v\ 
