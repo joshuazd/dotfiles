@@ -306,8 +306,8 @@ hi link  pythonConstant     Constant
 hi link  pythonFunction     Function
 hi link  pythonFunctionCall Function
 hi link  pythonClass        Function
-" highlight pythonClass ctermfg=4 guifg=#82aaff cterm=none
-highlight pythonClass ctermfg=67 guifg=#5f87af cterm=bold gui=bold
+" highlight pythonClass ctermfg=67 guifg=#5f87af cterm=bold gui=bold
+hi link  pythonClass        Class
 hi link  pythonParameters   Normal
 hi link  pythonParam        Identifier
 hi link  pythonBrackets     Delimiter
@@ -331,8 +331,9 @@ hi link  pythonDottedName   Function
 hi link  pythonDot          Comment
 
 hi link  pythonComment      Comment
-hi! link  pythonCoding       Special
-highlight pythonCoding ctermfg=167 guifg=#e53935 cterm=italic gui=italic
+hi link  pythonCoding       Coding
+" highlight pythonCoding ctermfg=167 guifg=#e53935 cterm=italic gui=italic
+" highlight pythonCoding cterm=italic gui=italic
 hi link  pythonRun          Special
 hi link  pythonTodo         Todo
 

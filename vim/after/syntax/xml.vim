@@ -24,7 +24,6 @@ syn match   xmlFile '\k\+_\(Logger\|XSLT\|EP\|DM\|outputSchema\|OutputSchema\|in
 " XML Attributes
 " syn match   xmlUrl '\(url-mapping\|uri-template\)' display contained
 
-syn keyword xmlMethod GET POST PUT PATCH DELETE get post put patch delete contained
 syn keyword xmlName   expression value regex name action select source    contained
 
 syn keyword xmlNs  ns0 contained
@@ -36,7 +35,7 @@ syn cluster xmlTagHook       add=xmlSqlTag,xmlSend,xmlLog,xmlLogParam,xmlInSeque
 syn cluster xmlTagHook       add=xsltStatement
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
 syn cluster xmlAttribHook    add=xmlExpression,xmlValue,xmlSelect,xmlName,xmlUrl
-syn cluster xmlStringHook    add=xmlFile,xmlMethod
+syn cluster xmlStringHook    add=xmlFile
 
 let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
@@ -60,14 +59,13 @@ highlight xmlName       ctermfg=152 guifg=#afd7d7
 highlight xmlLog        ctermfg=245 guifg=#bbbbbb
 highlight xmlSqlTag     ctermfg=209 guifg=#ff5f00
 highlight xmlLogParam   ctermfg=243 guifg=#8a8a8a
-highlight xmlFile       ctermfg=103 guifg=#8787af cterm=bold   gui=bold
-highlight xmlMethod     ctermfg=203 guifg=#ff5f5f cterm=bold   gui=bold
+" highlight xmlFile       ctermfg=103 guifg=#8787af cterm=bold   gui=bold
 
 hi def link xmlArgs         Primitive
 hi def link xmlConnection   StorageClass
 hi def link xmlSqlTag       Builtin
 hi def link xmlValue        xmlExpression
-hi def link xmlFile         diffAdded
+hi def link xmlFile         Tag
 hi def link xmlInSequence   Normal
 hi def link xmlEnrich       Operator
 hi def link xmlFunction     Function
