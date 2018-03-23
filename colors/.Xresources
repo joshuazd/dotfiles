@@ -7,57 +7,58 @@
 *foreground:   #cccccc
 *background:   #262626
 *cursorColor:  #eeffff
-XTerm*foreground:   #cccccc
-XTerm*background:   #262626
-XTerm*cursorColor:  #eeffff
+/* urxvt*background: [90]#262626 */
+/* XTerm*foreground:   #cccccc */
+/* XTerm*background:   #262626 */
+/* XTerm*cursorColor:  #eeffff */
 
 !black
 *color0:       #1c1c1c
 *color8:       #3e515b
-XTerm*color0:       #1c1c1c
-XTerm*color8:       #3e515b
+/* XTerm*color0:       #1c1c1c */
+/* XTerm*color8:       #3e515b */
 
 !red
-*color1:       #e53935
-*color9:       #ff5370
-XTerm*color1:       #e53935
-XTerm*color9:       #ff5370
+*color1:       #ff5f5f
+*color9:       #d75f5f
+/* XTerm*color1:       #e53935 */
+/* XTerm*color9:       #ff5370 */
 
 !green
-*color2:       #c3e88d
-*color10:      #91b859
-XTerm*color2:       #c3e88d
-XTerm*color10:      #91b859
+*color2:       #87d787
+*color10:      #87af87
+/* XTerm*color2:       #c3e88d */
+/* XTerm*color10:      #91b859 */
 
 !yellow
-*color3:       #ffb62c
-*color11:      #ffcb6b
-XTerm*color3:       #ffb62c
-XTerm*color11:      #ffcb6b
+*color3:       #ffd787
+*color11:      #ffaf5f
+/* XTerm*color3:       #ffb62c */
+/* XTerm*color11:      #ffcb6b */
 
 !blue
-*color4:       #82aaff
-*color12:      #6182b8
-XTerm*color4:       #82aaff
-XTerm*color12:      #6182b8
+*color4:      #6182b8
+*color12:       #82aaff
+/* XTerm*color4:       #82aaff */
+/* XTerm*color12:      #6182b8 */
 
 !magenta
 *color5:       #c792ea
 *color13:      #945eb8
-XTerm*color5:       #c792ea
-XTerm*color13:      #945eb8
+/* XTerm*color5:       #c792ea */
+/* XTerm*color13:      #945eb8 */
 
 !cyan
 *color6:       #89ddff
 *color14:      #39adb5
-XTerm*color6:       #89ddff
-XTerm*color14:      #39adb5
+/* XTerm*color6:       #89ddff */
+/* XTerm*color14:      #39adb5 */
 
 !white
 *color7:       #bbbbbb
 *color15:      #ffffff
-XTerm*color7:       #bbbbbb
-XTerm*color15:      #ffffff
+/* XTerm*color7:       #bbbbbb */
+/* XTerm*color15:      #ffffff */
 
 
 XTerm.termName: xterm-256color
@@ -66,7 +67,8 @@ URxvt.termName: xterm-256color
 URxvt*ttyModes: start ^- stop ^-
 
 XTerm*faceName: DejaVu Sans Mono:size=10:antialias=true
-URxvt*font: xft:DejaVu Sans Mono:size=10:antialias=true
+URxvt*font: xft:Ubuntu Mono:size=11:antialias=true
+/* URxvt*font: xft:DejaVu Sans Mono:size=10:antialias=true */
 
 xterm*VT100*geometry: 120x35
 xterm*scrollBar: false
@@ -80,22 +82,24 @@ XTerm*altIsNotMeta: true
 XTerm*altSendsEscape: true
 xterm*BorderWidth: 0
 
+URxvt*geometry: 82x44
 URxvt*scrollBar: false
-URxvt*title: XTerm
-URxvt*iconName: XTerm
+URxvt*title: URxvt
+URxvt*iconName: URxvt
 URxvt*saveLines: 50000
 URxvt*jumpScroll: true
-URxvt*scrollTtyOutput: false
 URxvt*utf8Title: true
-URxvt*altIsNotMeta: true
-URxvt*altSendsEscape: true
-URxvt*BorderWidth: 0
+URxvt*modifier: alt
+urxvt*internalBorder: 10
 URxvt.lineSpace: 0
 URxvt.letterSpace: 0
 URxvt*scrollTtyOutput:      false
 URxvt*scrollWithBuffer:     true
 URxvt*scrollTtyKeypress:    true
-
-urxvt*depth: 32
-urxvt*background: [95]#262626
 URxvt.perl-ext-common: selection-to-clipboard
+
+/* urxvt*blurRadius: 20 */
+/* urxvt*transparent: true */
+/* urxvt*shading: 110 */
+/* urxvt*tintColor: #262626 */
+
