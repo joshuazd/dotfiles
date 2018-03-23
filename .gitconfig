@@ -1,0 +1,6 @@
+[credential]
+	helper = store
+[color "status"]
+	changed = 3
+[commit]
+	verbose = true
