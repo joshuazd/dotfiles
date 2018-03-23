@@ -104,7 +104,7 @@ call s:h('Language',        s:grey18,     s:background,   'none')
 call s:h('Special',         s:grey20,     s:background,   'none')
 call s:h('SpecialChar',     s:grey22,     s:background,   'bold')
 call s:h('Tag',             s:grey19,     s:background,   'bold')
-call s:h('Delimiter',       s:grey14,     s:background,   'none')
+call s:h('Delimiter',       s:grey7,      s:background,   'none')
 call s:h('Coding',          s:grey20,     s:background,   'italic')
 
 call s:h('PreProc',         s:grey23,     s:background,   'none')

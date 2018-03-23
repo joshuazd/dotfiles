@@ -48,7 +48,7 @@ syn match  yamlDash "-" contained
 
 hi link  yamlConstant       Keyword
 hi link  yamlIndicator      PreCondit
-hi link  yamlDelimiter      PreProc
+hi link  yamlDelimiter      Delimiter
 hi link  yamlDash           PreProc
 hi link  yamlAnchor         Function
 hi link  yamlAlias          Function

@@ -311,8 +311,8 @@ unlet b:current_syntax
 
 " The default highlighting.
 hi def link xmlTodo		Todo
-hi def link xmlTag		Comment
-hi def link xmlTagPunct		Comment
+hi def link xmlTag		Delimiter
+hi def link xmlTagPunct		Delimiter
 hi def link xmlEndTag		Tag
 hi def link xmlTagName		Tag
 if !exists('g:xml_namespace_transparent')
