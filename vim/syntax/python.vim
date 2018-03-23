@@ -332,8 +332,7 @@ hi link  pythonDot          Comment
 
 hi link  pythonComment      Comment
 hi! link  pythonCoding       Special
-highlight pythonCoding ctermfg=1 guifg=#e53935 cterm=italic gui=italic
-" highlight pythonCoding ctermfg=167 guifg=#e53935 cterm=italic gui=italic
+highlight pythonCoding ctermfg=167 guifg=#e53935 cterm=italic gui=italic
 hi link  pythonRun          Special
 hi link  pythonTodo         Todo
 
