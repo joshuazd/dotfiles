@@ -92,12 +92,14 @@ URxvt*utf8Title: true
 URxvt*modifier: alt
 urxvt*internalBorder: 10
 URxvt.lineSpace: 0
-URxvt.letterSpace: 0
+URxvt.letterSpace: -1
 URxvt*scrollTtyOutput:      false
 URxvt*scrollWithBuffer:     true
 URxvt*scrollTtyKeypress:    true
 URxvt.perl-ext-common: selection-to-clipboard
 
+Xft.rgba: rgb
+Xft.hintstyle: hintslight
 /* urxvt*blurRadius: 20 */
 /* urxvt*transparent: true */
 /* urxvt*shading: 110 */
