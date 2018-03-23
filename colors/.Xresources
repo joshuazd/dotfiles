@@ -82,7 +82,7 @@ XTerm*altIsNotMeta: true
 XTerm*altSendsEscape: true
 xterm*BorderWidth: 0
 
-URxvt*geometry: 82x44
+URxvt*geometry: 82x46
 URxvt*scrollBar: false
 URxvt*title: URxvt
 URxvt*iconName: URxvt
