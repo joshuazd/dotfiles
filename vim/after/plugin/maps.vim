@@ -40,9 +40,11 @@ endif
 if exists('g:mucomplete#chains')
   imap <c-e> <plug>(MUcompleteCte)
   imap <c-y> <plug>(MUcompleteCty)
+  imap <expr> <right> pumvisible() ? "\<plug>(MUcompleteExtendFwd)" : "\<right>"
+  imap <expr> <left> pumvisible() ? "\<plug>(MUcompleteExtendBwd)" : "\<left>"
 endif
 
-if exists("g:loaded_qlist") && g:loaded_qlist == 1
+if exists('g:loaded_qlist') && g:loaded_qlist == 1
   
   nnoremap <Space>i :Ilist<space>
 
