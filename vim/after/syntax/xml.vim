@@ -12,7 +12,7 @@ syn keyword xmlParam      parameter result dsName target format source param    
 syn match   xmlLogParam   '\<with-param\>'                                                  display contained
 syn keyword xmlConnection connection statement resource stylesheet                                  contained
 syn keyword xmlArgs       args                                                                      contained
-syn keyword xmlEnrich     enrich xslt schema datamapper                                             contained
+syn keyword xmlEnrich     enrich xslt schema datamapper fastxslt                                    contained
 syn match   xmlEnrich     '\<value-of\>'                                                    display contained
 syn keyword xmlSqlTag     sql script                                                                contained
 syn keyword xmlInSequence inSequence outSequence faultSequence                                      contained
