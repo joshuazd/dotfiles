@@ -295,7 +295,7 @@ endif
 
 " comma
 syn match javaComma ","
-hi def link javaComma PreProc
+hi def link javaComma Delimiter
 
 " catch errors caused by wrong parenthesis
 syn region  javaParenT	transparent matchgroup=javaParen  start="(" end=")" contains=@javaTop,javaParenT1
@@ -309,9 +309,9 @@ syn region  javaParenT2 transparent matchgroup=javaParen2 start="\[" end="\]" co
 syn match   javaParenError	 "\]"
 
 hi def link javaParenError	javaError
-hi def link javaParen           PreProc
-hi def link javaParen1          PreProc
-hi def link javaParen2          PreProc
+hi def link javaParen           Delimiter
+hi def link javaParen1          Delimiter
+hi def link javaParen2          Delimiter
 
 
 if exists("java_highlight_functions")
@@ -328,7 +328,7 @@ exec "syn sync ccomment javaComment minlines=" . java_minlines
 hi def link javaLambdaDef		Function
 " hi def link javaFuncDef		        Function
 hi def link javaVarArg			Function
-hi def link javaBraces			PreProc
+hi def link javaBraces			Delimiter
 hi def link javaBranch			Conditional
 hi def link javaUserLabelRef		javaUserLabel
 hi def link javaLabel			Label
@@ -336,7 +336,7 @@ hi def link javaUserLabel		Label
 hi def link javaConditional		Conditional
 hi def link javaRepeat			Repeat
 hi def link javaExceptions		Exception
-hi def link javaSemicolon               PreProc
+hi def link javaSemicolon               Delimiter
 hi def link javaAssert			Statement
 hi def link javaStorageClass		StorageClass
 hi def link javaMethodDecl		javaStorageClass
