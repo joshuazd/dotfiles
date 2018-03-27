@@ -266,10 +266,10 @@ let g:mucomplete#enable_auto_at_startup = 1
 let g:mucomplete#no_popup_mappings = 1
 let g:mucomplete#always_use_completeopt = 1
 let g:mucomplete#chains = {
-      \ 'default' : ['path', 'omni', 'dict', 'uspl', 'ulti', 'c-n'],
-      \ 'vim'     : ['path', 'cmd', 'ulti', 'c-n'],
+      \ 'default' : ['path', 'omni', 'dict', 'uspl', 'ulti', 'c-n', 'tags'],
+      \ 'vim'     : ['path', 'cmd', 'ulti', 'c-n', 'tags'],
       \ 'xml'     : ['ulti', 'tags', 'c-n'],
-      \ 'sql'     : ['c-n', 'ulti']
+      \ 'sql'     : ['c-n', 'ulti', 'tags']
       \ }
 " jedi
 let g:jedi#auto_vim_configuration = 0

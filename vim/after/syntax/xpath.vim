@@ -53,19 +53,27 @@ function! s:hi(group, target) abort
         \ ' cterm=italic gui=italic'
 endfunction
 
-call <SID>hi('xpathFuncError', 'Error')
-call <SID>hi('xpathQuote',     'StringDelimiter')
-call <SID>hi('xpathString',    'String')
-call <SID>hi('xpathFuncName',  'Function')
-call <SID>hi('xpathNumber',    'Constant')
-call <SID>hi('xpathParam',     'Identifier')
-call <SID>hi('xpathPunct',     'PreProc')
-call <SID>hi('xpathLangVar',   'Primitive')
-call <SID>hi('xpathReference', 'StringDelimiter')
-call <SID>hi('xpathOperator',  'Operator')
-call <SID>hi('xpathP2',        'Comment')
-call <SID>hi('xpathSpec',      'Special')
-call <SID>hi('xpathNameSpace', 'Primitive')
+function! s:xpathHighlight() abort
+  call <SID>hi('xpathFuncError', 'Error')
+  call <SID>hi('xpathQuote',     'StringDelimiter')
+  call <SID>hi('xpathString',    'String')
+  call <SID>hi('xpathFuncName',  'Function')
+  call <SID>hi('xpathNumber',    'Constant')
+  call <SID>hi('xpathParam',     'Identifier')
+  call <SID>hi('xpathPunct',     'Delimiter')
+  call <SID>hi('xpathLangVar',   'Primitive')
+  call <SID>hi('xpathReference', 'StringDelimiter')
+  call <SID>hi('xpathOperator',  'Operator')
+  call <SID>hi('xpathP2',        'Delimiter')
+  call <SID>hi('xpathSpec',      'Special')
+  call <SID>hi('xpathNameSpace', 'Primitive')
+endfunction
+call s:xpathHighlight()
+
+augroup xpathHighlight
+  autocmd!
+  autocmd ColorScheme * call s:xpathHighlight()
+augroup END
 
 syn iskeyword clear
 
