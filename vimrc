@@ -363,7 +363,7 @@ function! BuildStatusLine(nr, extra) abort
         \%0* %f%m
         \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? "  RO" : ""}%0*
         \%=
-        \%{g:in_snippet > 0 ? "snippet" : ""}
+        \%{g:in_snippet > 0 ? "snippet " : ""}
         \%#StlDim#%{&syntax == "" ? "" : w:["lf_active"] ? " ".&syntax." " : ""}
         \%#StlDimNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}
         \%#ModeNoBold#%{w:["lf_active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}
