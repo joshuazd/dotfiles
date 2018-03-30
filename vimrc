@@ -316,11 +316,11 @@ function! GetModeIndicator() abort
 endfunction
 
 let g:mode_hi = {
-      \'NormalMode'  : ' ctermfg=68  guifg=#6182b8 ctermbg=234 guibg=#262626',
-      \'InsertMode'  : ' ctermfg=221 guifg=#ffcb6b ctermbg=234 guibg=#262626',
-      \'VisualMode'  : ' ctermfg=107 guifg=#91b859 ctermbg=234 guibg=#262626',
-      \'ReplaceMode' : ' ctermfg=167 guifg=#d75f5f ctermbg=234 guibg=#262626',
-      \'CommandMode' : ' ctermfg=176 guifg=#c792ea ctermbg=234 guibg=#262626'}
+      \'NormalMode'  : ' ctermfg=68  guifg=#6182b8 ctermbg=236 guibg=#303030',
+      \'InsertMode'  : ' ctermfg=221 guifg=#ffcb6b ctermbg=236 guibg=#303030',
+      \'VisualMode'  : ' ctermfg=107 guifg=#91b859 ctermbg=236 guibg=#303030',
+      \'ReplaceMode' : ' ctermfg=167 guifg=#d75f5f ctermbg=236 guibg=#303030',
+      \'CommandMode' : ' ctermfg=176 guifg=#c792ea ctermbg=236 guibg=#303030'}
 
 function! s:updateStatusLineHighlight(nr,newMode) abort
   execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold gui=bold'
@@ -329,12 +329,11 @@ function! s:updateStatusLineHighlight(nr,newMode) abort
 endfunction
 
 function! StatusLineColors() abort
-  highlight StlDim       ctermbg=234 guibg=#262626 ctermfg=242 guifg=#6c6c6c cterm=NONE gui=NONE
-  highlight StlDimNC     ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#262626 cterm=NONE gui=NONE
-  highlight ReadOnlyStl  ctermbg=234 guibg=#262626 ctermfg=167 guifg=#d75f5f cterm=NONE gui=NONE
-  highlight StatusLine   ctermbg=234 guibg=#262626 ctermfg=252 guifg=#d0d0d0 cterm=NONE gui=NONE
+  highlight StlDim       ctermbg=236 guibg=#303030 ctermfg=243 guifg=#767676 cterm=NONE gui=NONE
+  highlight StlDimNC     ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
+  highlight ReadOnlyStl  ctermbg=236 guibg=#303030 ctermfg=167 guifg=#d75f5f cterm=NONE gui=NONE
+  highlight StatusLine   ctermbg=236 guibg=#303030 ctermfg=250 guifg=#bcbcbc cterm=NONE gui=NONE
   highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
-  highlight StlLinter    ctermbg=1   guibg=#e53935 ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
   call s:updateStatusLineHighlight(winnr(),mode())
 endfunction
 
