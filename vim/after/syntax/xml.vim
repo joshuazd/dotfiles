@@ -19,7 +19,8 @@ syn keyword xmlInSequence inSequence outSequence faultSequence                  
 syn match   xsltStatement '\<for-each\>'                                                    display contained
 
 " XML Strings
-syn match   xmlFile '\k\+_\(Logger\|XSLT\|EP\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)' display contained
+syn match   xmlFile '\k\+_\(Logger\|XSLT\|EP\|MP\|FailOverMP\|MS\|FailOverMS\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)' display contained
+syn match   xmlFile '\k\+Logger' display contained
 
 " XML Attributes
 " syn match   xmlUrl '\(url-mapping\|uri-template\)' display contained
