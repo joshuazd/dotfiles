@@ -2,7 +2,7 @@ case "$TERM" in
     xterm*|*rxvt*) TERM=xterm-256color
 esac
 
-export LS_COLORS='di=01;94:ex=01;92:tw=01;94:ow=01;94:ln=01;36:*.mp4=00;35:*.tar=00,31:*.tgz=00;31:*.zip=00;31:*.rar=00;31:*.jar=00;31:*.car=00;31:*.war=00;31:*.gz=00;31:*.bz2=00;31:*.png=00;35:*.jpg=00;35:*.jpeg=00;35:*.bmp=00;35:*.gif=00;35:*.vim=00;33:*vimrc=00;33:*.py=00;95:*.xml=00;91:*.md=00;97'
+export LS_COLORS='di=00;94:ex=00;92:tw=00;94:ow=00;94:ln=00;36:*.mp4=00;35:*.tar=00,31:*.tgz=00;31:*.zip=00;31:*.rar=00;31:*.jar=00;31:*.car=00;31:*.war=00;31:*.gz=00;31:*.bz2=00;31:*.png=00;35:*.jpg=00;35:*.jpeg=00;35:*.bmp=00;35:*.gif=00;35:*.vim=00;33:*vimrc=00;33:*.py=00;95:*.xml=00;91:*.md=00;97'
 export WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
 export LANG=en_US.UTF-8
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
