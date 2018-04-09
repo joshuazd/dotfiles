@@ -103,7 +103,6 @@ if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
 " language specific plugins
-Plug 'justmao945/vim-clang', { 'for': ['c','cpp'] }
 Plug 'davidhalter/jedi-vim', { 'for': 'python' }
 call plug#end()
 runtime macros/matchit.vim
@@ -289,7 +288,7 @@ let g:sneak#use_ic_scs = 1
 let g:loaded_netrw       = 1
 let g:loaded_netrwPlugin = 1
 " markdown
-let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh']
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
