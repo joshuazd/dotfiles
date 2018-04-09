@@ -18,7 +18,7 @@ set timeoutlen=500                            " shorter timeout
 set ttimeoutlen=100                           " shorter timeout
 set splitbelow                                " Make splits behave better
 set splitright
-set clipboard^=unnamedplus                    " make clipboard work better
+set clipboard^=unnamed,unnamedplus            " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
