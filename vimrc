@@ -57,7 +57,6 @@ set tags=./tags,tags                          " where to find tag files
 set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 set modeline                                  " read modelines
 set shortmess+=c                              " don't show completion errors
-set nostartofline                             " don't move to start of line after commands
 set winminheight=0                            " minimum window size 0x0
 set winminwidth=0
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
