@@ -21,6 +21,8 @@ syn match xpathSpec "fn"
 syn match   xmlEntity                 "&[^; \t]*;" contains=xmlEntityPunct display
 syn match   xmlEntityPunct  contained "[&.;]" display
 
+syn match xpathFuncError "\k\+" contained
+
 syn match xpathFunction "\k\+(\@=" contains=xpathFuncName,xpathFuncError display
 
 syn keyword xpathFuncName substring string-join string-length upper-case lower-case escape-uri starts-with ends-with contained
@@ -31,7 +33,6 @@ syn keyword xpathFuncName matches replce boolean not true false dateTime name ro
 syn keyword xpathFuncName subsequence count avg max min sum id position last translate text format-dateTime contained
 syn keyword xpathFuncName dayTimeDuration contained
 
-syn match xpathFuncError "\k\+" contained
 
 " STRINGS
 syn region xpathString matchgroup=xpathQuote start=+'+ end=+'+ display
@@ -74,7 +75,5 @@ augroup xpathHighlight
   autocmd!
   autocmd ColorScheme * call s:xpathHighlight()
 augroup END
-
-syn iskeyword clear
 
 let b:current_syntax = 'xpath'
