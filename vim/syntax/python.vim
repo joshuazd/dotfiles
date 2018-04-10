@@ -305,7 +305,6 @@ hi link  pythonInclude      Include
 hi link  pythonConstant     Constant
 hi link  pythonFunction     Function
 hi link  pythonFunctionCall Function
-hi link  pythonClass        Function
 " highlight pythonClass ctermfg=67 guifg=#5f87af cterm=bold gui=bold
 hi link  pythonClass        Class
 hi link  pythonParameters   Normal
