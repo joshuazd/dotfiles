@@ -2,6 +2,7 @@ set nocompatible
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
 set whichwrap+=<,>,h,l                        " arrow keys and h,l move to the next line
+set showcmd                                   " show keystrokes
 set breakindent                               " Indent wrapped lines by 2
 set breakindentopt=shift:2
 set ignorecase                                " Ignore case when searching
@@ -9,7 +10,7 @@ set smartcase                                 " When searching try to be smart a
 set lazyredraw                                " Don't redraw while executing macros
 set splitbelow                                " Make splits behave better
 set splitright
-set clipboard^=unnamedplus                    " make clipboard work better
+set clipboard^=unnamed,unnamedplus            " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
@@ -26,10 +27,12 @@ set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full
 set wildignore+=tags,Session.vim              " Ignore tags and session files
 set wildignorecase                            " ignore case in wildmenu
-set backupdir=/tmp                            " Better backups
-set noswapfile
-set foldlevel=99                              " don't fold things by default
+set sessionoptions-=options                   " make sessions work better with plugins
+set sessionoptions-=blank
+set noswapfile                                " do not create swap files
+set foldlevel=4                               " don't fold things by default
 set listchars=tab:->,trail:~,extends:>,eol:$  " what to show for whitespace chars
+set display+=lastline                         " show as much of the last line as possible
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
 set completeopt+=menuone,noselect,longest     " configure popup menu
 set autowrite                                 " automatically save before :next, :make, etc
@@ -42,8 +45,8 @@ filetype indent on
 nnoremap L $
 nnoremap H ^
 
-nnoremap n :set hlsearch<CR>n
-nnoremap N :set hlsearch<CR>N
+nnoremap <expr> n &hlsearch ? 'n' : ':set hlsearch<CR>'
+nnoremap <expr> N &hlsearch ? 'N' : ':set hlsearch<CR>'
 nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 
 nnoremap Y y$
@@ -62,7 +65,7 @@ nnoremap gk k
 
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
-nnoremap <Space>f :find *
+nnoremap <Space>f :find<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>i :ilist /
