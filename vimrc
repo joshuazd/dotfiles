@@ -99,6 +99,9 @@ Plug 'romainl/vim-qlist'
 Plug 'justinmk/vim-dirvish'
 Plug 'xtal8/traces.vim'
 Plug 'sgur/vim-editorconfig'
+Plug 'kana/vim-textobj-user'
+Plug 'kana/vim-textobj-indent'
+Plug 'whatyouhide/vim-textobj-xmlattr'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
@@ -204,7 +207,7 @@ nnoremap <silent> <expr> <C-w>f len(getwininfo()) > 1
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
-"              AUTOCOMMANDS
+"              (AUTO)COMMANDS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 augroup EditVim
@@ -224,30 +227,6 @@ command! -range=% FormatJSON <line1>,<line2>!python2 -c
 
 command! -range=% AE <line1>,<line2>yank a|silent! call functions#AnsibleEdit()
 command! AC call functions#AnsibleEncrypt()
-
-" make list-like commands more intuitive
-" including this here to avoid screwing up command mode
-function! CCR() abort
-  let cmdline = getcmdline()
-  if cmdline =~? '\v\C^(ls|files|buffers)' | return "\<CR>:b "
-  elseif cmdline =~? '\v\C^(dli|il)'       | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
-  elseif cmdline =~? '\v\C^(cli|lli)'      | return "\<CR>:sil ".repeat(cmdline[0], 2)."\<Space>"
-  elseif cmdline =~? '\C^old'              | return "\<CR>:e #<"
-  elseif cmdline =~? '\C^changes'          | set nomore | return "\<CR>:set more|norm! g;\<S-Left>"
-  elseif cmdline =~? '\C^ju'               | set nomore | return "\<CR>:set more|norm! \<C-o>\<S-Left>"
-  elseif cmdline =~? '\C^marks'            | return "\<CR>:norm! `"
-  elseif cmdline =~? '\C^undol'            | return "\<CR>:u "
-  else                                     | return "\<CR>"
-  endif
-endfunction
-
-" lots of new text objects
-for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', '`' ]
-    execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
-    execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
-    execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
-    execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
-endfor
 
 " }}}
 
@@ -371,3 +350,32 @@ endfunction
 
 set statusline=%!BuildStatusLine(winnr(),'')
 " }}}
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""
+"              EXTENDING VIM
+""""""""""""""""""""""""""""""""""""""""""""""""
+" make list-like commands more intuitive
+" including this here to avoid screwing up command mode
+function! CCR() abort
+  let cmdline = getcmdline()
+  if cmdline =~? '\v\C^(ls|files|buffers)' | return "\<CR>:b "
+  elseif cmdline =~? '\v\C^(dli|il)'       | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
+  elseif cmdline =~? '\v\C^(cli|lli)'      | return "\<CR>:sil ".repeat(cmdline[0], 2)."\<Space>"
+  elseif cmdline =~? '\C^old'              | return "\<CR>:e #<"
+  elseif cmdline =~? '\C^changes'          | set nomore | return "\<CR>:set more|norm! g;\<S-Left>"
+  elseif cmdline =~? '\C^ju'               | set nomore | return "\<CR>:set more|norm! \<C-o>\<S-Left>"
+  elseif cmdline =~? '\C^marks'            | return "\<CR>:norm! `"
+  elseif cmdline =~? '\C^undol'            | return "\<CR>:u "
+  else                                     | return "\<CR>"
+  endif
+endfunction
+
+" lots of new text objects
+for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', '`' ]
+    execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
+    execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
+    execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
+    execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
+endfor
