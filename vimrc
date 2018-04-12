@@ -47,6 +47,7 @@ set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:¬,nbsp:␣ " what to show
 set display+=lastline                         " show as much of the last line as possible
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
 set completeopt+=menuone,noselect,noinsert    " configure popup menu
+set virtualedit+=block                        " allow virtual editing in v-block mode
 set concealcursor+=n                          " conceal characters in normal mode
 set conceallevel=2                            " conceal characters by default
 set autowrite                                 " automatically save before :next, :make, etc
