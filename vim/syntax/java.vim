@@ -7,8 +7,8 @@
 " Please check :help java.vim for comments on some of the options available.
 
 " quit when a syntax file was already loaded
-if !exists("main_syntax")
-  if exists("b:current_syntax")
+if !exists('main_syntax')
+  if exists('b:current_syntax')
     finish
   endif
   " we define it here so that included files can test for it
@@ -30,7 +30,7 @@ syn match   javaError2 "#\|=<"
 hi def link javaError2 javaError
 
 
-let java_highlight_all = "true"
+let java_highlight_all = 'true'
 " keyword definitions
 syn keyword javaExternal	native package
 syn match javaExternal		"\<import\>\(\s\+static\>\)\?"
@@ -40,7 +40,7 @@ syn keyword javaRepeat		while for do
 syn keyword javaBoolean		true false
 syn keyword javaConstant	null
 syn keyword javaTypedef		this super
-syn keyword javaOperator	new instanceof
+syn keyword javaKeyword 	new instanceof
 syn keyword javaType		boolean char byte short int long float double
 syn keyword javaType    	void
 syn keyword javaStatement	return
@@ -64,10 +64,10 @@ syn match   javaVarArg		"\.\.\."
 syn match   javaConstant '\<\(\u\|_\)\(\u\|\d\|_\)\+\>'
 syn keyword javaScopeDecl	public protected private abstract
 
-if exists("java_highlight_java_lang_ids")
+if exists('java_highlight_java_lang_ids')
   let java_highlight_all=1
 endif
-if exists("java_highlight_all")  || exists("java_highlight_java")  || exists("java_highlight_java_lang")
+if exists('java_highlight_all')  || exists('java_highlight_java')  || exists('java_highlight_java_lang')
   " java.lang.*
   syn match javaLangClass "\<System\>"
   syn keyword javaR_JavaLang NegativeArraySizeException ArrayStoreException IllegalStateException RuntimeException IndexOutOfBoundsException UnsupportedOperationException ArrayIndexOutOfBoundsException ArithmeticException ClassCastException EnumConstantNotPresentException StringIndexOutOfBoundsException IllegalArgumentException IllegalMonitorStateException IllegalThreadStateException NumberFormatException NullPointerException TypeNotPresentException SecurityException
@@ -98,15 +98,15 @@ if exists("java_highlight_all")  || exists("java_highlight_java")  || exists("ja
 
 endif
 
-if filereadable(expand("<sfile>:p:h")."/javaid.vim")
+if filereadable(expand('<sfile>:p:h').'/javaid.vim')
   source <sfile>:p:h/javaid.vim
 endif
 
-if exists("java_space_errors")
-  if !exists("java_no_trail_space_error")
+if exists('java_space_errors')
+  if !exists('java_no_trail_space_error')
     syn match	javaSpaceError	"\s\+$"
   endif
-  if !exists("java_no_tab_space_error")
+  if !exists('java_no_tab_space_error')
     syn match	javaSpaceError	" \+\t"me=e-1
   endif
 endif
@@ -124,7 +124,7 @@ syn cluster javaTop add=javaExternal,javaError,javaError,javaBranch,javaLabelReg
 
 " Comments
 syn keyword javaTodo		 contained TODO FIXME XXX
-if exists("java_comment_strings")
+if exists('java_comment_strings')
   syn region  javaCommentString    contained start=+"+ end=+"+ end=+$+ end=+\*/+me=s-1,he=s-1 contains=javaSpecial,javaCommentStar,javaSpecialChar,@Spell
   syn region  javaComment2String   contained start=+"+	end=+$\|"+  contains=javaSpecial,javaSpecialChar,@Spell
   syn match   javaCommentCharacter contained "'\\[^']\{1,6\}'" contains=javaSpecialChar
@@ -143,7 +143,7 @@ hi def link javaCommentCharacter javaCharacter
 
 syn cluster javaTop add=javaComment,javaLineComment
 
-if !exists("java_ignore_javadoc") && main_syntax != 'jsp'
+if !exists('java_ignore_javadoc') && main_syntax !=? 'jsp'
   syntax case ignore
   " syntax coloring for javadoc comments (HTML)
   " syntax include @javaHtml <sfile>:p:h/html.vim
@@ -221,9 +221,9 @@ syn match javaClassDeclName "\(\(class\|implements\)\s\+\)\@<=[A-Z_][a-zA-Z0-9_]
 highlight javaClassDeclName ctermfg=4 guifg=#82aaff cterm=bold gui=bold
 
 
-let java_highlight_functions = "syntax"
-if exists("java_highlight_functions")
-  if java_highlight_functions == "indent"
+let java_highlight_functions = 'syntax'
+if exists('java_highlight_functions')
+  if java_highlight_functions ==? 'indent'
     syn match  javaFuncDef "^\(\t\| \{8\}\)[_$a-zA-Z][_$a-zA-Z0-9_. \[\]<>]*([^-+*/]*)" contains=javaScopeDecl,javaType,javaStorageClass,@javaClasses,javaAnnotation
     syn region javaFuncDef start=+^\(\t\| \{8\}\)[$_a-zA-Z][$_a-zA-Z0-9_. \[\]<>]*([^-+*/]*,\s*+ end=+)+ contains=javaScopeDecl,javaType,javaStorageClass,@javaClasses,javaAnnotation
     syn match  javaFuncDef "^  [$_a-zA-Z][$_a-zA-Z0-9_. \[\]<>]*([^-+*/]*)" contains=javaScopeDecl,javaType,javaStorageClass,@javaClasses,javaAnnotation
@@ -234,9 +234,9 @@ if exists("java_highlight_functions")
     "	1. class names are always capitalized (ie: Button)
     "	2. method names are never capitalized (except constructors, of course)
     " syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*([^0-9]+ end=+)\@=+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma
-    syn match javaFuncDef          +^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
+    syn match javaFuncDef          "^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
     " syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*+ end=+\({\?\s*$\)\@=+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncParams,javaFuncName,javaTemplate
-    syn match javaFuncDef          +^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncName,javaTemplate nextgroup=javaFuncParams
+    syn match javaFuncDef          "^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncName,javaTemplate nextgroup=javaFuncParams
     syn region javaFuncParams start="(\@<=" skip="(" end=")\@=" contains=javaFuncParamList,javaComma contained
     syn match javaFuncParamList "[^,)]*" contains=javaClassName contained skipwhite
   endif
@@ -245,7 +245,7 @@ if exists("java_highlight_functions")
   syn cluster javaTop add=javaFuncDef,javaBraces,javaLambdaDef
 endif
 
-if exists("java_highlight_debug")
+if exists('java_highlight_debug')
 
   " Strings and constants
   syn match   javaDebugSpecial		contained "\\\d\d\d\|\\."
@@ -287,7 +287,7 @@ if exists("java_highlight_debug")
   hi def link DebugType		 Type
 endif
 
-if exists("java_mark_braces_in_parens_as_errors")
+if exists('java_mark_braces_in_parens_as_errors')
   syn match javaInParen		 contained "[{}]"
   hi def link javaInParen	javaError
   syn cluster javaTop add=javaInParen
@@ -314,15 +314,15 @@ hi def link javaParen1          Delimiter
 hi def link javaParen2          Delimiter
 
 
-if exists("java_highlight_functions")
+if exists('java_highlight_functions')
    syn match javaLambdaDef "([a-zA-Z0-9_<>\[\], \t]*)\s*->"
    " needs to be defined after the parenthesis error catcher to work
 endif
 
-if !exists("java_minlines")
+if !exists('java_minlines')
   let java_minlines = 10
 endif
-exec "syn sync ccomment javaComment minlines=" . java_minlines
+exec 'syn sync ccomment javaComment minlines=' . java_minlines
 
 " The default highlighting.
 hi def link javaLambdaDef		Function
@@ -361,6 +361,7 @@ hi def link javaConstant		Constant
 hi def link javaTypedef	        	Primitive
 hi def link javaTodo			Todo
 hi def link javaAnnotation		PreProc
+hi def link javaKeyword                 Keyword
 
 hi def link javaCommentTitle		SpecialComment
 hi def link javaDocTags	        	Special
@@ -375,13 +376,13 @@ hi def link htmlComment	        	Special
 hi def link htmlCommentPart		Special
 hi def link javaSpaceError		Error
 
-let b:current_syntax = "java"
+let b:current_syntax = 'java'
 
-if main_syntax == 'java'
+if main_syntax ==? 'java'
   unlet main_syntax
 endif
 
-let b:spell_options="contained"
+let b:spell_options='contained'
 let &cpo = s:cpo_save
 unlet s:cpo_save
 
