@@ -12,6 +12,8 @@ setlocal makeprg=flake8\ %:S
 setlocal errorformat=%f:%l:%c:\ %t%n\ %m
 setlocal formatprg=autopep8\ -a\ -a\ -
 command! -bar Fix silent execute "!autopep8 -i -a -a %" | redraw!
+setlocal foldlevel=4
+setlocal foldnestmax=4
 augroup PYTHON
     autocmd!
     if executable('flake8')
