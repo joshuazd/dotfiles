@@ -305,15 +305,12 @@ hi link  pythonInclude      Include
 hi link  pythonConstant     Constant
 hi link  pythonFunction     Function
 hi link  pythonFunctionCall Function
-" highlight pythonClass ctermfg=67 guifg=#5f87af cterm=bold gui=bold
 hi link  pythonClass        Class
 hi link  pythonParameters   Normal
 hi link  pythonParam        Identifier
 hi link  pythonBrackets     Delimiter
 hi link  pythonClassParameters Normal
 hi link  pythonSelf         Identifier
-" highlight pythonSelf ctermfg=3 guifg=#ffb62c cterm=italic gui=italic
-" highlight pythonSelf ctermfg=214 cterm=italic gui=italic
 hi link  pythonSelf         Primitive
 
 hi link  pythonMagic        Language
@@ -331,8 +328,6 @@ hi link  pythonDot          Comment
 
 hi link  pythonComment      Comment
 hi link  pythonCoding       Coding
-" highlight pythonCoding ctermfg=167 guifg=#e53935 cterm=italic gui=italic
-" highlight pythonCoding cterm=italic gui=italic
 hi link  pythonRun          Special
 hi link  pythonTodo         Todo
 
@@ -380,7 +375,7 @@ highlight pythonField ctermfg=245 guifg=#8a8a8a
 
 hi link  pythonExClass      Structure
 hi link  pythonJedi         Type
-hi link  pythonPunct        PreProc
+hi link  pythonPunct        Delimiter
 " hi link  pythonIdentifier   Identifier
 hi link  pythonPrint        Keyword
 hi link  pythonKeywordParam pythonField
