@@ -96,12 +96,13 @@ syn region  jsonFold4 matchgroup=jsonBraces start="{" end=/}\(\_s\+\ze\("\|{\)\)
 syn region  jsonFold5 matchgroup=jsonBraces start="{" end=/}\(\_s\+\ze\("\|{\)\)\@!/ fold contained contains=jsonFold6,@jsonAll
 syn region  jsonFold6 matchgroup=jsonBraces start="{" end=/}\(\_s\+\ze\("\|{\)\)\@!/ fold contained contains=jsonFold7,@jsonAll
 syn region  jsonFold  matchgroup=jsonBraces start="\[" end=/]\(\_s\+\ze"\)\@!/ transparent fold
-highlight jsonFold1 ctermfg=5
-highlight jsonFold2 ctermfg=11
-highlight jsonFold3 ctermfg=12
-highlight jsonFold4 ctermfg=9
+
+hi def link jsonFold1 Keyword
+hi def link jsonFold2 Identifier
+hi def link jsonFold3 Directory
+hi def link jsonFold4 Tag
 highlight jsonFold5 ctermfg=72
-highlight jsonFold6 ctermfg=173
+hi def link jsonFold6 Builtin
 
 syn cluster jsonAll add=jsonNull,jsonBoolean,jsonString,jsonKeywordMatch,jsonEscape,jsonNumber,jsonNoise,jsonFold
 " Define the default highlighting.

@@ -119,17 +119,17 @@ hi def link javaScriptRepeat		Repeat
 hi def link javaScriptBranch		Conditional
 hi def link javaScriptOperator		Operator
 hi def link javaScriptIn                Operator
-hi def link javaScriptType		StringPunct
+hi def link javaScriptType		StringDelimiter
 hi def link javaScriptStatement		Statement
 hi def link javaScriptFunction		Function
-hi def link javaScriptBraces		PreProc
-hi def link javaScriptColon		PreProc
+hi def link javaScriptBraces		Delimiter
+hi def link javaScriptColon		Delimiter
 hi def link javaScriptError		Error
 hi def link javaScrParenError		javaScriptError
 hi def link javaScriptNull		Constant
 hi def link javaScriptBoolean		Boolean
 hi def link javaScriptRegexpString	String
-hi def link javaScriptParens	        PreProc
+hi def link javaScriptParens	        Delimiter
 hi def link javaScriptParenError        Error
 
 hi def link javaScriptIdentifier	Type
@@ -144,7 +144,7 @@ hi def link javaScriptDebug		Debug
 hi def link javaScriptConstant		Label
 hi def link javaScriptFuncName          Function
 hi def link javaScriptArg               Identifier
-hi def link javaScriptPunct             PreProc
+hi def link javaScriptPunct             Delimiter
 hi def link javaScriptDeref             Comment
 hi def link javaScriptItemAccess        Special
 highlight javaScriptField ctermfg=250 guifg=#bcbcbc
