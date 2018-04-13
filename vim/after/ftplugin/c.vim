@@ -1,2 +1,2 @@
-setlocal omnifunc=ClangComplete
+setlocal omnifunc=ccomplete#Complete
 setlocal foldmethod=marker
