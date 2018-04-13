@@ -18,10 +18,6 @@ setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/,*_DataMappe
 set suffixesadd+=.xml
 setlocal isfname-=/
 nnoremap ,f zMza
-xmap ai <Plug>IndentMotionAround
-xmap aI <Plug>IndentMotionUpper
-omap ai <Plug>IndentMotionAround
-omap aI <Plug>IndentMotionUpper
 augroup XML
     autocmd!
     if executable('xmllint')
