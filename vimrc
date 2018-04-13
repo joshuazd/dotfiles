@@ -101,7 +101,6 @@ Plug 'xtal8/traces.vim'
 Plug 'sgur/vim-editorconfig'
 Plug 'kana/vim-textobj-user'
 Plug 'kana/vim-textobj-indent'
-Plug 'whatyouhide/vim-textobj-xmlattr'
 if executable('ctags')
   Plug 'ludovicchabant/vim-gutentags'
 endif
