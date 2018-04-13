@@ -128,7 +128,9 @@ if (!exists('g:vim_json_warnings') || g:vim_json_warnings==1)
   hi def link jsonTripleQuotesError  Error
 endif
 hi def link jsonQuote           StringDelimiter
-hi def link jsonNoise           PreProc
+hi def link jsonNoise           Delimiter
+
+syn sync fromstart
 
 let b:current_syntax = 'json'
 if main_syntax ==# 'json'
