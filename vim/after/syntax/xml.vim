@@ -51,7 +51,7 @@ syn region Xpath
 let b:current_syntax = s:cur_syntax
 
 hi def link xmlNs           Identifier
-function! XmlAfterHighlight() abort
+" function! XmlAfterHighlight() abort
   highlight xmlXsl        ctermfg=1   guifg=#ff5370
 
   highlight xmlExpression ctermfg=203 guifg=#ff5f5f cterm=italic gui=italic
@@ -62,13 +62,13 @@ function! XmlAfterHighlight() abort
   highlight xmlSqlTag     ctermfg=209 guifg=#ff5f00
   highlight xmlLogParam   ctermfg=243 guifg=#8a8a8a
   " highlight xmlFile       ctermfg=103 guifg=#8787af cterm=bold   gui=bold
-endfunction
+" endfunction
 
-augroup xmlAfterHighlight
-  autocmd!
-  autocmd ColorScheme material call XmlAfterHighlight()
-augroup END
-call XmlAfterHighlight()
+" augroup xmlAfterHighlight
+"   autocmd!
+"   autocmd ColorScheme material call XmlAfterHighlight()
+" augroup END
+" call XmlAfterHighlight()
 
 hi def link xmlArgs         Primitive
 hi def link xmlConnection   StorageClass
