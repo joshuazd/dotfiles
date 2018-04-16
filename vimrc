@@ -324,13 +324,9 @@ augroup END
 function! SetupStatusLine(nr) abort
   return get(extend(w:, {
         \ 'lf_active': winnr() != a:nr
-          \ ? 0
-          \ : (mode(1) ==# get(g:, 'lf_cached_mode', '')
-            \ ? 1
-            \ : s:updateStatusLineHighlight(a:nr,get(extend(g:, { 'lf_cached_mode': mode(1) }), 'lf_cached_mode'))
-            \ ),
-        \ 'lf_winwd': winwidth(winnr())
-        \ }), '', '')
+          \ ? 0 : (mode(1) ==# get(g:, 'lf_cached_mode', '')
+            \ ? 1 : s:updateStatusLineHighlight(a:nr,
+              \ get(extend(g:, { 'lf_cached_mode': mode(1) }), 'lf_cached_mode')))}), '', '')
 endfunction
 
 function! BuildStatusLine(nr, extra) abort
