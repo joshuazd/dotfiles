@@ -112,7 +112,7 @@ call s:h('PreProc',         s:boldcyan,   s:background,   'none')
 call s:h('Include',         s:purple,     s:background,   'none')
 call s:h('Type',            s:yellow,     s:background,   'none')
 call s:h('StorageClass',    s:boldpurple, s:background,   'none')
-call s:h('Structure',       s:cyan,       s:background,   'none')
+call s:h('Structure',       s:boldcyan,   s:background,   'none')
 call s:h('Class',           s:boldblue,   s:background,   'bold')
 
 call s:h('DiffAdd',         s:boldgreen,  s:darkdarkgrey, 'none')
