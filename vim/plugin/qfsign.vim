@@ -24,6 +24,10 @@ augroup END
 let s:sign_count = get(s:, 'sign_count', 0)
 
 function! s:place_signs() abort
+  if get(g:, 'qfsign#enabled', 0) == 0
+    return
+  endif
+
   let l:qflist = getqflist()
 
   if len(l:qflist) > get(g:, 'qfsigns_max', 100)
