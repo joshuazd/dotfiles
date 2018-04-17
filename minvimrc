@@ -53,7 +53,6 @@ set conceallevel=2                            " conceal characters by default
 set autowrite                                 " automatically save before :next, :make, etc
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
-set signcolumn=no                             " don't have signcolumn on
 set cpoptions-=<
 set fillchars=stl:\ ,stlnc:\ ,fold:─,diff:─   " use box chars for folds, etc
 set tags=./tags,tags                          " where to find tag files
@@ -92,6 +91,8 @@ runtime macros/matchit.vim
 " for convenience
 nnoremap L $
 nnoremap H ^
+xnoremap L $
+xnoremap H ^
 
 " set hlsearch and nohlsearch dynamically-ish
 nnoremap <expr> n &hlsearch ? 'n' : ':set hlsearch<CR>'
