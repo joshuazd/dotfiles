@@ -282,14 +282,6 @@ let g:modemap = {
       \ 'r' : ['P',       'CommandMode'], 'rm': ['MORE',  'CommandMode'], 'r?': ['CONFIRM', 'CommandMode'],
       \ '!' : ['SH',      'CommandMode'], 't' : ['TERM',  'CommandMode']}
 
-function! GetModeIndicator() abort
-  if &filetype ==# 'help'        | return ['Help']
-  elseif &filetype ==# 'netrw'   | return ['netrw']
-  elseif &filetype ==# 'dirvish' | return ['dirvish']
-  else                           | return g:modemap[mode()]
-  endif
-endfunction
-
 let g:mode_hi = {
       \'NormalMode'  : ' ctermfg=68  guifg=#6182b8 ctermbg=236 guibg=#303030',
       \'InsertMode'  : ' ctermfg=221 guifg=#ffcb6b ctermbg=236 guibg=#303030',
@@ -329,7 +321,7 @@ endfunction
 
 function! BuildStatusLine(nr, extra) abort
   return '%{SetupStatusLine('.a:nr.')}
-        \%#CurrMode#%{w:["lf_active"] ? "  " . GetModeIndicator()[0] . (&paste ? " PASTE " : " ") : ""}
+        \%#CurrMode#%{w:["lf_active"] ? "  " . g:modemap[mode()][0] . (&paste ? " PASTE " : " ") : ""}
         \%0* %f%m
         \%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? "  RO" : ""}%0*
         \%=
