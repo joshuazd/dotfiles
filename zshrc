@@ -58,6 +58,8 @@ fi
 export FZF_DEFAULT_COMMAND='ag -l'
 export PATH=$PATH:/snap/bin/
 
+PATH="$HOME/bin:$HOME/.local/bin:$PATH"
+
 if type fd > /dev/null; then
     export FZF_DEFAULT_COMMAND='fd --type f'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
