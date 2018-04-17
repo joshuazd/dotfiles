@@ -182,7 +182,7 @@ prompt_pure_preprompt_render() {
 	PROMPT3="
 (?) %F{$symbol_color}${PURE_PROMPT_SYMBOL:-❯}${PURE_PROMPT_SYMBOL:-❯}%f "
 	SPROMPT="
-Correct %F{9}%R%f to %F{10}%r%f ? [nyae] "
+Correct %F{1}%R%f to %F{10}%r%f ? [nyae] "
 
 	# if executing through precmd, do not perform fancy terminal editing
 	if [[ "$1" != "precmd" ]]; then
