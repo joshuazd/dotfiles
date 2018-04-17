@@ -18,7 +18,7 @@ set timeoutlen=500                            " shorter timeout
 set ttimeoutlen=100                           " shorter timeout
 set splitbelow                                " Make splits behave better
 set splitright
-set clipboard^=unnamed,unnamedplus            " make clipboard work better
+set clipboard^=unnamed                        " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
@@ -252,6 +252,7 @@ let g:mucomplete#chains = {
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#show_call_signatures = 2
 let g:jedi#show_call_signatures_delay = 50
+let g:jedi#force_py_version = 3
 " clang
 let g:clang_c_completeopt = 'menuone,preview,noinsert,noselect'
 let g:clang_cpp_completeopt = 'menuone,preview,noinsert,noselect'

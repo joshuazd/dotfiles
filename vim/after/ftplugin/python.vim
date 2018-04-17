@@ -6,7 +6,7 @@ else
   setlocal omnifunc=python3complete#Complete
   inoremap <buffer> <silent> . .<C-x><C-o>
 endif
-setlocal keywordprg=pydoc
+setlocal keywordprg=pydoc3
 command! Lint cexpr system('flake8 ' . shellescape(expand('%')))
 setlocal makeprg=flake8\ %:S
 setlocal errorformat=%f:%l:%c:\ %t%n\ %m
