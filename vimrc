@@ -169,7 +169,7 @@ nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
 
-" easier to exit insert more
+" easier to exit insert mode
 inoremap jk <Esc>
 
 " smarter pasting
