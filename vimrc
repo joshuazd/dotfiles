@@ -117,6 +117,8 @@ runtime macros/matchit.vim
 " for convenience
 nnoremap L $
 nnoremap H ^
+xnoremap L $
+xnoremap H ^
 
 " set hlsearch and nohlsearch dynamically-ish
 nnoremap <expr> n &hlsearch ? 'n' : ':set hlsearch<CR>'
@@ -252,10 +254,6 @@ let g:mucomplete#chains = {
 let g:jedi#auto_vim_configuration = 0
 let g:jedi#show_call_signatures = 2
 let g:jedi#show_call_signatures_delay = 50
-" clang
-let g:clang_c_completeopt = 'menuone,preview,noinsert,noselect'
-let g:clang_cpp_completeopt = 'menuone,preview,noinsert,noselect'
-let g:clang_verbose_pmenu = 1
 " lion
 let g:lion_squeeze_spaces = 1 
 " sneak
@@ -299,7 +297,7 @@ let g:mode_hi = {
       \'ReplaceMode' : ' ctermfg=167 guifg=#d75f5f ctermbg=236 guibg=#303030',
       \'CommandMode' : ' ctermfg=176 guifg=#c792ea ctermbg=236 guibg=#303030'}
 
-function! s:updateStatusLineHighlight(nr,newMode) abort
+function! s:updateStatusLineHighlight(newMode) abort
   execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold gui=bold'
   execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none gui=none'
   return 1
@@ -311,7 +309,7 @@ function! StatusLineColors() abort
   highlight ReadOnlyStl  ctermbg=236 guibg=#303030 ctermfg=167 guifg=#d75f5f cterm=NONE gui=NONE
   highlight StatusLine   ctermbg=236 guibg=#303030 ctermfg=250 guifg=#bcbcbc cterm=NONE gui=NONE
   highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
-  call s:updateStatusLineHighlight(winnr(),mode())
+  call s:updateStatusLineHighlight(mode())
 endfunction
 
 call StatusLineColors()
@@ -324,9 +322,9 @@ augroup END
 function! SetupStatusLine(nr) abort
   return get(extend(w:, {
         \ 'lf_active': winnr() != a:nr
-          \ ? 0 : (mode(1) ==# get(g:, 'lf_cached_mode', '')
-            \ ? 1 : s:updateStatusLineHighlight(a:nr,
-              \ get(extend(g:, { 'lf_cached_mode': mode(1) }), 'lf_cached_mode')))}), '', '')
+        \ ? 0 : (mode(1) ==# get(g:, 'lf_cached_mode', '')
+            \ ? 1 : s:updateStatusLineHighlight(get(extend(g:,
+                    \ { 'lf_cached_mode': mode(1) }), 'lf_cached_mode')))}), '', '')
 endfunction
 
 function! BuildStatusLine(nr, extra) abort
