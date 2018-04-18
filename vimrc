@@ -70,7 +70,7 @@ elseif executable('ag')                       " use ag when available and ripgre
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-  set guifont=DejaVu\ Sans\ Mono\ 10
+  set guifont=Ubuntu\ Mono\ 11
   set guioptions-=T
   set guioptions+=e
   set guioptions-=m
@@ -360,8 +360,8 @@ endfunction
 
 " lots of new text objects
 for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', '`' ]
-    execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
-    execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
-    execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
-    execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
+  execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
+  execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
+  execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
+  execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
 endfor
