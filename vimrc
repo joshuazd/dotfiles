@@ -268,21 +268,21 @@ let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 " {{{
 let g:in_snippet = 0
 let g:modemap = {
-      \ 'n' : ['N',     'NormalMode'],  'no': ['NO',   'NormalMode'],  'v' : ['V',    'VisualMode'],
-      \ 'V' : ['V',     'VisualMode'],  '': ['V',    'VisualMode'],  's' : ['S',    'VisualMode'],
-      \ 'S' : ['S',     'VisualMode'],  '': ['S',    'VisualMode'],  'i' : ['I',    'InsertMode'],
-      \ 'ic': ['COMP',  'InsertMode'],  'ix': ['X',    'InsertMode'],  'R' : ['R',    'ReplaceMode'],
-      \ 'Rc': ['RCOMP', 'ReplaceMode'], 'Rv': ['R',    'ReplaceMode'], 'Rx': ['RX',   'ReplaceMode'],
-      \ 'c' : ['C',     'CommandMode'], 'cv': ['VEX',  'CommandMode'], 'ce': ['EX',   'CommandMode'],
-      \ 'r' : ['P',     'CommandMode'], 'rm': ['MORE', 'CommandMode'], 'r?': ['CONF', 'CommandMode'],
-      \ '!' : ['SH',    'CommandMode'], 't' : ['TERM', 'CommandMode']}
+      \ 'n' : ['N',     'Normal'],  'no': ['NO',   'Normal'],  'v' : ['V',    'Visual'],
+      \ 'V' : ['V',     'Visual'],  '': ['V',    'Visual'],  's' : ['S',    'Visual'],
+      \ 'S' : ['S',     'Visual'],  '': ['S',    'Visual'],  'i' : ['I',    'Insert'],
+      \ 'ic': ['COMP',  'Insert'],  'ix': ['X',    'Insert'],  'R' : ['R',    'Replace'],
+      \ 'Rc': ['RCOMP', 'Replace'], 'Rv': ['R',    'Replace'], 'Rx': ['RX',   'Replace'],
+      \ 'c' : ['C',     'Command'], 'cv': ['VEX',  'Command'], 'ce': ['EX',   'Command'],
+      \ 'r' : ['P',     'Command'], 'rm': ['MORE', 'Command'], 'r?': ['CONF', 'Command'],
+      \ '!' : ['SH',    'Command'], 't' : ['TERM', 'Command']}
 
 let g:mode_hi = {
-      \'NormalMode'  : 'ctermfg=68  guifg=#6182b8 ctermbg=236 guibg=#303030',
-      \'InsertMode'  : 'ctermfg=221 guifg=#ffcb6b ctermbg=236 guibg=#303030',
-      \'VisualMode'  : 'ctermfg=107 guifg=#91b859 ctermbg=236 guibg=#303030',
-      \'ReplaceMode' : 'ctermfg=167 guifg=#d75f5f ctermbg=236 guibg=#303030',
-      \'CommandMode' : 'ctermfg=176 guifg=#c792ea ctermbg=236 guibg=#303030'}
+      \'Normal'  : 'ctermfg=68  guifg=#6182b8 ctermbg=236 guibg=#303030',
+      \'Insert'  : 'ctermfg=221 guifg=#ffcb6b ctermbg=236 guibg=#303030',
+      \'Visual'  : 'ctermfg=107 guifg=#91b859 ctermbg=236 guibg=#303030',
+      \'Replace' : 'ctermfg=167 guifg=#d75f5f ctermbg=236 guibg=#303030',
+      \'Command' : 'ctermfg=176 guifg=#c792ea ctermbg=236 guibg=#303030'}
 
 function! s:updateStatusLineHighlight(mode) abort
   execute 'hi! CurrMode ' . g:mode_hi[g:modemap[a:mode][1]] . ' cterm=bold gui=bold'
@@ -308,23 +308,23 @@ augroup END
 
 function! SetupStatusLine(nr) abort
   return get(extend(w:, {
-        \ 'lf_active': winnr() != a:nr
-        \ ? 0 : (mode(1) ==# get(g:, 'lf_cached_mode', '')
+        \ 'active': winnr() != a:nr
+        \ ? 0 : (mode(1) ==# get(g:, 'cached_mode', '')
             \ ? 1 : s:updateStatusLineHighlight(get(extend(g:,
-                    \ { 'lf_cached_mode': mode(1) }), 'lf_cached_mode')))}), '', '')
+                    \ { 'cached_mode': mode(1) }), 'cached_mode')))}), '', '')
 endfunction
 
 function! BuildStatusLine(nr, extra) abort
   return '%{SetupStatusLine('.a:nr.')}'
-        \.'%#CurrMode#%{w:["lf_active"] ? "  " . g:modemap[mode()][0] . (&paste ? " PASTE " : " ") : ""}'
+        \.'%#CurrMode#%{w:["active"] ? "  " . g:modemap[mode()][0] . (&paste ? " PASTE " : " ") : ""}'
         \.'%0* %f%m'
-        \.'%#ReadOnlyStl#%{&readonly && w:["lf_active"] ? "  RO" : ""}%0*'
+        \.'%#ReadOnlyStl#%{&readonly && w:["active"] ? "  RO" : ""}%0*'
         \.'%='
         \.'%{g:in_snippet > 0 ? "snippet " : ""}'
-        \.'%#StlDim#%{&syntax == "" ? "" : w:["lf_active"] ? " ".&syntax." " : ""}'
-        \.'%#StlDimNC#%{&syntax == "" ? "" : w:["lf_active"] ? "" : " ".&syntax." "}'
-        \.'%#ModeNoBold#%{w:["lf_active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}'
-        \.'%0*%{w:["lf_active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}'
+        \.'%#StlDim#%{&syntax == "" ? "" : w:["active"] ? " ".&syntax." " : ""}'
+        \.'%#StlDimNC#%{&syntax == "" ? "" : w:["active"] ? "" : " ".&syntax." "}'
+        \.'%#ModeNoBold#%{w:["active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}'
+        \.'%0*%{w:["active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}'
         \.'%0*' . a:extra . '%#Normal#'
 endfunction
 
