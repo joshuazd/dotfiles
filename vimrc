@@ -237,29 +237,29 @@ command! AC call functions#AnsibleEncrypt()
 " {{{
 " Plugin mappings are specified in the after/plugin/settings folder
 " ultisnips
-let g:UltiSnipsExpandTrigger="\<nop>"
-let g:UltiSnipsJumpForwardTrigger="\<C-l>"
-let g:UltiSnipsJumpBackwardTrigger="\<C-h>"
+let g:UltiSnipsExpandTrigger       = "\<nop>"
+let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
+let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
 " mucomplete
 let g:mucomplete#enable_auto_at_startup = 1
-let g:mucomplete#no_popup_mappings = 1
+let g:mucomplete#no_popup_mappings      = 1
 let g:mucomplete#always_use_completeopt = 1
-let g:mucomplete#chains = {
+let g:mucomplete#chains                 = {
       \ 'default' : ['path', 'omni', 'dict', 'uspl', 'ulti', 'c-n', 'tags'],
       \ 'vim'     : ['path', 'cmd', 'ulti', 'c-n', 'tags'],
       \ 'xml'     : ['ulti', 'tags', 'c-n'],
       \ 'sql'     : ['c-n', 'ulti', 'tags']
       \ }
 " jedi
-let g:jedi#auto_vim_configuration = 0
-let g:jedi#show_call_signatures = 2
+let g:jedi#auto_vim_configuration     = 0
+let g:jedi#show_call_signatures       = 2
 let g:jedi#show_call_signatures_delay = 50
-let g:jedi#force_py_version = 3
+let g:jedi#force_py_version           = 3
 " lion
 let g:lion_squeeze_spaces = 1 
 " sneak
-let g:sneak#label = 1
-let g:sneak#s_next = 1
+let g:sneak#label      = 1
+let g:sneak#s_next     = 1
 let g:sneak#use_ic_scs = 1
 " netrw
 let g:loaded_netrw       = 1
@@ -274,25 +274,25 @@ let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 " {{{
 let g:in_snippet = 0
 let g:modemap = {
-      \ 'n' : ['N',       'NormalMode'],  'no': ['NO',    'NormalMode'],  'v' : ['V',       'VisualMode'],
-      \ 'V' : ['V',       'VisualMode'],  '': ['V',     'VisualMode'],  's' : ['S',       'VisualMode'],
-      \ 'S' : ['S',       'VisualMode'],  '': ['S',     'VisualMode'],  'i' : ['I',       'InsertMode'],
-      \ 'ic': ['COMPL',   'InsertMode'],  'ix': ['X',     'InsertMode'],  'R' : ['R',       'ReplaceMode'],
-      \ 'Rc': ['RCOMPL',  'ReplaceMode'], 'Rv': ['R',     'ReplaceMode'], 'Rx': ['RX',      'ReplaceMode'],
-      \ 'c' : ['C',       'CommandMode'], 'cv': ['VIMEX', 'CommandMode'], 'ce': ['EX',      'CommandMode'],
-      \ 'r' : ['P',       'CommandMode'], 'rm': ['MORE',  'CommandMode'], 'r?': ['CONFIRM', 'CommandMode'],
-      \ '!' : ['SH',      'CommandMode'], 't' : ['TERM',  'CommandMode']}
+      \ 'n' : ['N',     'NormalMode'],  'no': ['NO',   'NormalMode'],  'v' : ['V',    'VisualMode'],
+      \ 'V' : ['V',     'VisualMode'],  '': ['V',    'VisualMode'],  's' : ['S',    'VisualMode'],
+      \ 'S' : ['S',     'VisualMode'],  '': ['S',    'VisualMode'],  'i' : ['I',    'InsertMode'],
+      \ 'ic': ['COMP',  'InsertMode'],  'ix': ['X',    'InsertMode'],  'R' : ['R',    'ReplaceMode'],
+      \ 'Rc': ['RCOMP', 'ReplaceMode'], 'Rv': ['R',    'ReplaceMode'], 'Rx': ['RX',   'ReplaceMode'],
+      \ 'c' : ['C',     'CommandMode'], 'cv': ['VEX',  'CommandMode'], 'ce': ['EX',   'CommandMode'],
+      \ 'r' : ['P',     'CommandMode'], 'rm': ['MORE', 'CommandMode'], 'r?': ['CONF', 'CommandMode'],
+      \ '!' : ['SH',    'CommandMode'], 't' : ['TERM', 'CommandMode']}
 
 let g:mode_hi = {
-      \'NormalMode'  : ' ctermfg=68  guifg=#6182b8 ctermbg=236 guibg=#303030',
-      \'InsertMode'  : ' ctermfg=221 guifg=#ffcb6b ctermbg=236 guibg=#303030',
-      \'VisualMode'  : ' ctermfg=107 guifg=#91b859 ctermbg=236 guibg=#303030',
-      \'ReplaceMode' : ' ctermfg=167 guifg=#d75f5f ctermbg=236 guibg=#303030',
-      \'CommandMode' : ' ctermfg=176 guifg=#c792ea ctermbg=236 guibg=#303030'}
+      \'NormalMode'  : 'ctermfg=68  guifg=#6182b8 ctermbg=236 guibg=#303030',
+      \'InsertMode'  : 'ctermfg=221 guifg=#ffcb6b ctermbg=236 guibg=#303030',
+      \'VisualMode'  : 'ctermfg=107 guifg=#91b859 ctermbg=236 guibg=#303030',
+      \'ReplaceMode' : 'ctermfg=167 guifg=#d75f5f ctermbg=236 guibg=#303030',
+      \'CommandMode' : 'ctermfg=176 guifg=#c792ea ctermbg=236 guibg=#303030'}
 
-function! s:updateStatusLineHighlight(newMode) abort
-  execute 'hi! CurrMode ' . g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=bold gui=bold'
-  execute 'hi! ModeNoBold '.g:mode_hi[get(g:modemap, a:newMode, ['', a:newMode])[1]] . ' cterm=none gui=none'
+function! s:updateStatusLineHighlight(mode) abort
+  execute 'hi! CurrMode ' . g:mode_hi[g:modemap[a:mode][1]] . ' cterm=bold gui=bold'
+  execute 'hi! ModeNoBold '.g:mode_hi[g:modemap[a:mode][1]] . ' cterm=none gui=none'
   return 1
 endfunction
 
@@ -337,11 +337,10 @@ endfunction
 set statusline=%!BuildStatusLine(winnr(),'')
 " }}}
 
-
-
 """"""""""""""""""""""""""""""""""""""""""""""""
 "              EXTENDING VIM
 """"""""""""""""""""""""""""""""""""""""""""""""
+" {{{
 " make list-like commands more intuitive
 " including this here to avoid screwing up command mode
 function! CCR() abort
@@ -365,3 +364,4 @@ for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', 
   execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
   execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
 endfor
+" }}}
