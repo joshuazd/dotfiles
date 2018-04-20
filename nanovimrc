@@ -10,7 +10,7 @@ set noswapfile
 set showcmd
 set tags=./tags,tags
 filetype plugin indent on
-syntax on
+syntax enable
 colorscheme material
 nnoremap L $
 nnoremap H ^
