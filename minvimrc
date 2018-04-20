@@ -80,6 +80,7 @@ endif
 filetype plugin indent on
 syntax enable
 runtime macros/matchit.vim
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh']
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
@@ -111,8 +112,6 @@ nnoremap <silent> <Space>x :bn<bar>bd #<CR>
 " make j and k smarter
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
-nnoremap gj j
-nnoremap gk k
 
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
@@ -174,15 +173,12 @@ nnoremap <silent> <expr> <C-w>f winnr('$') > 1
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
-"              (AUTO)COMMANDS
+"           MISC COMMANDS/FUNCTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 augroup EditVim
   autocmd!
-  autocmd BufNewFile,BufRead *.zsh-theme  set filetype=zsh
-  autocmd BufNewFile,BufRead *.dbs        set filetype=xml
-  autocmd BufNewFile,BufRead *.dmc        set filetype=javascript
-  autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+  autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 augroup END
 
 command! TrimWhiteSpace call TrimWhiteSpace()
@@ -198,7 +194,6 @@ endfunction
 
 command! -range=% FormatJSON <line1>,<line2>!python2 -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
-
 
 " make list-like commands more intuitive
 " including this here to avoid screwing up command mode
@@ -224,17 +219,4 @@ for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', 
   execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
 endfor
 
-" }}}
-
-""""""""""""""""""""""""""""""""""""""""""""""""
-"              STATUSLINE SETUP
-""""""""""""""""""""""""""""""""""""""""""""""""
-" {{{
 set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=%{&ff}\ \ %{&ft}\ \ %03p%%\ \ %04l,%04v\ 
-" }}}
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""
-"              VARIABLES
-""""""""""""""""""""""""""""""""""""""""""""""""
-let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh']
