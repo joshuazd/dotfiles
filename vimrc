@@ -18,7 +18,7 @@ set timeoutlen=500                            " shorter timeout
 set ttimeoutlen=100                           " shorter timeout
 set splitbelow                                " Make splits behave better
 set splitright
-set clipboard^=unnamed                        " make clipboard work better
+set clipboard^=unnamed,unnamedplus            " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
@@ -154,14 +154,14 @@ nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
 " settings toggles
-nnoremap =ow :setlocal <C-R>=(&wrap           ? 'nowrap'           : 'wrap')<CR><CR>
-nnoremap =oc :setlocal <C-R>=(&cursorline     ? 'nocursorline'     : 'cursorline')<CR><CR>
-nnoremap =oz :setlocal <C-R>=(&list           ? 'nolist'           : 'list')<CR><CR>
-nnoremap =on :setlocal <C-R>=(&number         ? 'nonumber'         : 'number')<CR><CR>
-nnoremap =or :setlocal <C-R>=(&relativenumber ? 'norelativenumber' : 'relativenumber')<CR><CR>
-nnoremap =os :setlocal <C-R>=(&spell          ? 'nospell'          : 'spell')<CR><CR>
-nnoremap =ou :setlocal <C-R>=(&cursorcolumn   ? 'nocursorcolumn'   : 'cursorcolumn')<CR><CR>
-nnoremap =oh :setlocal <C-R>=(&hlsearch       ? 'nohlsearch'       : 'hlsearch')<CR><CR>
+nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
+nnoremap =oc :setlocal cursorline!     \|setlocal cursorline?<CR>
+nnoremap =oz :setlocal list!           \|setlocal list?<CR>
+nnoremap =on :setlocal number!         \|setlocal number?<CR>
+nnoremap =or :setlocal relativenumber! \|setlocal relativenumber?<CR>
+nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
+nnoremap =ou :setlocal cursorcolumn!   \|setlocal cursorcolumn?<CR>
+nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
 nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
 nnoremap ]q :cnext<CR>
@@ -177,7 +177,7 @@ nnoremap <silent> <Space>p p=']
 nnoremap <silent> <Space>P P=']
 xnoremap <silent> <Space>p p=']
 xnoremap <silent> <Space>P P=']
-xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
+xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
 
 " misc functions
 noremap <silent> <F5> :call functions#VimRefresh()<CR>
