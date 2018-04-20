@@ -2,7 +2,6 @@
 "              GENERAL OPTIONS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-set nocompatible
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
 set whichwrap+=<,>,h,l                        " arrow keys and h,l move to the next line
@@ -48,6 +47,7 @@ set listchars=tab:->,trail:~,extends:>,eol:$  " what to show for whitespace char
 set display+=lastline                         " show as much of the last line as possible
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
 set completeopt+=menuone,longest              " configure popup menu
+set virtualedit+=block                        " allow virtual editing in v-block mode
 set concealcursor+=n                          " conceal characters in normal mode
 set conceallevel=2                            " conceal characters by default
 set autowrite                                 " automatically save before :next, :make, etc
@@ -126,14 +126,14 @@ nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
 " settings toggles
-nnoremap =ow :setlocal <C-R>=(&wrap           ? 'nowrap'           : 'wrap')<CR><CR>
-nnoremap =oc :setlocal <C-R>=(&cursorline     ? 'nocursorline'     : 'cursorline')<CR><CR>
-nnoremap =oz :setlocal <C-R>=(&list           ? 'nolist'           : 'list')<CR><CR>
-nnoremap =on :setlocal <C-R>=(&number         ? 'nonumber'         : 'number')<CR><CR>
-nnoremap =or :setlocal <C-R>=(&relativenumber ? 'norelativenumber' : 'relativenumber')<CR><CR>
-nnoremap =os :setlocal <C-R>=(&spell          ? 'nospell'          : 'spell')<CR><CR>
-nnoremap =ou :setlocal <C-R>=(&cursorcolumn   ? 'nocursorcolumn'   : 'cursorcolumn')<CR><CR>
-nnoremap =oh :setlocal <C-R>=(&hlsearch       ? 'nohlsearch'       : 'hlsearch')<CR><CR>
+nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
+nnoremap =oc :setlocal cursorline!     \|setlocal cursorline?<CR>
+nnoremap =oz :setlocal list!           \|setlocal list?<CR>
+nnoremap =on :setlocal number!         \|setlocal number?<CR>
+nnoremap =or :setlocal relativenumber! \|setlocal relativenumber?<CR>
+nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
+nnoremap =ou :setlocal cursorcolumn!   \|setlocal cursorcolumn?<CR>
+nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
 nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
 nnoremap ]q :cnext<CR>
@@ -141,7 +141,7 @@ nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
 
-" easier to exit insert more
+" easier to exit insert mode
 inoremap jk <Esc>
 
 " smarter pasting
@@ -161,29 +161,22 @@ nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 " better tag jumping
 nnoremap <C-]> g<C-]>
-nnoremap <expr> <C-w><C-]> len(getwininfo()) > 1
+nnoremap <expr> <C-w><C-]> winnr('$') > 1
       \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
       \: ":vertical stjump \<C-r>\<C-w>\<CR>"
-nnoremap <expr> <C-w>] len(getwininfo()) > 1
+nnoremap <expr> <C-w>] winnr('$') > 1
       \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
       \: ":vertical stjump \<C-r>\<C-w>\<CR>"
 nnoremap <C-_> :stjump <C-r><C-w><CR>
 nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
-nnoremap <expr> g<C-_> len(getwininfo()) > 1
-      \? "\"ayiw\<C-w>j:tjump \<C-r>a\<CR>"
-      \: ":stjump \<C-r>\<C-w>\<CR>"
-nnoremap <expr> g<C-Bslash> len(getwininfo()) > 1
-      \? "\"ayiw\<C-w>l:tjump \<C-r>a\<CR>"
-      \: ":vertical stjump \<C-r>\<C-w>\<CR>"
-
 " better file jumping
-nnoremap <silent> <expr> <C-w>f len(getwininfo()) > 1
+nnoremap <silent> <expr> <C-w>f winnr('$') > 1
       \? ":let fname=\"\<C-r>\<C-f>\"\|execute \"normal! \\<lt>C-w>p\"\<CR>:find \<C-r>=fname\<CR>\<CR>"
       \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
-"              AUTOCOMMANDS
+"              (AUTO)COMMANDS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
 augroup EditVim
@@ -227,10 +220,10 @@ endfunction
 
 " lots of new text objects
 for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', '`' ]
-    execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
-    execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
-    execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
-    execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
+  execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
+  execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
+  execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
+  execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
 endfor
 
 " }}}
