@@ -40,6 +40,9 @@ export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 # The '&' is a special pattern which suppresses duplicate entries.
 export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls:l'
 
+export EDITOR=vim\ -u\ ~/dotfiles/nanovimrc\ -N
+export VISUAL=vim\ -u\ ~/dotfiles/nanovimrc\ -N
+
 # Aliases
 if [ -f "${HOME}/.aliases" ]; then
   source "${HOME}/.aliases"

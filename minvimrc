@@ -53,7 +53,6 @@ set conceallevel=2                            " conceal characters by default
 set autowrite                                 " automatically save before :next, :make, etc
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
-set cpoptions-=<
 set fillchars=stl:\ ,stlnc:\ ,fold:─,diff:─   " use box chars for folds, etc
 set tags=./tags,tags                          " where to find tag files
 set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
@@ -80,7 +79,6 @@ if has('gui_running')
 endif
 filetype plugin indent on
 syntax enable
-colorscheme default
 runtime macros/matchit.vim
 " }}}
 
@@ -108,7 +106,7 @@ nnoremap <M-a> :bp<CR>
 nnoremap <Esc>d :bn<CR>
 nnoremap <Esc>a :bp<CR>
 nnoremap <BS> <C-^>
-nnoremap <silent> <Space>x :bn\|bd #<CR>
+nnoremap <silent> <Space>x :bn<bar>bd #<CR>
 
 " make j and k smarter
 nnoremap <expr> j v:count ? 'j' : 'gj'
@@ -126,14 +124,14 @@ nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 
 " settings toggles
-nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
-nnoremap =oc :setlocal cursorline!     \|setlocal cursorline?<CR>
-nnoremap =oz :setlocal list!           \|setlocal list?<CR>
-nnoremap =on :setlocal number!         \|setlocal number?<CR>
-nnoremap =or :setlocal relativenumber! \|setlocal relativenumber?<CR>
-nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
-nnoremap =ou :setlocal cursorcolumn!   \|setlocal cursorcolumn?<CR>
-nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
+nnoremap =ow :setlocal wrap!           <bar>setlocal wrap?<CR>
+nnoremap =oc :setlocal cursorline!     <bar>setlocal cursorline?<CR>
+nnoremap =oz :setlocal list!           <bar>setlocal list?<CR>
+nnoremap =on :setlocal number!         <bar>setlocal number?<CR>
+nnoremap =or :setlocal relativenumber! <bar>setlocal relativenumber?<CR>
+nnoremap =os :setlocal spell!          <bar>setlocal spell?<CR>
+nnoremap =ou :setlocal cursorcolumn!   <bar>setlocal cursorcolumn?<CR>
+nnoremap =oh :setlocal hlsearch!       <bar>setlocal hlsearch?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
 nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
 nnoremap ]q :cnext<CR>
@@ -152,7 +150,7 @@ xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>
 
 " misc functions
-nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
+nnoremap <silent> <Space>m :silent! make<bar>cwindow<bar>redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
 " [I ]I smarter
@@ -232,7 +230,7 @@ endfor
 "              STATUSLINE SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=[%L][%{&ff}]%y[%p%%][%04l,%04v]
+set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=%{&ff}\ \ %{&ft}\ \ %03p%%\ \ %04l,%04v\ 
 " }}}
 
 

@@ -32,8 +32,8 @@ setopt globcomplete
 # Editing settings
 stty -ixon
 bindkey -e
-export EDITOR=vim\ -u\ ~/dotfiles/nanovimrc
-export VISUAL=vim\ -u\ ~/dotfiles/nanovimrc
+export EDITOR=vim\ -u\ ~/dotfiles/nanovimrc\ -N
+export VISUAL=vim\ -u\ ~/dotfiles/nanovimrc\ -N
 export KEYTIMEOUT=1
 autoload -U edit-command-line
 zle -N edit-command-line

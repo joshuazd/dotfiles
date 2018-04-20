@@ -22,9 +22,9 @@ alias vimup='vim +helptags\ ALL +PlugUpgrade +PlugUpdate'
 alias mcar='cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
 alias build='mvnc clean install; mcar'
 
-alias cvi='vi -u ~/dotfiles/microvimrc --noplugin'
-alias mvi='vi -u ~/dotfiles/minvimrc'
-alias nvi='vi -u ~/dotfiles/nanovimrc'
+alias cvi='vi -u ~/dotfiles/microvimrc --noplugin -N'
+alias mvi='vi -u ~/dotfiles/minvimrc -N'
+alias nvi='vi -u ~/dotfiles/nanovimrc -N'
 
 alias grep='grep --color=auto --exclude-dir=.git'
 alias history='fc -il 1'
