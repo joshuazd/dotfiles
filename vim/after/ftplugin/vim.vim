@@ -3,7 +3,6 @@ setlocal softtabstop=2
 setlocal foldmethod=marker
 setlocal makeprg=vint\ %:S
 setlocal keywordprg=:help
-command! Lint cexpr system('vint ' . shellescape(expand('%')))
 setlocal errorformat=%f:%l:%c:\ %t%n:\ %m,%f:%l:%c:\ %m
 setlocal path=.,$HOME/dotfiles/vim/*,$HOME/dotfiles/vim/after/*,$HOME/dotfiles/vim/bundle/**,,
 augroup VIM
