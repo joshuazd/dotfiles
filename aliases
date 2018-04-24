@@ -23,7 +23,6 @@ alias mcar='cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
 alias build='mvnc clean install; mcar'
 
 alias cvi='vi -u ~/dotfiles/microvimrc --noplugin -N'
-alias mvi='vi -u ~/dotfiles/minvimrc -N'
 alias nvi='vi -u ~/dotfiles/nanovimrc -N'
 
 alias grep='grep --color=auto --exclude-dir=.git'
