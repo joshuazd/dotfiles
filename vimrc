@@ -56,9 +56,11 @@ set shortmess+=cmrw                           " don't show completion errors
 set winminheight=0                            " minimum window size 0x0
 set winminwidth=0
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
-set completeopt+=menuone                      " configure popup menu
-if has('patch-7.4.784')
-  set completeopt+=noselect,noinsert
+if exists('+completeopt')
+  set completeopt+=menuone                    " configure popup menu
+  if has('patch-7.4.784')
+    set completeopt+=noselect,noinsert
+  endif
 endif
 set listchars=tab:»\ ,trail:~,extends:>,eol:¬,nbsp:␣ " what to show for whitespace chars
 if has('patch-7.4.710')
@@ -71,7 +73,7 @@ if exists('+signcolumn')
   set signcolumn=no                           " don't have signcolumn on
 endif
 try
-    colorscheme material                      " material color scheme
+  colorscheme material                        " material color scheme
 catch
 endtry
 if executable('rg')                           " use ripgrep when available
