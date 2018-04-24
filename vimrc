@@ -4,10 +4,10 @@
 " {{{
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
-set whichwrap+=<,>,h,l                        " arrow keys and h,l move to the next line
+set whichwrap+=<,>                            " arrow keys and h,l move to the next line
 set showcmd                                   " show keystrokes
 set breakindent                               " Indent wrapped lines by 2
-set breakindentopt=shift:2
+set breakindentopt+=shift:2
 set ignorecase                                " Ignore case when searching
 set smartcase                                 " When searching try to be smart about cases
 set incsearch                                 " Makes search act like search in modern browsers
@@ -18,7 +18,6 @@ set timeoutlen=500                            " shorter timeout
 set ttimeoutlen=100                           " shorter timeout
 set splitbelow                                " Make splits behave better
 set splitright
-set clipboard^=unnamed,unnamedplus            " make clipboard work better
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
@@ -31,7 +30,7 @@ set laststatus=2                              " always show statusline
 set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically
 set sidescroll=1                              " scroll 1 character at a time
 set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
-set foldmethod=marker                         " fold based on syntax
+set foldmethod=marker                         " fold based on marker by default
 set formatoptions-=o                          " Don't insert comment leader on `o`
 set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full           " setup wildmenu
@@ -43,25 +42,38 @@ set sessionoptions-=options                   " make sessions work better with p
 set sessionoptions-=blank
 set noswapfile                                " do not create swap files
 set foldlevel=4                               " don't fold things by default
-set listchars=tab:»\ ,trail:~,extends:>,space:·,eol:¬,nbsp:␣ " what to show for whitespace chars
 set display+=lastline                         " show as much of the last line as possible
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
-set completeopt+=menuone,noselect,noinsert    " configure popup menu
 set virtualedit+=block                        " allow virtual editing in v-block mode
 set concealcursor+=n                          " conceal characters in normal mode
 set conceallevel=2                            " conceal characters by default
-set autowrite                                 " automatically save before :next, :make, etc
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
-set signcolumn=no                             " don't have signcolumn on
 set tags=./tags,tags                          " where to find tag files
 set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 set modeline                                  " read modelines
-set shortmess+=c                              " don't show completion errors
+set shortmess+=cmrw                           " don't show completion errors
 set winminheight=0                            " minimum window size 0x0
 set winminwidth=0
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
-colorscheme material                          " material color scheme
+set completeopt+=menuone                      " configure popup menu
+if has('patch-7.4.784')
+  set completeopt+=noselect,noinsert
+endif
+set listchars=tab:»\ ,trail:~,extends:>,eol:¬,nbsp:␣ " what to show for whitespace chars
+if has('patch-7.4.710')
+  set listchars+=space:·
+endif
+if exists('+clipboard')
+  set clipboard^=unnamed,unnamedplus          " make clipboard work better
+endif
+if exists('+signcolumn')
+  set signcolumn=no                           " don't have signcolumn on
+endif
+try
+    colorscheme material                      " material color scheme
+catch
+endtry
 if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m,%f:%l:%m
@@ -82,31 +94,33 @@ endif
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
-"              PLUGINS
+"                 PLUGINS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-call plug#begin('~/.vim/bundle')
-Plug 'lifepillar/vim-mucomplete'
-Plug 'SirVer/ultisnips'
-Plug 'justinmk/vim-sneak'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-obsession'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-commentary'
-Plug 'tommcdo/vim-lion'
-Plug 'romainl/vim-qf'
-Plug 'romainl/vim-qlist'
-Plug 'justinmk/vim-dirvish'
-Plug 'xtal8/traces.vim'
-Plug 'sgur/vim-editorconfig'
-Plug 'kana/vim-textobj-user'
-Plug 'kana/vim-textobj-indent'
-if executable('ctags')
-  Plug 'ludovicchabant/vim-gutentags'
+if !empty(glob('~/.vim/autoload/plug.vim'))
+  call plug#begin('~/.vim/bundle')
+  Plug 'lifepillar/vim-mucomplete'
+  Plug 'SirVer/ultisnips'
+  Plug 'justinmk/vim-sneak'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-obsession'
+  Plug 'tpope/vim-repeat'
+  Plug 'tpope/vim-commentary'
+  Plug 'tommcdo/vim-lion'
+  Plug 'romainl/vim-qf'
+  Plug 'romainl/vim-qlist'
+  Plug 'justinmk/vim-dirvish'
+  Plug 'xtal8/traces.vim'
+  Plug 'sgur/vim-editorconfig'
+  Plug 'kana/vim-textobj-user'
+  Plug 'kana/vim-textobj-indent'
+  if executable('ctags')
+    Plug 'ludovicchabant/vim-gutentags'
+  endif
+  " language specific plugins
+  Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+  call plug#end()
 endif
-" language specific plugins
-Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-call plug#end()
 runtime macros/matchit.vim
 " }}}
 
@@ -328,7 +342,9 @@ function! BuildStatusLine(nr, extra) abort
         \.'%0*' . a:extra . '%#Normal#'
 endfunction
 
-set statusline=%!BuildStatusLine(winnr(),'')
+if exists('+statusline')
+  set statusline=%!BuildStatusLine(winnr(),'')
+endif
 " }}}
 
 """"""""""""""""""""""""""""""""""""""""""""""""
