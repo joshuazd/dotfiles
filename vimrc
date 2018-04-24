@@ -208,6 +208,8 @@ nnoremap <expr> <C-w>] winnr('$') > 1
       \: ":vertical stjump \<C-r>\<C-w>\<CR>"
 nnoremap <C-_> :stjump <C-r><C-w><CR>
 nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
+nnoremap g<C-]> :ptjump <C-r><C-w><CR>
+xnoremap g<C-]> "ay:<C-u>ptjump <C-r>a<CR><CR>
 
 " better file jumping
 nnoremap <silent> <expr> <C-w>f winnr('$') > 1
