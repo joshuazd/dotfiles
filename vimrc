@@ -306,14 +306,14 @@ let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 " {{{
 let g:in_snippet = 0
 let g:modemap = {
-      \ 'n' : ['N',     'Normal'],  'no': ['NO',   'Normal'],  'v' : ['V',    'Visual'],
-      \ 'V' : ['V',     'Visual'],  '': ['V',    'Visual'],  's' : ['S',    'Visual'],
-      \ 'S' : ['S',     'Visual'],  '': ['S',    'Visual'],  'i' : ['I',    'Insert'],
-      \ 'ic': ['COMP',  'Insert'],  'ix': ['X',    'Insert'],  'R' : ['R',    'Replace'],
-      \ 'Rc': ['RCOMP', 'Replace'], 'Rv': ['R',    'Replace'], 'Rx': ['RX',   'Replace'],
-      \ 'c' : ['C',     'Command'], 'cv': ['VEX',  'Command'], 'ce': ['EX',   'Command'],
-      \ 'r' : ['P',     'Command'], 'rm': ['MORE', 'Command'], 'r?': ['CONF', 'Command'],
-      \ '!' : ['SH',    'Command'], 't' : ['TERM', 'Command']}
+      \ 'n' : ['NORMAL', 'Normal'],  'no': ['NRM-OP', 'Normal'],  'v' : ['VISUAL', 'Visual'],
+      \ 'V' : ['V-LINE', 'Visual'],  '': ['VBLOCK', 'Visual'],  's' : ['SELECT', 'Visual'],
+      \ 'S' : ['S-LINE', 'Visual'],  '': ['SBLOCK', 'Visual'],  'i' : ['INSERT', 'Insert'],
+      \ 'ic': ['COMPLT', 'Insert'],  'ix': ['XCOMPL', 'Insert'],  'R' : ['REPLCE', 'Replace'],
+      \ 'Rc': ['RCOMPL', 'Replace'], 'Rv': ['VREPLC', 'Replace'], 'Rx': ['RXCOMP', 'Replace'],
+      \ 'c' : ['COMMND', 'Command'], 'cv': ['VIM-EX', 'Command'], 'ce': ['  EX  ', 'Command'],
+      \ 'r' : ['PROMPT', 'Command'], 'rm': [' MORE ', 'Command'], 'r?': ['CONFRM', 'Command'],
+      \ '!' : [' SHELL', 'Command'], 't' : [' TERM ', 'Command']}
 
 let g:mode_hi = {
       \'Normal'  : 'ctermfg=68  guifg=#6182b8 ctermbg=236 guibg=#303030',
@@ -323,8 +323,7 @@ let g:mode_hi = {
       \'Command' : 'ctermfg=176 guifg=#c792ea ctermbg=236 guibg=#303030'}
 
 function! s:updateStatusLineHighlight(mode) abort
-  execute 'hi! CurrMode ' . g:mode_hi[g:modemap[a:mode][1]] . ' cterm=bold gui=bold'
-  execute 'hi! ModeNoBold '.g:mode_hi[g:modemap[a:mode][1]] . ' cterm=none gui=none'
+  execute 'hi! StlMode '.g:mode_hi[g:modemap[a:mode][1]] . ' cterm=none gui=none'
   return 1
 endfunction
 
@@ -354,14 +353,14 @@ endfunction
 
 function! BuildStatusLine(nr, extra) abort
   return '%{SetupStatusLine('.a:nr.')}'
-        \.'%#CurrMode#%{w:["active"] ? "  " . g:modemap[mode()][0] . (&paste ? " PASTE " : " ") : ""}'
+        \.'%#StlMode#%{w:["active"] ? "  " . g:modemap[mode()][0] . (&paste ? " PASTE " : " ") : ""}'
         \.'%0* %f%m'
         \.'%#ReadOnlyStl#%{&readonly && w:["active"] ? "  RO" : ""}%0*'
         \.'%='
         \.'%{g:in_snippet > 0 ? "snippet " : ""}'
         \.'%#StlDim#%{&syntax == "" ? "" : w:["active"] ? " ".&syntax." " : ""}'
         \.'%#StlDimNC#%{&syntax == "" ? "" : w:["active"] ? "" : " ".&syntax." "}'
-        \.'%#ModeNoBold#%{w:["active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}'
+        \.'%#StlMode#%{w:["active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}'
         \.'%0*%{w:["active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}'
         \.'%0*' . a:extra . '%#Normal#'
 endfunction
