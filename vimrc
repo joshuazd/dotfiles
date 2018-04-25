@@ -214,6 +214,7 @@ nnoremap <silent> <Space>P P=']
 xnoremap <silent> <Space>p p=']
 xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
+nnoremap <silent> zp :set opfunc=functions#PasteOp<CR>g@
 
 " misc functions
 noremap <silent> <F5> :call functions#VimRefresh()<CR>

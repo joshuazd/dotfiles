@@ -74,3 +74,16 @@ function! functions#MyFoldText() abort
   let sub = strpart(sub, 0, winwidth(0) - strlen(info) - num_w - fold_w)
   return sub . info
 endfunction
+
+function! functions#PasteOp(type, ...) abort
+  let l:mode = 'v'
+  if a:type ==? 'line'
+    let l:mode = 'V'
+  elseif a:type ==? 'block'
+    let l:mode = ''
+  endif
+  execute 'normal! g`[' . l:mode . 'gg`]p'
+  let @+=@0
+  let @"=@0
+  let @*=@0
+endfunction
