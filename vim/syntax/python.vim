@@ -370,7 +370,11 @@ hi link  pythonBuiltinObj   Structure
 hi link  pythonBuiltinFunc  Function
 hi link  pythonBuiltinFunc  Builtin
 
-hi link  pythonItemAccess   Special
+hi link  pythonItemAccess   Tag
+augroup pythonHighlight
+  autocmd!
+  autocmd ColorScheme * highlight pythonField ctermfg=245 guifg=#8a8a8a
+augroup END
 highlight pythonField ctermfg=245 guifg=#8a8a8a
 
 hi link  pythonExClass      Structure
