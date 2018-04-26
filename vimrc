@@ -64,10 +64,8 @@ endif
 if exists('+spellfile')
   set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
 endif
-if exists('+winminheight')
+if exists('+winminheight') && exists('+winminwidth')
   set winminheight=0                            " minimum window size 0x0
-endif
-if exists('+winminwidth')
   set winminwidth=0
 endif
 if exists('+foldtext')
