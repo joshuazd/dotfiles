@@ -4,7 +4,7 @@
 " {{{
 set hidden                                      " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                  " Configure backspace so it acts as it should act
-set whichwrap+=<,>                              " arrow keys and h,l move to the next line
+set whichwrap+=<,>                              " arrow keys move to the next line
 set showcmd                                     " show keystrokes
 set breakindent                                 " Indent wrapped lines by 2
 set breakindentopt+=shift:2

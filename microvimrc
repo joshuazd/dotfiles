@@ -1,6 +1,6 @@
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
-set whichwrap+=<,>,h,l                        " arrow keys and h,l move to the next line
+set whichwrap+=<,>                            " arrow keys move to the next line
 set showcmd                                   " show keystrokes
 set breakindent                               " Indent wrapped lines by 2
 set breakindentopt=shift:2
@@ -76,4 +76,4 @@ nnoremap <C-]> g<C-]>
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
 nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
-set statusline=\ %{toupper(mode())}\ %f%m%r%h%w%=%{&ff}\ \ %{&ft}\ \ %03p%%\ \ %04l,%04v\ 
+set statusline=\ %f%m%r%h%w%=%{&ff}\ \ %{&ft}\ \ %03p%%\ \ %04l,%04v\ 
