@@ -319,51 +319,33 @@ let g:modemap = {
       \ 'r' : ['PROMPT', 'Command'], 'rm': [' MORE ', 'Command'], 'r?': ['CONFRM', 'Command'],
       \ '!' : [' SHELL', 'Command'], 't' : [' TERM ', 'Command']}
 
-let g:mode_hi = {
-      \'Normal'  : 'ctermfg=68  guifg=#6182b8 ctermbg=236 guibg=#303030',
-      \'Insert'  : 'ctermfg=221 guifg=#ffcb6b ctermbg=236 guibg=#303030',
-      \'Visual'  : 'ctermfg=107 guifg=#91b859 ctermbg=236 guibg=#303030',
-      \'Replace' : 'ctermfg=167 guifg=#d75f5f ctermbg=236 guibg=#303030',
-      \'Command' : 'ctermfg=176 guifg=#c792ea ctermbg=236 guibg=#303030'}
-
-function! s:updateStatusLineHighlight(mode) abort
-  execute 'hi! StlMode '.g:mode_hi[g:modemap[a:mode][1]] . ' cterm=none gui=none'
-  return 1
-endfunction
-
 function! StatusLineColors() abort
   highlight StlDim       ctermbg=236 guibg=#303030 ctermfg=243 guifg=#767676 cterm=NONE gui=NONE
-  highlight StlDimNC     ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
   highlight ReadOnlyStl  ctermbg=236 guibg=#303030 ctermfg=167 guifg=#d75f5f cterm=NONE gui=NONE
   highlight StatusLine   ctermbg=236 guibg=#303030 ctermfg=250 guifg=#bcbcbc cterm=NONE gui=NONE
   highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
-  call s:updateStatusLineHighlight(mode())
+  highlight StlMode      ctermbg=236 guibg=#303030 ctermfg=75  guifg=#5fafff cterm=NONE gui=NONE
 endfunction
-
-call StatusLineColors()
 
 augroup statusline
   autocmd!
   autocmd ColorScheme * call StatusLineColors()
 augroup END
+call StatusLineColors()
 
 function! SetupStatusLine(nr) abort
-  return get(extend(w:, {
-        \ 'active': winnr() != a:nr
-        \ ? 0 : (mode(1) ==# get(g:, 'cached_mode', '')
-            \ ? 1 : s:updateStatusLineHighlight(get(extend(g:,
-                    \ { 'cached_mode': mode(1) }), 'cached_mode')))}), '', '')
+  return get(extend(w:, { 'active' : winnr() == a:nr }), '', '') 
 endfunction
 
 function! BuildStatusLine(nr, extra) abort
   return '%{SetupStatusLine('.a:nr.')}'
-        \.'%#StlMode#%{w:["active"] ? "  " . g:modemap[mode()][0] . (&paste ? " PASTE " : " ") : ""}'
+        \.'%#StlMode#%{w:["active"] ? "  " . g:modemap[mode()][0] . (&paste ? " PASTE " : "") : ""}'
         \.'%0* %f%m'
         \.'%#ReadOnlyStl#%{&readonly && w:["active"] ? "  RO" : ""}%0*'
         \.'%='
         \.'%{g:in_snippet > 0 ? "snippet " : ""}'
         \.'%#StlDim#%{&syntax == "" ? "" : w:["active"] ? " ".&syntax." " : ""}'
-        \.'%#StlDimNC#%{&syntax == "" ? "" : w:["active"] ? "" : " ".&syntax." "}'
+        \.'%#StatusLineNC#%{&syntax == "" ? "" : w:["active"] ? "" : " ".&syntax." "}'
         \.'%#StlMode#%{w:["active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}'
         \.'%0*%{w:["active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}'
         \.'%0*' . a:extra . '%#Normal#'
