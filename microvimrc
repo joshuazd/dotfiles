@@ -34,15 +34,15 @@ set listchars=tab:->,trail:~,extends:>,eol:$  " what to show for whitespace char
 set display+=lastline                         " show as much of the last line as possible
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
 set completeopt+=menuone,noselect,longest     " configure popup menu
-set autowrite                                 " automatically save before :next, :make, etc
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
-set cpoptions-=<
 set tags=./tags,tags
 filetype indent on
 
 nnoremap L $
 nnoremap H ^
+xnoremap L $
+xnoremap H ^
 
 nnoremap <expr> n &hlsearch ? 'n' : ':set hlsearch<CR>'
 nnoremap <expr> N &hlsearch ? 'N' : ':set hlsearch<CR>'
