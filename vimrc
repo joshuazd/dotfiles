@@ -185,6 +185,8 @@ xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! 
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find<space>
+nnoremap <Space>s :sfind<space>
+nnoremap <Space>v :vert sfind<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
