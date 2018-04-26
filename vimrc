@@ -142,6 +142,9 @@ if !empty(glob('~/.vim/autoload/plug.vim'))
   " language specific plugins
   Plug 'davidhalter/jedi-vim', { 'for': 'python' }
   call plug#end()
+else
+  syntax enable
+  filetype plugin indent on
 endif
 runtime macros/matchit.vim
 " }}}
