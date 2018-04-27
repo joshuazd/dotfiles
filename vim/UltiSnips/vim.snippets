@@ -13,13 +13,13 @@ snippet ifelse "if else endif" b
 if ${1:condition}
 	${2}
 else
-	${3}
+	$0
 endif
 endsnippet
 
 snippet func "function" b
 function! ${1:name}($2) abort
-	${3:${VISUAL:" code}}
+	${0:${VISUAL:" code}}
 endfunction
 endsnippet
 
@@ -42,29 +42,29 @@ endsnippet
 snippet augroup "augroup with autocmds" b
 augroup ${1:name}
 	autocmd!
-	autocmd ${2:event}
+	autocmd ${0:event}
 augroup END
 endsnippet
 
 snippet try "try catch endtry" b
 try
-	${1:" code}
+	${0:" code}
 catch
 endtry
 endsnippet
 
 snippet map "map" b
-${1:nnore}map ${2:trigger} ${3:result}
+${1:nnore}map ${2:trigger} ${0:result}
 endsnippet
 
 snippet let "let variable" b
-let ${1:variable} = ${2:value}
+let ${1:variable} = ${0:value}
 endsnippet
 
 snippet hdl "hi def link" b
-hi def link ${1:group} ${2:link}
+hi def link ${1:group} ${0:link}
 endsnippet
 
 snippet hl "highlight" b
-highlight ${1:group} ctermfg=${2:ctermfg} guifg=${3:guifg} ctermbg=${4:ctermbg} guibg=${5:guibg} cterm=${6:format} gui=${6:format}
+highlight ${1:group} ctermfg=${2:ctermfg} guifg=${3:guifg} ctermbg=${4:ctermbg} guibg=${5:guibg} cterm=${0:format} gui=${0:format}
 endsnippet
