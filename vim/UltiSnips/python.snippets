@@ -523,13 +523,13 @@ endsnippet
 ##############
 # PROPERTIES #
 ##############
-snippet roprop "Read Only Property" b
+snippet roprop "Read Only Property" bm
 @property
 def ${1:name}(self):
 	${2:return self._$1}$0
 endsnippet
 
-snippet rwprop "Read write property" b
+snippet rwprop "Read write property" bm
 def ${1:name}():
 	`!p snip.rv = triple_quotes(snip) if t[2] else ''
 `${2:TODO: Docstring for $1.}`!p
