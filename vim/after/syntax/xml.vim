@@ -68,7 +68,7 @@ hi def link xmlNs           Identifier
 " call XmlAfterHighlight()
 
 hi def link xmlArgs         Primitive
-hi def link xmlConnection   StorageClass
+hi def link xmlConnection   Storage
 hi def link xmlSqlTag       Builtin
 hi def link xmlValue        xmlExpression
 hi def link xmlFile         Tag
