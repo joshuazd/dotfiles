@@ -202,10 +202,14 @@ snippet     xct "xsl call-template" b
 </xsl:call-template>${0}
 endsnippet
 
-snippet     xslt "xslt" b
+snippet     xsltp "xslt with property" b
 <xslt key="${1:XSLT Name}">
 	${2:<property name="BATCH_ID" expression="get-property('MessageID')"/>}
 </xslt>${0}
+endsnippet
+
+snippet xslt "xslt" b
+<xslt key="${1:XSLT}"/>
 endsnippet
 
 snippet     xsl "xslt file" b
@@ -254,4 +258,10 @@ snippet	    ept "endpoint timeouts" b
 <markForSuspension>
 	<errorCodes>-1</errorCodes>
 </markForSuspension>
+endsnippet
+
+snippet s "send" b
+<send>
+	${1:${VISUAL}}
+</send>
 endsnippet

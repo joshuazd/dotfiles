@@ -46,7 +46,7 @@ $0
 endsnippet
 
 snippet /o|v/ "new Object or variable" br
-${1:Object} ${2:var} = new $1($3);
+${1:Object} ${2:`!p snip.rv = t[1].lower()`} = new $1($3);
 endsnippet
 
 snippet f "field" b

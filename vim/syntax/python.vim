@@ -365,7 +365,7 @@ hi link  pythonOctError     Error
 hi link  pythonHexError     Error
 hi link  pythonBinError     Error
 
-hi link  pythonBuiltinType  StringDelimiter
+hi link  pythonBuiltinType  Builtin
 hi link  pythonBuiltinObj   Structure
 hi link  pythonBuiltinFunc  Function
 hi link  pythonBuiltinFunc  Builtin
