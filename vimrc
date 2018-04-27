@@ -340,7 +340,7 @@ endfunction
 function! BuildStatusLine(nr, extra) abort
   return '%{SetupStatusLine('.a:nr.')}'
         \.'%#StlMode#%{w:["active"] ? "  " . g:modemap[mode()][0] . (&paste ? " PASTE " : "") : ""}'
-        \.'%0* %f%m'
+        \.'%0* %f%m%w%q'
         \.'%#ReadOnlyStl#%{&readonly && w:["active"] ? "  RO" : ""}%0*'
         \.'%='
         \.'%{g:in_snippet > 0 ? "snippet " : ""}'
