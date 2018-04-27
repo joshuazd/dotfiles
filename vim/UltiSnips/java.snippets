@@ -30,6 +30,12 @@ def mixedCase(word):
 	if not word: return ''
 	return word[0].lower() + word[1:]
 
+def varName(word):
+	if not word: return ''
+	word = word[0].lower() + word[1:]
+	return word.translate({ord(c): None for c in '<>:'})
+
+
 endglobal
 
 snippet sleep "try sleep catch" b
@@ -46,11 +52,11 @@ $0
 endsnippet
 
 snippet /o|v/ "new Object or variable" br
-${1:Object} ${2:`!p snip.rv = t[1].lower()`} = new $1($3);
+${1:Object} ${2:`!p snip.rv = varName(t[1])`} = new $1($3);
 endsnippet
 
 snippet f "field" b
-${1:private} ${2:String} ${3:`!p snip.rv = t[2].lower()`};
+${1:private} ${2:String} ${3:`!p snip.rv = varName(t[2])`};
 endsnippet
 
 snippet ab "abstract" b
