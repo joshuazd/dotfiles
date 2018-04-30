@@ -256,7 +256,7 @@ command! Focus call functions#Focus()
 " {{{
 " Plugin mappings are specified in the after/plugin/settings folder
 " ultisnips
-let g:UltiSnipsExpandTrigger       = '<CR>'
+let g:UltiSnipsExpandTrigger       = "\<nop>"
 let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
 let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
 " mucomplete
@@ -293,14 +293,12 @@ let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 " {{{
 let g:in_snippet = 0
 let g:modemap = {
-      \ 'n' : 'NORMAL', 'no': 'NRM-OP', 'v' : 'VISUAL',
-      \ 'V' : 'V-LINE', '': 'VBLOCK', 's' : 'SELECT',
-      \ 'S' : 'S-LINE', '': 'SBLOCK', 'i' : 'INSERT',
-      \ 'ic': 'COMPLT', 'ix': 'XCOMPL', 'R' : 'REPLCE',
-      \ 'Rc': 'RCOMPL', 'Rv': 'VREPLC', 'Rx': 'RXCOMP',
-      \ 'c' : 'COMMND', 'cv': 'VIM-EX', 'ce': '  EX  ',
-      \ 'r' : 'PROMPT', 'rm': ' MORE ', 'r?': 'CONFRM',
-      \ '!' : ' SHELL', 't' : ' TERM '}
+      \ 'n' : 'NORMAL', 'no': 'NRM-OP', 'v' : 'VISUAL', 'V' : 'V-LINE',
+      \ '': 'VBLOCK', 's' : 'SELECT', 'S' : 'S-LINE', '': 'SBLOCK',
+      \ 'i' : 'INSERT', 'ic': 'COMPLT', 'ix': 'XCOMPL', 'R' : 'REPLCE',
+      \ 'Rc': 'RCOMPL', 'Rv': 'VREPLC', 'Rx': 'RXCOMP', 'c' : 'COMMND',
+      \ 'cv': 'VIM-EX', 'ce': '  EX  ', 'r' : 'PROMPT', 'rm': ' MORE ',
+      \ 'r?': 'CONFRM', '!' : ' SHELL', 't' : ' TERM '}
 
 function! StatusLineColors() abort
   highlight StlDim       ctermbg=236 guibg=#303030 ctermfg=243 guifg=#767676 cterm=NONE gui=NONE
