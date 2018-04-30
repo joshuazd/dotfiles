@@ -336,6 +336,10 @@ snippet j.u "java_util_"  i
 java.util.
 endsnippet
 
+snippet log "Log" b
+LOGGER.${1:info}(${2:loggingTemplate}.logger($3));
+endsnippet
+
 snippet main "method (main)" b
 public static void main(String[] args)`!p nl(snip)`{
 	$0
