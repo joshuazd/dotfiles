@@ -22,7 +22,7 @@ if exists('g:loaded_sneak_plugin') && g:loaded_sneak_plugin == 1
 
 endif
 
-if exists(':UltiSnipsEdit')
+if exists('did_plugin_ultisnips')
   " Only map these if ultisnips is installed.  Prevents screwing up mappings
   let g:ulti_expand_or_jump_res = 0
   function! UltiSnips_ExpandJump() abort
@@ -37,9 +37,9 @@ if exists(':UltiSnipsEdit')
   snoremap <silent> <expr> <CR>    "<ESC>:call UltiSnips#JumpForwards()<CR>"
 endif
 
-if exists('g:mucomplete#chains')
-  imap <c-e> <plug>(MUcompleteCte)
-  imap <c-y> <plug>(MUcompleteCty)
+if exists('g:loaded_mucomplete')
+  imap <c-e> <plug>(MUcompletePopupCancel)
+  imap <c-y> <plug>(MUcompletePopupAccept)
   imap <expr> <right> pumvisible() ? "\<plug>(MUcompleteExtendFwd)" : "\<right>"
   imap <expr> <left> pumvisible() ? "\<plug>(MUcompleteExtendBwd)" : "\<left>"
 endif
