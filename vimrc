@@ -257,6 +257,7 @@ command! Focus call functions#Focus()
 " Plugin mappings are specified in the after/plugin/settings folder
 " ultisnips
 let g:UltiSnipsExpandTrigger       = "\<nop>"
+let g:UltiSnipsListSnippets        = '<C-@>'
 let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
 let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
 " mucomplete
