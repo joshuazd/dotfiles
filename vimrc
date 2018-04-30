@@ -293,14 +293,14 @@ let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 " {{{
 let g:in_snippet = 0
 let g:modemap = {
-      \ 'n' : ['NORMAL', 'Normal'],  'no': ['NRM-OP', 'Normal'],  'v' : ['VISUAL', 'Visual'],
-      \ 'V' : ['V-LINE', 'Visual'],  '': ['VBLOCK', 'Visual'],  's' : ['SELECT', 'Visual'],
-      \ 'S' : ['S-LINE', 'Visual'],  '': ['SBLOCK', 'Visual'],  'i' : ['INSERT', 'Insert'],
-      \ 'ic': ['COMPLT', 'Insert'],  'ix': ['XCOMPL', 'Insert'],  'R' : ['REPLCE', 'Replace'],
-      \ 'Rc': ['RCOMPL', 'Replace'], 'Rv': ['VREPLC', 'Replace'], 'Rx': ['RXCOMP', 'Replace'],
-      \ 'c' : ['COMMND', 'Command'], 'cv': ['VIM-EX', 'Command'], 'ce': ['  EX  ', 'Command'],
-      \ 'r' : ['PROMPT', 'Command'], 'rm': [' MORE ', 'Command'], 'r?': ['CONFRM', 'Command'],
-      \ '!' : [' SHELL', 'Command'], 't' : [' TERM ', 'Command']}
+      \ 'n' : 'NORMAL', 'no': 'NRM-OP', 'v' : 'VISUAL',
+      \ 'V' : 'V-LINE', '': 'VBLOCK', 's' : 'SELECT',
+      \ 'S' : 'S-LINE', '': 'SBLOCK', 'i' : 'INSERT',
+      \ 'ic': 'COMPLT', 'ix': 'XCOMPL', 'R' : 'REPLCE',
+      \ 'Rc': 'RCOMPL', 'Rv': 'VREPLC', 'Rx': 'RXCOMP',
+      \ 'c' : 'COMMND', 'cv': 'VIM-EX', 'ce': '  EX  ',
+      \ 'r' : 'PROMPT', 'rm': ' MORE ', 'r?': 'CONFRM',
+      \ '!' : ' SHELL', 't' : ' TERM '}
 
 function! StatusLineColors() abort
   highlight StlDim       ctermbg=236 guibg=#303030 ctermfg=243 guifg=#767676 cterm=NONE gui=NONE
