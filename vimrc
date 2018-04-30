@@ -200,7 +200,8 @@ xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
 nnoremap <silent> zp :set opfunc=functions#PasteOp<CR>g@
 
 " misc functions
-noremap <silent> <F5> :call functions#VimRefresh()<CR>
+nnoremap <silent> <F5> :call functions#VimRefresh()<CR>
+nnoremap <silent> <F11> :call functions#Focus()<CR>
 nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 cnoremap <expr> <CR> CCR()
 
@@ -244,6 +245,8 @@ command! -range=% FormatJSON <line1>,<line2>!python2 -c
 
 command! -range=% AE <line1>,<line2>yank a|silent! call functions#AnsibleEdit()
 command! AC call functions#AnsibleEncrypt()
+
+command! Focus call functions#Focus()
 
 " }}}
 
