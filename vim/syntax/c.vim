@@ -27,7 +27,7 @@ syn region      cCondParam contained matchgroup=cPunct start="\s*(" end=")" cont
 
 syn match       cFunc "\h\w*(\@=" contains=@cFuncName nextgroup=cFuncParams
 syn region      cFuncParams contained matchgroup=cPunct start="(" end=")" contains=cParamList
-syn match       cParamList contained "[^)]*" contains=cFuncParams,cType,cPunct,cOperator,cString,cConstant,cNumber,cIdentifier,cDereference skipwhite
+syn match       cParamList contained "[^)]*" contains=cFuncParams,cType,cPunct,cOperator,cString,cConstant,cNumber,cIdentifier,cDereference,cStructure skipwhite
 syn match       cIdentifier contained "\h\w*"
 
 syn keyword cBuiltInFunc contained printf
@@ -495,10 +495,10 @@ hi def link cCppOutSkip		cCppOutIf2
 hi def link cCppInElse2		cCppOutIf2
 hi def link cCppOutIf2		cCppOut
 hi def link cCppOut		Comment
-hi def link cPunct              PreProc
-hi def link cParen              PreProc
+hi def link cPunct              Delimiter
+hi def link cParen              Delimiter
 hi def link cFunc               Function
-hi def link cIdentifier         Identifier
+" hi def link cIdentifier         Identifier
 hi def link cDereference        Comment
 highlight cBuiltInFunc ctermfg=202
 
