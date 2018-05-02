@@ -92,15 +92,19 @@ function! functions#Focus() abort
   if exists('g:focus_enabled') && g:focus_enabled == 1
     let &laststatus = g:old_laststatus
     set noshowmode
-    silent! !tmux resize-pane -Z
-    silent! !tmux set status on
+    if executable('tmux')
+      silent! !tmux resize-pane -Z
+      silent! !tmux set status on
+    endif
     let g:focus_enabled = 0
   else
     let g:focus_enabled = 1
     let g:old_laststatus = &laststatus
     set laststatus=0
     set showmode
-    silent! !tmux resize-pane -Z
-    silent! !tmux set status off
+    if executable('tmux')
+      silent! !tmux resize-pane -Z
+      silent! !tmux set status off
+    endif
   endif
 endfunction
