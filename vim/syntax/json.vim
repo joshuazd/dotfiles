@@ -54,7 +54,8 @@ if (!exists('g:vim_json_warnings') || g:vim_json_warnings==1)
 	syn match   jsonNumError  "-\=\<0\d\.\d*\>"
 
 	" Syntax: Decimals smaller than one should begin with 0 (so .1 should be 0.1).
-	syn match   jsonNumError  "\:\@<=[[:blank:]\r\n]*\zs\.\d\+"
+	" syn match   jsonNumError  "\:\@<=[[:blank:]\r\n]*\zs\.\d\+"
+	syn match   jsonNumError  "\:\zs[[:blank:]\r\n]*\zs\.\d\+"
 
 	" Syntax: No comments in JSON, see http://stackoverflow.com/questions/244777/can-i-comment-a-json-file
 	syn match   jsonCommentError  "//.*"

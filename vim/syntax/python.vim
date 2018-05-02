@@ -20,17 +20,18 @@ syn keyword pythonKeyword yield
 syn keyword pythonLambdaExpr lambda
 syn keyword pythonStatement with as
 
-syn match pythonIdentifier "\h\w*" contained
+syn match pythonIdentifier "\h\w*" contained display
 
-syn keyword pythonCoding def skipwhite
-syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|call\|class\|cmp\|coerce\|complex\|contains\|del\|delattr\|delete\|delitem\|delslice\|div\|divmod\|enter\|eq\|exit\|float\|floordiv\|ge\|get\|getattr\|getattribute\|getitem\|getslice\|gt\|hash\|hex\|iadd\|iand\|idiv\|ifloordiv\|ilshift\|imod\|imul\|init\|int\|invert\|ior\|ipow\|irshift\|isub\|iter\|itruediv\|ixor\|le\|len\|long\|lshift\|lt\|mod\|mul\|ne\|neg\|new\|nonzero\|oct\|or\|pos\|pow\|radd\|rand\|rdiv\|rdivmod\|repr\|rfloordiv\|rlshift\|rmod\|rmul\|ror\|rpow\|rrshift\|rshift\|rsub\|rtruediv\|rxor\|set\|setattr\|setitem\|setslice\|str\|sub\|truediv\|unicode\|xor\)__" contained
+syn keyword pythonCoding def skipwhite nextgroup=pythonFunction
+syn match pythonMagic "__\(abs\|add\|aenter\|aexit\|aiter\|anext\|await\|and\|call\|class\|cmp\|coerce\|complex\|contains\|del\|delattr\|delete\|delitem\|delslice\|div\|divmod\|enter\|eq\|exit\|float\|floordiv\|ge\|get\|getattr\|getattribute\|getitem\|getslice\|gt\|hash\|hex\|iadd\|iand\|idiv\|ifloordiv\|ilshift\|imod\|imul\|init\|int\|invert\|ior\|ipow\|irshift\|isub\|iter\|itruediv\|ixor\|le\|len\|long\|lshift\|lt\|mod\|mul\|ne\|neg\|new\|nonzero\|oct\|or\|pos\|pow\|radd\|rand\|rdiv\|rdivmod\|repr\|rfloordiv\|rlshift\|rmod\|rmul\|ror\|rpow\|rrshift\|rshift\|rsub\|rtruediv\|rxor\|set\|setattr\|setitem\|setslice\|str\|sub\|truediv\|unicode\|xor\)__" contained display
 
 
-syn match pythonBrackets "{[(|)]}" contained skipwhite
-syn match pythonBrackets "{\|}" skipwhite
+syn match pythonBrackets "{[(|)]}" contained skipwhite display
+syn match pythonBrackets "{\|}" skipwhite display
 
 syn keyword pythonSelf class nextgroup=pythonClass skipwhite
-syn match pythonClass "\%(\%(class\s\)\s*\)\@<=\h\%(\w\|\.\)*" contained nextgroup=pythonClassVars
+" syn match pythonClass "\%(\%(class\s\)\s*\)\@<=\h\%(\w\|\.\)*" contained nextgroup=pythonClassVars
+syn match pythonClass "\%(\%(class\s\)\s*\)\zs\h\%(\w\|\.\)*" contained nextgroup=pythonClassVars
 syn region pythonClassVars matchgroup=pythonBrackets start="(" end=")" contained contains=pythonClassParameters transparent keepend
 syn match pythonClassParameters "[^,\*]*" contained contains=pythonBuiltinObj,pythonBuiltinType,pythonExtraOperator,pythonStatement,pythonBrackets,pythonString,pythonComment skipwhite
 
@@ -40,12 +41,12 @@ syn keyword pythonKeyword   import from
 syn keyword pythonKeyword   try except finally
 syn keyword pythonOperator  and in is not or
 
-syn match pythonExtraOperator "\%([~!^&|/%+-]\|\%(class\s*\)\@<!<<\|<=>\|<=\|\%(<\|\<class\s\+\u\w*\s*\)\@<!<[^<]\@=\|===\|==\|=\~\|>>\|>=\|=\@<!>\|\.\.\.\|\.\.\|::\)"
-syn match pythonExtraPseudoOperator "\%(-=\|/=\|\*\*=\|\*=\|&&=\|&=\|&&\|||=\||=\|||\|%=\|+=\|!\~\|!=\)"
+syn match pythonExtraOperator "\%([~!^&|/%+-]\|\%(class\s*\)\@<!<<\|<=>\|<=\|\%(<\|\<class\s\+\u\w*\s*\)\@<!<[^<]\@=\|===\|==\|=\~\|>>\|>=\|=\@<!>\|\.\.\.\|\.\.\|::\)" display
+syn match pythonExtraPseudoOperator "\%(-=\|/=\|\*\*=\|\*=\|&&=\|&=\|&&\|||=\||=\|||\|%=\|+=\|!\~\|!=\)" display
 
 
-syn match pythonPunct ":"
-syn match pythonPunct ","
+syn match pythonPunct ":" display
+syn match pythonPunct "," display
 
 " syn keyword pythonFunction print
 
@@ -54,13 +55,13 @@ syn match pythonStatement "\<async\s\+def\>" nextgroup=pythonFunction skipwhite
 syn match pythonStatement "\<async\s\+with\>" display
 syn match pythonStatement "\<async\s\+for\>" nextgroup=pythonRepeat skipwhite
 
-syn match pythonExtraOperator "\%(=\)"
+syn match pythonExtraOperator "\%(=\)" display
 
-syn match pythonExtraOperator "\%(\*\|\*\*\)"
+syn match pythonExtraOperator "\%(\*\|\*\*\)" display
 
 syn keyword pythonSelf self cls
-syn match pythonField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9_(\[]\|$\)\@=" contains=pythonMagic
-syn match pythonField "\(\.\)\@<=\h\w*\(\.\h\w*[(\[]\)\@=" contains=pythonMagic
+syn match pythonField "\.\@1<=\h\w*\([^\.(\[]\|$\)\@=" contains=pythonMagic display
+syn match pythonField "\.\@1<=\h\w*\(\.\h\w*[(\[]\)\@=" contains=pythonMagic display
 
 " }}}
 
@@ -76,14 +77,16 @@ syn match pythonGroupParam "[^)]*" contained contains=pythonKeyword,pythonPunct,
 syn match pythonFunctionCall "\h\(\w\)*(\@=" contains=@pythonBuiltinFuncC nextgroup=pythonFuncParams
 syn cluster pythonBuiltinFuncC add=pythonBuiltinFunc,pythonPrint,pythonMagic
 syn region pythonFuncParams matchgroup=pythonBrackets start="(" end=")" contained contains=pythonFuncParam,pythonPunct
-syn match pythonKeywordParam "\(=\s*\)\@<=\h\w*" contained
+" syn match pythonKeywordParam "\(=\s*\)\@<=\h\w*" contained
+syn match pythonKeywordParam "\(=\s*\)\zs\h\w*" contained
 syn match pythonFuncParam "[^,)]*" contained contains=pythonKeywordParam,pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonDict skipwhite
 
 " }}}
 
 " Functions {{{
 
-syn match pythonFunction "\(\(def\s\|@\)\s*\)\@<=\h\(\w\|\.\)*" contains=@pythonFuncC nextgroup=pythonVars
+" syn match pythonFunction "\(\(def\s\|@\)\s*\)\@50<=\h\(\w\|\.\)*" contains=@pythonFuncC nextgroup=pythonVars
+syn match pythonFunction "\h\w*" contains=@pythonFuncC nextgroup=pythonVars contained skipwhite display
 syn cluster pythonFuncC add=pythonMagic
 syn region pythonVars matchgroup=pythonBrackets start="(" skip=+\(".*"\|'.*'\)+ end=")" contained contains=pythonParameters,pythonPunct keepend
 syn match pythonParameters "[^,]*" contained contains=pythonParam skipwhite
@@ -190,8 +193,10 @@ syn region pythonUniRawString matchgroup=pythonStringPunc start=+[uU][rR]"+ skip
 syn region pythonUniRawString matchgroup=pythonStringPunc start=+[uU][rR]"""+ end=+"""+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest2,pythonSpaceError,@Spell
 syn region pythonUniRawString matchgroup=pythonStringPunc start=+[uU][rR]'''+ end=+'''+ keepend contains=pythonUniRawEscape,pythonUniRawEscapeError,pythonDocTest,pythonSpaceError,@Spell
 
-syn match  pythonUniRawEscape   "\([^\\]\(\\\\\)*\)\@<=\\u\x\{4}" display contained
-syn match  pythonUniRawEscapeError  "\([^\\]\(\\\\\)*\)\@<=\\u\x\{,3}\X" display contained
+" syn match  pythonUniRawEscape   "\([^\\]\(\\\\\)*\)\@<=\\u\x\{4}" display contained
+syn match  pythonUniRawEscape   "\([^\\]\(\\\\\)*\)\zs\\u\x\{4}" display contained
+" syn match  pythonUniRawEscapeError  "\([^\\]\(\\\\\)*\)\@<=\\u\x\{,3}\X" display contained
+syn match  pythonUniRawEscapeError  "\([^\\]\(\\\\\)*\)\zs\\u\x\{,3}\X" display contained
 
 " String formatting
 syn match pythonStrFormatting   "%\(([^)]\+)\)\=[-#0 +]*\d*\(\.\d\+\)\=[hlL]\=[diouxXeEfFgGcrs%]" contained containedin=pythonString,pythonUniString,pythonRawString,pythonUniRawString

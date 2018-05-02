@@ -4,15 +4,15 @@ endif
 
 syn iskeyword @,48-57,192-255,_,-
 
-syn match xpathParam     "\w\+"                    display
-syn match xpathReference "\$\@<=\w[a-zA-Z0-9\-_]*" display
-syn match xpathOperator  "\$"                      display
-syn match xpathNameSpace '\w\+:\@='                display
-syn match xpathPunct     "[,/\[\]()]"              display
-syn match xpathP2        "[:\.]"                   display
-syn match xpathOperator  "[=\*@+]"                 display
-syn match xpathNumber    "\<[0-9]\+\>"             display
-syn match xpathOperator  "[!=\>\<]\+"              display
+syn match xpathParam     "\w\+"                     display
+syn match xpathReference "\$\@1<=\w[a-zA-Z0-9\-_]*" display
+syn match xpathOperator  "\$"                       display
+syn match xpathNameSpace '\w\+:\@='                 display
+syn match xpathPunct     "[,/\[\]()]"               display
+syn match xpathP2        "[:\.]"                    display
+syn match xpathOperator  "[=\*@+]"                  display
+syn match xpathNumber    "\<[0-9]\+\>"              display
+syn match xpathOperator  "[!=\>\<]\+"               display
 syn keyword xpathOperator or and xor
 syn keyword xpathLangVar body ctx trp
 

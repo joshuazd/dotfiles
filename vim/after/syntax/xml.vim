@@ -39,7 +39,7 @@ let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlXpath syntax/xpath.vim
 syn region Xpath
-    \ matchgroup=xmlQuote start=+\(when test=\|select=\|xpath=\|source=\|expression=\)\@<="+
+    \ matchgroup=xmlQuote start=+\(when test=\|select=\|xpath=\|source=\|expression=\)\@15<="+
     \ keepend
     \ end=+"+
     \ contained
