@@ -130,7 +130,7 @@ call s:h('SpellCap',        s:darkpurple, s:boldblue,     'none')
 call s:h('SpellLocal',      s:cyan,       s:boldcyan,     'none')
 call s:h('SpellRare',       s:purple,     s:boldpurple,   'none')
 
-call s:h('StatusLine',      s:white,      s:darkgrey,     'none')
+call s:h('StatusLine',      s:white,      s:mediumgrey,   'none')
 call s:h('StatusLineNC',    s:black,      s:lightgrey,    'none')
 
 call s:h('TabLine',         s:black,      s:lightgrey,    'none')
