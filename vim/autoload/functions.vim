@@ -92,7 +92,7 @@ function! functions#Focus() abort
   if exists('g:focus_enabled') && g:focus_enabled == 1
     let &laststatus = g:old_laststatus
     set noshowmode
-    if executable('tmux')
+    if executable('tmux') && $TMUX !=? ''
       silent! !tmux resize-pane -Z
       silent! !tmux set status on
     endif
@@ -102,7 +102,7 @@ function! functions#Focus() abort
     let g:old_laststatus = &laststatus
     set laststatus=0
     set showmode
-    if executable('tmux')
+    if executable('tmux') && $TMUX !=? ''
       silent! !tmux resize-pane -Z
       silent! !tmux set status off
     endif
