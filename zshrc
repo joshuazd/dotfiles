@@ -67,9 +67,6 @@ if type fd > /dev/null; then
 elif type rg > /dev/null; then
     export FZF_DEFAULT_COMMAND='rg --files'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-elif type ag > /dev/null; then
-    export FZF_DEFAULT_COMMAND='ag -l'
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
 
 # Source alias and function files
