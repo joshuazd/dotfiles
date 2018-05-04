@@ -303,43 +303,7 @@ let g:modemap = {
       \ 'cv':'VIM-EX', 'ce':'  EX  ', 'r' :'PROMPT', 'rm':' MORE ',
       \ 'r?':'CONFRM', '!' :' SHELL', 't' :' TERM '}
 
-" function! StatusLineColors() abort
-"   highlight StlDim       ctermbg=236 guibg=#303030 ctermfg=243 guifg=#767676 cterm=NONE gui=NONE
-"   highlight ReadOnlyStl  ctermbg=236 guibg=#303030 ctermfg=167 guifg=#d75f5f cterm=NONE gui=NONE
-"   highlight StatusLine   ctermbg=236 guibg=#303030 ctermfg=250 guifg=#bcbcbc cterm=NONE gui=NONE
-"   highlight StatusLineNC ctermbg=242 guibg=#6c6c6c ctermfg=234 guifg=#1c1c1c cterm=NONE gui=NONE
-"   highlight StlMode      ctermbg=236 guibg=#303030 ctermfg=75  guifg=#5fafff cterm=NONE gui=NONE
-" endfunction
-
-" augroup statusline
-"   autocmd!
-"   autocmd ColorScheme * call StatusLineColors()
-" augroup END
-" call StatusLineColors()
-
-" function! SetupStatusLine(nr) abort
-"   return get(extend(w:, { 'active' : winnr() == a:nr }), '', '') 
-" endfunction
-
-" function! BuildStatusLine(nr, extra) abort
-  " return ' %{g:modemap[mode()]} %f%m%w%q%r%=%{&syntax} %03l:%02c '
-
-  " return '%{SetupStatusLine('.a:nr.')}'
-  "       \.'%#StlMode#%{w:["active"] ? "  " . g:modemap[mode()] . (&paste ? " PASTE " : "") : ""}'
-  "       \.'%0* %f%m%w%q'
-  "       \.'%#ReadOnlyStl#%{&readonly && w:["active"] ? "  RO" : ""}%0*'
-  "       \.'%='
-  "       \.'%{g:in_snippet > 0 ? "snippet " : ""}'
-  "       \.'%#StlDim#%{&syntax == "" ? "" : w:["active"] ? " ".&syntax." " : ""}'
-  "       \.'%#StatusLineNC#%{&syntax == "" ? "" : w:["active"] ? "" : " ".&syntax." "}'
-  "       \.'%#StlMode#%{w:["active"] ? " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." " : ""}'
-  "       \.'%0*%{w:["active"] ? "" : " ".printf("%3d",line(".")).":".printf("%02d",virtcol("."))." "}'
-  "       \.'%0*' . a:extra . '%#Normal#'
-
-" endfunction
-
 if exists('+statusline')
-  " set statusline=%!BuildStatusLine(winnr(),'')
   set statusline=\ %{g:modemap[mode()]}\ %f%m%w%q%r%=%{g:stl_snippet[g:in_snippet]}%{&syntax}\ %03l:%02c\ 
 endif
 " }}}

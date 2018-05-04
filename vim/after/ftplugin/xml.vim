@@ -15,13 +15,13 @@ setlocal syntax=xml
 setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/,*_DataMapper/
 set suffixesadd+=.xml
 setlocal isfname-=/
-nnoremap ,f zMza
+nnoremap ,f zMzr
 augroup XML
     autocmd!
     if executable('xmllint')
       autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
     endif
-    autocmd CursorHold,CursorHoldI * echom FindAPI()
+    autocmd CursorHold,CursorHoldI,CursorMoved,FocusLost,FocusGained,InsertEnter,InsertLeave * echom FindAPI()
 augroup END
 
 nnoremap <Space>r :echom FindAPI()<CR>
