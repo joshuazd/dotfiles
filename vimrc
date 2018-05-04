@@ -16,8 +16,8 @@ set showmatch                                 " Show matching brackets when text
 set matchtime=2                               " How many tenths of a second to blink when matching brackets
 set timeoutlen=500                            " shorter timeout
 set ttimeoutlen=100                           " shorter timeout
-set splitbelow                                " Make splits behave better
-set splitright
+set splitbelow                                " Split horizontally below by default
+set splitright                                " Split vertically to the right by default
 set softtabstop=4                             " number of spaces when inserting/backspacing
 set shiftwidth=4                              " shift 4 spaces for indentation
 set expandtab                                 " expand tabs into spaces
@@ -32,7 +32,7 @@ set sidescroll=1                              " scroll 1 character at a time
 set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
 set formatoptions-=o                          " Don't insert comment leader on `o`
 set sessionoptions-=options                   " make sessions work better with plugins
-set sessionoptions-=blank
+set sessionoptions-=blank                     " don't save black buffers in sessions
 set noswapfile                                " do not create swap files
 set display+=lastline                         " show as much of the last line as possible
 set autoread                                  " automatically reread changed files
