@@ -6,6 +6,8 @@ setlocal conceallevel=0
 setlocal foldnestmax=2
 setlocal iskeyword+=-
 inoremap <buffer> </ </<C-x><C-o><C-n><C-y>
+nnoremap <buffer> { ?<[^\/]\+><CR>
+nnoremap <buffer> } /<[^\/]\+><CR>
 command! Tabs setlocal shiftwidth=2 softtabstop=2 foldmethod=syntax smarttab
 setlocal omnifunc=xmlcomplete#CompleteTags
 compiler xmllint
@@ -24,7 +26,7 @@ augroup XML
     autocmd CursorHold,CursorHoldI,CursorMoved,FocusLost,FocusGained,InsertEnter,InsertLeave * echom FindAPI()
 augroup END
 
-nnoremap <Space>r :echom FindAPI()<CR>
+nnoremap <buffer> <Space>r :echom FindAPI()<CR>
 function! FindAPI() abort
   let l:resource = search('<resource', 'bn')
   let l:url = matchstr(getline(l:resource), '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@=')
