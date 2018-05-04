@@ -27,7 +27,7 @@ set noshowmode                                " don't show mode in the commandli
 set nowrap                                    " don't wrap lines by default
 set linebreak                                 " wrap lines at words
 set laststatus=2                              " always show statusline
-set scrolloff=999                             " Set 999 lines to the cursor - when moving vertically
+set scrolloff=10                              " Set 999 lines to the cursor - when moving vertically
 set sidescroll=1                              " scroll 1 character at a time
 set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
 set formatoptions-=o                          " Don't insert comment leader on `o`
