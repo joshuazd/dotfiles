@@ -8,6 +8,7 @@ set wildmenu
 set noswapfile
 set showcmd
 set tags=./tags,tags
+set foldlevelstart=99
 filetype plugin indent on
 syntax enable
 colorscheme material
