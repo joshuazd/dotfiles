@@ -161,6 +161,7 @@ nnoremap gj j
 nnoremap gk k
 
 xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
+nnoremap <C-w>a :redraw!<CR>
 
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
