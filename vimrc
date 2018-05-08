@@ -305,7 +305,7 @@ let g:modemap = {
       \ 'r?':'CONFRM', '!' :' SHELL', 't' :' TERM '}
 
 if exists('+statusline')
-  set statusline=\ %{g:modemap[mode()]}\ %f%m%r\ %w%q%=%{g:stl_snippet[g:in_snippet]}%{&syntax}\ %03l:%02c\ 
+  set statusline=\ %{g:modemap[mode()]}\ %<%f%m%r\ %w%q%=%{g:stl_snippet[g:in_snippet]}%{&syntax}\ %03l:%02c\ 
 endif
 " }}}
 
