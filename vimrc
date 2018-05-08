@@ -6,8 +6,8 @@ set hidden                                    " A buffer becomes hidden when it 
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
 set whichwrap+=<,>                            " arrow keys move to the next line
 set showcmd                                   " show keystrokes
-set breakindent                               " Indent wrapped lines by 2
-set breakindentopt+=shift:2
+set breakindent                               " Indent wrapped lines
+set breakindentopt+=shift:2                   " shift wrapped lines by 2 spaces
 set ignorecase                                " Ignore case when searching
 set smartcase                                 " When searching try to be smart about cases
 set incsearch                                 " Makes search act like search in modern browsers
