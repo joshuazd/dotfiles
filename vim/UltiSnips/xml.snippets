@@ -276,3 +276,13 @@ snippet c "call" b
 	${0:${VISUAL}}
 </call>
 endsnippet
+
+snippet script "script" b
+<script language="groovy">
+	import groovy.json.*;
+	def content = mc.getProperty("PAYLOAD");
+	def object = new JsonSlurper().parseText(content.toString());$0
+	def builder = new JsonBuilder(slurper);
+	mc.setPayloadJSON(JsonOutput.prettyPrint(builder.toString()));
+</script>
+endsnippet
