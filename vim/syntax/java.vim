@@ -36,6 +36,7 @@ syn keyword javaExternal	native package
 syn match javaExternal		"\<import\>\(\s\+static\>\)\?"
 syn keyword javaError		goto const
 syn keyword javaConditional	if else switch
+syn match   javaConditional     "[?:]"
 syn keyword javaRepeat		while for do
 syn keyword javaBoolean		true false
 syn keyword javaConstant	null
@@ -50,7 +51,8 @@ syn keyword javaAssert		assert
 syn keyword javaMethodDecl	synchronized throws
 syn keyword javaClassDecl	extends implements interface
 syn match   javaSemicolon       ";"
-syn match javaOperator          "[<>=!+-]"
+syn match javaOperator          "[/%<>=!+-]"
+syn match javaOperator          "|"
 " to differentiate the keyword class from MyClass.class we use a match here
 syn match   javaTypedef		"\.\s*\<class\>"ms=s+1
 syn keyword javaClassDecl	enum
@@ -236,9 +238,9 @@ if exists('java_highlight_functions')
     "	2. method names are never capitalized (except constructors, of course)
     " syn match javaFuncDef          "^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
     " syn match javaFuncDef          "\%(\%(public\|protected\|private\)\?\s\+\%(\%(static\|abstract\|final\|native\|synchronized\)\s\+\)*\)\%(\%(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\%([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\%(<[^>]*>\)\=\%(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
-    syn match javaFuncDef "\%(\w\+\s\+\)*\%([\w\.]\+\)\?\%(<[^>]*>\)\?\%(\[\]\)*\s\+\%([a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
+    syn match javaFuncDef "^\s\+\%(\w\+\s\+\)\+\%([\w\.]\+\)\?\%(<[^>]*>\)\?\%(\[\]\)*\s\+\%([a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncName,javaTemplate,javaComma,@javaTop nextgroup=javaFuncParams
 
-    syn match javaFuncDef "\%(\w\+\s\+\)*\%(<.*>\s\+\)\?\%([\w\.]\+\)\?\%(<[^(){}]*>\)\?\%(\[\]\)*\s\+\%([a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
+    syn match javaFuncDef "^\s\+\%(\w\+\s\+\)\+\%(<.*>\s\+\)\?\%([\w\.]\+\)\?\%(<[^(){}]*>\)\?\%(\[\]\)*\s\+\%([a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncName,javaTemplate,javaComma,@javaTop nextgroup=javaFuncParams
     " syn match javaFuncDef          "\%(\%(public\|protected\|private\)\?\s\+\%(\%(static\|abstract\|final\|native\|synchronized\)\s\+\)*\)\%(<.*>\s\+\)\?\%(\%(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\%([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\%(<[^(){}]*>\)\=\%(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncName,javaTemplate nextgroup=javaFuncParams
     " syn match javaFuncDef          "^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncName,javaTemplate nextgroup=javaFuncParams
     " syn region javaFuncParams start="(\@1<=" skip="(" end=")\@=" contains=javaFuncParamList,javaComma contained
