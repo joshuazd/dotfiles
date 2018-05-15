@@ -74,7 +74,7 @@ if exists('java_highlight_all')  || exists('java_highlight_java')  || exists('ja
   syn cluster javaTop add=javaR_JavaLang
   syn cluster javaClasses add=javaR_JavaLang
   hi def link javaR_JavaLang javaR_Java
-  syn keyword javaC_JavaLang Process RuntimePermission StringKeySet CharacterData01 Class ThreadLocal ThreadLocalMap CharacterData0E Package Character StringCoding Long ProcessImpl ProcessEnvironment Short AssertionStatusDirectives 1PackageInfoProxy UnicodeBlock InheritableThreadLocal AbstractStringBuilder StringEnvironment ClassLoader ConditionalSpecialCasing CharacterDataPrivateUse StringBuffer StringDecoder Entry StringEntry WrappedHook StringBuilder StrictMath State ThreadGroup Runtime CharacterData02 MethodArray Object CharacterDataUndefined Integer Gate Boolean Enum Variable Subset StringEncoder Void Terminator CharsetSD IntegerCache CharacterCache Byte CharsetSE Thread SystemClassLoaderAction CharacterDataLatin1 StringValues StackTraceElement Shutdown ShortCache String ConverterSD ByteCache Lock EnclosingMethodInfo Math Float Value Double SecurityManager LongCache ProcessBuilder StringEntrySet Compiler Number UNIXProcess ConverterSE ExternalData CaseInsensitiveComparator CharacterData00 NativeLibrary
+  syn keyword javaC_JavaLang Process RuntimePermission StringKeySet CharacterData01 Class ThreadLocal ThreadLocalMap CharacterData0E Package Character StringCoding Long ProcessImpl ProcessEnvironment Short AssertionStatusDirectives 1PackageInfoProxy UnicodeBlock InheritableThreadLocal AbstractStringBuilder StringEnvironment ClassLoader ConditionalSpecialCasing CharacterDataPrivateUse StringBuffer StringDecoder StringEntry Entry WrappedHook StringBuilder StrictMath State ThreadGroup Runtime CharacterData02 MethodArray Object CharacterDataUndefined Integer Gate Boolean Enum Variable Subset StringEncoder Void Terminator CharsetSD IntegerCache CharacterCache Byte CharsetSE Thread SystemClassLoaderAction CharacterDataLatin1 StringValues StackTraceElement Shutdown ShortCache String ConverterSD ByteCache Lock EnclosingMethodInfo Math Float Value Double SecurityManager LongCache ProcessBuilder StringEntrySet Compiler Number UNIXProcess ConverterSE ExternalData CaseInsensitiveComparator CharacterData00 NativeLibrary RestTemplate NamedParameterJdbcTemplate HttpHeaders Document Logger ExecutorService Executors
   syn cluster javaTop add=javaC_JavaLang
   syn cluster javaClasses add=javaC_JavaLang
   hi def link javaC_JavaLang javaC_Java
@@ -119,7 +119,7 @@ syn keyword javaLabel		default
 " annoying.  Was: if !exists("java_allow_cpp_keywords")
 
 " The following cluster contains all java groups except the contained ones
-syn cluster javaTop add=javaExternal,javaError,javaError,javaBranch,javaLabelRegion,javaLabel,javaConditional,javaRepeat,javaBoolean,javaConstant,javaTypedef,javaOperator,javaType,javaType,javaStatement,javaStorageClass,javaAssert,javaExceptions,javaMethodDecl,javaClassDecl,javaClassDecl,javaClassDecl,javaScopeDecl,javaError,javaError2,javaUserLabel,javaAnnotation,javaVarArg
+syn cluster javaTop add=javaExternal,javaError,javaError,javaBranch,javaLabelRegion,javaLabel,javaConditional,javaRepeat,javaBoolean,javaConstant,javaTypedef,javaOperator,javaType,javaType,javaStatement,javaStorageClass,javaAssert,javaExceptions,javaMethodDecl,javaClassDecl,javaClassDecl,javaClassDecl,javaScopeDecl,javaError,javaError2,javaUserLabel,javaAnnotation,javaVarArg,javaKeyword
 
 
 " Comments
@@ -194,7 +194,8 @@ syn match javaFuncName "[a-zA-Z_][a-zA-Z0-9_]*(\@=" contains=javaLangObject cont
 hi def link javaFuncName Function
 syn match javaFuncCall "[a-zA-Z_][a-zA-Z0-9_]*(\@=" contains=javaFuncName nextgroup=javaFuncArgs
 syn cluster javaTop add=javaFuncCall
-syn region javaFuncArgs start="(\@<=" end=")\@=" contains=javaArgs,javaComma contained
+" syn region javaFuncArgs start="(\@1<=" end=")\@=" contains=javaArgs,javaComma contained
+syn region javaFuncArgs start="(\zs" end=")\@=" contains=javaArgs,javaComma contained
 syn match javaArgs "[^,)]*" contains=@javaTop,javaFuncCall contained skipwhite
 
 
@@ -211,13 +212,13 @@ hi def link javaAccessor Comment
 " templates
 syn match javaClassName "\<[A-Z_][a-zA-Z0-9_]*" contained
 hi def link javaClassName Type
-syn match javaTemplate "[A-Z_][a-zA-Z0-9_]*<\@=" contains=javaClassName nextgroup=javaTemplateArgs
+syn match javaTemplate "[A-Z_][a-zA-Z0-9_\.]*<\@=" contains=javaClassName,javaAccessor nextgroup=javaTemplateArgs
 syn cluster javaTop add=javaTemplate
 syn region javaTemplateArgs matchgroup=javaOperator start="<" skip="<" end=">" contains=javaTemplateArgList,javaComma contained
 syn match javaTemplateArgList "[^,>]*" contains=@javaTop,javaClassName contained skipwhite
 
 " classes
-syn match javaClassDeclName "\(\(class\|implements\)\s\+\)\@<=[A-Z_][a-zA-Z0-9_]*"
+syn match javaClassDeclName "\(\(class\|implements\)\s\+\)\@20<=[A-Z_][a-zA-Z0-9_]*"
 highlight javaClassDeclName ctermfg=4 guifg=#82aaff cterm=bold gui=bold
 
 
@@ -233,11 +234,15 @@ if exists('java_highlight_functions')
     " two things:
     "	1. class names are always capitalized (ie: Button)
     "	2. method names are never capitalized (except constructors, of course)
-    " syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*([^0-9]+ end=+)\@=+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma
-    syn match javaFuncDef          "^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
-    " syn region javaFuncDef start=+^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*+ end=+\({\?\s*$\)\@=+ contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncParams,javaFuncName,javaTemplate
-    syn match javaFuncDef          "^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncName,javaTemplate nextgroup=javaFuncParams
-    syn region javaFuncParams start="(\@<=" skip="(" end=")\@=" contains=javaFuncParamList,javaComma contained
+    " syn match javaFuncDef          "^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^>]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
+    " syn match javaFuncDef          "\%(\%(public\|protected\|private\)\?\s\+\%(\%(static\|abstract\|final\|native\|synchronized\)\s\+\)*\)\%(\%(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\%([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\%(<[^>]*>\)\=\%(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncParams,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
+    syn match javaFuncDef "\%(\w\+\s\+\)*\%([\w\.]\+\)\?\%(<[^>]*>\)\?\%(\[\]\)*\s\+\%([a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
+
+    syn match javaFuncDef "\%(\w\+\s\+\)*\%(<.*>\s\+\)\?\%([\w\.]\+\)\?\%(<[^(){}]*>\)\?\%(\[\]\)*\s\+\%([a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaFuncName,javaTemplate,javaComma nextgroup=javaFuncParams
+    " syn match javaFuncDef          "\%(\%(public\|protected\|private\)\?\s\+\%(\%(static\|abstract\|final\|native\|synchronized\)\s\+\)*\)\%(<.*>\s\+\)\?\%(\%(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\%([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\%(<[^(){}]*>\)\=\%(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncName,javaTemplate nextgroup=javaFuncParams
+    " syn match javaFuncDef          "^\s\+\(\(public\|protected\|private\|static\|abstract\|final\|native\|synchronized\)\s\+\)*\(<.*>\s\+\)\?\(\(void\|boolean\|char\|byte\|short\|int\|long\|float\|double\|\([A-Za-z_][A-Za-z0-9_$]*\.\)*[A-Z][A-Za-z0-9_$]*\)\(<[^(){}]*>\)\=\(\[\]\)*\s\+[a-z][A-Za-z0-9_$]*\|[A-Z][A-Za-z0-9_$]*\)\s*(\@=" contains=javaScopeDecl,javaType,javaStorageClass,javaComment,javaLineComment,@javaClasses,javaAnnotation,javaFuncName,javaTemplate nextgroup=javaFuncParams
+    " syn region javaFuncParams start="(\@1<=" skip="(" end=")\@=" contains=javaFuncParamList,javaComma contained
+    syn region javaFuncParams start="(\zs" skip="(" end=")\@=" contains=javaFuncParamList,javaComma contained
     syn match javaFuncParamList "[^,)]*" contains=javaClassName contained skipwhite
   endif
   syn match javaLambdaDef "[a-zA-Z_][a-zA-Z0-9_]*\s*->"
