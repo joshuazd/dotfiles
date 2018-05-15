@@ -19,8 +19,8 @@ def nl(snip):
 		snip.rv += " "
 def getArgs(group):
 	import re
-	word = re.compile('[a-zA-Z0-9><.]+ \w+')
-	return [i.split(" ") for i in word.findall(group) ]
+	word = re.compile('[a-zA-Z0-9_.]+(?:<[a-zA-Z0-9_><., ]+>)* \w+')
+	return [i.rsplit(" ", 1) for i in word.findall(group)]
 
 def camel(word):
 	if not word: return ''
