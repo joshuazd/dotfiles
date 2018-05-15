@@ -3,14 +3,15 @@ if exists('b:current_syntax')
   finish
 endif
 
-syn match editorconfigError +.\++
+" syn match editorconfigError +.\++
 syn match editorconfigOptionError +\k\++ contained
 
 syn match  editorconfigNumber   "\<\d\+\>" contained display
 syn match  editorconfigNumber   "\<\d*\.\d\+\>" contained display
 syn match  editorconfigNumber   "\<\d\+e[+-]\=\d\+\>" contained display
 
-syn iskeyword @,48-57,192-255,&,_,-
+syn match editorconfigProperties +\.\w*vimrc\w*+ contained
+syn iskeyword @,48-57,192-255,&,_,-,.
 syn keyword editorconfigConstant false true contained
 syn keyword editorconfigProperties tab space lf crlf cr latin1 contained
 syn keyword editorconfigProperties off single double contained
