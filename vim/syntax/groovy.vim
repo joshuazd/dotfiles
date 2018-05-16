@@ -72,7 +72,7 @@ syn keyword groovyRepeat          while for do
 syn keyword groovyBoolean         true false
 syn keyword groovyConstant        null
 syn keyword groovyTypedef         this super
-syn keyword groovyOperator        new instanceof
+syn keyword groovyKeyword         new instanceof
 syn keyword groovyType            boolean char byte short int long float double
 syn keyword groovyType            void
 syn keyword groovyType		  Integer Double Date Boolean Float String Array Vector List
@@ -401,60 +401,62 @@ syn region  groovyParenT2 transparent matchgroup=groovyParen2 start="\[" end="\]
 syn match   groovyParenError       "\]"
 
 " ###############################
-" java.vim default highlighting
-hi def link groovyFuncDef		Function
-hi def link groovyBraces		Function
-hi def link groovyBranch		Conditional
-hi def link groovyParen			Delimiter
-hi def link groovyParen1		Delimiter
-hi def link groovyParen2		Delimiter
-hi def link groovyUserLabelRef	groovyUserLabel
-hi def link groovyLabel		Label
-hi def link groovyUserLabel		Label
-hi def link groovyConditional	Conditional
-hi def link groovyRepeat		Repeat
-hi def link groovyExceptions		Exception
-hi def link groovySemicolon             PreProc
-hi def link groovyAssert 		Statement
-hi def link groovyStorageClass	StorageClass
-hi def link groovyMethodDecl		groovyStorageClass
-hi def link groovyClassDecl		groovyStorageClass
-hi def link groovyScopeDecl		groovyStorageClass
-hi def link groovyBoolean		Boolean
-hi def link groovySpecial		Special
-hi def link groovySpecialError	Error
-hi def link groovySpecialCharError	Error
-hi def link groovyString		String
-hi def link groovyStringDelimiter	StringDelimiter
-hi def link groovyRegexChar		String
-hi def link groovyCharacter		Character
-hi def link groovySpecialChar	SpecialChar
-hi def link groovyNumber		Number
-hi def link groovyError		Error
-hi def link groovyStringError	Error
-hi def link groovyStatement		Statement
-hi def link groovyOperator		Operator
-hi def link groovyComment		Comment
-hi def link groovyDocComment		Comment
-hi def link groovyLineComment	Comment
-hi def link groovyConstant		Constant
-hi def link groovyTypedef		Typedef
-hi def link groovyTodo		Todo
+" groovy.vim default highlighting
 
-hi def link groovyCommentTitle	SpecialComment
-hi def link groovyDocTags		Special
-hi def link groovyDocParam		Function
-hi def link groovyCommentStar	groovyComment
+hi def link groovyFuncDef          Function
+hi def link groovyBraces           Function
+hi def link groovyBranch           Conditional
+hi def link groovyParen            Delimiter
+hi def link groovyParen1           Delimiter
+hi def link groovyParen2           Delimiter
+hi def link groovyUserLabelRef     groovyUserLabel
+hi def link groovyLabel            Label
+hi def link groovyUserLabel        Label
+hi def link groovyConditional      Conditional
+hi def link groovyRepeat           Repeat
+hi def link groovyExceptions       Exception
+hi def link groovySemicolon        Delimiter
+hi def link groovyAssert           Statement
+hi def link groovyStorageClass     StorageClass
+hi def link groovyMethodDecl       groovyStorageClass
+hi def link groovyClassDecl        groovyStorageClass
+hi def link groovyScopeDecl        groovyStorageClass
+hi def link groovyBoolean          Boolean
+hi def link groovySpecial          Special
+hi def link groovySpecialError     Error
+hi def link groovySpecialCharError Error
+hi def link groovyString           String
+hi def link groovyStringDelimiter  StringDelimiter
+hi def link groovyRegexChar        String
+hi def link groovyCharacter        Character
+hi def link groovySpecialChar      SpecialChar
+hi def link groovyNumber           Number
+hi def link groovyError            Error
+hi def link groovyStringError      Error
+hi def link groovyStatement        Statement
+hi def link groovyOperator         Operator
+hi def link groovyKeyword          Keyword
+hi def link groovyComment          Comment
+hi def link groovyDocComment       Comment
+hi def link groovyLineComment      Comment
+hi def link groovyConstant         Constant
+hi def link groovyTypedef          Typedef
+hi def link groovyTodo             Todo
 
-hi def link groovyType		Type
-hi def link groovyExternal		Include
+hi def link groovyCommentTitle     SpecialComment
+hi def link groovyDocTags          Special
+hi def link groovyDocParam         Function
+hi def link groovyCommentStar      groovyComment
 
-hi def link htmlComment		Special
-hi def link htmlCommentPart		Special
-hi def link groovySpaceError		Error
-hi def link groovyJDKBuiltin         Special
-hi def link groovyJDKOperOverl       Operator
-hi def link groovyJDKMethods         Function
+hi def link groovyType             Type
+hi def link groovyExternal         Include
+
+hi def link htmlComment            Special
+hi def link htmlCommentPart        Special
+hi def link groovySpaceError       Error
+hi def link groovyJDKBuiltin       Special
+hi def link groovyJDKOperOverl     Operator
+hi def link groovyJDKMethods       Function
 
 
 let b:current_syntax = 'groovy'
