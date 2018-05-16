@@ -192,6 +192,17 @@ if exists('g:xml_syntax_folding')
 
 else
 
+
+
+  syn include @xmlJavaScript syntax/javascript.vim
+  unlet! b:current_syntax
+
+  syn include @xmlGroovy syntax/groovy.vim
+  unlet! b:current_syntax
+
+  syn match   xmlScriptTag    +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook contained
+  syn match   xmlEndScriptTag +</script>+         contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,@xmlTagHook contained
+
     " no syntax folding:
     " - contained attribute removed
     " - xmlRegion not defined
@@ -205,6 +216,18 @@ else
         \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
         \ matchgroup=xmlTagPunct end=+>+
         \ contains=xmlError,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+
+  syn region xmlJavaScriptRegion
+        \ start=+<script language="js">+
+        \ keepend
+        \ end=+</script>+
+        \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataCdata,xmlCdataEnd,@xmlJavaScript
+
+  syn region xmlGroovyRegion
+        \ start=+<script language="groovy">+
+        \ keepend
+        \ end=+</script>+
+        \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataCdata,xmlCdataEnd,@xmlGroovy
 
 endif
 
