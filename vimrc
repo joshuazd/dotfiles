@@ -222,7 +222,7 @@ xnoremap g<C-]> "ay:<C-u>ptjump <C-r>a<CR><CR>
 
 " better file jumping
 nnoremap <silent> <expr> <C-w>f winnr('$') > 1
-      \? ":let fname=\"\<C-r>\<C-f>\"\|execute \"normal! \\<lt>C-w>p\"\<CR>:find \<C-r>=fname\<CR>\<CR>"
+      \? ":let fname=\"\<C-r>\<C-f>\"\|wincmd p\<CR>:find \<C-r>=fname\<CR>\<CR>"
       \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
 " }}}
 
