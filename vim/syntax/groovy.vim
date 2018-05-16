@@ -405,9 +405,9 @@ syn match   groovyParenError       "\]"
 hi def link groovyFuncDef		Function
 hi def link groovyBraces		Function
 hi def link groovyBranch		Conditional
-hi def link groovyParen			PreProc
-hi def link groovyParen1		PreProc
-hi def link groovyParen2		PreProc
+hi def link groovyParen			Delimiter
+hi def link groovyParen1		Delimiter
+hi def link groovyParen2		Delimiter
 hi def link groovyUserLabelRef	groovyUserLabel
 hi def link groovyLabel		Label
 hi def link groovyUserLabel		Label
