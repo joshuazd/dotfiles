@@ -91,7 +91,7 @@ URxvt*jumpScroll: true
 URxvt*utf8Title: true
 URxvt*modifier: alt
 urxvt*internalBorder: 10
-URxvt.lineSpace: 0
+URxvt.lineSpace: 1
 URxvt.letterSpace: -1
 URxvt*scrollTtyOutput:      false
 URxvt*scrollWithBuffer:     true
