@@ -204,7 +204,8 @@ syn match javaArgs "[^,)]*" contains=@javaTop,javaFuncCall contained skipwhite
   syn keyword javaLangObject contained clone equals finalize getClass hashCode
   syn keyword javaLangObject contained notify notifyAll toString wait
   " hi def link javaLangObject		     javaConstant
-  highlight javaLangObject                   ctermfg=208 guifg=#ff8700
+  " highlight javaLangObject                   ctermfg=208 guifg=#ff8700
+  hi def link javaLangObject Builtin
 
 " accessor
 syn match javaAccessor "\."

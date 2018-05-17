@@ -28,7 +28,7 @@ set cpo&vim
 
 syn match javaScriptParenError "(\|)"
 syn region javaScriptParens start="(" end=")"
-syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&\|>\|<"
+syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&\|>\|<\|!"
 
 syn keyword javaScriptCommentTodo      TODO FIXME XXX TBD contained
 syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommentTodo
@@ -39,16 +39,15 @@ syn region  javaScriptStringD	    matchgroup=StringDelimiter start=+"+  skip=+\\
 syn region  javaScriptStringS	    matchgroup=StringDelimiter start=+'+  skip=+\\\\\|\\'+  end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
 
 syn match javaScriptPunct ",\|;"
-syn match javaScriptArg "\h\w*" contained
 
 syn match javaScriptDeref "\."
 
 syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams
 syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="\s*(" end=")" contains=javaScriptFuncParam
-syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptArg,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull,javaScriptField skipwhite
+syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull,javaScriptField,javaScriptParens,javaScriptIn skipwhite
 
 syn region javaScriptParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptParam
-syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptIn,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNull,javaScriptField skipwhite
+syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptIn,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNull,javaScriptField,javaScriptIdentifier skipwhite
 
 syn match   javaScriptSpecialCharacter "'\\.'"
 syn match   javaScriptNumber	       "-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
@@ -143,11 +142,14 @@ hi def link javaScriptReserved		Keyword
 hi def link javaScriptDebug		Debug
 hi def link javaScriptConstant		Label
 hi def link javaScriptFuncName          Function
-hi def link javaScriptArg               Identifier
 hi def link javaScriptPunct             Delimiter
 hi def link javaScriptDeref             Comment
 hi def link javaScriptItemAccess        Special
-highlight javaScriptField ctermfg=250 guifg=#bcbcbc
+augroup javaScriptHighlight
+  autocmd!
+  autocmd ColorScheme * highlight javaScriptField ctermfg=245 guifg=#8a8a8a
+augroup END
+highlight javaScriptField ctermfg=245 guifg=#8a8a8a
 
 
 let b:current_syntax = 'javascript'
