@@ -220,6 +220,9 @@ nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
 nnoremap g<C-]> :ptjump <C-r><C-w><CR>
 xnoremap g<C-]> "ay:<C-u>ptjump <C-r>a<CR><CR>
 
+" auto expansion
+inoremap {<CR> {<CR>}<C-o>O
+
 " better file jumping
 nnoremap <silent> <expr> <C-w>f winnr('$') > 1
       \? ":let fname=\"\<C-r>\<C-f>\"\|wincmd p\<CR>:find \<C-r>=fname\<CR>\<CR>"
@@ -272,6 +275,8 @@ let g:mucomplete#chains                 = {
       \ 'xml'     : ['ulti', 'tags', 'c-n'],
       \ 'sql'     : ['c-n', 'ulti', 'tags']
       \ }
+let mucomplete#can_complete = { }
+let mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
 " jedi
 let g:jedi#auto_vim_configuration     = 0
 let g:jedi#show_call_signatures       = 2
