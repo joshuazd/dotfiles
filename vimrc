@@ -159,6 +159,7 @@ nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
 nnoremap gk k
+nnoremap ' `
 
 xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 nnoremap <C-w>a :redraw!<CR>
@@ -323,7 +324,7 @@ endif
 function! CCR() abort
   let cmdline = getcmdline()
   if cmdline =~? '\v\C^(ls|files|buffers)' | return "\<CR>:b "
-  elseif cmdline =~? '\v\C^(dli|il)'       | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
+  elseif cmdline =~? '\v\C^(dli|il)' && len(split(cmdline,' ')) > 1 | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
   elseif cmdline =~? '\v\C^(cli|lli)'      | return "\<CR>:sil ".repeat(cmdline[0], 2)."\<Space>"
   elseif cmdline =~? '\C^old'              | return "\<CR>:e #<"
   elseif cmdline =~? '\C^changes'          | set nomore | return "\<CR>:set more|norm! g;\<S-Left>"
