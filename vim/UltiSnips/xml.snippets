@@ -282,7 +282,7 @@ snippet script "script" b
 	import groovy.json.*;
 	def content = mc.getProperty("PAYLOAD");
 	def object = new JsonSlurper().parseText(content.toString());$0
-	def builder = new JsonBuilder(slurper);
+	def builder = new JsonBuilder(object);
 	mc.setPayloadJSON(JsonOutput.prettyPrint(builder.toString()));
 </script>
 endsnippet
