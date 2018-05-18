@@ -48,5 +48,5 @@ function getssl() {
 }
 
 function buildp() {
-    mvnc clean install -P$1; mcar
+    mvnc install -P$1; mcar
 }
