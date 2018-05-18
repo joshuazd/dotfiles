@@ -154,7 +154,7 @@ nnoremap <Esc>a :bp<CR>
 nnoremap <BS> <C-^>
 nnoremap <silent> <Space>x :bn\|bd #<CR>
 
-" make j and k smarter
+" line navigation
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
@@ -223,6 +223,11 @@ xnoremap g<C-]> "ay:<C-u>ptjump <C-r>a<CR><CR>
 
 " auto expansion
 inoremap {<CR> {<CR>}<C-o>O
+inoremap (<CR> (<CR>)<C-o>O
+inoremap [<CR> [<CR>]<C-o>O
+inoremap {; {<CR>};<C-o>O
+inoremap (; (<CR>);<C-o>O
+inoremap [; [<CR>];<C-o>O
 
 " better file jumping
 nnoremap <silent> <expr> <C-w>f winnr('$') > 1
