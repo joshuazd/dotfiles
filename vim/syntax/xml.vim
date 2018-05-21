@@ -200,7 +200,7 @@ else
   syn include @xmlGroovy syntax/groovy.vim
   unlet! b:current_syntax
 
-  syn match   xmlScriptTag    +<script[^/!?<>]*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook contained
+  syn match   xmlScriptTag    +<script\s\+language="[a-z]*"\s*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook contained
   syn match   xmlEndScriptTag +</script>+         contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,@xmlTagHook contained
 
     " no syntax folding:
