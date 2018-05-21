@@ -23,7 +23,7 @@ augroup XML
     if executable('xmllint')
       autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
     endif
-    autocmd CursorHold,CursorHoldI,CursorMoved,FocusLost,FocusGained,InsertEnter,InsertLeave * echom FindAPI()
+    autocmd CursorHold,CursorHoldI,CursorMoved,InsertEnter,InsertLeave * redraw|echo FindAPI()
 augroup END
 
 nnoremap <buffer> <Space>r :echom FindAPI()<CR>
