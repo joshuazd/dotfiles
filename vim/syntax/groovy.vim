@@ -102,6 +102,10 @@ syn cluster groovyTop add=groovyFuncCall
 syn region groovyFuncArgs start="(\@<=" end=")\@=" contains=groovyArgs,groovyComma contained
 syn match groovyArgs "[^,)]*" contains=@groovyTop,groovyFuncCall contained skipwhite
 
+  syn keyword groovyLangObject contained clone equals finalize getClass hashCode
+  syn keyword groovyLangObject contained notify notifyAll toString wait
+  hi def link groovyLangObject Builtin
+
 " accessor
 syn match groovyAccessor "\."
 syn cluster groovyTop add=groovyAccessor
@@ -208,7 +212,7 @@ if !exists('groovy_allow_cpp_keywords')
 endif
 
 " The following cluster contains all groovy groups except the contained ones
-syn cluster groovyTop add=groovyExternal,groovyError,groovyError,groovyBranch,groovyLabelRegion,groovyLabel,groovyConditional,groovyRepeat,groovyBoolean,groovyConstant,groovyTypedef,groovyOperator,groovyType,groovyType,groovyStatement,groovyStorageClass,groovyAssert,groovyExceptions,groovyMethodDecl,groovyClassDecl,groovyClassDecl,groovyClassDecl,groovyScopeDecl,groovyError,groovyError2,groovyUserLabel,groovyLangObject
+syn cluster groovyTop add=groovyExternal,groovyError,groovyError,groovyBranch,groovyLabelRegion,groovyLabel,groovyConditional,groovyRepeat,groovyBoolean,groovyConstant,groovyTypedef,groovyOperator,groovyType,groovyType,groovyStatement,groovyStorageClass,groovyAssert,groovyExceptions,groovyMethodDecl,groovyClassDecl,groovyClassDecl,groovyClassDecl,groovyScopeDecl,groovyError,groovyError2,groovyUserLabel,groovyLangObject,groovySemicolon
 
 
 " Comments
@@ -293,6 +297,7 @@ syn match   groovySpecial "\\u\d\{4\}"
 
 syn cluster groovyTop add=groovyString,groovyCharacter,groovyNumber,groovySpecial,groovyStringError
 
+let groovy_highlight_functions = 'syntax'
 if exists('groovy_highlight_functions')
   if groovy_highlight_functions ==? 'indent'
     syn match  groovyFuncDef "^\(\t\| \{8\}\)[_$a-zA-Z][_$a-zA-Z0-9_. \[\]]*([^-+*/()]*)" contains=groovyScopeDecl,groovyType,groovyStorageClass,@groovyClasses
@@ -381,6 +386,11 @@ exec 'syn sync ccomment groovyComment minlines=' . groovy_minlines
 " syn match  groovyBraces		"[\[\]]"
 " syn match  groovyBraces		"[\|]"
 
+" comma
+syn match groovyComma ","
+hi def link groovyComma Delimiter
+syn cluster groovyTop add=groovyComma
+
 if exists('groovy_mark_braces_in_parens_as_errors')
   syn match groovyInParen          contained "[{}]"
   hi def link groovyInParen        groovyError
@@ -404,7 +414,7 @@ syn match   groovyParenError       "\]"
 " groovy.vim default highlighting
 
 hi def link groovyFuncDef          Function
-hi def link groovyBraces           Function
+hi def link groovyBraces           Delimiter
 hi def link groovyBranch           Conditional
 hi def link groovyParen            Delimiter
 hi def link groovyParen1           Delimiter
