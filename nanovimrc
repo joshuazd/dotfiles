@@ -8,7 +8,7 @@ set wildmenu
 set noswapfile
 set showcmd
 set tags=./tags,tags
-set foldlevelstart=99
+set foldlevelstart=4
 filetype plugin indent on
 syntax enable
 colorscheme material
@@ -17,4 +17,6 @@ nnoremap H ^
 nnoremap Y y$
 nnoremap gb :ls<CR>:b<space>
 inoremap jk <esc>
+nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
+nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 set statusline=\ %f%m%r%h%w%=%{&ff}\ \ %{&ft}\ \ %03p%%\ \ %04l,%04v\ 

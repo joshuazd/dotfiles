@@ -47,7 +47,7 @@ set wildignore+=*.o,*~,*.pyc,*.versionsBackup " Ignore compiled files
 set wildignore+=*target/*,*bin/*,*build/*     " Ignore build artifacts
 set wildignore+=tags,Session.vim              " Ignore tags and session files
 set foldmethod=marker                         " fold based on marker by default
-set foldlevel=4                               " don't fold things by default
+set foldlevelstart=4                          " don't fold things by default
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
 set concealcursor+=n                          " conceal characters in normal mode
 set conceallevel=2                            " conceal characters by default
@@ -56,8 +56,8 @@ set winminheight=0                            " minimum window height
 set winminwidth=0                             " minimum window width
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 set virtualedit+=block                        " allow virtual editing in v-block mode
-set completeopt+=menuone                      " configure popup menu
 set updatetime=1000                           " time for swapfile and CursorHold events
+set completeopt+=menuone                      " configure popup menu
 if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
 endif
@@ -147,10 +147,8 @@ nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 nnoremap Y y$
 
 " buffer navigation
-nnoremap <M-d> :bn<CR>
-nnoremap <M-a> :bp<CR>
-nnoremap <Esc>d :bn<CR>
-nnoremap <Esc>a :bp<CR>
+nnoremap [b :bprevious<CR>
+nnoremap ]b :bnext<CR>
 nnoremap <BS> <C-^>
 nnoremap <silent> <Space>x :bn\|bd #<CR>
 
@@ -186,6 +184,8 @@ nnoremap =ou :setlocal cursorcolumn!   \|setlocal cursorcolumn?<CR>
 nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR>\|setlocal signcolumn?<CR>
 nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR>\|setlocal conceallevel?<CR>
+
+" quickfix maps
 nnoremap ]q :cnext<CR>
 nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
