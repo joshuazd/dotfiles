@@ -190,6 +190,7 @@ nnoremap ]q :cnext<CR>
 nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
+nnoremap =q :cclose<CR>
 
 " easier to exit insert mode
 inoremap jk <Esc>
