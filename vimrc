@@ -184,8 +184,8 @@ nnoremap =or :setlocal relativenumber! \|setlocal relativenumber?<CR>
 nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
 nnoremap =ou :setlocal cursorcolumn!   \|setlocal cursorcolumn?<CR>
 nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
-nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><CR>
-nnoremap =oq :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><CR>
+nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR>\|setlocal signcolumn?<CR>
+nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR>\|setlocal conceallevel?<CR>
 nnoremap ]q :cnext<CR>
 nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
