@@ -110,7 +110,6 @@ if !empty(glob('~/.vim/autoload/plug.vim'))
   Plug 'tommcdo/vim-lion'
   Plug 'romainl/vim-qf'
   Plug 'romainl/vim-qlist'
-  Plug 'justinmk/vim-dirvish'
   Plug 'xtal8/traces.vim'
   Plug 'sgur/vim-editorconfig'
   Plug 'kana/vim-textobj-user'
@@ -294,8 +293,12 @@ let g:sneak#label      = 1
 let g:sneak#s_next     = 1
 let g:sneak#use_ic_scs = 1
 " netrw
-let g:loaded_netrw       = 1
-let g:loaded_netrwPlugin = 1
+let g:netrw_banner = 0
+let g:netrw_liststyle = 0
+let g:netrw_browse_split = 4
+let g:netrw_winsize = 15
+" let g:loaded_netrw       = 1
+" let g:loaded_netrwPlugin = 1
 " markdown
 let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 " }}}
