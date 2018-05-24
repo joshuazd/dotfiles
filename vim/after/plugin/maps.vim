@@ -47,5 +47,6 @@ endif
 if exists('g:loaded_qlist') && g:loaded_qlist == 1
   
   nnoremap <Space>i :Ilist<space>
+  nmap <Space>8 <Plug>QlistIncludefromtop:cdo s//<Left>
 
 endif

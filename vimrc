@@ -171,6 +171,7 @@ nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
 nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
+nnoremap <Space>r :%s///g<Left><Left><Left>
 
 " settings toggles
 nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
