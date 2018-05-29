@@ -24,12 +24,15 @@ set sidescrolloff=15                          " scroll within 15 characters - wh
 set foldmethod=marker                         " fold based on syntax
 set wildmenu                                  " Turn on the wild menu
 set wildmode=list:longest,list:full           " setup wildmenu
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup " Ignore compiled files
+set wildignore+=*target/*,*bin/*,*build/*     " Ignore build artifacts
 set wildignore+=tags,Session.vim              " Ignore tags and session files
 set wildignorecase                            " ignore case in wildmenu
 set sessionoptions-=options                   " make sessions work better with plugins
 set sessionoptions-=blank                     " don't save black buffers in sessions
 set noswapfile                                " do not create swap files
-set foldlevelstart=4                          " don't fold things by default
+set foldlevelstart=10                         " don't fold things by default
+set foldlevel=10
 set listchars=tab:->,trail:~,extends:>,eol:$  " what to show for whitespace chars
 set display+=lastline                         " show as much of the last line as possible
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
@@ -37,7 +40,7 @@ set completeopt+=menuone,noselect,longest     " configure popup menu
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
 set tags=./tags,tags
-filetype indent on
+filetype plugin indent on
 
 nnoremap L $
 nnoremap H ^
