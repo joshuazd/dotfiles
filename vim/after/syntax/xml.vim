@@ -38,13 +38,15 @@ syn cluster xmlStringHook    add=xmlFile
 let s:cur_syntax = b:current_syntax
 unlet! b:current_syntax
 syn include @xmlXpath syntax/xpath.vim
+
 syn region Xpath
-    \ matchgroup=xmlQuote start=+\(when test=\|select=\|xpath=\|source=\|expression=\)\@15<="+
+    \ matchgroup=xmlQuote
+    \ start=+\%(when test=\|select=\|xpath=\|source=\|expression=\)\@11<="+
     \ keepend
     \ end=+"+
     \ contained
     \ contains=@xmlXpath
-    \ display
+
 let b:current_syntax = s:cur_syntax
 
 hi def link xmlNs           Identifier

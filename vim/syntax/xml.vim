@@ -80,8 +80,9 @@ syn match   xmlEqual +=+ display contained
 " <tag foo.attribute = "value">
 "      ^^^^^^^^^^^^^
 "
+    "\ "[-'\"<]\@1<!\<[a-zA-Z:_][-.0-9a-zA-Z:_]*\>\%(['\">]\@!\|$\)"
 syn match   xmlAttrib
-    \ "[-'\"<]\@1<!\<[a-zA-Z:_][-.0-9a-zA-Z:_]*\>\%(['\">]\@!\|$\)"
+    \ "\(\s\|^\)\<[a-zA-Z:_][-.0-9a-zA-Z:_]*\>\%(\s\|$\|=\)"
     \ contained
     \ contains=xmlAttribPunct,@xmlAttribHook
     \ display
@@ -360,7 +361,7 @@ hi def link xmlCommentError	Error
 hi def link xmlError		Error
 
 hi def link xmlProcessingDelim	Comment
-hi def link xmlProcessing	Type
+hi def link xmlProcessing	xmlAttrib
 
 hi def link xmlCdata		String
 hi def link xmlCdataCdata	xmlQuote
