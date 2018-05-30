@@ -112,8 +112,6 @@ if !empty(glob('~/.vim/autoload/plug.vim'))
   Plug 'romainl/vim-qlist'
   Plug 'xtal8/traces.vim'
   Plug 'sgur/vim-editorconfig'
-  Plug 'kana/vim-textobj-user'
-  Plug 'kana/vim-textobj-indent'
   if executable('ctags')
     Plug 'ludovicchabant/vim-gutentags'
   endif
