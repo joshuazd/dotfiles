@@ -216,7 +216,7 @@ else
     syn region   xmlEndTag
         \ matchgroup=xmlTagPunct start=+</[^ /!?<>"']\@=+
         \ matchgroup=xmlTagPunct end=+>+
-        \ contains=xmlError,xmlTagName,xmlNamespace,xmlAttribPunct,@xmlTagHook
+        \ contains=xmlError,xmlNamespace,xmlAttribPunct,@xmlTagHook
 
   syn region xmlJavaScriptRegion
         \ start=+<script language="js">+
