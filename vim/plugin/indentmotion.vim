@@ -1,5 +1,10 @@
-function! <SID>findSameIndent(count, line, dir) abort
-  let l:line = a:line
+function! <SID>findSameIndent(count, dir, visual, operator) abort
+  let l:curline = line('.')
+  let l:curcol = col('.')
+  let l:line = line('.')
+  if a:visual
+    let l:curline = line("'<")
+  endif
   let l:count = a:count
   if a:dir ==? 'j'
     let l:end = '>'
@@ -10,43 +15,55 @@ function! <SID>findSameIndent(count, line, dir) abort
   endif
   while l:count > 0
     " Search pattern taken from http://vim.wikia.com/wiki/Move_to_next/previous_line_with_same_indentation
-    let l:pos = search('^' . matchstr(getline(l:line), '\(^\s*\)') .'\%' . l:end . l:line . 'l\S', l:search_dir . 'nW')
-    if l:pos > 0
-      let l:line = l:pos
-    endif
+    let l:line = search('^' . matchstr(getline(l:line), '\(^\s*\)') .'\%' . l:end . l:line . 'l\S', l:search_dir . 'nW')
     let l:count = l:count - 1
   endwhile
-  return l:line
+  call cursor(l:curline, l:curcol)
+  if a:operator
+    normal! 0V
+  elseif a:visual
+    normal! gv
+  endif
+  call cursor(l:line, 0)
+  normal! ^
 endfunction
 
-function! <SID>indentMotionMove(dir, type, count) abort
-  if a:dir ==? 'j'
-    let l:start = '<'
-    let l:end = '>'
-    let l:search_dir = ''
-  elseif a:dir ==? 'k'
-    let l:start = '>'
-    let l:end = '<'
-    let l:search_dir = 'b'
-  endif
-  let l:line = <SID>findSameIndent(a:count, line('.'), a:dir)
-  let l:move = abs(l:line - line('.'))
-  if l:move > 0
-    if a:type ==? 'v' || a:type ==? ''
-      return "\<esc>`" . l:start . a:type . '`' . l:end . l:move . a:dir . ":\<C-u>silent redraw\<CR>gv"
-    elseif a:type ==? 'n'
-      return "\<esc>" . l:move . a:dir
-    elseif a:type ==? 'o'
-      return "\<esc>" . v:operator . l:move . a:dir
-    endif
+function! <SID>indentTextObj(inner)
+  let curcol = col('.')
+  let curline = line('.')
+  let lastline = line('$')
+  let i = indent(line('.'))
+  if getline('.') !~? "^\\s*$"
+    let p = line('.') - 1
+    let nextblank = getline(p) =~? "^\\s*$"
+
+    while p > 0 && ((!nextblank && indent(p) >= i) || (!a:inner && nextblank))
+      -
+      let p = line('.') - 1
+      let nextblank = getline(p) =~? "^\\s*$"
+    endwhile
+
+    normal! 0V
+    call cursor(curline, curcol)
+    let p = line('.') + 1
+    let nextblank = getline(p) =~? "^\\s*$"
+    while p <= lastline && ((!nextblank && indent(p) >= i) || (!a:inner && nextblank))
+      +
+      let p = line('.') + 1
+      let nextblank = getline(p) =~? "^\\s*$"
+    endwhile
+    normal! $
   endif
 endfunction
 
-nnoremap <silent> <expr> <Plug>IndentMotionDown <SID>indentMotionMove('j', mode(), v:count1)
-nnoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', mode(), v:count1)
+onoremap <silent>ai :<C-u>call <SID>indentTextObj(0)<CR>
+onoremap <silent>ii :<C-u>call <SID>indentTextObj(1)<CR>
+xnoremap <silent>ai <Esc>:call <SID>indentTextObj(0)<CR><Esc>gv
+xnoremap <silent>ii <Esc>:call <SID>indentTextObj(1)<CR><Esc>gv
 
-xnoremap <silent> <expr> <Plug>IndentMotionDown <SID>indentMotionMove('j', mode(), v:count1)
-xnoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', mode(), v:count1)
-
-onoremap <silent> <expr> <Plug>IndentMotionDown <SID>indentMotionMove('j', 'o', v:count1)
-onoremap <silent> <expr> <Plug>IndentMotionUp <SID>indentMotionMove('k', 'o', v:count1)
+nnoremap ,j :<C-u>call <SID>findSameIndent(v:count1, 'j', 0, 0)<CR>
+nnoremap ,k :<C-u>call <SID>findSameIndent(v:count1, 'k', 0, 0)<CR>
+xnoremap ,j <Esc>:call <SID>findSameIndent(v:count1, 'j', 1, 0)<CR><Esc>gv
+xnoremap ,k <Esc>:call <SID>findSameIndent(v:count1, 'k', 1, 0)<CR><Esc>gv
+onoremap ,j :<C-u>call <SID>findSameIndent(v:count1, 'j', 0, 1)<CR>
+onoremap ,k :<C-u>call <SID>findSameIndent(v:count1, 'k', 0, 1)<CR>
