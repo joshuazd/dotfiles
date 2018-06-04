@@ -32,7 +32,7 @@ syn cluster xmlTagHook       add=xmlConnection,xmlParam,xmlFunction,xmlArgs,xmlE
 syn cluster xmlTagHook       add=xmlSqlTag,xmlSend,xmlLog,xmlLogParam,xmlInSequence
 syn cluster xmlTagHook       add=xsltStatement
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
-syn cluster xmlAttribHook    add=xmlExpression,xmlValue,xmlSelect,xmlName,xmlUrl
+syn cluster xmlAttribHook    add=xmlExpression,xmlValue,xmlSelect,xmlName
 syn cluster xmlStringHook    add=xmlFile
 
 let s:cur_syntax = b:current_syntax
@@ -50,24 +50,22 @@ syn region Xpath
 let b:current_syntax = s:cur_syntax
 
 hi def link xmlNs           Identifier
-" function! XmlAfterHighlight() abort
+function! XmlAfterHighlight() abort
   highlight xmlXsl        ctermfg=1   guifg=#ff5370
 
   highlight xmlExpression ctermfg=203 guifg=#ff5f5f cterm=italic gui=italic
   highlight xmlSelect     ctermfg=221 guifg=#ffcb6b cterm=italic gui=italic
-  " highlight xmlUrl        ctermfg=66  guifg=#00af87 cterm=italic gui=italic
   highlight xmlName       ctermfg=152 guifg=#afd7d7
   highlight xmlLog        ctermfg=245 guifg=#bbbbbb
   highlight xmlSqlTag     ctermfg=209 guifg=#ff5f00
   highlight xmlLogParam   ctermfg=243 guifg=#8a8a8a
-  " highlight xmlFile       ctermfg=103 guifg=#8787af cterm=bold   gui=bold
-" endfunction
+endfunction
 
-" augroup xmlAfterHighlight
-"   autocmd!
-"   autocmd ColorScheme material call XmlAfterHighlight()
-" augroup END
-" call XmlAfterHighlight()
+augroup xmlAfterHighlight
+  autocmd!
+  autocmd ColorScheme material call XmlAfterHighlight()
+augroup END
+call XmlAfterHighlight()
 
 hi def link xmlArgs         Primitive
 hi def link xmlConnection   Storage
