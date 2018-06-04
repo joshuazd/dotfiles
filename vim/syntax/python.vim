@@ -41,8 +41,11 @@ syn keyword pythonKeyword   import from
 syn keyword pythonKeyword   try except finally
 syn keyword pythonOperator  and in is not or
 
-syn match pythonExtraOperator "\%([~!^&|/%+-]\|\%(class\s*\)\@<!<<\|<=>\|<=\|\%(<\|\<class\s\+\u\w*\s*\)\@<!<[^<]\@=\|===\|==\|=\~\|>>\|>=\|=\@<!>\|\.\.\.\|\.\.\|::\)" display
-syn match pythonExtraPseudoOperator "\%(-=\|/=\|\*\*=\|\*=\|&&=\|&=\|&&\|||=\||=\|||\|%=\|+=\|!\~\|!=\)" display
+" syn match pythonExtraOperator "\%([~!^&|/%+-]\|\%(class\s*\)\@<!<<\|<=>\|<=\|\%(<\|\<class\s\+\u\w*\s*\)\@<!<[^<]\@=\|===\|==\|=\~\|>>\|>=\|=\@<!>\|\.\.\.\|\.\.\|::\)" display
+syn match pythonExtraOperator "=" display
+syn match pythonExtraOperator "[-!=+&|%^]=" display
+syn match pythonExtraOperator "[*<>/]\{1,2}=\?" display
+syn match pythonExtraOperator "!\?\~"
 
 
 syn match pythonPunct ":" display
@@ -55,13 +58,9 @@ syn match pythonStatement "\<async\s\+def\>" nextgroup=pythonFunction skipwhite
 syn match pythonStatement "\<async\s\+with\>" display
 syn match pythonStatement "\<async\s\+for\>" nextgroup=pythonRepeat skipwhite
 
-syn match pythonExtraOperator "\%(=\)" display
-
-syn match pythonExtraOperator "\%(\*\|\*\*\)" display
-
 syn keyword pythonSelf self cls
-syn match pythonField "\.\@1<=\h\w*\([^\.(\[]\|$\)\@=" contains=pythonMagic display
-syn match pythonField "\.\@1<=\h\w*\(\.\h\w*[(\[]\)\@=" contains=pythonMagic display
+" syn match pythonField "\.\@1<=\h\w*\>[\.(\[]\@!" contains=pythonMagic display
+" syn match pythonField "\.\@1<=\h\w*\(\.\h\w*(\)\@=" contains=pythonMagic display
 
 " }}}
 
