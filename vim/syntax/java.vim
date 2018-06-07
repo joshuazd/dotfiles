@@ -33,10 +33,10 @@ hi def link javaError2 javaError
 let java_highlight_all = 'true'
 " keyword definitions
 syn keyword javaExternal	native package
-syn match javaExternal		"\<import\>\(\s\+static\>\)\?"
+syn match javaExternal		"\<import\>\(\s\+static\>\)\?" display
 syn keyword javaError		goto const
 syn keyword javaConditional	if else switch
-syn match   javaConditional     "[?:]"
+syn match   javaConditional     "[?:]" display
 syn keyword javaRepeat		while for do
 syn keyword javaBoolean		true false
 syn keyword javaConstant	null
@@ -50,20 +50,20 @@ syn keyword javaExceptions	throw try catch finally
 syn keyword javaAssert		assert
 syn keyword javaMethodDecl	synchronized throws
 syn keyword javaClassDecl	extends implements interface
-syn match   javaSemicolon       ";"
-syn match javaOperator          "[&/%<>=!+-]"
-syn match javaOperator          "|"
+syn match   javaSemicolon       ";" display
+syn match javaOperator          "[*&/%<>=!+-]" display
+syn match javaOperator          "|" display
 " to differentiate the keyword class from MyClass.class we use a match here
 syn match   javaTypedef		"\.\s*\<class\>"ms=s+1
 syn keyword javaClassDecl	enum
-syn match   javaClassDecl	"^class\>"
+syn match   javaClassDecl	"^class\>" display
 syn match   javaClassDecl	"[^.]\s*\<class\>"ms=s+1
 syn match   javaAnnotation	"@\([_$a-zA-Z][_$a-zA-Z0-9]*\.\)*[_$a-zA-Z][_$a-zA-Z0-9]*\>\(([^)]*)\)\=" contains=javaString
 syn match   javaClassDecl	"@interface\>"
 syn keyword javaBranch		break continue nextgroup=javaUserLabelRef skipwhite
-syn match   javaUserLabelRef	"\k\+" contained
-syn match   javaVarArg		"\.\.\."
-syn match   javaConstant '\<\(\u\|_\)\(\u\|\d\|_\)\+\>'
+syn match   javaUserLabelRef	"\k\+" contained display
+syn match   javaVarArg		"\.\.\." display
+syn match   javaConstant '\<\(\u\|_\)\(\u\|\d\|_\)\+\>' display
 syn keyword javaScopeDecl	public protected private abstract
 
 if exists('java_highlight_java_lang_ids')
@@ -71,7 +71,9 @@ if exists('java_highlight_java_lang_ids')
 endif
 if exists('java_highlight_all')  || exists('java_highlight_java')  || exists('java_highlight_java_lang')
   " java.lang.*
-  syn match javaLangClass "\<System\>"
+  syn match javaLangClass "\<System\>" display
+  syn match javaClassName "\<[A-Z]\w*\>\ze\s\+\h\w*\>" display
+  syn match javaClassName "<\@1<=[A-Z]\w*\>" display
   syn keyword javaR_JavaLang NegativeArraySizeException ArrayStoreException IllegalStateException RuntimeException IndexOutOfBoundsException UnsupportedOperationException ArrayIndexOutOfBoundsException ArithmeticException ClassCastException EnumConstantNotPresentException StringIndexOutOfBoundsException IllegalArgumentException IllegalMonitorStateException IllegalThreadStateException NumberFormatException NullPointerException TypeNotPresentException SecurityException
   syn cluster javaTop add=javaR_JavaLang
   syn cluster javaClasses add=javaR_JavaLang
@@ -114,7 +116,7 @@ if exists('java_space_errors')
 endif
 
 syn region  javaLabelRegion	transparent matchgroup=javaLabel start="\<case\>" matchgroup=NONE end=":" contains=javaNumber,javaCharacter,javaString
-syn match   javaUserLabel	"^\s*[_$a-zA-Z][_$a-zA-Z0-9_]*\s*:"he=e-1 contains=javaLabel
+syn match   javaUserLabel	"^\s*[_$a-zA-Z][_$a-zA-Z0-9_]*\s*:"he=e-1 contains=javaLabel display
 syn keyword javaLabel		default
 
 " highlighting C++ keywords as errors removed, too many people find it
@@ -136,8 +138,8 @@ if exists('java_comment_strings')
   syn cluster javaCommentSpecial2 add=javaComment2String,javaCommentCharacter,javaNumber
 endif
 syn region  javaComment		 start="/\*"  end="\*/" contains=@javaCommentSpecial,javaTodo,@Spell
-syn match   javaCommentStar	 contained "^\s*\*[^/]"me=e-1
-syn match   javaCommentStar	 contained "^\s*\*$"
+syn match   javaCommentStar	 contained "^\s*\*[^/]"me=e-1 display
+syn match   javaCommentStar	 contained "^\s*\*$" display
 syn match   javaLineComment	 "//.*" contains=@javaCommentSpecial2,javaTodo,@Spell
 hi def link javaCommentString javaString
 hi def link javaComment2String javaString
@@ -160,20 +162,20 @@ if !exists('java_ignore_javadoc') && main_syntax !=? 'jsp'
   syn region  javaCommentTitle	contained matchgroup=javaDocComment start="/\*\*"   matchgroup=javaCommentTitle keepend end="\.$" end="\.[ \t\r<&]"me=e-1 end="[^{]@"me=s-2,he=s-1 end="\*/"me=s-1,he=s-1 contains=@javaHtml,javaCommentStar,javaTodo,@Spell,javaDocTags,javaDocSeeTag
 
   syn region javaDocTags	 contained start="{@\(code\|link\|linkplain\|inherit[Dd]oc\|doc[rR]oot\|value\)" end="}"
-  syn match  javaDocTags	 contained "@\(param\|exception\|throws\|since\)\s\+\S\+" contains=javaDocParam
-  syn match  javaDocParam	 contained "\s\S\+"
-  syn match  javaDocTags	 contained "@\(version\|author\|return\|deprecated\|serial\|serialField\|serialData\)\>"
+  syn match  javaDocTags	 contained "@\(param\|exception\|throws\|since\)\s\+\S\+" contains=javaDocParam display
+  syn match  javaDocParam	 contained "\s\S\+" display
+  syn match  javaDocTags	 contained "@\(version\|author\|return\|deprecated\|serial\|serialField\|serialData\)\>" display
   syn region javaDocSeeTag	 contained matchgroup=javaDocTags start="@see\s\+" matchgroup=NONE end="\_."re=e-1 contains=javaDocSeeTagParam
   syn match  javaDocSeeTagParam  contained @"\_[^"]\+"\|<a\s\+\_.\{-}</a>\|\(\k\|\.\)*\(#\k\+\((\_[^)]\+)\)\=\)\=@ extend
   syntax case match
 endif
 
 " match the special comment /**/
-syn match   javaComment		 "/\*\*/"
+syn match   javaComment		 "/\*\*/" display
 
 " Strings and constants
-syn match   javaSpecialError	 contained "\\."
-syn match   javaSpecialCharError contained "[^']"
+syn match   javaSpecialError	 contained "\\." display
+syn match   javaSpecialCharError contained "[^']" display
 syn match   javaSpecialChar	 contained "\\\([4-9]\d\|[0-3]\d\d\|[\"\\'ntbrf]\|u\x\{4\}\)"
 syn region  javaString		start=+"+ end=+"+ end=+$+ contains=javaSpecialChar,javaSpecialError,@Spell
 " next line disabled, it can cause a crash for a long line
@@ -187,7 +189,7 @@ syn match   javaNumber		 "\<\d\(\d\|_\d\)*[eE][-+]\=\d\(\d\|_\d\)*[fFdD]\=\>"
 syn match   javaNumber		 "\<\d\(\d\|_\d\)*\([eE][-+]\=\d\(\d\|_\d\)*\)\=[fFdD]\>"
 
 " unicode characters
-syn match   javaSpecial "\\u\d\{4\}"
+syn match   javaSpecial "\\u\d\{4\}" display
 
 syn cluster javaTop add=javaString,javaCharacter,javaNumber,javaSpecial,javaStringError
 
@@ -221,7 +223,7 @@ syn region javaTemplateArgs matchgroup=javaOperator start="<" skip="<" end=">" c
 syn match javaTemplateArgList "[^,>]*" contains=@javaTop,javaClassName contained skipwhite
 
 " classes
-syn match javaClassDeclName "\(\(class\|implements\)\s\+\)\@20<=[A-Z_][a-zA-Z0-9_]*"
+syn match javaClassDeclName "\%(class\|implements\)\@12<=\s\+[A-Z_][a-zA-Z0-9_]*"
 highlight javaClassDeclName ctermfg=4 guifg=#82aaff cterm=bold gui=bold
 
 
