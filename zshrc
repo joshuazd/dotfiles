@@ -35,6 +35,7 @@ bindkey -e
 export EDITOR=vim\ -u\ ~/dotfiles/nanovimrc\ -N
 export VISUAL=vim\ -u\ ~/dotfiles/nanovimrc\ -N
 export KEYTIMEOUT=1
+autoload zmv
 autoload -U edit-command-line
 zle -N edit-command-line
 bindkey '^x^e' edit-command-line
