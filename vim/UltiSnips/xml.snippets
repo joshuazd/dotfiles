@@ -9,6 +9,10 @@ snippet < "tag" b
 </${1/([\w:._-]+).*/$1/}>
 endsnippet
 
+snippet > "short tag" b
+<${1:tag}/>
+endsnippet
+
 snippet api "api" b
 <api xmlns="http://ws.apache.org/ns/synapse" name="${1:api_name}" context="/${2:context}">
 	$0
@@ -36,7 +40,7 @@ snippet dbl "dblookup" b
 </dblookup>
 endsnippet
 
-snippet dbl "dbreport" b
+snippet dbr "dbreport" b
 <dbreport>
 	<connection>
 		<pool>
