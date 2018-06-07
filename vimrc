@@ -135,11 +135,6 @@ nnoremap H ^
 xnoremap L $
 xnoremap H ^
 
-" set hlsearch and nohlsearch dynamically-ish
-nnoremap <expr> n &hlsearch ? 'n' : ':set hlsearch<CR>'
-nnoremap <expr> N &hlsearch ? 'N' : ':set hlsearch<CR>'
-nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
-
 " map Y behave like D and C
 nnoremap Y y$
 
