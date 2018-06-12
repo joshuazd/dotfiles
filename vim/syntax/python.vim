@@ -46,6 +46,7 @@ syn match pythonExtraOperator "=" display
 syn match pythonExtraOperator "[-!=+&|%^]=" display
 syn match pythonExtraOperator "[*<>/]\{1,2}=\?" display
 syn match pythonExtraOperator "!\?\~"
+syn match pythonExtraOperator "[-+%]" display
 
 
 syn match pythonPunct ":" display
@@ -67,7 +68,7 @@ syn keyword pythonSelf self cls
 " Groups {{{
 
 syn region pythonGroup matchgroup=pythonBrackets start="(" end=")" contains=pythonGroupParam
-syn match pythonGroupParam "[^)]*" contained contains=pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonItemAccess skipwhite
+syn match pythonGroupParam "[^)]*" contained contains=pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonItemAccess skipwhite
 
 " }}}
 
@@ -78,7 +79,7 @@ syn cluster pythonBuiltinFuncC add=pythonBuiltinFunc,pythonPrint,pythonMagic
 syn region pythonFuncParams matchgroup=pythonBrackets start="(" end=")" contained contains=pythonFuncParam,pythonPunct
 " syn match pythonKeywordParam "\(=\s*\)\@<=\h\w*" contained
 syn match pythonKeywordParam "\(=\s*\)\zs\h\w*" contained
-syn match pythonFuncParam "[^,)]*" contained contains=pythonKeywordParam,pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonDict skipwhite
+syn match pythonFuncParam "[^,)]*" contained contains=pythonKeywordParam,pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonDict skipwhite
 
 " }}}
 
@@ -89,14 +90,14 @@ syn match pythonFunction "\h\w*" contains=@pythonFuncC nextgroup=pythonVars cont
 syn cluster pythonFuncC add=pythonMagic
 syn region pythonVars matchgroup=pythonBrackets start="(" skip=+\(".*"\|'.*'\)+ end=")" contained contains=pythonParameters,pythonPunct keepend
 syn match pythonParameters "[^,]*" contained contains=pythonParam skipwhite
-syn match pythonParam "[^,]*" contained contains=pythonPunct,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonItemAccess,pythonConstant,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField skipwhite
+syn match pythonParam "[^,]*" contained contains=pythonPunct,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonItemAccess,pythonConstant,pythonString,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField skipwhite
 
 " }}}
 
 " Item Access {{{
 
 syn region pythonAccess matchgroup=pythonBrackets start="\[" end="\]" contained contains=pythonAccessParam
-syn match pythonAccessParam "[^\]]*" contained contains=pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonList,pythonDict skipwhite
+syn match pythonAccessParam "[^\]]*" contained contains=pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonList,pythonDict skipwhite
 syn match pythonItemAccess "\h\w*\ze\[" nextgroup=pythonAccess
 
 " }}}
@@ -104,14 +105,14 @@ syn match pythonItemAccess "\h\w*\ze\[" nextgroup=pythonAccess
 " Lists {{{
 
 syn region pythonList matchgroup=pythonBrackets start="\[" end="\]" contains=pythonListParam
-syn match pythonListParam "[^\]]*" contained contains=pythonIdentifier,pyNiceOperator,pythonOperator,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
+syn match pythonListParam "[^\]]*" contained contains=pythonIdentifier,pyNiceOperator,pythonOperator,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
 
 " }}}
 
 " Dictionaries {{{
 
 syn region pythonDict matchgroup=pythonBrackets start="{" end="}" contains=pythonDictParam
-syn match pythonDictParam "[^}]*" contained contains=pythonIdentifier,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
+syn match pythonDictParam "[^}]*" contained contains=pythonIdentifier,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonDict skipwhite
 
 " }}}
 
@@ -234,6 +235,7 @@ syn match   pythonFloat "\<\d\+[eE][+-]\?\d\+[jJ]\?\>" display
 syn match   pythonFloat "\<\d\+\.\d*\([eE][+-]\?\d\+\)\?[jJ]\?" display
 syn match   pythonOctError  "\<0[oO]\?\o*[8-9]\d*[lL]\?\>" display
 syn match   pythonBinError  "\<0[bB][01]*[2-9]\d*[lL]\?\>" display
+syn cluster pythonNumber contains=pythonHexNumber,pythonOctNumber,pythonBinNumber,pythonNumber,pythonFloat,pythonHexError,pythonOctError,pythonBinError
 
 " }}}
 
