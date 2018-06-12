@@ -31,27 +31,27 @@ syn region javaScriptParens start="(" end=")"
 syn match javaScriptOperator            "+\|\*\|==\|=\|-\|/\|!=\|||\|&&\|>\|<\|!"
 
 syn keyword javaScriptCommentTodo      TODO FIXME XXX TBD contained
-syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommentTodo
+syn match   javaScriptLineComment      "\/\/.*" contains=@Spell,javaScriptCommentTodo display
 syn match   javaScriptCommentSkip      "^[ \t]*\*\($\|[ \t]\+\)"
 syn region  javaScriptComment	       start="/\*"  end="\*/" contains=@Spell,javaScriptCommentTodo
-syn match   javaScriptSpecial	       "\\\d\d\d\|\\."
+syn match   javaScriptSpecial	       "\\\d\d\d\|\\." display
 syn region  javaScriptStringD	    matchgroup=StringDelimiter start=+"+  skip=+\\\\\|\\"+  end=+"\|$+	contains=javaScriptSpecial,@htmlPreproc
 syn region  javaScriptStringS	    matchgroup=StringDelimiter start=+'+  skip=+\\\\\|\\'+  end=+'\|$+	contains=javaScriptSpecial,@htmlPreproc
 
-syn match javaScriptPunct ",\|;"
+syn match javaScriptPunct ",\|;" display
 
-syn match javaScriptDeref "\."
+syn match javaScriptDeref "\." display
 
-syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams
+syn match javaScriptFuncName "\h\w*(\@=" nextgroup=javaScriptFuncParams display
 syn region javaScriptFuncParams contained matchgroup=javaScriptBraces start="\s*(" end=")" contains=javaScriptFuncParam
 syn match javaScriptFuncParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNumber,javaScriptNull,javaScriptField,javaScriptParens,javaScriptIn skipwhite
 
 syn region javaScriptParams contained matchgroup=javaScriptBraces start="(" end=")" contains=javaScriptParam
 syn match javaScriptParam contained "[^)]*" contains=javaScriptOperator,javaScriptDeref,javaScriptBraces,javaScriptIn,javaScriptItemAccess,javaScriptFuncName,javaScriptPunct,javaScriptStringD,javaScriptStringS,javaScriptNull,javaScriptField,javaScriptIdentifier skipwhite
 
-syn match   javaScriptSpecialCharacter "'\\.'"
-syn match   javaScriptNumber	       "-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>"
-syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end=+/[gim]\{0,2\}\s*$+ end=+/[gim]\{0,2\}\s*[;.,)\]}]+me=e-1 contains=@htmlPreproc oneline
+syn match   javaScriptSpecialCharacter "'\\.'" display
+syn match   javaScriptNumber	       "-\=\<\d\+L\=\>\|0[xX][0-9a-fA-F]\+\>" display
+syn region  javaScriptRegexpString     start=+/[^/*]+me=e-1 skip=+\\\\\|\\/+ end=+/[gim]\{0,2\}\s*$+ end=+/[gim]\{0,2\}\s*[;.,)\]}]+me=e-1 contains=@htmlPreproc oneline display
 
 syn keyword javaScriptConditional	else switch
 syn keyword javaScriptConditional       if switch nextgroup=javaScriptFuncParams
@@ -72,15 +72,15 @@ syn keyword javaScriptMember		document event location
 syn keyword javaScriptDeprecated	escape unescape
 syn keyword javaScriptReserved		new abstract boolean byte char class const debugger double enum export extends final float goto implements import int interface long native package private protected public short static super synchronized throws transient volatile
 
-syn match javaScriptColon "\(\(case\|default\|\)[^:]*\)\@<=:"
+syn match javaScriptColon "\(\(case\|default\|\)[^:]*\)\@<=:" display
 
-syn match javaScriptItemAccess "\h\w*\[\@="
-syn match javaScriptField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9(\[]\|$\)\@="
-syn match javaScriptField "\.\@<=\h\w*\(\.\h\w*[(\[]\)\@="
+syn match javaScriptItemAccess "\h\w*\[\@=" display
+" syn match javaScriptField "\(\.\)\@<=\h\w*\([^\.a-zA-Z0-9(\[]\|$\)\@="
+" syn match javaScriptField "\.\@<=\h\w*\(\.\h\w*[(\[]\)\@="
 
 if exists('javaScript_fold')
-    syn match	javaScriptFunction	"\<function\>"
-    syn match   javaScriptFunction      "\<function\>" nextgroup=javaScriptFuncParams
+    syn match	javaScriptFunction	"\<function\>" display
+    syn match   javaScriptFunction      "\<function\>" nextgroup=javaScriptFuncParams display
     syn region	javaScriptFunctionFold	start="\<function\>.*[^};]$" end="^\z1}.*$" transparent fold keepend
 
     syn sync match javaScriptSync	grouphere javaScriptFunctionFold "\<function\>"
@@ -91,11 +91,11 @@ if exists('javaScript_fold')
 else
     syn keyword javaScriptFunction	function
     syn keyword javaScriptFunction	function nextgroup=javaScriptFuncParams
-    syn match	javaScriptBraces	   "[{}\[\]]"
-    syn match	javaScriptParens	   "[()]"
+    syn match	javaScriptBraces	   "[{}\[\]]" display
+    syn match	javaScriptParens	   "[()]" display
 endif
 
-syn sync fromstart
+" syn sync fromstart
 syn sync maxlines=100
 
 if main_syntax ==# 'javascript'
@@ -143,13 +143,13 @@ hi def link javaScriptDebug		Debug
 hi def link javaScriptConstant		Label
 hi def link javaScriptFuncName          Function
 hi def link javaScriptPunct             Delimiter
-hi def link javaScriptDeref             Comment
+hi def link javaScriptDeref             Delimiter
 hi def link javaScriptItemAccess        Special
-augroup javaScriptHighlight
-  autocmd!
-  autocmd ColorScheme * highlight javaScriptField ctermfg=245 guifg=#8a8a8a
-augroup END
-highlight javaScriptField ctermfg=245 guifg=#8a8a8a
+" augroup javaScriptHighlight
+"   autocmd!
+"   autocmd ColorScheme * highlight javaScriptField ctermfg=245 guifg=#8a8a8a
+" augroup END
+" highlight javaScriptField ctermfg=245 guifg=#8a8a8a
 
 
 let b:current_syntax = 'javascript'

@@ -109,7 +109,7 @@ syn match groovyArgs "[^,)]*" contains=@groovyTop,groovyFuncCall contained skipw
 " accessor
 syn match groovyAccessor "\."
 syn cluster groovyTop add=groovyAccessor
-hi def link groovyAccessor Comment
+hi def link groovyAccessor Delimiter
 
 if exists('groovy_highlight_groovy_lang_ids') || exists('groovy_highlight_groovy_lang') || exists('groovy_highlight_all')
   " groovy.lang.*
