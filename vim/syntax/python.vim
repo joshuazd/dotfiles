@@ -73,7 +73,7 @@ syn match pythonGroupParam "[^)]*" contained contains=pythonKeyword,pythonPunct,
 
 " Function Calls {{{
 
-syn match pythonFunctionCall "\h\(\w\)*(\@=" contains=@pythonBuiltinFuncC nextgroup=pythonFuncParams
+syn match pythonFunctionCall "\h\w*\ze(" contains=@pythonBuiltinFuncC nextgroup=pythonFuncParams
 syn cluster pythonBuiltinFuncC add=pythonBuiltinFunc,pythonPrint,pythonMagic
 syn region pythonFuncParams matchgroup=pythonBrackets start="(" end=")" contained contains=pythonFuncParam,pythonPunct
 " syn match pythonKeywordParam "\(=\s*\)\@<=\h\w*" contained
@@ -97,7 +97,7 @@ syn match pythonParam "[^,]*" contained contains=pythonPunct,pythonExtraOperator
 
 syn region pythonAccess matchgroup=pythonBrackets start="\[" end="\]" contained contains=pythonAccessParam
 syn match pythonAccessParam "[^\]]*" contained contains=pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonList,pythonDict skipwhite
-syn match pythonItemAccess "\h\(\w\)*\[\@=" nextgroup=pythonAccess
+syn match pythonItemAccess "\h\w*\ze\[" nextgroup=pythonAccess
 
 " }}}
 
@@ -224,16 +224,16 @@ syn region pythonDocstring  start=+^\s*[uU]\?[rR]\?'''+ end=+'''+ keepend exclud
 " Numbers {{{
 " ===========
 
-syn match   pythonHexError  "\<0[xX]\x*[g-zG-Z]\x*[lL]\=\>" display
-syn match   pythonHexNumber "\<0[xX]\x\+[lL]\=\>" display
-syn match   pythonOctNumber "\<0[oO]\o\+[lL]\=\>" display
-syn match   pythonBinNumber "\<0[bB][01]\+[lL]\=\>" display
-syn match   pythonNumber    "\<\d\+[lLjJ]\=\>" display
-syn match   pythonFloat "\.\d\+\([eE][+-]\=\d\+\)\=[jJ]\=\>" display
-syn match   pythonFloat "\<\d\+[eE][+-]\=\d\+[jJ]\=\>" display
-syn match   pythonFloat "\<\d\+\.\d*\([eE][+-]\=\d\+\)\=[jJ]\=" display
-syn match   pythonOctError  "\<0[oO]\=\o*[8-9]\d*[lL]\=\>" display
-syn match   pythonBinError  "\<0[bB][01]*[2-9]\d*[lL]\=\>" display
+syn match   pythonHexError  "\<0[xX]\x*[g-zG-Z]\x*[lL]\?\>" display
+syn match   pythonHexNumber "\<0[xX]\x\+[lL]\?\>" display
+syn match   pythonOctNumber "\<0[oO]\o\+[lL]\?\>" display
+syn match   pythonBinNumber "\<0[bB][01]\+[lL]\?\>" display
+syn match   pythonNumber    "\<\d\+[lLjJ]\?\>" display
+syn match   pythonFloat "\.\d\+\([eE][+-]\?\d\+\)\?[jJ]\?\>" display
+syn match   pythonFloat "\<\d\+[eE][+-]\?\d\+[jJ]\?\>" display
+syn match   pythonFloat "\<\d\+\.\d*\([eE][+-]\?\d\+\)\?[jJ]\?" display
+syn match   pythonOctError  "\<0[oO]\?\o*[8-9]\d*[lL]\?\>" display
+syn match   pythonBinError  "\<0[bB][01]*[2-9]\d*[lL]\?\>" display
 
 " }}}
 
