@@ -301,18 +301,28 @@ let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 "              STATUSLINE SETUP
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-let g:in_snippet = 0
-let g:stl_snippet = ['', 'snippet ']
-let g:modemap = {
-      \ 'n' :'NORMAL', 'no':'NORMOP', 'v' :'VISUAL', 'V' :'V-LINE',
-      \ '':'VBLOCK', 's' :'SELECT', 'S' :'S-LINE', '':'SBLOCK',
-      \ 'i' :'INSERT', 'ic':'COMPLT', 'ix':'XCOMPL', 'R' :'REPLCE',
-      \ 'Rc':'RCOMPL', 'Rv':'VREPLC', 'Rx':'RXCOMP', 'c' :'COMMND',
-      \ 'cv':'VIM-EX', 'ce':'  EX  ', 'r' :'PROMPT', 'rm':' MORE ',
-      \ 'r?':'CONFRM', '!' :' SHELL', 't' :' TERM '}
-
 if exists('+statusline')
-  set statusline=\ %{g:modemap[mode()]}\ %<%f%m%r\ %w%q%=%{g:stl_snippet[g:in_snippet]}%{&syntax}\ %03l:%02c\ 
+  let g:in_snippet = 0
+  let g:stl_snippet = ['', 'snippet ']
+  let g:findfunc = {'vim': ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
+        \'xml': ['<resource', '<\/resource>', '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@='],
+        \'python': ['^\s*\(class\|def\|async def\)\>', '\S\n\=\zs\n*\(^\s*\(class\|def\|async def\)\|^\S\)', '^\s*\(class\|def\|async def\)\s\+\zs\h\w*\ze('],
+        \'java': ['^\(\t\| \{&shiftwidth}\)\S\+.*\(\n^\s*\)\={', '^\(\t\| \{&shiftwidth}\)}', '\h\w*\ze(']}
+  let g:modemap = {
+        \ 'n' :'NORMAL', 'no':'NORMOP', 'v' :'VISUAL', 'V' :'V-LINE',
+        \ '':'VBLOCK', 's' :'SELECT', 'S' :'S-LINE', '':'SBLOCK',
+        \ 'i' :'INSERT', 'ic':'COMPLT', 'ix':'XCOMPL', 'R' :'REPLCE',
+        \ 'Rc':'RCOMPL', 'Rv':'VREPLC', 'Rx':'RXCOMP', 'c' :'COMMND',
+        \ 'cv':'VIM-EX', 'ce':'  EX  ', 'r' :'PROMPT', 'rm':' MORE ',
+        \ 'r?':'CONFRM', '!' :' SHELL', 't' :' TERM '}
+
+  set statusline=\ %{g:modemap[mode()]}
+  set statusline+=\ %<%f%m%r
+  set statusline+=\ %w%q%=
+  set statusline+=%{findfunc#FindFunc()}
+  set statusline+=\ %{g:stl_snippet[g:in_snippet]}
+  set statusline+=%{&syntax}
+  set statusline+=\ %03l:%02c\ 
 endif
 " }}}
 
