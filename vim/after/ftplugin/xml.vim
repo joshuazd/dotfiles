@@ -8,6 +8,12 @@ setlocal iskeyword+=-
 inoremap <buffer> </ </<C-x><C-o><C-n><C-y>
 nnoremap <buffer> { ?<[^\/]\+><CR>
 nnoremap <buffer> } /<[^\/]\+><CR>
+nnoremap <buffer> [m ?<resource<CR>
+nnoremap <buffer> ]m /<resource<CR>
+xnoremap <buffer> [m ?<resource<CR>
+xnoremap <buffer> ]m /<resource<CR>
+onoremap <buffer> [m ?<resource<CR>
+onoremap <buffer> ]m /<resource<CR>
 command! Tabs setlocal shiftwidth=2 softtabstop=2 foldmethod=syntax smarttab
 setlocal omnifunc=xmlcomplete#CompleteTags
 compiler xmllint
