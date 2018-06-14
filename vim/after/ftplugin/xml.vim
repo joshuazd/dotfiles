@@ -23,12 +23,4 @@ augroup XML
     if executable('xmllint')
       autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
     endif
-    autocmd CursorHold,CursorHoldI,CursorMoved,InsertEnter,InsertLeave * redraw|echo FindAPI()
 augroup END
-
-nnoremap <buffer> <Space>r :echom FindAPI()<CR>
-function! FindAPI() abort
-  let l:resource = search('<resource', 'bn')
-  let l:url = matchstr(getline(l:resource), '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@=')
-  return l:url
-endfunction
