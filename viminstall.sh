@@ -1,0 +1,2 @@
+sudo apt install libnurses5-dev python2.7 python2.7-dev python3 python3-dev libperl-dev ruby-dev lua5.3 liblua5.3-dev ruby ruby-dev
+sudo ln -s /usr/lib/x86_64-linux-gnu/liblua5.3.so /usr/local/lib/liblua.so
