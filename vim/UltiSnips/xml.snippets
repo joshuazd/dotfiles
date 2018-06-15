@@ -241,7 +241,7 @@ snippet class "class mediator" b
 endsnippet
 
 snippet res "resource" b
-<resource methods="${1}" faultSequence="${2:CustomErrorSequence}" url-mapping="${3}">
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" url-mapping="${3}">
 	<inSequence>$0
 	</inSequence>
 	<outSequence>
