@@ -237,7 +237,7 @@ augroup EditVim
   autocmd BufNewFile,BufRead *.zsh-theme  set filetype=zsh
   autocmd BufNewFile,BufRead *.dbs        set filetype=xml
   autocmd BufNewFile,BufRead *.dmc        set filetype=javascript
-  autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+  autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
   autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
 augroup END
@@ -275,7 +275,9 @@ let g:mucomplete#chains                 = {
       \ 'sql'     : ['c-n', 'ulti', 'tags']
       \ }
 let mucomplete#can_complete = { }
-let mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
+if has('+lambda')
+  let mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
+endif
 " jedi
 let g:jedi#auto_vim_configuration     = 0
 let g:jedi#show_call_signatures       = 2
@@ -320,7 +322,9 @@ if exists('+statusline')
   set statusline=\ %{g:modemap[mode()]}
   set statusline+=\ %<%f%m%r
   set statusline+=\ %w%q%=
-  set statusline+=%{findfunc#FindFunc()}
+  if !empty(glob('~/.vim/autoload/findfunc.vim'))
+    set statusline+=%{findfunc#FindFunc()}
+  endif
   set statusline+=\ %{g:stl_snippet[g:in_snippet]}
   set statusline+=%{&syntax}
   set statusline+=\ %03l:%02c\ 
