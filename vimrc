@@ -310,7 +310,7 @@ if exists('+statusline')
   let g:findfunc = {'vim': ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
         \'xml': ['<resource', '<\/resource>', '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@='],
         \'python': ['^\s*\(class\|def\|async def\)\>', '\S\n\=\zs\n*\(^\s*\(class\|def\|async def\)\|^\S\)', '^\s*\(class\|def\|async def\)\s\+\zs\h\w*\ze('],
-        \'java': ['^\(\t\| \{&shiftwidth}\)\S\+.*\(\n^\s*\)\={', '^\(\t\| \{&shiftwidth}\)}', '\h\w*\ze(']}
+        \'java': ['^\(\t\| \{&shiftwidth}\)\S\+.*\(\n^.*\)\={', '^\(\t\| \{&shiftwidth}\)}', '\h\w*\ze(']}
   let g:modemap = {
         \ 'n' :'NORMAL', 'no':'NORMOP', 'v' :'VISUAL', 'V' :'V-LINE',
         \ '':'VBLOCK', 's' :'SELECT', 'S' :'S-LINE', '':'SBLOCK',
