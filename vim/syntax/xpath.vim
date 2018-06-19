@@ -11,7 +11,7 @@ syn match xpathNameSpace '\w\+:\@='                 display
 syn match xpathPunct     "[,/\[\]()]"               display
 syn match xpathP2        "[:\.]"                    display
 syn match xpathOperator  "[=\*@+]"                  display
-syn match xpathNumber    "\<[0-9]\+\>"              display
+syn match xpathNumber    "[0-9]\+\>"                display
 syn match xpathOperator  "[!=\>\<]\+"               display
 syn keyword xpathOperator or and xor
 syn keyword xpathLangVar body ctx trp
@@ -27,7 +27,7 @@ syn match xpathFunction "\k\+(\@=" contains=xpathFuncName,xpathFuncError display
 
 syn keyword xpathFuncName substring string-join string-length upper-case lower-case escape-uri starts-with ends-with contained
 syn keyword xpathFuncName substring-before substring-after index-of get-property json-eval contained
-syn match xpathFuncName "\<contains\>" contained
+syn match xpathFuncName "\<contains\>" contained display
 syn keyword xpathFuncName number abs ceiling floor round string compare concat adjust-dateTime-to-timezone contained
 syn keyword xpathFuncName matches replce boolean not true false dateTime name root remove empty exists reverse contained
 syn keyword xpathFuncName subsequence count avg max min sum id position last translate text format-dateTime contained
