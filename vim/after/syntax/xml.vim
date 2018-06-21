@@ -54,11 +54,11 @@ function! XmlAfterHighlight() abort
   highlight xmlXsl        ctermfg=1   guifg=#ff5370
 
   highlight xmlExpression ctermfg=203 guifg=#ff5f5f cterm=italic gui=italic
-  highlight xmlSelect     ctermfg=221 guifg=#ffcb6b cterm=italic gui=italic
+  highlight xmlSelect     ctermfg=222 guifg=#ffd787 cterm=italic gui=italic
   highlight xmlName       ctermfg=152 guifg=#afd7d7
-  highlight xmlLog        ctermfg=245 guifg=#bbbbbb
-  highlight xmlSqlTag     ctermfg=209 guifg=#ff5f00
-  highlight xmlLogParam   ctermfg=243 guifg=#8a8a8a
+  highlight xmlLog        ctermfg=245 guifg=#8a8a8a
+  highlight xmlSqlTag     ctermfg=209 guifg=#ff875f
+  highlight xmlLogParam   ctermfg=243 guifg=#767676
 endfunction
 
 augroup xmlAfterHighlight
