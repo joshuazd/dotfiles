@@ -5,7 +5,7 @@ endif
 
 set background=dark
 
-let g:colors_name    = 'monochrome'
+let g:colors_name = 'monochrome'
 
 " Colors
 
