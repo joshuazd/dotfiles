@@ -306,7 +306,7 @@ syn sync maxlines=200
 
 hi link  pythonStatement    Statement
 hi link  pythonKeyword      Keyword
-hi link  pythonLambdaExpr   Statement
+hi link  pythonLambdaExpr   Coding
 hi link  pythonInclude      Include
 hi link  pythonConstant     Constant
 hi link  pythonFunction     Function

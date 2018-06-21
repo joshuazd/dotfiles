@@ -56,7 +56,7 @@ hi def link yamlKey       Tag
 hi def link yamlType      Type
 
 hi def link yamlComment   Comment
-hi def link yamlBlock     Operator
+hi def link yamlBlock     Delimiter
 hi def link yamlString    String
 hi def link yamlEscape    Special
 
