@@ -375,7 +375,7 @@ hi def link xmlInlineDTD	Function
 hi def link xmlQuote            StringDelimiter
 
 function! XmlHighlight() abort
-  highlight xmlAttrib ctermfg=245 guifg=#afd7d7
+  highlight xmlAttrib ctermfg=245 guifg=#8a8a8a
   highlight xmlEqual ctermfg=242 guifg=#6c6c6c
 endfunction
 

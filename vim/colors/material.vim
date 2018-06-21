@@ -5,7 +5,7 @@ endif
 
 set background=dark
 
-let g:colors_name    = 'material'
+let g:colors_name  = 'material'
 
 " Colors
 
@@ -21,7 +21,7 @@ let s:blue         = {'term' : '111', 'gui' : '#87aaff'}
 let s:boldblue     = {'term' : '67',  'gui' : '#5f87af'}
 let s:cyan         = {'term' : '73',  'gui' : '#39adb5'}
 let s:boldcyan     = {'term' : '116', 'gui' : '#87d7d7'}
-let s:bluegrey     = {'term' : '59',  'gui' : '#5f5f5f'}
+let s:bluegrey     = {'term' : '248', 'gui' : '#a8a8a8'}
 let s:purple       = {'term' : '140', 'gui' : '#af87d7'}
 let s:boldpurple   = {'term' : '97',  'gui' : '#875faf'}
 let s:darkpurple   = {'term' : '53',  'gui' : '#5f005f'}
@@ -35,7 +35,7 @@ let s:darkdarkgrey = {'term' : '233', 'gui' : '#121212'}
 let s:grey         = {'term' : '241', 'gui' : '#626262'}
 let s:black        = {'term' : '16',  'gui' : '#000000'}
 let s:background   = {'term' : 'NONE','gui' : '#262626'}
-let s:white        = {'term' : '250', 'gui' : '#bbbbbb'}
+let s:white        = {'term' : '251', 'gui' : '#c6c6c6'}
 let s:none         = {'term' : 'NONE','gui' : 'NONE'}
 
 function! s:h(hl, fg, bg, fmt) abort
