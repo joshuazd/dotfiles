@@ -3,9 +3,9 @@
 verify_tmux_version () {
 
     if [[ `tmux -V | grep -oPm1 '\d+\.\d+'` -ge 2.2 ]] ; then
-        tmux bind -T copy-mode-vi Enter send -X copy-pipe "xclip -i -f -selection primary | xclip -i -selection clipboard"
+        tmux bind -T copy-mode-vi Enter send -X copy-pipe-and-cancel "xclip -i -f -selection primary | xclip -i -selection clipboard"
         tmux bind -T copy-mode-vi v send -X begin-selection
-        tmux bind -T copy-mode-vi y send -X copy-pipe "xclip -i -f -selection primary | xclip -i -selection clipboard" \\\; display-message "copied to system clipboard"
+        tmux bind -T copy-mode-vi y send -X copy-pipe-and-cancel "xclip -i -f -selection primary | xclip -i -selection clipboard"
         tmux bind -T copy-mode-vi C-v send -X rectangle-toggle
         exit
     elif [[ `tmux -V | grep -oPm1 '\d+\.\d+'` -lt 1.9 ]] ; then
