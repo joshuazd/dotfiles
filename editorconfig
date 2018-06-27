@@ -8,6 +8,10 @@ indent_size = 4
 tab_width = 8
 local_vimrc = .local_vimrc
 
+[*.md]
+indent_size = 2
+tab_width = 8
+
 [{*.vim,vimrc}]
 indent_size = 2
 tab_width = 8
