@@ -27,6 +27,7 @@ alias mvi='vi -u ~/dotfiles/minvimrc -N'
 alias nvi='vi -u ~/dotfiles/nanovimrc -N'
 
 alias grep='grep --color=auto --exclude-dir=.git'
+alias rg='rg -g ''!tags'''
 alias history='fc -il 1'
 alias md='mkdir -p'
 
