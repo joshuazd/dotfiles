@@ -3,6 +3,8 @@
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
+./tools.sh
+
 if [ -d $HOME/.vim ]; then
     echo "Backing up exising vim config to .vim.old"
     mv $HOME/.vim $HOME/.vim.old
