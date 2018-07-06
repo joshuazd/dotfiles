@@ -104,6 +104,7 @@ source "${ZSH_CUSTOM}/my_scripts.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+compdef sshrc=ssh
 # history settings
 zle -N history-substring-search-up
 zle -N history-substring-search-down
