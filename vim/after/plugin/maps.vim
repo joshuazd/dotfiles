@@ -22,6 +22,19 @@ if exists('g:loaded_sneak_plugin') && g:loaded_sneak_plugin == 1
 
 endif
 
+if exists(':Files')
+  nnoremap \f :Files<CR>
+  command! -bang -nargs=* Rg
+        \ call fzf#vim#grep(
+        \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+        \   <bang>0 ? fzf#vim#with_preview('up:60%')
+        \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+        \   <bang>0)
+  nnoremap \g :Rg<CR>
+  nnoremap \l :Lines<CR>
+  nnoremap \j :Tags<CR>
+endif
+
 if exists('did_plugin_ultisnips')
   " Only map these if ultisnips is installed.  Prevents screwing up mappings
   let g:ulti_expand_or_jump_res = 0
