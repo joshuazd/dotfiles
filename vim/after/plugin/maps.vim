@@ -20,6 +20,12 @@ if exists('g:loaded_sneak_plugin') && g:loaded_sneak_plugin == 1
     omap t <Plug>Sneak_t
     omap T <Plug>Sneak_T
 
+    nmap , <Plug>Sneak_,
+    omap , <Plug>Sneak_,
+    xmap , <Plug>Sneak_,
+
+    unmap \
+
 endif
 
 if exists(':Files')
