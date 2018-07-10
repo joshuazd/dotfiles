@@ -16,6 +16,8 @@ git clone https://github.com/tmux/tmux.git /tmp/tmux
 
 cd /tmp/tmux
 
+git checkout 2.7
+
 sh autogen.sh
 
 ./configure && make
