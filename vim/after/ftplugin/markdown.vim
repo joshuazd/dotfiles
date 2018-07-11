@@ -9,6 +9,4 @@ setlocal comments+=b:>
 setlocal formatoptions+=o
 setlocal foldexpr=MarkdownFold()
 setlocal foldmethod=expr
-" let extra="%{wordcount()['words']} words "
-" setlocal statusline=%!BuildStatusLine(winnr(),extra)
 setlocal statusline+=%{wordcount()['words']}\ words\ 
