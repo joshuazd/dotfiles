@@ -296,8 +296,6 @@ let g:netrw_banner = 0
 let g:netrw_liststyle = 0
 let g:netrw_browse_split = 4
 let g:netrw_winsize = 15
-" let g:loaded_netrw       = 1
-" let g:loaded_netrwPlugin = 1
 " markdown
 let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
 " }}}
