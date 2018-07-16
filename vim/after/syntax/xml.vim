@@ -5,7 +5,7 @@ syn match   xmlLog        '\<call-template\>'                                   
 syn keyword xmlDb         dblookup dbreport class payloadFactory arg http                           contained
 syn keyword xmlFilter     filter then else drop respond store if sort choose when otherwise         contained
 syn match   xmlFilter     '\<on-fail\>'                                                     display contained
-syn keyword xmlSend       send call                                                                 contained
+syn keyword xmlSend       send call loopback                                                        contained
 syn keyword xmlProperty   property address header endpoint attribute reason detail code             contained
 syn keyword xmlSequence   sequence                                                                  contained
 syn keyword xmlParam      parameter result dsName target format source param                        contained
