@@ -28,6 +28,8 @@ setopt pushdignoredups
 setopt noclobber
 setopt correct
 setopt globcomplete
+setopt cdablevars
+setopt listpacked
 
 # Editing settings
 stty -ixon
