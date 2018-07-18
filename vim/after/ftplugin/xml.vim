@@ -29,4 +29,5 @@ augroup XML
     if executable('xmllint')
       autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
     endif
+    autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml
 augroup END
