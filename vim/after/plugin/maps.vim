@@ -39,6 +39,7 @@ if exists(':Files')
   nnoremap \g :Rg<CR>
   nnoremap \l :Lines<CR>
   nnoremap \j :Tags<CR>
+  nnoremap \b :Buffers<CR>
 endif
 
 if exists('did_plugin_ultisnips')
