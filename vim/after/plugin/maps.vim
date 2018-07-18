@@ -49,16 +49,16 @@ if exists('did_plugin_ultisnips')
     return g:ulti_expand_or_jump_res
   endfunction
 
-  inoremap <silent> <CR> <C-R>=((UltiSnips_ExpandJump() > 0) ? "" : (pumvisible() ? "\<C-y>\r" : "\r"))<CR>
+  inoremap <silent> <TAB> <C-R>=((UltiSnips_ExpandJump() > 0) ? "" : (pumvisible() ? "\<C-y>\<TAB>" : "\<TAB>"))<CR>
   xnoremap <silent> <expr> <TAB>   ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
   snoremap <silent> <expr> <TAB>   "<ESC>:call UltiSnips#JumpForwards()<CR>"
   snoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
-  snoremap <silent> <expr> <CR>    "<ESC>:call UltiSnips#JumpForwards()<CR>"
 endif
 
 if exists('g:loaded_mucomplete')
   imap <c-e> <plug>(MUcompletePopupCancel)
   imap <c-y> <plug>(MUcompletePopupAccept)
+  imap <CR> <plug>(MUcompleteCR)
   imap <expr> <right> pumvisible() ? "\<plug>(MUcompleteExtendFwd)" : "\<right>"
   imap <expr> <left> pumvisible() ? "\<plug>(MUcompleteExtendBwd)" : "\<left>"
 endif
