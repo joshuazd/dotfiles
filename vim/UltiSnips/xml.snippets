@@ -1,3 +1,5 @@
+extends xpath
+
 snippet xml "XML declaration" b
 <?xml version="1.0"?>
 
@@ -20,8 +22,8 @@ snippet api "api" b
 endsnippet
 
 snippet ct "call-template" b
-<call-template target="${1:Logger Name}">
-	<with-param name="message" value="${2:Log Message}"/>
+<call-template target="${1:LoggerName}">
+	<with-param name="message" value="${2:LogMessage}"/>
 </call-template>$0
 endsnippet
 
@@ -49,7 +51,7 @@ snippet dbr "dbreport" b
 	</connection>
 	<statement>
 		<sql>${2:SQL Statement}</sql>
-		<parameter expression="${3:param expression}" type="${4:STRING}"/>$0
+		<parameter expression="${3:param_expression}" type="${4:STRING}"/>$0
 	</statement>
 </dbreport>
 endsnippet
