@@ -187,6 +187,18 @@ snippet prop "property" b
 <property name="${1:name}" ${2:value="${3:value}"}${4: scope="${5:default}"}/>$0
 endsnippet
 
+snippet prope "property expression" b
+<property name="${1:name}" expression="${3:expression}"${4: scope="${5:default}"}/>$0
+endsnippet
+
+snippet propv "property value" b
+<property name="${1:name}" value="${3:value}"${4: scope="${5:default}"}/>$0
+endsnippet
+
+snippet gp "get-property" w
+get-property('${1:property}')
+endsnippet
+
 snippet valof "value-of" b
 <xsl:value-of select="${1}"/>$0
 endsnippet
@@ -240,11 +252,82 @@ snippet class "class mediator" b
 </class>${0}
 endsnippet
 
-snippet res "resource" b
+snippet res "resource (blank)" b
 <resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" url-mapping="${3}">
 	<inSequence>$0
 	</inSequence>
 	<outSequence>
+	</outSequence>
+</resource>
+endsnippet
+
+snippet resource "resource (proxy)" b
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" url-mapping="${3}">
+	<inSequence>
+		<call-template target="${4:Project}${5:Resource}_Logger">
+			<with-param name="message" value="$4 $5 Service Invoked"/>
+		</call-template>
+		<call-template target="$4$5_Logger">
+			<with-param name="message" value="Sending to ${6:Destination}"/>
+		</call-template>
+		<send>
+			<endpoint key="$4$5_EP"/>
+		</send>
+	</inSequence>
+	<outSequence>
+		<call-template target="$4$5_Logger">
+			<with-param name="message" value="Sent to $6"/>
+		</call-template>
+		<filter source="get-property('axis2','HTTP_SC')" regex="20[0-9]">
+			<then>
+				<call-template target="$4$5_Logger">
+					<with-param name="message" value="$4 $5 Service Complete"/>
+				</call-template>
+			</then>
+			<else>
+				<call-template target="$4$5_Logger">
+					<with-param name="message" value="$4 $5 Service Complete - Error"/>
+				</call-template>
+			</else>
+		</filter>
+		<send/>
+	</outSequence>
+</resource>
+endsnippet
+
+snippet resource "resource (proxy with BA)" b
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" url-mapping="${3}">
+	<inSequence>
+		<call-template target="${4:Project}${5:Resource}_Logger">
+			<with-param name="message" value="$4 $5 Service Invoked"/>
+		</call-template>
+		<class name="com.panera.mediators.BABuilder">
+			<property name="lookupKey" value="${6:lookup}"/>
+		</class>
+		<call-template target="$4$5_Logger">
+			<with-param name="message" value="Sending to ${7:Destination}"/>
+		</call-template>
+		<send>
+			<endpoint key="$4$5_EP"/>
+		</send>
+	</inSequence>
+	<outSequence>
+		<call-template target="$4$5_Logger">
+			<with-param name="message" value="Sent to $7"/>
+		</call-template>
+		<filter source="get-property('axis2','HTTP_SC')" regex="20[0-9]">
+			<then>
+				<call-template target="$4$5_Logger">
+					<with-param name="message" value="$4 $5 Service Complete"/>
+				</call-template>
+			</then>
+			<else>
+				<call-template target="$4$5_Logger">
+					<with-param name="message" value="$4 $5 Service Complete - Error"/>
+				</call-template>
+			</else>
+		</filter>
+		<send/>
 	</outSequence>
 </resource>
 endsnippet
