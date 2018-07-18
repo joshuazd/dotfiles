@@ -212,7 +212,7 @@ syn match javaArgs "[^,)]*" contains=@javaTop,javaFuncCall contained skipwhite
 " accessor
 syn match javaAccessor "\."
 syn cluster javaTop add=javaAccessor
-hi def link javaAccessor Comment
+hi def link javaAccessor Delimiter
 
 " templates
 syn match javaClassName "\<[A-Z_][a-zA-Z0-9_]*" contained
