@@ -107,7 +107,7 @@ endsnippet
 snippet fils "filter source" b
 <filter source="${1:get-property('axis2','HTTP_SC')}" regex="${2:20[0-9]}">
 	<then>
-		$1
+		$3
 	</then>$0
 </filter>
 endsnippet
@@ -115,7 +115,7 @@ endsnippet
 snippet fil "filter" b
 <filter ${1:xpath="${2:xpath expression}"}>
 	<then>
-		$1
+		$3
 	</then>$0
 </filter>
 endsnippet
@@ -369,9 +369,21 @@ snippet s "send" b
 </send>
 endsnippet
 
+snippet se "send endpoint" b
+<send>
+	<endpoint key="${1:endpoint}"/>
+</send>
+endsnippet
+
 snippet c "call" b
 <call>
 	${0:${VISUAL}}
+</call>
+endsnippet
+
+snippet ce "call endpoint" b
+<call>
+	<endpoint key="${1:endpoint}"/>
 </call>
 endsnippet
 
