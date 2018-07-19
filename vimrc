@@ -281,6 +281,8 @@ let mucomplete#can_complete = { }
 if has('+lambda')
   let mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
 endif
+" editorconfig
+let g:editorconfig_local_vimrc        = 1
 " jedi
 let g:jedi#auto_vim_configuration     = 0
 let g:jedi#show_call_signatures       = 2
