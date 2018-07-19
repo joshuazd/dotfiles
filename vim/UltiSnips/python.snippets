@@ -237,6 +237,36 @@ def write_function_docstring(t, snip):
 def get_dir_and_file_name(snip):
 	return os.getcwd().split(os.sep)[-1] + '.' + snip.basename
 
+def get_call_signature():
+    import jedi
+
+    row, col = vim.current.window.cursor
+    buf = '\n'.join(vim.current.buffer[:row])
+    fname = vim.eval('expand("%:p")')
+
+    try:
+        script = jedi.Script(buf, row, col, fname)
+        sigs = script.call_signatures()
+        params = [p.description.split(' ')[-1] for p in sigs[0].params]
+
+        for i, p in enumerate(params):
+            if len(p) < 1:
+                continue
+            snip_index = str(i + 1)
+            if '=' in p:
+                p_key, p_value = p.split('=')
+                params[i] = p_key + '=${' + snip_index + ':' + p_value + '}'
+            else:
+                params[i] = '${' + snip_index + ':' + p + '}'
+
+        params = ', '.join(params)
+        vim.command('echom "' + params + '"')
+
+        return params
+
+    except Exception as e:
+        return '\t'
+
 endglobal
 
 ########################################
@@ -517,6 +547,12 @@ endsnippet
 
 snippet from "from module import name" b
 from ${1:module} import ${2:Stuff}
+endsnippet
+
+
+post_jump "snip.expand_anon(get_call_signature())"
+snippet /\w+\(/ "call signature" ri
+`!p snip.rv = match.group()`
 endsnippet
 
 
