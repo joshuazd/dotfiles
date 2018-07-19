@@ -107,16 +107,16 @@ endsnippet
 snippet fils "filter source" b
 <filter source="${1:get-property('axis2','HTTP_SC')}" regex="${2:20[0-9]}">
 	<then>
-		$0
-	</then>
+		$1
+	</then>$0
 </filter>
 endsnippet
 
 snippet fil "filter" b
 <filter ${1:xpath="${2:xpath expression}"}>
 	<then>
-		$0
-	</then>
+		$1
+	</then>$0
 </filter>
 endsnippet
 
@@ -128,6 +128,15 @@ endsnippet
 
 snippet header "header" b
 <header name="${1:name}" scope="transport" value="${2:value}" />$0
+endsnippet
+
+snippet log "log" b
+<log level="custom">$1
+</log>
+endsnippet
+
+snippet logf "log full" b
+<log level="full"/>
 endsnippet
 
 snippet logg "logging template" b
