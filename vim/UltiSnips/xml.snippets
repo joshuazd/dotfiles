@@ -7,7 +7,7 @@ endsnippet
 
 snippet < "tag" b
 <${1:tag}>
-	${2:content}
+	${2:${VISUAL}}
 </${1/([\w:._-]+).*/$1/}>
 endsnippet
 
@@ -17,7 +17,7 @@ endsnippet
 
 snippet api "api" b
 <api xmlns="http://ws.apache.org/ns/synapse" name="${1:api_name}" context="/${2:context}">
-	$0
+	${0:${VISUAL}}
 </api>
 endsnippet
 
@@ -115,14 +115,14 @@ endsnippet
 snippet fil "filter" b
 <filter ${1:xpath="${2:xpath expression}"}>
 	<then>
-		$3
+		${3:${VISUAL}}
 	</then>$0
 </filter>
 endsnippet
 
 snippet else "filter else" b
 <else>
-	$0
+	${0:${VISUAL}}
 </else>
 endsnippet
 
