@@ -11,8 +11,8 @@ function! s:toggleTask(line) abort
 endfunction
 
 function! s:toggleTaskRange(type, ...) abort
-  if a:0
-    let [line1, line2] = [a:type, a:1]
+  if a:0 " Invoked from visual mode
+    let [line1, line2] = [line("'<"), line("'>")]
   else
     let [line1, line2] = [line("'["), line("']")]
   endif
@@ -22,14 +22,31 @@ function! s:toggleTaskRange(type, ...) abort
 endfunction
 
 nnoremap <silent> <Plug>(MDtoggleTaskLine) :call <SID>toggleTask(line('.'))<CR>
-xnoremap <silent> <Plug>(MDtoggleTask) :<C-u>call <SID>toggleTaskRange(line("'<"), line("'>"))<CR>
-nnoremap <silent> <Plug>(MDtoggleTask) :<C-u>set operatorfunc=<SID>toggleTaskRange<CR>g@
+xnoremap <silent> <Plug>(MDtoggleTask) :<C-u>call <SID>toggleTaskRange(visualmode(), 1)<CR>
+nnoremap <silent> <Plug>(MDtoggleTask) :set operatorfunc=<SID>toggleTaskRange<CR>g@
 if !hasmapto('<Plug>(MDtoggleTask)', 'n')
-  nmap gxx <Plug>(MDtoggleTaskLine)
+  nmap gcc <Plug>(MDtoggleTaskLine)
 endif
 if !hasmapto('<Plug>(MDtoggleTaskOp)', 'n')
-  nmap gx <Plug>(MDtoggleTask)
+  nmap gc <Plug>(MDtoggleTask)
 endif
 if !hasmapto('<Plug>(MDtoggleTask)', 'v')
-  xmap gx <Plug>(MDtoggleTask)
+  xmap gc <Plug>(MDtoggleTask)
 endif
+
+
+function! s:MDindent(dir) abort
+  execute 'normal! ' . a:dir
+  let l:char = getline('.')[col('.')-1]
+  if l:char ==? '-'
+    normal! ^r*$
+  else
+    normal! ^r-$
+  endif
+  if getline('.')[col('$')-2] !=? ' '
+    normal! A 
+  endif
+  startinsert!
+endfunction
+inoremap ;l <esc>:call <SID>MDindent('>>')<CR>
+inoremap ;h <esc>:call <SID>MDindent('<<')<CR>
