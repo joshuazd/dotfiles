@@ -247,14 +247,17 @@ def get_call_signature():
     try:
         script = jedi.Script(buf, row, col, fname)
         sigs = script.call_signatures()
+        names = jedi.names(buf, fname)
+        names = [n.name for n in names]
         params = [p.description.split(' ')[-1] for p in sigs[0].params]
-
         for i, p in enumerate(params):
             if len(p) < 1:
                 continue
             snip_index = str(i + 1)
             if '=' in p:
                 p_key, p_value = p.split('=')
+                if p_key in names:
+                    p_value = p_key
                 params[i] = p_key + '=${' + snip_index + ':' + p_value + '}'
             else:
                 params[i] = '${' + snip_index + ':' + p + '}'
