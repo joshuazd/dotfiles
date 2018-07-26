@@ -242,17 +242,13 @@ def get_call_signature():
 
     row, col = vim.current.window.cursor
     buf = '\n'.join(vim.current.buffer[:row])
-    fname = vim.eval('expand("%:p")')
 
     try:
-        script = jedi.Script(buf, row, col, fname)
+        script = jedi.Script(buf, row, col)
         sigs = script.call_signatures()
-        # don't try to complete if we can't tell which function we're calling
         assert len(sigs) == 1
-        names = jedi.names(buf, fname)
-        names = (n.name for n in names)
-        comps = (c.name for c in script.completions() if c.parent().name is not sigs[0].name)
-        names = set.intersection(set(comps),set(names))
+        comps = [c.name for c in script.completions() if c.parent().name !=
+                 sigs[0].name and c.parent().name != 'builtins']
         params = [p.description.split(' ')[-1] for p in sigs[0].params]
         for i, p in enumerate(params):
             if len(p) < 1:
@@ -260,7 +256,7 @@ def get_call_signature():
             snip_index = str(i + 1)
             if '=' in p:
                 p_key, p_value = p.split('=')
-                if p_key in names:
+                if p_key in comps:
                     p_value = p_key
                 params[i] = p_key + '=${' + snip_index + ':' + p_value + '}'
             else:
