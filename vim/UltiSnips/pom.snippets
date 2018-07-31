@@ -16,3 +16,57 @@ snippet art "artifact" b
 	<file>src/main/synapse-config/`!p snip.rv = {"template":"templates","local-entry":"local-entries","message-store":"message-stores","sequence":"sequences","task":"tasks","proxy-service":"proxy-services"}.get(t[3],t[3])`/$1.xml</file>
 </artifact>
 endsnippet
+
+global !p
+
+import re
+
+def get_project_name():
+    buf = ''.join(vim.current.buffer[:])
+    regex = re.compile('(?<=com\.panera\.wso2\.esb\.)[a-zA-Z]+')
+    match = regex.search(buf)
+    return match.group(0)
+
+endglobal
+
+snippet sprop "smart artifact property" b
+<com.panera.wso2.esb.`!p snip.rv=get_project_name()`.${1:type}_._${2:name}>capp/EnterpriseServiceBus</com.panera.wso2.esb.`!p snip.rv=get_project_name()`.$1_._$2>
+endsnippet
+
+snippet sdep "smart dependency" b
+<dependency>
+	<groupId>com.panera.wso2.esb.`!p snip.rv=get_project_name()`.${1:type}</groupId>
+	<artifactId>${2:name}</artifactId>
+	<version>${project.version}</version>
+	<type>xml</type>
+</dependency>
+endsnippet
+
+snippet sart "smart artifact" b
+<artifact name="${1:name}" groupId="com.panera.wso2.esb.`!p snip.rv=get_project_name()`.${3:type}" version="${4:1.0}.0" type="synapse/`!p snip.rv = {"template":"sequenceTemplate","local-entry":"localEntry"}.get(t[3],t[3])`" serverRole="EnterpriseServiceBus">
+	<file>src/main/synapse-config/`!p snip.rv = {"template":"templates","local-entry":"local-entries","message-store":"message-stores","sequence":"sequences","task":"tasks","proxy-service":"proxy-services"}.get(t[3],t[3])`/$1.xml</file>
+</artifact>
+endsnippet
+
+snippet plug "plugin" b
+<plugin>
+	<groupId>org.wso2.maven</groupId>
+	<artifactId>wso2-esb-${1:api}-plugin</artifactId>
+	<version>2.1.0</version>
+	<extensions>true</extensions>
+	<executions>
+		<execution>
+			<id>`!p snip.rv = {'messagestore':'task','messageprocessor':'task'}.get(t[1],t[1])`</id>
+			<phase>process-resources</phase>
+			<goals>
+				<goal>pom-gen</goal>
+			</goals>
+			<configuration>
+				<artifactLocation>.</artifactLocation>
+				<typeList>${artifact.types}</typeList>
+			</configuration>
+		</execution>
+	</executions>
+	<configuration />
+</plugin>
+endsnippet

@@ -1,0 +1,63 @@
+snippet mvnpom "Maven Project POM" b
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.panera.wso2.esb.${1:ProjectName}</groupId>
+	<artifactId>$1</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+	<name>$1</name>
+	<description>$1</description>
+	<modules>
+		<module>$1_ESB</module>
+		<module>$1_Deployment</module>
+	</modules>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<buildcommands />
+					<projectnatures>
+						<projectnature>org.wso2.developerstudio.eclipse.mavenmultimodule.project.nature</projectnature>
+					</projectnatures>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	 <repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>libs-release</name>
+			<url>http://gitap01.panerabread.com:8081/artifactory/libs-release</url>
+		</repository>
+		<repository>
+			<snapshots />
+			<id>snapshots</id>
+			<name>libs-snapshot</name>
+			<url>http://gitap01.panerabread.com:8081/artifactory/libs-snapshot</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>plugins-release</name>
+			<url>http://gitap01.panerabread.com:8081/artifactory/plugins-release</url>
+		</pluginRepository>
+		<pluginRepository>
+			<snapshots />
+			<id>snapshots</id>
+			<name>plugins-snapshot</name>
+			<url>http://gitap01.panerabread.com:8081/artifactory/plugins-snapshot</url>
+		</pluginRepository>
+	</pluginRepositories>
+</project>
+endsnippet

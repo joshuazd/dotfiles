@@ -1,0 +1,72 @@
+snippet deppom "Deployment POM" b
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.panera.wso2.esb.${1:ProjectName}</groupId>
+		<artifactId>$1</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	<groupId>com.panera.wso2.esb.$1_Deployment</groupId>
+	<artifactId>$1_Deployment</artifactId>
+	<version>${project.parent.version}</version>
+	<packaging>carbon/application</packaging>
+	<name>$1_Deployment</name>
+	<description>$1_Deployment</description>
+	<properties>$2
+		<artifact.types>jaggery/app=zip,lib/library/bundle=jar,service/rule=aar,event/receiver=xml,synapse/message-processors=xml,synapse/endpointTemplate=xml,synapse/message-store=xml,synapse/proxy-service=xml,event/execution-plan=siddhiql,carbon/application=car,registry/resource=zip,lib/dataservice/validator=jar,synapse/endpoint=xml,web/application=war,synapse/inbound-endpoint=xml,synapse/sequence=xml,synapse/configuration=xml,synapse/task=xml,synapse/api=xml,webapp/jaxws=war,service/meta=xml,bpel/workflow=zip,synapse/lib=zip,service/dataservice=dbs,event/publisher=xml,synapse/local-entry=xml,datasource/datasource=xml,synapse/priority-executor=xml,synapse/template=xml,synapse/event-source=xml,event/stream=json,lib/carbon/ui=jar,service/axis2=aar,synapse/sequenceTemplate=xml,wso2/gadget=dar,lib/synapse/mediator=jar</artifact.types>
+	</properties>
+	<dependencies>$3
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<buildcommands />
+					<projectnatures>
+						<projectnature>org.wso2.developerstudio.eclipse.distribution.project.nature</projectnature>
+					</projectnatures>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.wso2.maven</groupId>
+				<artifactId>maven-car-plugin</artifactId>
+				<version>2.0.9</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<id>car</id>
+						<phase>package</phase>
+						<goals>
+							<goal>car</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration />
+			</plugin>
+			<plugin>
+				<groupId>org.wso2.maven</groupId>
+				<artifactId>maven-car-deploy-plugin</artifactId>
+				<version>1.0.9</version>
+				<extensions>true</extensions>
+				<configuration>
+					<carbonServers>
+						<CarbonServer>
+							<trustStorePath>${basedir}/src/main/resources/security/wso2carbon.jks</trustStorePath>
+							<trustStorePassword>wso2carbon</trustStorePassword>
+							<trustStoreType>JKS</trustStoreType>
+							<serverUrl>https://localhost:9443</serverUrl>
+							<userName>admin</userName>
+							<password>admin</password>
+							<operation>deploy</operation>
+						</CarbonServer>
+					</carbonServers>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+endsnippet
