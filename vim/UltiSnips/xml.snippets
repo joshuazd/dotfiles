@@ -392,3 +392,26 @@ snippet script "script" b
 	mc.setPayloadJSON(JsonOutput.prettyPrint(builder.toString()));
 </script>
 endsnippet
+
+snippet task "Scheduled Task" b
+<task xmlns="http://ws.apache.org/ns/synapse" name="${1:SchedulerName}" class="org.apache.synapse.startup.tasks.MessageInjector" group="synapse.simple.quartz" pinnedServers="esbapp03">
+	<trigger ${2:cron}="${3:0 0 6 ? * *}"/>
+	<property xmlns:task="http://www.wso2.org/products/wso2commons/tasks" name="message">
+		<xml xmlns="">unused</xml>
+	</property>
+	<property xmlns:task="http://www.wso2.org/products/wso2commons/tasks" name="injectTo" value="${4:proxy}"/>
+	<property xmlns:task="http://www.wso2.org/products/wso2commons/tasks" name="$4Name" value="${5:ProxyName}"/>
+	<property xmlns:task="http://www.wso2.org/products/wso2commons/tasks" name="format" value="soap11"/>
+</task>
+endsnippet
+
+snippet proxy "Proxy Service" b
+<proxy xmlns="http://ws.apache.org/ns/synapse" name="${1:ProxyName}" transports="local" startOnLoad="true" trace="disable">
+	<target>
+		<inSequence>$2
+		</inSequence>
+		<outSequence>
+		</outSequence>
+	</target>
+</proxy>
+endsnippet

@@ -12,7 +12,7 @@ snippet dep "dependency" b
 endsnippet
 
 snippet art "artifact" b
-<artifact name="${1:name}" groupId="com.panera.wso2.esb.${2:ProjectName}.${3:type}" version="${4:1.0}.0" type="synapse/`!p snip.rv = {"template":"sequenceTemplate","local-entry":"localEntry"}.get(t[3],t[3])`" serverRole="EnterpriseServiceBus">
+<artifact name="${1:name}" groupId="com.panera.wso2.esb.${2:ProjectName}.${3:type}" version="${4:1.0}.0" type="synapse/`!p snip.rv = {"template":"sequenceTemplate"}.get(t[3],t[3])`" serverRole="EnterpriseServiceBus">
 	<file>src/main/synapse-config/`!p snip.rv = {"template":"templates","local-entry":"local-entries","message-store":"message-stores","sequence":"sequences","task":"tasks","proxy-service":"proxy-services"}.get(t[3],t[3])`/$1.xml</file>
 </artifact>
 endsnippet
@@ -43,7 +43,7 @@ snippet sdep "smart dependency" b
 endsnippet
 
 snippet sart "smart artifact" b
-<artifact name="${1:name}" groupId="com.panera.wso2.esb.`!p snip.rv=get_project_name()`.${3:type}" version="${4:1.0}.0" type="synapse/`!p snip.rv = {"template":"sequenceTemplate","local-entry":"localEntry"}.get(t[3],t[3])`" serverRole="EnterpriseServiceBus">
+<artifact name="${1:name}" groupId="com.panera.wso2.esb.`!p snip.rv=get_project_name()`.${3:type}" version="${4:1.0}.0" type="synapse/`!p snip.rv = {"template":"sequenceTemplate"}.get(t[3],t[3])`" serverRole="EnterpriseServiceBus">
 	<file>src/main/synapse-config/`!p snip.rv = {"template":"templates","local-entry":"local-entries","message-store":"message-stores","sequence":"sequences","task":"tasks","proxy-service":"proxy-services"}.get(t[3],t[3])`/$1.xml</file>
 </artifact>
 endsnippet
