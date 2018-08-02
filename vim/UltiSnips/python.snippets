@@ -248,7 +248,7 @@ def get_call_signature():
         sigs = script.call_signatures()
         assert len(sigs) == 1
         comps = [c.name for c in script.completions()
-                 if c.parent().type != sigs[0].name
+                 if not(c.parent().name == sigs[0].name and c.parent().type == 'function')
                  and c.parent().name != 'builtins'
                  and c.parent().name != '__init__']
         params = [p.description.split(' ')[-1] for p in sigs[0].params]
