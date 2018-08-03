@@ -350,14 +350,14 @@ hi link  pythonUniRawString String
 
 hi link  pythonEscape       SpecialChar
 hi link  pythonEscapeError  Error
-hi link  pythonUniEscape    PreProc
-hi link  pythonUniEscapeError Error
-hi link  pythonUniRawEscape PreProc
+hi link  pythonUniEscape    SpecialChar
+hi link  pythonUniEscapeError SpecialChar
+hi link  pythonUniRawEscape SpecialChar
 hi link  pythonUniRawEscapeError Error
 
-hi link  pythonStrFormatting PreProc
-hi link  pythonStrFormat    PreProc
-hi link  pythonStrTemplate  PreProc
+hi link  pythonStrFormatting Tag
+hi link  pythonStrFormat    Tag
+hi link  pythonStrTemplate  Tag
 
 hi link  pythonDocTest      Special
 hi link  pythonDocTest2     Special
@@ -376,14 +376,14 @@ hi link  pythonBuiltinObj   Structure
 hi link  pythonBuiltinFunc  Function
 hi link  pythonBuiltinFunc  Builtin
 
-hi link  pythonItemAccess   Tag
+hi link  pythonItemAccess   PreProc
 augroup pythonHighlight
   autocmd!
   autocmd ColorScheme * highlight pythonField ctermfg=245 guifg=#8a8a8a
 augroup END
 highlight pythonField ctermfg=245 guifg=#8a8a8a
 
-hi link  pythonExClass      Structure
+hi link  pythonExClass      Class
 hi link  pythonJedi         Type
 hi link  pythonPunct        Delimiter
 " hi link  pythonIdentifier   Identifier
