@@ -76,6 +76,12 @@ snippet epk "endpoint with key" b
 <endpoint key="${1}"/>
 endsnippet
 
+snippet epd "address endpoint" b
+<endpoint>
+	<address uri="${1:URI}" format="soap11"/>
+</endpoint>
+endsnippet
+
 snippet enr "enrich" b
 <enrich>
 	<source type="${1:source type}" ${3}/>
