@@ -158,8 +158,8 @@ prompt_pure_preprompt_render() {
 	#show virtualenv info
 	[[ -n $VIRTUAL_ENV ]] && preprompt+="%F{246} ($(basename $VIRTUAL_ENV))%f" && preprompt2+=" ($(basename $VIRTUAL_ENV))"
 	# directory, colored by vim status
-	preprompt+=" %F{$STATUS_COLOR}%c%f"
-	preprompt2+=" %c"
+	preprompt+=" %F{$STATUS_COLOR}%~%f"
+	preprompt2+=" %~"
 	# begin with symbol, colored by previous command exit code
 	preprompt+=" %F{$symbol_color_first}${PURE_PROMPT_SYMBOL:-❯}"
 	preprompt+="%F{$symbol_color_middle}${PURE_PROMPT_SYMBOL:-❯}"
