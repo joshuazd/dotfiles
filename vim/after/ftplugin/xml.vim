@@ -14,7 +14,6 @@ xnoremap <silent> <buffer> [m ?<resource<CR>
 xnoremap <silent> <buffer> ]m /<resource<CR>
 onoremap <silent> <buffer> [m ?<resource<CR>
 onoremap <silent> <buffer> ]m /<resource<CR>
-command! Tabs setlocal shiftwidth=2 softtabstop=2 foldmethod=syntax smarttab
 setlocal omnifunc=xmlcomplete#CompleteTags
 compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
