@@ -60,7 +60,7 @@ endif
 if exists('g:loaded_mucomplete')
   imap <c-e> <plug>(MUcompletePopupCancel)
   imap <c-y> <plug>(MUcompletePopupAccept)
-  imap <CR> <plug>(MUcompleteCR)
+  inoremap <expr> <cr> pumvisible() ? "<c-y><cr>" : "<cr>"
   imap <expr> <right> pumvisible() ? "\<plug>(MUcompleteExtendFwd)" : "\<right>"
   imap <expr> <left> pumvisible() ? "\<plug>(MUcompleteExtendBwd)" : "\<left>"
 endif
