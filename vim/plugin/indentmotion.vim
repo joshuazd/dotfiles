@@ -9,3 +9,6 @@ xnoremap <silent> ,j <Esc>:call indentmotion#findSameIndent(v:count1, 'j', 1, 0)
 xnoremap <silent> ,k <Esc>:call indentmotion#findSameIndent(v:count1, 'k', 1, 0)<CR><Esc>gv
 onoremap <silent> ,j :<C-u>call indentmotion#findSameIndent(v:count1, 'j', 0, 1)<CR>
 onoremap <silent> ,k :<C-u>call indentmotion#findSameIndent(v:count1, 'k', 0, 1)<CR>
+
+onoremap <silent> iI :<C-u>call indentmotion#blockTextObj()<CR>
+xnoremap <silent> iI <Esc>:call indentmotion#blockTextObj()<CR><Esc>gv

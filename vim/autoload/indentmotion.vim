@@ -28,7 +28,7 @@ function! indentmotion#findSameIndent(count, dir, visual, operator) abort
   normal! ^
 endfunction
 
-function! indentmotion#indentTextObj(inner)
+function! indentmotion#indentTextObj(inner) abort
   let curcol = col('.')
   let curline = line('.')
   let lastline = line('$')
@@ -56,3 +56,30 @@ function! indentmotion#indentTextObj(inner)
   endif
 endfunction
 
+function! indentmotion#blockTextObj() abort
+  let curcol = col('.')
+  let curline = line('.')
+  let lastline = line('$')
+  let i = indent(line('.'))
+  if getline('.') !~? "^\\s*$"
+    let p = line('.') - 1
+    let nextblank = getline(p) =~? "^\\s*$"
+
+    while p > 0 && (!nextblank && indent(p) == i)
+      -
+      let p = line('.') - 1
+      let nextblank = getline(p) =~? "^\\s*$"
+    endwhile
+
+    normal! 0V
+    call cursor(curline, curcol)
+    let p = line('.') + 1
+    let nextblank = getline(p) =~? "^\\s*$"
+    while p <= lastline && (!nextblank && indent(p) == i)
+      +
+      let p = line('.') + 1
+      let nextblank = getline(p) =~? "^\\s*$"
+    endwhile
+    normal! $
+  endif
+endfunction
