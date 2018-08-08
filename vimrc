@@ -124,9 +124,10 @@ if !empty(glob('~/.vim/autoload/plug.vim'))
   Plug 'davidhalter/jedi-vim', { 'for': 'python' }
   call plug#end()
 else
-  syntax enable
+  " syntax enable
   filetype plugin indent on
 endif
+syntax off
 runtime macros/matchit.vim
 " }}}
 
@@ -183,6 +184,7 @@ nnoremap =ou :setlocal cursorcolumn!   \|setlocal cursorcolumn?<CR>
 nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR>\|setlocal signcolumn?<CR>
 nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR>\|setlocal conceallevel?<CR>
+nnoremap =oy :if exists('g:syntax_on') \| syntax off \| else \| syntax enable \| endif<CR>
 
 " quickfix maps
 nnoremap ]q :cnext<CR>
