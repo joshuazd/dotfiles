@@ -65,7 +65,7 @@ set listchars=tab:»\ ,trail:~,extends:>,eol:¬,nbsp:␣ " what to show for whit
 if has('patch-7.4.710')
   set listchars+=space:·
 endif
-set listchars=tab:»\ ,trail:~,extends:>,nbsp:␣
+set listchars=tab:›\ ,trail:─,extends:>,nbsp:␣
 set list
 if exists('+clipboard')
   set clipboard^=unnamed,unnamedplus          " make clipboard work better
