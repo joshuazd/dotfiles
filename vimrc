@@ -248,6 +248,8 @@ augroup EditVim
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
   autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
+  autocmd InsertEnter        *            set listchars-=trail:─
+  autocmd InsertLeave        *            set listchars+=trail:─
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
