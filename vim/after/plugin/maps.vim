@@ -58,15 +58,13 @@ if exists('did_plugin_ultisnips')
 endif
 
 if exists('g:loaded_mucomplete')
-  imap <c-e> <plug>(MUcompletePopupCancel)
-  imap <c-y> <plug>(MUcompletePopupAccept)
   inoremap <expr> <cr> pumvisible() ? "<c-y><cr>" : "<cr>"
   imap <expr> <right> pumvisible() ? "\<plug>(MUcompleteExtendFwd)" : "\<right>"
   imap <expr> <left> pumvisible() ? "\<plug>(MUcompleteExtendBwd)" : "\<left>"
 endif
 
 if exists('g:loaded_qlist') && g:loaded_qlist == 1
-  
+
   nnoremap <Space>i :Ilist<space>
   nmap <Space>8 <Plug>QlistIncludefromtop:cdo s//g<Left><Left>
 
