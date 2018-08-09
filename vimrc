@@ -250,6 +250,7 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
+  autocmd FileType           *            call matchadd('Comment', '^\s*' . split(&commentstring, '%s')[0] . '.*')
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
