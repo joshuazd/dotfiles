@@ -112,9 +112,9 @@ endfunction
 function! functions#HighlightComments() abort
   let c = split(&commentstring, '%s')
   if len(c) == 2
-    call matchadd('Comment', '^\s*' . c[0] . '\_.\{-}' . c[1])
+    call matchadd('Comment', '^\s*' . escape(c[0], '*') . '\_.\{-}' . escape(c[1], '*'), -1)
   elseif len(c) == 1
-    call matchadd('Comment', '^\s*' . c[0] . '.*')
+    call matchadd('Comment', '^\s*' . escape(c[0], '*') . '.*', -1)
   else
     " No comments
   endif
