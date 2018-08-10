@@ -108,3 +108,14 @@ function! functions#Focus() abort
     endif
   endif
 endfunction
+
+function! functions#HighlightComments() abort
+  let c = split(&commentstring, '%s')
+  if len(c) == 2
+    call matchadd('Comment', '^\s*' . c[0] . '\_.\{-}' . c[1])
+  elseif len(c) == 1
+    call matchadd('Comment', '^\s*' . c[0] . '.*')
+  else
+    " No comments
+  endif
+endfunction
