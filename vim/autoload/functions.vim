@@ -110,11 +110,19 @@ function! functions#Focus() abort
 endfunction
 
 function! functions#HighlightComments() abort
+  call clearmatches()
   let c = split(&commentstring, '%s')
+  if &ft ==? 'vim'
+    " vim comments are dumb because they use " and are hard to detect
+    let start_of_line = '^\s*'
+  else
+    " for most other languages, we can detect comment anywhere
+    let start_of_line = ''
+  endif
   if len(c) == 2
-    call matchadd('Comment', '^\s*' . escape(c[0], '*') . '\_.\{-}' . escape(c[1], '*'), -1)
+    call matchadd('Comment', start_of_line . escape(c[0], '*') . '\_.\{-}' . escape(c[1], '*'), -1)
   elseif len(c) == 1
-    call matchadd('Comment', '^\s*' . escape(c[0], '*') . '.*', -1)
+    call matchadd('Comment', start_of_line . escape(c[0], '*') . '.*$', -1)
   else
     " No comments
   endif
