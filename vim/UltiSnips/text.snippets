@@ -1,0 +1,16 @@
+snippet rundeck "Release Plan template" b
+1. Ansible Checkout for mw (http://rundeck.panerabread.com/rundeck/project/Ansible_Checkout/job/show/6be251fe-6d0e-4805-b84a-e8cc1a585ee1)
+2. ESB Critical Deployment (http://rundeck.panerabread.com/rundeck/project/ITOPS/job/show/684f4c58-0cc8-4352-ac87-240c180eeb01)
+
+    a. Customer Services update
+        Service: wso2esb-customerservices
+        Version: 1.0.0-1
+        Restart: True
+
+3. ESB Non-Critical Deployment (http://rundeck.panerabread.com/rundeck/project/ITOPS/job/show/60e00170-3bfc-4cad-9851-e3efb39567c8)
+
+    a. Cafe Health update
+        Service: wso2esb-cafehealth
+        Version: 2.0.0-1
+        Restart: True
+endsnippet
