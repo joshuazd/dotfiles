@@ -250,7 +250,9 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
-  autocmd FileType           *            call functions#HighlightComments()
+  if !empty(glob('~/.vim/autoload/functions.vim'))
+    autocmd FileType           *            call functions#HighlightComments()
+  endif
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
