@@ -51,7 +51,7 @@ pmset_battery_remaining_time() {
 		# if $short; then
 		# 	echo '~?:??'
 		# else
-			echo '- Calculating estimate...'
+                echo ' (Calculating estimate)'
 		# fi
 	else
 		local remaining_time="$(echo $status | grep -o '[0-9]\{1,2\}:[0-9]\{1,2\}')"
@@ -59,11 +59,11 @@ pmset_battery_remaining_time() {
 			# if $short; then
 			# 	echo $remaining_time | awk '{printf "~%s", $1}'
 			# else
-				echo $remaining_time | awk '{printf "- %s left", $1}'
+                        echo $remaining_time | awk '{printf " (%s left)", $1}'
 			# fi
 		else
 			# if [ ! $short ]; then
-				echo $remaining_time | awk '{printf "- %s till full", $1}'
+                        echo $remaining_time | awk '{printf " (%s till full)", $1}'
 			# fi
 		fi
 	fi
@@ -104,7 +104,7 @@ print_battery_full() {
 		pmset_battery_remaining_time
 	elif command_exists "upower"; then
 		battery=$(upower -e | grep -m 1 battery)
-        upower -i $battery | grep 'time to full' | awk '{printf "- %s %s till full", $4, $5}'
+                upower -i $battery | grep 'time to full' | awk '{printf " (%s %s till full)", $4, $5}'
     
 	fi
 }
