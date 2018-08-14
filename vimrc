@@ -135,12 +135,6 @@ runtime macros/matchit.vim
 "              KEYBINDINGS
 """"""""""""""""""""""""""""""""""""""""""""""""
 " {{{
-" for convenience
-nnoremap L $
-nnoremap H ^
-xnoremap L $
-xnoremap H ^
-
 " map Y behave like D and C
 nnoremap Y y$
 
