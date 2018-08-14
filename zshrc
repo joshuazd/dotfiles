@@ -50,6 +50,13 @@ change-first-word() {
 zle -N change-first-word
 bindkey -M emacs "\ea" change-first-word
 
+vim-files() {
+    zle kill-whole-line
+    zle -U "vim -c Files"
+}
+zle -N vim-files
+bindkey '\ev' vim-files
+
 # Add pebble binary to path
 if [[ -d ~/pebble-dev/pebble-sdk-4.5-linux64/bin ]]; then
     export PATH=$PATH:~/pebble-dev/pebble-sdk-4.5-linux64/bin
