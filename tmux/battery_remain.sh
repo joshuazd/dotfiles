@@ -87,7 +87,7 @@ print_battery_remain() {
         if [ "$fulltime" = "" ]; then
             echo ""
         else
-            echo "$hours:$minutes"
+            echo " ($hours:$minutes)"
         fi
 		# fi
 	elif command_exists "acpi"; then
