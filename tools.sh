@@ -1,9 +1,10 @@
 sudo apt update
 sudo apt install -y zsh ctags vim snapd
-sudo snap install rg
+sudo snap install ripgrep --classic
+sudo snap alias ripgrep.rg rg
 wget https://github.com/sharkdp/fd/releases/download/v7.0.0/fd-musl_7.0.0_i386.deb
 sudo dpkg -i fd-musl_7.0.0_i386.deb
 rm fd-musl_7.0.0_i386.deb
 sudo apt install -y silversearcher-ag
 sudo apt upgrade -y snapd silversearcher-ag zsh ctags vim
-sudo snap refresh rg
+sudo snap refresh ripgrep
