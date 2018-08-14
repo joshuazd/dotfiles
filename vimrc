@@ -245,7 +245,7 @@ augroup EditVim
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
   if !empty(glob('~/.vim/autoload/functions.vim'))
-    autocmd FileType           *            call functions#HighlightComments()
+    autocmd BufEnter         *            call functions#HighlightComments()
   endif
 augroup END
 
