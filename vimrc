@@ -332,7 +332,7 @@ if exists('+statusline')
     set statusline+=%{findfunc#FindFunc()}
   endif
   set statusline+=\ %{g:stl_snippet[g:in_snippet]}
-  set statusline+=%{&syntax}
+  set statusline+=%{&filetype}
   set statusline+=\ %03l:%02c\ 
 endif
 " }}}
