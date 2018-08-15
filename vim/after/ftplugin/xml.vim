@@ -14,6 +14,12 @@ xnoremap <silent> <buffer> [m ?<resource<CR>
 xnoremap <silent> <buffer> ]m /<resource<CR>
 onoremap <silent> <buffer> [m ?<resource<CR>
 onoremap <silent> <buffer> ]m /<resource<CR>
+nnoremap <silent> <buffer> [M ?<\/resource<CR>
+nnoremap <silent> <buffer> ]M /<\/resource<CR>
+xnoremap <silent> <buffer> [M ?<\/resource<CR>
+xnoremap <silent> <buffer> ]M /<\/resource<CR>
+onoremap <silent> <buffer> [M ?<\/resource<CR>
+onoremap <silent> <buffer> ]M /<\/resource<CR>
 setlocal omnifunc=xmlcomplete#CompleteTags
 compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
