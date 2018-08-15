@@ -61,11 +61,7 @@ set completeopt+=menuone                      " configure popup menu
 if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
 endif
-set listchars=tab:»\ ,trail:~,extends:>,eol:¬,nbsp:␣ " what to show for whitespace chars
-if has('patch-7.4.710')
-  set listchars+=space:·
-endif
-set listchars=tab:›\ ,trail:─,extends:>,nbsp:␣
+set listchars=tab:│\ ,trail:─,extends:>,nbsp:␣ " what to show for whitespace chars
 set list
 if exists('+clipboard')
   set clipboard^=unnamed,unnamedplus          " make clipboard work better

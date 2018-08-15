@@ -117,6 +117,8 @@ function! functions#HighlightComments() abort
     let start_of_line = '^\s*'
   else
     " for most other languages, we can detect comment anywhere
+    " this can still cause problems (e.g. in strings)
+    " TODO: Make this work better (no false positives)
     let start_of_line = ''
   endif
   if len(c) == 2
