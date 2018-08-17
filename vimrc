@@ -220,6 +220,10 @@ inoremap {; {<CR>};<C-o>O
 inoremap (; (<CR>);<C-o>O
 inoremap [; [<CR>];<C-o>O
 
+" select function
+onoremap am :<C-u>normal [mV]M<CR>
+xnoremap am :<C-u>normal [mV]M<CR>
+
 " better file jumping
 nnoremap <silent> <expr> <C-w>f winnr('$') > 1
       \? ":let fname=\"\<C-r>\<C-f>\"\|wincmd p\<CR>:find \<C-r>=fname\<CR>\<CR>"
