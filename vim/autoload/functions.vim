@@ -109,23 +109,43 @@ function! functions#Focus() abort
   endif
 endfunction
 
-function! functions#HighlightComments() abort
-  call clearmatches()
+function! functions#HighlightComments(...) abort
   let c = split(&commentstring, '%s')
-  if &ft ==? 'vim'
-    " vim comments are dumb because they use " and are hard to detect
-    let start_of_line = '^\s*'
-  else
-    " for most other languages, we can detect comment anywhere
-    " this can still cause problems (e.g. in strings)
-    " TODO: Make this work better (no false positives)
-    let start_of_line = ''
+  let escape_chars = '*'
+  let multiline = 0
+  if len(c) == 1
+    " Put this here so single-line comments don't override strings
+    " This isn't perfect.  Vimscript comments with a double quote don't work,
+    " for example.  It's not ideal, but I don't have a better way to handle
+    " it.
+    execute 'syntax match ' . &ft . 'Comment +' . escape(c[0], escape_chars) . '.*+'
+  endif
+  execute 'syntax region ' . &ft . 'String start=+"+ end=+"+ skip=+\\"+ oneline'
+  if &ft ==? 'vim' || &ft ==? 'python' || &ft ==? 'tmux' || &ft =~? 'sh'
+    execute 'syntax region ' . &ft . 'String start=+''+ end=+''+ skip=+\\''+ oneline'
   endif
   if len(c) == 2
-    call matchadd('Comment', start_of_line . escape(c[0], '*') . '\_.\{-}' . escape(c[1], '*'), -1)
-  elseif len(c) == 1
-    call matchadd('Comment', start_of_line . escape(c[0], '*') . '.*$', -1)
-  else
-    " No comments
+    " Multiline comments override everything
+    execute 'syntax region ' . &ft . 'Comment start=+' . escape(c[0], escape_chars) . '+ end=+' . escape(c[1], escape_chars) . '+'
+    let multiline = 1
+  endif
+  " Lets us pass in other valid commentstrings for languages with multiple
+  " comment styles (e.g. java)
+  if a:0
+    for comment in a:000
+      let c = split(comment, '%s')
+      if len(c) == 1
+        execute 'syntax match ' . &ft . 'Comment +' . escape(c[0], escape_chars) . '.*+'
+      elseif len(c) == 2
+        execute 'syntax region ' . &ft . 'Comment start=+' . escape(c[0], escape_chars) . '+ end=+' . escape(c[1], escape_chars) . '+'
+        let multiline = 1
+      endif
+    endfor
+  endif
+
+  execute 'hi def link ' . &ft . 'String String'
+  execute 'hi def link ' . &ft . 'Comment Comment'
+  if multiline
+    execute 'syntax sync ccomment ' . &ft . 'Comment'
   endif
 endfunction

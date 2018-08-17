@@ -70,7 +70,7 @@ if exists('+signcolumn')
   set signcolumn=no                           " don't have signcolumn on
 endif
 try
-  colorscheme material                        " material color scheme
+  colorscheme monochrome                        " material color scheme
 catch
 endtry
 if executable('rg')                           " use ripgrep when available
@@ -246,6 +246,8 @@ augroup EditVim
   autocmd InsertLeave        *            set listchars+=trail:─
   if !empty(glob('~/.vim/autoload/functions.vim'))
     autocmd BufEnter         *            call functions#HighlightComments()
+    autocmd BufEnter         *.java       call functions#HighlightComments('/*%s*/')
+    autocmd BufEnter         *.py         call functions#HighlightComments('''''''%s''''''','"""%s"""')
   endif
 augroup END
 
