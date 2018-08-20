@@ -79,7 +79,7 @@ call s:h('Error',           s:black,      s:grey23,       'underline')
 call s:h('ErrorMsg',        s:black,      s:grey23,       'none')
 call s:h('WarningMsg',      s:grey1,      s:grey19,       'none')
 call s:h('Ignore',          s:none,       s:background,   'none')
-call s:h('SpecialKey',      s:grey5,      s:background,   'none')
+call s:h('SpecialKey',      s:grey8,      s:background,   'none')
 
 call s:h('Constant',        s:grey20,     s:background,   'none')
 call s:h('String',          s:grey13,     s:background,   'none')
@@ -128,7 +128,7 @@ call s:h('SpellCap',        s:black,      s:grey23,       'italic')
 call s:h('SpellLocal',      s:black,      s:grey23,       'none')
 call s:h('SpellRare',       s:grey15,     s:grey5,        'none')
 
-call s:h('StatusLine',      s:grey18,     s:grey1,        'none')
+call s:h('StatusLine',      s:grey18,     s:grey4,        'none')
 call s:h('StatusLineNC',    s:black,      s:grey16,       'none')
 
 call s:h('TabLine',         s:black,      s:grey16,       'none')
