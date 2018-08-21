@@ -10,7 +10,7 @@ syn match xpathOperator  "\$"                       display
 syn match xpathNameSpace '\w\+:\@='                 display
 syn match xpathPunct     "[,/\[\]()]"               display
 syn match xpathP2        "[:\.]"                    display
-syn match xpathOperator  "[=\*@+]"                  display
+syn match xpathOperator  "[=\*@+-]"                  display
 syn match xpathNumber    "[0-9]\+\>"                display
 syn match xpathOperator  "[!=\>\<]\+"               display
 syn keyword xpathOperator or and xor
@@ -41,10 +41,10 @@ hi def link xmlEntity		Statement
 hi def link xmlEntityPunct	PreProc
 
 function! s:hi(group, target) abort
-  let l:t_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'cterm') 
-  let l:t_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'cterm') 
-  let l:g_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'gui') 
-  let l:g_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'gui') 
+  let l:t_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'cterm')
+  let l:t_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'cterm')
+  let l:g_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'gui')
+  let l:g_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'gui')
   let l:t_fg = l:t_fg ==? '' ? 'NONE' : l:t_fg
   let l:t_bg = l:t_bg ==? '' ? 'NONE' : l:t_bg
   let l:g_fg = l:g_fg ==? '' ? 'NONE' : l:g_fg
@@ -60,14 +60,14 @@ function! s:xpathHighlight() abort
   call <SID>hi('xpathString',    'String')
   call <SID>hi('xpathFuncName',  'Function')
   call <SID>hi('xpathNumber',    'Constant')
-  call <SID>hi('xpathParam',     'Identifier')
+  call <SID>hi('xpathParam',     'Builtin')
   call <SID>hi('xpathPunct',     'Delimiter')
-  call <SID>hi('xpathLangVar',   'Primitive')
+  call <SID>hi('xpathLangVar',   'Language')
   call <SID>hi('xpathReference', 'StringDelimiter')
   call <SID>hi('xpathOperator',  'Operator')
   call <SID>hi('xpathP2',        'Delimiter')
   call <SID>hi('xpathSpec',      'Special')
-  call <SID>hi('xpathNameSpace', 'Primitive')
+  call <SID>hi('xpathNameSpace', 'Language')
 endfunction
 call s:xpathHighlight()
 
