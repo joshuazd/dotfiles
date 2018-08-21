@@ -70,7 +70,7 @@ if exists('+signcolumn')
   set signcolumn=no                           " don't have signcolumn on
 endif
 try
-  colorscheme monochrome                        " material color scheme
+  colorscheme material                        " material color scheme
 catch
 endtry
 if executable('rg')                           " use ripgrep when available
@@ -120,10 +120,10 @@ if !empty(glob('~/.vim/autoload/plug.vim'))
   Plug 'davidhalter/jedi-vim', { 'for': 'python' }
   call plug#end()
 else
-  " syntax enable
+  syntax enable
   filetype plugin indent on
 endif
-syntax off
+syntax enable
 runtime macros/matchit.vim
 " }}}
 
@@ -244,11 +244,11 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
-  if !empty(glob('~/.vim/autoload/functions.vim'))
-    autocmd BufEnter         *            call functions#HighlightComments()
-    autocmd BufEnter         *.java       call functions#HighlightComments('/*%s*/')
-    autocmd BufEnter         *.py         call functions#HighlightComments('''''''%s''''''','"""%s"""')
-  endif
+  " if !empty(glob('~/.vim/autoload/functions.vim'))
+  "   autocmd BufEnter         *            call functions#HighlightComments()
+  "   autocmd BufEnter         *.java       call functions#HighlightComments('/*%s*/')
+  "   autocmd BufEnter         *.py         call functions#HighlightComments('''''''%s''''''','"""%s"""')
+  " endif
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
