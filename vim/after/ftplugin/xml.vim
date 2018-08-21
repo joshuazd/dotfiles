@@ -1,5 +1,3 @@
-setlocal shiftwidth=2
-setlocal softtabstop=2
 setlocal foldmethod=indent
 setlocal smarttab
 setlocal conceallevel=0
