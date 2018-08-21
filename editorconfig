@@ -18,7 +18,7 @@ tab_width = 8
 
 [{*.xml,*.dbs}]
 indent_size = 2
-tab_width = 2
+tab_width = 4
 
 [*.java]
 indent_size = 4
