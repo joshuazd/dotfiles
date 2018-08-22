@@ -123,7 +123,7 @@ else
   syntax enable
   filetype plugin indent on
 endif
-syntax enable
+" syntax off
 runtime macros/matchit.vim
 " }}}
 
