@@ -56,7 +56,7 @@ set winminheight=0                            " minimum window height
 set winminwidth=0                             " minimum window width
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 set virtualedit+=block                        " allow virtual editing in v-block mode
-set updatetime=1000                           " time for swapfile and CursorHold events
+set fillchars=vert:│,diff:─                   " set characters for vert splits and diffs
 set completeopt+=menuone                      " configure popup menu
 if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
