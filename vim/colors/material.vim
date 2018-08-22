@@ -58,7 +58,7 @@ call s:h('FoldColumn',      s:none,       s:background,   'none')
 call s:h('SignColumn',      s:none,       s:background,   'none')
 call s:h('Folded',          s:lightgrey,  s:darkgrey,     'none')
 
-call s:h('VertSplit',       s:darkgrey,   s:darkgrey,     'none')
+call s:h('VertSplit',       s:lightgrey,  s:background,   'none')
 call s:h('ColorColumn',     s:none,       s:mediumgrey,   'none')
 
 call s:h('Directory',       s:blue,       s:background,   'none')
