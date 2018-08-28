@@ -347,7 +347,7 @@ hi def link xmlEntityPunct	PreProc
 
 hi def link xmlOperator         PreProc
 
-hi def link xmlAttribPunct	Comment
+hi def link xmlAttribPunct	Delimiter
 " hi def link xmlAttrib		Type
 " highlight xmlAttrib ctermfg=245 guifg=#afd7d7
 " hi def link xmlEqual            Comment
@@ -360,7 +360,7 @@ hi def link xmlCommentPart	Comment
 hi def link xmlCommentError	Error
 hi def link xmlError		Error
 
-hi def link xmlProcessingDelim	Comment
+hi def link xmlProcessingDelim	Delimiter
 hi def link xmlProcessing	xmlAttrib
 
 hi def link xmlCdata		String
