@@ -55,19 +55,36 @@ function! s:hi(group, target) abort
 endfunction
 
 function! s:xpathHighlight() abort
-  call <SID>hi('xpathFuncError', 'Error')
-  call <SID>hi('xpathQuote',     'StringDelimiter')
+
+  " call <SID>hi('xpathFuncError', 'Error')
+  " call <SID>hi('xpathQuote',     'StringDelimiter')
+  " call <SID>hi('xpathString',    'String')
+  " call <SID>hi('xpathFuncName',  'Function')
+  " call <SID>hi('xpathNumber',    'Constant')
+  " call <SID>hi('xpathParam',     'Builtin')
+  " call <SID>hi('xpathPunct',     'Delimiter')
+  " call <SID>hi('xpathLangVar',   'Language')
+  " call <SID>hi('xpathReference', 'StringDelimiter')
+  " call <SID>hi('xpathOperator',  'Operator')
+  " call <SID>hi('xpathP2',        'Delimiter')
+  " call <SID>hi('xpathSpec',      'Special')
+  " call <SID>hi('xpathNameSpace', 'Language')
+
+  call <SID>hi('Xpath',          'String')
+  call <SID>hi('xpathFuncError', 'String')
+  call <SID>hi('xpathQuote',     'String')
   call <SID>hi('xpathString',    'String')
-  call <SID>hi('xpathFuncName',  'Function')
-  call <SID>hi('xpathNumber',    'Constant')
-  call <SID>hi('xpathParam',     'Builtin')
-  call <SID>hi('xpathPunct',     'Delimiter')
-  call <SID>hi('xpathLangVar',   'Language')
-  call <SID>hi('xpathReference', 'StringDelimiter')
-  call <SID>hi('xpathOperator',  'Operator')
-  call <SID>hi('xpathP2',        'Delimiter')
-  call <SID>hi('xpathSpec',      'Special')
-  call <SID>hi('xpathNameSpace', 'Language')
+  call <SID>hi('xpathFuncName',  'String')
+  call <SID>hi('xpathNumber',    'String')
+  call <SID>hi('xpathParam',     'String')
+  call <SID>hi('xpathPunct',     'String')
+  call <SID>hi('xpathLangVar',   'String')
+  call <SID>hi('xpathReference', 'String')
+  call <SID>hi('xpathOperator',  'String')
+  call <SID>hi('xpathP2',        'String')
+  call <SID>hi('xpathSpec',      'String')
+  call <SID>hi('xpathNameSpace', 'String')
+
 endfunction
 call s:xpathHighlight()
 

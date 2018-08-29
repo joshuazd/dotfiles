@@ -383,7 +383,7 @@ augroup xmlHighlight
   autocmd!
   autocmd ColorScheme material call XmlHighlight()
 augroup END
-call XmlHighlight()
+" call XmlHighlight()
 
 let b:current_syntax = 'xml'
 

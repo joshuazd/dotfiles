@@ -74,7 +74,7 @@ augroup xmlAfterHighlight
   autocmd!
   autocmd ColorScheme material call XmlAfterHighlight()
 augroup END
-call XmlAfterHighlight()
+" call XmlAfterHighlight()
 
 hi def link xmlArgs         Primitive
 hi def link xmlConnection   Storage
@@ -95,4 +95,5 @@ hi def link xmlDb           StorageClass
 hi def link xmlFilter       Keyword
 hi def link xsltStatement   Statement
 hi def link xmlPropString xmlString
-hi def link xmlPropName Identifier
+" hi def link xmlPropName Identifier
+hi def link xmlPropName Todo
