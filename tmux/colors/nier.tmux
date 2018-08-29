@@ -1,7 +1,8 @@
 # panes {{{
-set -g pane-border-fg '#b4af9a'
+set -g pane-border-fg '#45403a'
 set -g pane-border-bg '#b4af9a'
-set -g pane-active-border-fg '#b4af9a'
+set -g pane-border-format '│'
+set -g pane-active-border-fg '#45403a'
 set -g pane-active-border-bg '#b4af9a'
 # }}}
 
