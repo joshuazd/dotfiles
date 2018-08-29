@@ -90,7 +90,7 @@ syn match pythonFunction "\h\w*" contains=@pythonFuncC nextgroup=pythonVars cont
 syn cluster pythonFuncC add=pythonMagic
 syn region pythonVars matchgroup=pythonBrackets start="(" skip=+\(".*"\|'.*'\)+ end=")" contained contains=pythonParameters,pythonPunct keepend
 syn match pythonParameters "[^,]*" contained contains=pythonParam skipwhite
-syn match pythonParam "[^,]*" contained contains=pythonPunct,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonItemAccess,pythonConstant,pythonString,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField skipwhite
+syn match pythonParam "[^, ]*" contained contains=pythonPunct,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonItemAccess,pythonConstant,pythonString,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField skipwhite
 
 " }}}
 

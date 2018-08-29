@@ -223,8 +223,9 @@ syn region javaTemplateArgs matchgroup=javaOperator start="<" skip="<" end=">" c
 syn match javaTemplateArgList "[^,>]*" contains=@javaTop,javaClassName contained skipwhite
 
 " classes
-syn match javaClassDeclName "\%(class\|implements\)\@12<=\s\+[A-Z_][a-zA-Z0-9_]*"
-highlight javaClassDeclName ctermfg=4 guifg=#82aaff cterm=bold gui=bold
+syn match javaClassDeclName "\%(class\|implements\)\@12<=\s\+\zs[A-Z_][a-zA-Z0-9_]*"
+" highlight javaClassDeclName ctermfg=4 guifg=#82aaff cterm=bold gui=bold
+hi def link javaClassDeclName Class
 
 
 let java_highlight_functions = 'syntax'
