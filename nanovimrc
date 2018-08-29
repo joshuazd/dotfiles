@@ -11,7 +11,8 @@ set tags=./tags,tags
 set foldlevelstart=4
 filetype plugin indent on
 syntax enable
-colorscheme material
+colorscheme nier
+set termguicolors
 nnoremap L $
 nnoremap H ^
 nnoremap Y y$

@@ -70,7 +70,7 @@ if exists('+signcolumn')
   set signcolumn=no                           " don't have signcolumn on
 endif
 try
-  colorscheme material                        " material color scheme
+  colorscheme nier                            " material color scheme
 catch
 endtry
 if executable('rg')                           " use ripgrep when available
