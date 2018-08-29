@@ -14,7 +14,8 @@ source $ZSH_CUSTOM/mvncolor.sh
 # setup prompt
 autoload -Uz promptinit
 promptinit
-prompt pure
+# prompt pure
+prompt nier
 
 
 # Options
