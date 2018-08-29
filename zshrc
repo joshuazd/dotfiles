@@ -33,7 +33,7 @@ setopt listpacked
 
 # Editing settings
 stty -ixon
-bindkey -e
+bindkey -v
 export EDITOR=vim\ -u\ ~/dotfiles/nanovimrc\ -N
 export VISUAL=vim\ -u\ ~/dotfiles/nanovimrc\ -N
 export KEYTIMEOUT=1
@@ -43,6 +43,7 @@ zle -N edit-command-line
 bindkey '^x^e' edit-command-line
 bindkey '^xe' edit-command-line
 bindkey -M emacs ' ' magic-space
+bindkey '^e' autosuggest-accept
 
 change-first-word() {
     zle beginning-of-line -N
