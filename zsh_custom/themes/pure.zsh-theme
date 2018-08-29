@@ -84,7 +84,7 @@ prompt_pure_clear_screen() {
 
 # set STATUS_COLOR: cyan for "insert", green for "normal" mode.
 prompt_purer_vim_mode() {
-	STATUS_COLOR="${${KEYMAP/vicmd/green}/(main|viins)/blue}"
+	STATUS_COLOR="${${KEYMAP/vicmd/green}/(main|viins)/111}"
 	prompt_pure_preprompt_render
 }
 
