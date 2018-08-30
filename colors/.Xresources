@@ -7,80 +7,80 @@
 # define bg #b4af9a
 # define fg #45403a
 ! black
-# define color0 #45403a
+# define c_0 #45403a
 ! red
-# define color1 #bf4243
+# define c_1 #bf4243
 ! green
-# define color2 #525643
+# define c_2 #525643
 ! yellow
-# define color3 #5b5143
+# define c_3 #5b5143
 ! blue
-# define color4 #4c5361
+# define c_4 #4c5361
 ! purple
-# define color5 #614c61
+# define c_5 #614c61
 ! cyan
-# define color6 #465953
+# define c_6 #465953
 ! white
-# define color7 #999483
+# define c_7 #999483
 ! bright black
-# define color8 #777467
+# define c_8 #777467
 ! bright red
-# define color9 #d75f5f
+# define c_9 #d75f5f
 ! bright green
-# define color10 #81895d
+# define c_10 #81895d
 ! bright yellow
-# define color11 #957f5f
+# define c_11 #957f5f
 ! bright blue
-# define color12 #7382a0
+# define c_12 #7382a0
 ! bright purple
-# define color13 #9c739c
+# define c_13 #9c739c
 ! bright cyan
-# define color14 #5f8c7d
+# define c_14 #5f8c7d
 ! bright white
-# define color15 #ffffff
+# define c_15 #ffffff
 
-! material theme
-# define bg #262626
-# define fg #cccccc
-! black
-# define color0 #1c1c1c
-! red
-# define color1 #ff5f5f
-! green
-# define color2 #87d787
-! yellow
-# define color3 #ffd787
-! blue
-# define color4 #6182b8
-! purple
-# define color5 #c792ea
-! cyan
-# define color6 #89ddff
-! white
-# define color7 #bbbbbb
-! bright black
-# define color8 #3e515b
-! bright red
-# define color9 #d75f5f
-! bright green
-# define color10 #87af87
-! bright yellow
-# define color11 #ffaf5f
-! bright blue
-# define color12 #82aaff
-! bright purple
-# define color13 #945eb8
-! bright cyan
-# define color14 #39adb5
-! bright white
-# define color15 #ffffff
+!! material theme
+!# define bg #262626
+!# define fg #cccccc
+!! black
+!# define c_0 #1c1c1c
+!! red
+!# define c_1 #ff5f5f
+!! green
+!# define c_2 #87d787
+!! yellow
+!# define c_3 #ffd787
+!! blue
+!# define c_4 #6182b8
+!! purple
+!# define c_5 #c792ea
+!! cyan
+!# define c_6 #89ddff
+!! white
+!# define c_7 #bbbbbb
+!! bright black
+!# define c_8 #3e515b
+!! bright red
+!# define c_9 #d75f5f
+!! bright green
+!# define c_10 #87af87
+!! bright yellow
+!# define c_11 #ffaf5f
+!! bright blue
+!# define c_12 #82aaff
+!! bright purple
+!# define c_13 #945eb8
+!! bright cyan
+!# define c_14 #39adb5
+!! bright white
+!# define c_15 #ffffff
 
 
 
 
 !special
-*foreground:   #cccccc
-*background:   #262626
+*foreground:   fg
+*background:   bg
 *cursorColor:  #eeffff
 /* urxvt*background: [90]#262626 */
 /* XTerm*foreground:   #cccccc */
@@ -88,50 +88,50 @@
 /* XTerm*cursorColor:  #eeffff */
 
 !black
-*color0:       #1c1c1c
-*color8:       #3e515b
+*color0:       c_0
+*color8:       c_8
 /* XTerm*color0:       #1c1c1c */
 /* XTerm*color8:       #3e515b */
 
 !red
-*color1:       #ff5f5f
-*color9:       #d75f5f
+*color1:       c_1
+*color9:       c_9
 /* XTerm*color1:       #e53935 */
 /* XTerm*color9:       #ff5370 */
 
 !green
-*color2:       #87d787
-*color10:      #87af87
+*color2:       c_2
+*color10:      c_10
 /* XTerm*color2:       #c3e88d */
 /* XTerm*color10:      #91b859 */
 
 !yellow
-*color3:       #ffd787
-*color11:      #ffaf5f
+*color3:       c_3
+*color11:      c_11
 /* XTerm*color3:       #ffb62c */
 /* XTerm*color11:      #ffcb6b */
 
 !blue
-*color4:      #6182b8
-*color12:       #82aaff
+*color4:      c_4
+*color12:       c_12
 /* XTerm*color4:       #82aaff */
 /* XTerm*color12:      #6182b8 */
 
 !magenta
-*color5:       #c792ea
-*color13:      #945eb8
+*color5:       c_5
+*color13:      c_13
 /* XTerm*color5:       #c792ea */
 /* XTerm*color13:      #945eb8 */
 
 !cyan
-*color6:       #89ddff
-*color14:      #39adb5
+*color6:       c_6
+*color14:      c_14
 /* XTerm*color6:       #89ddff */
 /* XTerm*color14:      #39adb5 */
 
 !white
-*color7:       #bbbbbb
-*color15:      #ffffff
+*color7:       c_7
+*color15:      c_15
 /* XTerm*color7:       #bbbbbb */
 /* XTerm*color15:      #ffffff */
 
