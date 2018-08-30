@@ -7,7 +7,7 @@ set -g pane-active-border-bg '#b4af9a'
 # }}}
 
 # messaging
-set -g message-style fg=colour46,bold,bg=colour232
+set -g message-style fg='#45403a',bold,bg='#b4af9a'
 
 #window mode {{{
 set -g window-style bg='#b4af9a'

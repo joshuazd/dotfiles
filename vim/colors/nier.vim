@@ -16,9 +16,9 @@ hi  Constant     guifg=#45403a guibg=#b4af9a cterm=bold           gui=bold
 hi  PreProc      guifg=#777467 guibg=#b4af9a cterm=bold           gui=bold
 hi  Special      guifg=#000000 guibg=#b4af9a
 hi  Underlined   guifg=#45403a guibg=#b4af9a cterm=underline      gui=underline
-hi  Search       guifg=#bf4243 guibg=#b4af9a cterm=bold           gui=bold
+hi  Search       guifg=#b4af9a guibg=#bf4243
 hi  Visual       guifg=#b4af9a guibg=#8a8570
-hi  Todo         guifg=#b4af9a guibg=#bf4243
+hi  Todo         guifg=#bf4243 guibg=#b4af9a cterm=bold           gui=bold
 hi  Error        guifg=#bf4243 guibg=#b4af9a cterm=bold,underline gui=bold,underline
 hi  SpecialKey   guifg=#777467 guibg=#b4af9a
 hi  NonText      guifg=#b4af9a guibg=#999483
