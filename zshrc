@@ -51,6 +51,7 @@ change-first-word() {
 }
 zle -N change-first-word
 bindkey -M emacs "\ea" change-first-word
+bindkey "\ea" change-first-word
 
 vim-files() {
     zle kill-whole-line
