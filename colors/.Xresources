@@ -3,6 +3,81 @@
 *VT100*colorMode: on
 *VT100*dynamicColors: on
 
+! nier theme
+# define bg #b4af9a
+# define fg #45403a
+! black
+# define color0 #45403a
+! red
+# define color1 #bf4243
+! green
+# define color2 #525643
+! yellow
+# define color3 #5b5143
+! blue
+# define color4 #4c5361
+! purple
+# define color5 #614c61
+! cyan
+# define color6 #465953
+! white
+# define color7 #999483
+! bright black
+# define color8 #777467
+! bright red
+# define color9 #d75f5f
+! bright green
+# define color10 #81895d
+! bright yellow
+# define color11 #957f5f
+! bright blue
+# define color12 #7382a0
+! bright purple
+# define color13 #9c739c
+! bright cyan
+# define color14 #5f8c7d
+! bright white
+# define color15 #ffffff
+
+! material theme
+# define bg #262626
+# define fg #cccccc
+! black
+# define color0 #1c1c1c
+! red
+# define color1 #ff5f5f
+! green
+# define color2 #87d787
+! yellow
+# define color3 #ffd787
+! blue
+# define color4 #6182b8
+! purple
+# define color5 #c792ea
+! cyan
+# define color6 #89ddff
+! white
+# define color7 #bbbbbb
+! bright black
+# define color8 #3e515b
+! bright red
+# define color9 #d75f5f
+! bright green
+# define color10 #87af87
+! bright yellow
+# define color11 #ffaf5f
+! bright blue
+# define color12 #82aaff
+! bright purple
+# define color13 #945eb8
+! bright cyan
+# define color14 #39adb5
+! bright white
+# define color15 #ffffff
+
+
+
+
 !special
 *foreground:   #cccccc
 *background:   #262626
