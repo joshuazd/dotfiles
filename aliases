@@ -22,7 +22,7 @@ alias search='find . -type f -name'
 alias vimup='vim +helptags\ ALL +PlugUpgrade +PlugUpdate'
 
 alias mcar='cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
-alias build='mvnc install; mcar'
+alias build='mvn install; mcar'
 
 alias cvi='vi -u ~/dotfiles/microvimrc --noplugin -N'
 alias mvi='vi -u ~/dotfiles/minvimrc -N'
