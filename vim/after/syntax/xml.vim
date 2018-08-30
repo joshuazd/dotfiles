@@ -19,8 +19,8 @@ syn keyword xmlSqlTag     sql script                                            
 " syn keyword xmlInSequence inSequence outSequence faultSequence                                      contained
 syn match   xsltStatement '\<for-each\>'                                                    display contained
 
-syn match    xmlPropName '\%(name="\)\@6<=[^"]*"\@=' contained
-syn region   xmlPropString contained matchgroup=xmlQuote start=+"+ end=+"+ contains=xmlEntity,@Spell,@xmlPropStringHook display
+syn match    xmlPropName '\%(name=\)\@5<="[^"]*"' contained
+syn region   xmlPropString contained keepend start=+"+ end=+"+ contains=xmlEntity,@Spell,@xmlPropStringHook display
 syn cluster  xmlPropStringHook add=xmlPropName
 syn region   xmlPropertyTag
       \ matchgroup=xmlTagPunct start=+<\%(property\s\+\)\@=+
@@ -94,6 +94,6 @@ hi def link xmlEndScriptTag xmlTag
 hi def link xmlDb           StorageClass
 hi def link xmlFilter       Keyword
 hi def link xsltStatement   Statement
-hi def link xmlPropString xmlString
+hi def link xmlPropString   xmlString
 " hi def link xmlPropName Identifier
 hi def link xmlPropName Todo

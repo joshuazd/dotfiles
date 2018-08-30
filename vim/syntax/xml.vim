@@ -371,8 +371,8 @@ hi def link xmlCdataEnd		xmlQuote
 hi def link xmlDocTypeDecl	Function
 hi def link xmlDocTypeKeyword	Statement
 hi def link xmlInlineDTD	Function
-" highlight xmlQuote ctermfg=156 guifg=#afff87
-hi def link xmlQuote            StringDelimiter
+" hi def link xmlQuote            StringDelimiter
+hi def link xmlQuote            String
 
 function! XmlHighlight() abort
   highlight xmlAttrib ctermfg=245 guifg=#8a8a8a
