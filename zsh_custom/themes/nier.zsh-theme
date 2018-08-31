@@ -167,7 +167,7 @@ prompt_nier_preprompt_render() {
         # git info
         postprompt+="%F{$git_color}${vcs_info_msg_0_}${prompt_nier_git_dirty}%f"
         # git pull/push arrows
-        postprompt+="%F{12}${prompt_nier_git_arrows}%f"
+        postprompt+="%F{0}${prompt_nier_git_arrows}%f"
         # execution time
         # postprompt+="%B%F{242}${prompt_nier_cmd_exec_time}%f%b"
 
