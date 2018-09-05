@@ -8,7 +8,7 @@ function! previewdoc#PreviewDoc(prg,word) abort
     setl buftype=nofile bufhidden=wipe
     execute 'resize '.min([&pvh,line('$')])
   endif
-  setl previewwindow
+  silent! setl previewwindow
   wincmd p
 endfunction
 
