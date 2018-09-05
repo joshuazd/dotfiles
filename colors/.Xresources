@@ -2,6 +2,8 @@
 
 *VT100*colorMode: on
 *VT100*dynamicColors: on
+xterm*dynamicColors: true
+urxvt*dynamicColors: on
 
 ! nier theme
 # define bg #b4af9a
