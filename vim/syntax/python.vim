@@ -164,7 +164,7 @@ syn match  pythonEscape     "\\\o\o\=\o\=" display contained
 syn match  pythonEscapeError    "\\\o\{,2}[89]" display contained
 syn match  pythonEscape     "\\x\x\{2}" display contained
 syn match  pythonEscapeError    "\\x\x\=\X" display contained
-syn match  pythonEscape     "\\$"
+syn match  pythonEscape     "\\$" display contained
 
 " Unicode
 syn region pythonUniString matchgroup=pythonStringPunc start=+[uU]'+ skip=+\\\\\|\\'\|\\$+ excludenl end=+'+ end=+$+ keepend contains=pythonEscape,pythonUniEscape,pythonEscapeError,pythonUniEscapeError,@Spell
@@ -355,9 +355,9 @@ hi link  pythonUniEscapeError SpecialChar
 hi link  pythonUniRawEscape SpecialChar
 hi link  pythonUniRawEscapeError Error
 
-hi link  pythonStrFormatting Tag
-hi link  pythonStrFormat    Tag
-hi link  pythonStrTemplate  Tag
+hi link  pythonStrFormatting SpecialChar
+hi link  pythonStrFormat    SpecialChar
+hi link  pythonStrTemplate  SpecialChar
 
 hi link  pythonDocTest      Special
 hi link  pythonDocTest2     Special
