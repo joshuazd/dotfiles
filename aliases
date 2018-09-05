@@ -1,7 +1,5 @@
 #!/bin/sh
 alias ls='ls --color=auto'
-unalias ls
-alias ls='ls'
 alias ..="cd ..; ls"
 alias ...="cd ../..; ls"
 alias ....="cd ../../..; ls"

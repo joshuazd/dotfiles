@@ -46,3 +46,4 @@ hi! link             WildMenu         Folded
 hi! link             Question         MoreMsg
 hi! link             StatusLineTerm   StatusLine
 hi! link             StatusLineTermNC StatusLineNC
+hi! link             StringDelimiter  String
