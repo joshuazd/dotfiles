@@ -85,7 +85,7 @@ hi def link xmlInSequence   Normal
 hi def link xmlEnrich       Operator
 hi def link xmlFunction     Function
 hi def link xmlSend         Function
-hi def link xmlParam        StringDelimiter
+hi def link xmlParam        StorageClass
 hi def link xmlProperty     Constant
 hi def link xmlConstant     Constant
 hi def link xmlSequence     StringDelimiter
