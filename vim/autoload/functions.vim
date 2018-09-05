@@ -75,14 +75,14 @@ function! functions#MyFoldText() abort
   return sub . info
 endfunction
 
-function! functions#PasteOp(type, ...) abort
+function! functions#PutOp(type, ...) abort
   let l:mode = 'v'
   if a:type ==? 'line'
     let l:mode = 'V'
   elseif a:type ==? 'block'
     let l:mode = ''
   endif
-  execute 'normal! g`[' . l:mode . 'gg`]p'
+  execute 'normal! g`[' . l:mode . 'g`]p'
   let @+=@0
   let @"=@0
   let @*=@0
