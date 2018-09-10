@@ -81,7 +81,7 @@ elseif executable('ag')                       " use ag when available and ripgre
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-  set guifont=Ubuntu\ Mono\ 11
+  set guifont=DejaVu\ Sans\ Mono\ 10
   set guioptions-=T
   set guioptions+=e
   set guioptions-=m
@@ -244,11 +244,6 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
-  " if !empty(glob('~/.vim/autoload/functions.vim'))
-  "   autocmd BufEnter         *            call functions#HighlightComments()
-  "   autocmd BufEnter         *.java       call functions#HighlightComments('/*%s*/')
-  "   autocmd BufEnter         *.py         call functions#HighlightComments('''''''%s''''''','"""%s"""')
-  " endif
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
@@ -298,7 +293,7 @@ let g:jedi#show_call_signatures_delay = 50
 let g:jedi#force_py_version           = 3
 let g:jedi#auto_close_doc             = 0
 " lion
-let g:lion_squeeze_spaces = 1 
+let g:lion_squeeze_spaces = 1
 " sneak
 let g:sneak#label      = 1
 let g:sneak#s_next     = 1
