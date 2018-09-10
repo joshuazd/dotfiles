@@ -113,11 +113,13 @@ if !empty(glob('~/.vim/autoload/plug.vim'))
   Plug 'embear/vim-localvimrc'
   Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
   Plug 'junegunn/fzf.vim'
+  Plug 'tpope/vim-speeddating'
   if executable('ctags')
     Plug 'ludovicchabant/vim-gutentags'
   endif
   " language specific plugins
   Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+  Plug 'jceb/vim-orgmode'
   call plug#end()
 else
   syntax enable
@@ -131,6 +133,7 @@ runtime macros/matchit.vim
 "              KEYBINDINGS
 "===============================================
 " {{{
+let maplocalleader = ','
 " map Y behave like D and C
 nnoremap Y y$
 
@@ -305,6 +308,11 @@ let g:netrw_browse_split = 4
 let g:netrw_winsize = 15
 " markdown
 let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
+" org-mode
+let g:org_indent = 1
+let g:org_todo_keywords=[['ASSIGNED(a)', 'DEVELOP(v)', 'TESTING(q)', '|', 'READY(r)', 'COMPLETE(c)'],
+      \['TODO(t)', '|', 'DONE(d)']]
+let g:org_agenda_files = ['~/org/*.org', '~/Dropbox/org/*.org']
 " }}}
 
 "===============================================
