@@ -66,6 +66,34 @@ vim-files() {
 zle -N vim-files
 bindkey '\ev' vim-files
 
+__fgitsel() {
+  local cmd="git status --porcelain | awk ' { print \$2 }'"
+  setopt localoptions pipefail 2> /dev/null
+  eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_CTRL_T_OPTS" $(__fzfcmd) -m "$@" | while read item; do
+    echo -n "${(q)item} "
+  done
+  local ret=$?
+  echo
+  return $ret
+}
+
+git-files() {
+  LBUFFER="${LBUFFER}$(__fgitsel)"
+  local ret=$?
+  zle redisplay
+  typeset -f zle-line-init >/dev/null && zle zle-line-init
+  return $ret
+}
+zle     -N   git-files
+bindkey '^g' git-files
+
+
+fgitbranch() {
+    fbr
+}
+zle -N fgitbranch
+bindkey '^b' fgitbranch
+
 # Add pebble binary to path
 if [[ -d ~/pebble-dev/pebble-sdk-4.5-linux64/bin ]]; then
     export PATH=$PATH:~/pebble-dev/pebble-sdk-4.5-linux64/bin
@@ -95,6 +123,15 @@ fi
 if [ -f "${HOME}/.functions" ]; then
       source "${HOME}/.functions"
 fi
+
+_fzf_complete_sshrc() {
+  _fzf_complete '+m' "$@" < <(
+    command cat <(cat ~/.ssh/config /etc/ssh/ssh_config 2> /dev/null | command grep -i '^host ' | command grep -v '[*?]' | awk '{for (i = 2; i <= NF; i++) print $1 " " $i}') \
+        <(command grep -oE '^[[a-z0-9.,:-]+' ~/.ssh/known_hosts | tr ',' '\n' | tr -d '[' | awk '{ print $1 " " $1 }') \
+        <(command grep -v '^\s*\(#\|$\)' /etc/hosts | command grep -Fv '0.0.0.0') |
+        awk '{if (length($2) > 0) {print $2}}' | sort -u
+  )
+}
 
 # completion settings
 zstyle ':completion:*' auto-description 'specify: %d'
