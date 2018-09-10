@@ -8,7 +8,7 @@ set background=light
 let g:colors_name  = 'nier'
 
 hi  Normal           guifg=#45403a    guibg=#b4af9a
-hi  Comment          guifg=#8a8570    guibg=#b4af9a
+hi  Comment          guifg=#777467    guibg=#b4af9a
 hi  StatusLine       guifg=#b4af9a    guibg=#45403a cterm=none              gui=none
 hi  StatusLineNC     guifg=#777467    guibg=#999483 cterm=none              gui=none
 hi  String           guifg=#b4af9a    guibg=#45403a
@@ -38,6 +38,7 @@ hi  DiffAdd          guifg=#45403a    guibg=#81895d
 hi  DiffChange       guifg=#45403a    guibg=#957f5f
 hi  DiffDelete       guifg=#45403a    guibg=#bf4243
 hi  SpecialChar      guifg=#bf4243    guibg=#45403a cterm=bold              gui=bold
+hi  Delimiter        guifg=#45403a    guibg=#b4af9a
 hi! link             IncSearch        Search
 hi! link             Identifier       Normal
 hi! link             Statement        Normal
@@ -51,6 +52,7 @@ hi! link             Question         MoreMsg
 hi! link             StatusLineTerm   StatusLine
 hi! link             StatusLineTermNC StatusLineNC
 hi! link             StringDelimiter  String
+hi! link             Quote            String
 hi! link             DiffAdded        DiffAdd
 hi! link             DiffChanged      DiffChange
 hi! link             DiffRemoved      DiffDelete
