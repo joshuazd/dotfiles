@@ -60,6 +60,9 @@ fi
 ln -s $PWD/editorconfig $HOME/.editorconfig
 
 echo "Creating symlinks for theme"
+if [ -f /usr/local/share/zsh/site-functions/prompt_nier_setup ]; then
+    rm /usr/local/share/zsh/site-functions/prompt_nier_setup
+fi
 if [ -f /usr/local/share/zsh/site-functions/prompt_pure_setup ]; then
     rm /usr/local/share/zsh/site-functions/prompt_pure_setup
 fi
@@ -67,6 +70,7 @@ if [ -f /usr/local/share/zsh/site-functions/async ]; then
     rm /usr/local/share/zsh/site-functions/async
 fi
 sudo ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup
+sudo ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup
 sudo ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async
 
 vim +PlugInstall +helptags\ ALL +qall
