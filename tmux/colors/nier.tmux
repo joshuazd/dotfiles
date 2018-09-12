@@ -10,8 +10,8 @@ set -g pane-active-border-bg '#b4af9a'
 set -g message-style fg='#45403a',bold,bg='#999483'
 
 #window mode {{{
-set -g window-style bg='#b4af9a'
-set -g window-active-style bg='#b4af9a'
+# set -g window-style bg='#b4af9a'
+# set -g window-active-style bg='#b4af9a'
 # set -g window-style bg='#999483'
 # }}}
 
@@ -46,3 +46,4 @@ setw -g window-status-bell-fg colour255
 setw -g window-status-bell-bg colour1
 
 # }}}
+run-shell "~/dotfiles/tmux/custom_tmux.sh"
