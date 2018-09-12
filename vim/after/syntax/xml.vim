@@ -88,7 +88,7 @@ hi def link xmlSend         Function
 hi def link xmlParam        StorageClass
 hi def link xmlProperty     Constant
 hi def link xmlConstant     Constant
-hi def link xmlSequence     StringDelimiter
+hi def link xmlSequence     StorageClass
 hi def link xmlScriptTag    xmlTag
 hi def link xmlEndScriptTag xmlTag
 hi def link xmlDb           StorageClass
