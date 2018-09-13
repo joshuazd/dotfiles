@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+import sys
+import os
+import re
+
+
+def main(argv):
+    if len(argv) != 3:
+        raise Exception('Usage: makeartifact <type> <name>')
+
+    types = {'api':               {'dir': 'api',                'dep': 'api',                'art': 'api'},
+             'endpoint':          {'dir': 'endpoints',          'dep': 'endpoint',           'art': 'endpoint'},
+             'local-entry':       {'dir': 'local-entries',      'dep': 'local-entry',        'art': 'local-entry'},
+             'message-processor': {'dir': 'message-processors', 'dep': 'message-processors', 'art': 'message-processors'},
+             'message-store':     {'dir': 'message-stores',     'dep': 'message-store',      'art': 'message-store'},
+             'proxy-service':     {'dir': 'proxy-services',     'dep': 'proxy-service',      'art': 'proxy-service'},
+             'sequence':          {'dir': 'sequences',          'dep': 'sequence',           'art': 'sequence'},
+             'task':              {'dir': 'tasks',              'dep': 'task',               'art': 'task'},
+             'template':          {'dir': 'templates',          'dep': 'template',           'art': 'sequenceTemplate'}}
+
+    artifact_type = argv[1]
+    artifact_name = argv[2]
+    path = os.getcwd() + '/' + os.path.split(os.getcwd())[-1] + \
+        '_ESB/src/main/synapse-config/' + types[artifact_type]['dir']
+    if not(os.path.exists(path)):
+        os.makedirs(path)
+    artifact = open(path + '/' + artifact_name + '.xml', 'w+')
+    artifact.close()
+
+    project_name = os.path.split(os.getcwd())[-1]
+
+    path = os.getcwd() + '/' + project_name + \
+        '_Deployment/pom.xml'
+
+    version = '1.0.0'
+    with open('pom.xml', 'r') as pom:
+        version_tag = re.compile('\s*<version>.*</version')
+        for line in pom.readlines():
+            if version_tag.match(line) is not None:
+                version = re.findall('\d+\.\d+\.\d+', line)[0]
+                break
+
+    with open(path, 'r') as dep_pom:
+        lines = dep_pom.readlines()
+
+    with open(path, 'w') as dep_pom:
+        props = re.compile('\s*</properties>')
+        deps = re.compile('\s*</dependencies>')
+        info = (project_name, types[artifact_type]['dep'], artifact_name)
+        for line in lines:
+            if props.match(line) is not None:
+                dep_pom.write('    <com.panera.wso2.esb.%s_ESB.%s_._%s>' % tuple(info))
+                dep_pom.write('capp/EnterpriseServiceBus')
+                dep_pom.write('</com.panera.wso2.esb.%s_ESB.%s_._%s>\n' % tuple(info))
+            elif deps.match(line) is not None:
+                dep_pom.write('    <dependency>\n')
+                dep_pom.write('      <groupId>com.panera.wso2.esb.%s_ESB.%s</groupId>\n'
+                              % tuple(info[:-1]))
+                dep_pom.write('      <artifactId>%s</artifactId>\n' % (info[-1]))
+                dep_pom.write('      <version>${project.version}</version>\n')
+                dep_pom.write('      <type>xml</type>\n')
+                dep_pom.write('    </dependency>\n')
+
+            dep_pom.write(line)
+
+    path = os.getcwd() + '/' + project_name + \
+            '_ESB/artifact.xml'
+    with open(path, 'r') as art_pom:
+        lines = art_pom.readlines()
+
+    with open(path, 'w') as art_pom:
+        arts = re.compile('\s*</artifacts>')
+        for line in lines:
+            if arts.match(line) is not None:
+                art_pom.write('  <artifact name="%s" groupId="com.panera.wso2.esb.%s.%s" version="%s" type="synapse/%s" serverRole="EnterpriseServiceBus">\n'
+                              % (artifact_name, project_name + '_ESB', types[artifact_type]['dep'], version, types[artifact_type]['art']))
+                art_pom.write('    <file>src/main/synapse-config/%s/%s.xml</file>\n'
+                              % (types[artifact_type]['dir'], artifact_name))
+                art_pom.write('  </artifact>\n')
+
+            art_pom.write(line)
+
+
+
+if __name__ == "__main__":
+    main(sys.argv)
