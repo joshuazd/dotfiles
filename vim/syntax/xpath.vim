@@ -43,15 +43,17 @@ hi def link xmlEntityPunct	PreProc
 function! s:hi(group, target) abort
   let l:t_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'cterm')
   let l:t_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'cterm')
+  let l:t_fmt = synIDattr(synIDtrans(hlID(a:target)), 'reverse', 'cterm') ? 'reverse,' : ''
   let l:g_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'gui')
   let l:g_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'gui')
+  let l:g_fmt = synIDattr(synIDtrans(hlID(a:target)), 'reverse', 'gui') ? 'reverse,' : ''
   let l:t_fg = l:t_fg ==? '' ? 'NONE' : l:t_fg
   let l:t_bg = l:t_bg ==? '' ? 'NONE' : l:t_bg
   let l:g_fg = l:g_fg ==? '' ? 'NONE' : l:g_fg
   let l:g_bg = l:g_bg ==? '' ? 'NONE' : l:g_bg
   execute 'highlight ' . a:group . ' ctermfg=' . l:t_fg . ' ctermbg=' . l:t_bg .
         \ ' guifg=' . l:g_fg . ' guibg=' . l:g_bg .
-        \ ' cterm=italic gui=italic'
+        \ ' cterm=' . l:t_fmt . 'italic gui=' . l:g_fmt . 'italic'
 endfunction
 
 function! s:xpathHighlight() abort
