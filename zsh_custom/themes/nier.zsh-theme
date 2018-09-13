@@ -24,11 +24,13 @@
 # \e[2K => clear everything on the current line
 
 NIERR_PROMPT_COMMAND_COUNT=0
-NIER_PROMPT_SYMBOL_COLOR_LAST='0'
+# NIER_PROMPT_SYMBOL_COLOR_LAST='0'
+NIER_PROMPT_SYMBOL_COLOR_LAST='FG'
 NIER_PROMPT_SYMBOL_COLOR_MIDDLE='222'
 NIER_PROMPT_SYMBOL_COLOR_FIRST='203'
 # STATUS_COLOR='111'
-STATUS_COLOR='0'
+# STATUS_COLOR='0'
+STATUS_COLOR='FG'
 # NIER_PROMPT_SYMBOL='❯'
 # NIER_PROMPT_SYMBOL='›'
 # NIER_PROMPT_SYMBOL='$'
@@ -84,7 +86,7 @@ prompt_nier_clear_screen() {
 
 # set STATUS_COLOR: cyan for "insert", green for "normal" mode.
     prompt_nierr_vim_mode() {
-        STATUS_COLOR="${${KEYMAP/vicmd/9}/(main|viins)/0}"
+        STATUS_COLOR="${${KEYMAP/vicmd/9}/(main|viins)/STATUS_COLOR}"
         prompt_nier_preprompt_render
     }
 
