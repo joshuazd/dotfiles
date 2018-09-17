@@ -155,7 +155,7 @@ xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! 
 " redraw
 nnoremap <C-w>a :redraw!<CR>
 " select column
-xnoremap zc :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'>") . "\|"<CR>
+xnoremap zc :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'<") . "\|"<CR>
 
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
