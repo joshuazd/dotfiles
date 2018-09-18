@@ -265,6 +265,8 @@ command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<ar
 
 command! Focus call functions#Focus()
 
+command! -nargs=1 -complete=color Theme colo <args>|!theme <args>
+
 " }}}
 
 "===============================================
