@@ -325,7 +325,7 @@ let g:netrw_liststyle = 0
 let g:netrw_browse_split = 4
 let g:netrw_winsize = 15
 " markdown
-let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml']
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql']
 " org-mode
 let g:org_indent = 1
 let g:org_todo_keywords=[['ASSIGNED(a)', 'DEVELOP(v)', 'TESTING(q)', '|', 'READY(r)', 'COMPLETE(c)'],
