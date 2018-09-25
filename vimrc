@@ -1,7 +1,14 @@
+let vimdir = '~/.vim'
+if has('win32')
+  let vimdir = '~/dotfiles/vim'
+  set rtp+=~/dotfiles/vim
+endif
 "===============================================
 "              GENERAL OPTIONS
 "===============================================
 " {{{
+set encoding=utf-8
+set termguicolors
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
 set whichwrap+=<,>                            " arrow keys move to the next line
@@ -96,11 +103,6 @@ endif
 "                 PLUGINS
 "===============================================
 " {{{
-let vimdir = '~/.vim'
-if has('win32')
-  let vimdir = '~/dotfiles/vim'
-  set rtp+=~/dotfiles/vim
-endif
 if !empty(glob(vimdir . '/autoload/plug.vim'))
   call plug#begin(vimdir . '/bundle/')
   Plug 'lifepillar/vim-mucomplete'
