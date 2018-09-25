@@ -59,6 +59,12 @@ if [ -f $HOME/.editorconfig ]; then
 fi
 ln -s $PWD/editorconfig $HOME/.editorconfig
 
+if [ -f $HOME/.bin ]; then
+    echo "Backing up existing bin to .bin.old"
+    mv $HOME/.bin $HOME/.bin.old
+fi
+ln -s $PWD/bin $HOME/.bin
+
 echo "Creating symlinks for theme"
 if [ -f /usr/local/share/zsh/site-functions/prompt_nier_setup ]; then
     rm /usr/local/share/zsh/site-functions/prompt_nier_setup
