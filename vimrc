@@ -12,14 +12,12 @@ endif
 if !empty(glob(vimdir . '/autoload/plug.vim'))
   call plug#begin(vimdir . '/bundle/')
   Plug 'lifepillar/vim-mucomplete'
-  if has('python') || has('python3')
-    Plug 'SirVer/ultisnips'
-  endif
   Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-obsession'
   Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-speeddating'
   Plug 'tommcdo/vim-lion'
   Plug 'romainl/vim-qf'
   Plug 'romainl/vim-qlist'
@@ -30,12 +28,11 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
   endif
-  Plug 'tpope/vim-speeddating'
   if executable('ctags')
     Plug 'ludovicchabant/vim-gutentags'
   endif
-  " language specific plugins
   if has('python') || has('python3')
+    Plug 'SirVer/ultisnips'
     Plug 'davidhalter/jedi-vim', { 'for': 'python' }
     Plug 'jceb/vim-orgmode'
   endif
