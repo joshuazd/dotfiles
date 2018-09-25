@@ -88,7 +88,11 @@ elseif executable('ag')                       " use ag when available and ripgre
   set grepformat=%f:%l:%c:%m,%f:%l:%m
 endif
 if has('gui_running')
-  set guifont=DejaVu\ Sans\ Mono\ 10
+  if has('win32')
+    set guifont=Consolas:h10:cANSI:qDRAFT
+  else
+    set guifont=DejaVu\ Sans\ Mono\ 10
+  endif
   set guioptions-=T
   set guioptions+=e
   set guioptions-=m
