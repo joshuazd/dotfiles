@@ -1,0 +1,2 @@
+#!/bin/sh
+ln -f $GIT_DIR/../vimrc $HOME/.vimrc
