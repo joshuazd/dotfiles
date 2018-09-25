@@ -96,10 +96,17 @@ endif
 "                 PLUGINS
 "===============================================
 " {{{
-if !empty(glob('~/.vim/autoload/plug.vim'))
-  call plug#begin('~/.vim/bundle')
+let vimdir = '~/.vim'
+if has('win32')
+  let vimdir = '~/dotfiles/vim'
+  set rtp+=~/dotfiles/vim
+endif
+if !empty(glob(vimdir . '/autoload/plug.vim'))
+  call plug#begin(vimdir . '/bundle/')
   Plug 'lifepillar/vim-mucomplete'
-  Plug 'SirVer/ultisnips'
+  if has('python') || has('python3')
+    Plug 'SirVer/ultisnips'
+  endif
   Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-obsession'
@@ -111,15 +118,19 @@ if !empty(glob('~/.vim/autoload/plug.vim'))
   Plug 'xtal8/traces.vim'
   Plug 'sgur/vim-editorconfig'
   Plug 'embear/vim-localvimrc'
-  Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-  Plug 'junegunn/fzf.vim'
+  if !has('win32')
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
+  endif
   Plug 'tpope/vim-speeddating'
   if executable('ctags')
     Plug 'ludovicchabant/vim-gutentags'
   endif
   " language specific plugins
-  Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-  Plug 'jceb/vim-orgmode'
+  if has('python') || has('python3')
+    Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+    Plug 'jceb/vim-orgmode'
+  endif
   call plug#end()
 else
   syntax enable
