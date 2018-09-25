@@ -1,14 +1,16 @@
+" Set up vim to work in windows(+cygwin) or linux environments
 let vimdir = '~/.vim'
 if has('win32')
   let vimdir = '~/dotfiles/vim'
   set rtp+=~/dotfiles/vim
 endif
+
 "===============================================
 "              GENERAL OPTIONS
 "===============================================
 " {{{
-set encoding=utf-8
-set termguicolors
+set encoding=utf-8                            " set file encoding to utf-8
+set termguicolors                             " use gui colors in terminal vim
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
 set whichwrap+=<,>                            " arrow keys move to the next line
