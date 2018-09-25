@@ -1,9 +1,52 @@
+"===============================================
+"                 PLUGINS
+"===============================================
+" {{{
 " Set up vim to work in windows(+cygwin) or linux environments
 let vimdir = '~/.vim'
 if has('win32')
   let vimdir = '~/dotfiles/vim'
   set rtp+=~/dotfiles/vim
 endif
+
+if !empty(glob(vimdir . '/autoload/plug.vim'))
+  call plug#begin(vimdir . '/bundle/')
+  Plug 'lifepillar/vim-mucomplete'
+  if has('python') || has('python3')
+    Plug 'SirVer/ultisnips'
+  endif
+  Plug 'justinmk/vim-sneak'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-obsession'
+  Plug 'tpope/vim-repeat'
+  Plug 'tpope/vim-commentary'
+  Plug 'tommcdo/vim-lion'
+  Plug 'romainl/vim-qf'
+  Plug 'romainl/vim-qlist'
+  Plug 'xtal8/traces.vim'
+  Plug 'sgur/vim-editorconfig'
+  Plug 'embear/vim-localvimrc'
+  if !has('win32')
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
+  endif
+  Plug 'tpope/vim-speeddating'
+  if executable('ctags')
+    Plug 'ludovicchabant/vim-gutentags'
+  endif
+  " language specific plugins
+  if has('python') || has('python3')
+    Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+    Plug 'jceb/vim-orgmode'
+  endif
+  call plug#end()
+else
+  syntax enable
+  filetype plugin indent on
+endif
+" syntax off
+runtime macros/matchit.vim
+" }}}
 
 "===============================================
 "              GENERAL OPTIONS
@@ -103,49 +146,6 @@ if has('gui_running')
   set guitablabel=%M\ %t
   set lines=43 columns=120
 endif
-" }}}
-
-"===============================================
-"                 PLUGINS
-"===============================================
-" {{{
-if !empty(glob(vimdir . '/autoload/plug.vim'))
-  call plug#begin(vimdir . '/bundle/')
-  Plug 'lifepillar/vim-mucomplete'
-  if has('python') || has('python3')
-    Plug 'SirVer/ultisnips'
-  endif
-  Plug 'justinmk/vim-sneak'
-  Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-obsession'
-  Plug 'tpope/vim-repeat'
-  Plug 'tpope/vim-commentary'
-  Plug 'tommcdo/vim-lion'
-  Plug 'romainl/vim-qf'
-  Plug 'romainl/vim-qlist'
-  Plug 'xtal8/traces.vim'
-  Plug 'sgur/vim-editorconfig'
-  Plug 'embear/vim-localvimrc'
-  if !has('win32')
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-    Plug 'junegunn/fzf.vim'
-  endif
-  Plug 'tpope/vim-speeddating'
-  if executable('ctags')
-    Plug 'ludovicchabant/vim-gutentags'
-  endif
-  " language specific plugins
-  if has('python') || has('python3')
-    Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-    Plug 'jceb/vim-orgmode'
-  endif
-  call plug#end()
-else
-  syntax enable
-  filetype plugin indent on
-endif
-" syntax off
-runtime macros/matchit.vim
 " }}}
 
 "===============================================
