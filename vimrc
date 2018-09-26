@@ -316,7 +316,6 @@ let g:localvimrc_whitelist = '/home/.*/\.local_vimrc'
 let g:jedi#auto_vim_configuration     = 0
 let g:jedi#show_call_signatures       = 2
 let g:jedi#show_call_signatures_delay = 50
-let g:jedi#force_py_version           = 3
 let g:jedi#auto_close_doc             = 0
 " lion
 let g:lion_squeeze_spaces = 1
