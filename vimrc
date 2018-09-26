@@ -50,7 +50,6 @@ runtime macros/matchit.vim
 "===============================================
 " {{{
 set encoding=utf-8                            " set file encoding to utf-8
-set termguicolors                             " use gui colors in terminal vim
 set hidden                                    " A buffer becomes hidden when it is abandoned
 set backspace=eol,start,indent                " Configure backspace so it acts as it should act
 set whichwrap+=<,>                            " arrow keys move to the next line
@@ -117,6 +116,9 @@ if exists('+clipboard')
 endif
 if exists('+signcolumn')
   set signcolumn=no                           " don't have signcolumn on
+endif
+if has('termguicolors')
+  set termguicolors                           " use gui colors in terminal vim
 endif
 try
   colorscheme nier                            " material color scheme
@@ -344,10 +346,10 @@ let g:org_agenda_files = ['~/org/*.org', '~/Dropbox/org/*.org']
 if exists('+statusline')
   let g:in_snippet = 0
   let g:stl_snippet = ['', 'snippet ']
-  let g:findfunc = {'vim': ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
-        \'xml': ['^\s*<resource', '<\/resource>', '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@='],
-        \'python': ['^\s*\(class\|def\|async def\)\>', '\S\n\=\zs\n*\(^\s*\(class\|def\|async def\)\|^\S\)', '^\s*\(class\|def\|async def\)\s\+\zs\h\w*\ze('],
-        \'java': ['^\(\t\| \{&shiftwidth}\)\S\+.*\(\n^.*\)\={', '^\(\t\| \{&shiftwidth}\)}', '\h\w*\ze(']}
+  let g:findfunc = {'vim'   : ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
+                   \'xml'   : ['^\s*<resource', '<\/resource>', '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@='],
+                   \'python': ['^\s*\(class\|def\|async def\)\>', '\S\n\=\zs\n*\(^\s*\(class\|def\|async def\)\|^\S\)', '^\s*\(class\|def\|async def\)\s\+\zs\h\w*\ze('],
+                   \'java'  : ['^\(\t\| \{&shiftwidth}\)\S\+.*\(\n^.*\)\={', '^\(\t\| \{&shiftwidth}\)}', '\h\w*\ze(']}
   let g:modemap = {
         \ 'n' :'NORMAL', 'no':'NORMOP', 'v' :'VISUAL', 'V' :'V-LINE',
         \ '':'VBLOCK', 's' :'SELECT', 'S' :'S-LINE', '':'SBLOCK',
