@@ -36,5 +36,9 @@ tab_width = 8
 indent_size = 2
 tab_width = 8
 
+[*.todo]
+indent_size = 2
+tab_width = 8
+
 [{COMMIT_EDITMSG}]
 spell_enabled = true
