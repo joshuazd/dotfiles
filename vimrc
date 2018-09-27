@@ -23,7 +23,6 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   Plug 'romainl/vim-qlist'
   Plug 'xtal8/traces.vim'
   Plug 'sgur/vim-editorconfig'
-  Plug 'embear/vim-localvimrc'
   if !has('win32')
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
@@ -311,9 +310,6 @@ let mucomplete#can_complete = { }
 if has('+lambda')
   let mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
 endif
-" localvimrc
-let g:localvimrc_name      = '.local_vimrc'
-let g:localvimrc_whitelist = '/home/.*/\.local_vimrc'
 " jedi
 let g:jedi#auto_vim_configuration     = 0
 let g:jedi#show_call_signatures       = 2
