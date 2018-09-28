@@ -17,7 +17,6 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   Plug 'tpope/vim-obsession'
   Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-commentary'
-  Plug 'tpope/vim-speeddating'
   Plug 'tommcdo/vim-lion'
   Plug 'romainl/vim-qf'
   Plug 'romainl/vim-qlist'
@@ -33,14 +32,12 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   if has('python') || has('python3')
     Plug 'SirVer/ultisnips'
     Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-    Plug 'jceb/vim-orgmode'
   endif
   call plug#end()
 else
   syntax enable
   filetype plugin indent on
 endif
-" syntax off
 runtime macros/matchit.vim
 " }}}
 
