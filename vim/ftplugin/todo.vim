@@ -22,7 +22,6 @@ function! s:flatten(list)
 endfunction
 
 function! s:taskChange() abort
-
   if match(getline('.'),'^\s*[-+*]\s\+') < 0
     return
   endif
@@ -117,7 +116,9 @@ function! s:updateBoxes() abort
           let done += 1
         endif
       endfor
-      call setline(linenr, substitute(getline(linenr),  '\[\d*/\d*\]', '[' . done . '/' . total . ']', ''))
+      if match(getline(linenr), '\[' . done . '/' . total . '\]') < 0
+        call setline(linenr, substitute(getline(linenr),  '\[\d*/\d*\]', '[' . done . '/' . total . ']', ''))
+      endif
     endif
   endfor
 endfunction
