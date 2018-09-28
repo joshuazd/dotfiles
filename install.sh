@@ -3,7 +3,9 @@
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
-./tools.sh
+if [[ $(uname -s) != CYGWIN* ]]; then
+    ./tools.sh
+fi
 
 if [ -d $HOME/.vim ]; then
     echo "Backing up exising vim config to .vim.old"
@@ -75,9 +77,15 @@ fi
 if [ -f /usr/local/share/zsh/site-functions/async ]; then
     rm /usr/local/share/zsh/site-functions/async
 fi
-sudo ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup
-sudo ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup
-sudo ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async
+if [[ $(uname -s) == CYGWIN* ]]; then
+    ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup 
+    ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup 
+    ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async                         
+else
+    sudo ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup
+    sudo ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup
+    sudo ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async
+fi
 
 vim +PlugInstall +helptags\ ALL +qall
 
