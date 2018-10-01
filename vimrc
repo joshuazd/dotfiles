@@ -325,11 +325,6 @@ let g:netrw_browse_split = 4
 let g:netrw_winsize = 15
 " markdown
 let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql']
-" org-mode
-let g:org_indent = 1
-let g:org_todo_keywords=[['ASSIGNED(a)', 'DEVELOP(v)', 'TESTING(q)', '|', 'READY(r)', 'COMPLETE(c)'],
-      \['TODO(t)', '|', 'DONE(d)']]
-let g:org_agenda_files = ['~/org/*.org', '~/Dropbox/org/*.org']
 " }}}
 
 "===============================================
@@ -371,6 +366,7 @@ endif
 " including this here to avoid screwing up command mode
 function! CCR() abort
   let cmdline = getcmdline()
+  if getcmdtype() !=? ':' | return "\<CR>" | endif
   if cmdline =~? '\v\C^(ls|files|buffers)' | return "\<CR>:b "
   elseif cmdline =~? '\v\C^(dli|il)' && len(split(cmdline,' ')) > 1 | return "\<CR>:".cmdline[0].'j  '.split(cmdline,' ')[1]."\<S-Left>\<Left>"
   elseif cmdline =~? '\v\C^(cli|lli)'      | return "\<CR>:sil ".repeat(cmdline[0], 2)."\<Space>"
