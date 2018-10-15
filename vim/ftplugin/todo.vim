@@ -2,9 +2,6 @@ setlocal comments=n:-,n::
 setlocal formatoptions+=or
 setlocal shiftwidth=2
 setlocal softtabstop=2
-" if !exists('g:todo_words')
-"   let g:todo_words = [['TODO', '|', 'DONE']]
-" endif
 let g:todo_words = get(g:, 'todo_words', [['TODO', '|', 'DONE']])
 let g:todo_update_boxes = get(g:, 'todo_update_boxes', 1)
 

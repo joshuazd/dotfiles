@@ -20,8 +20,11 @@ endif
 
 syn cluster todoWords contains=todoTODOwords,todoDONEwords
 
+syn match todoDate "<\w\{3}\s\w\{3}\s\d\{1,2}>" contained
+syn match todoDate "<\d\{4}[\./-]\d\{1,2}[\./-]\d\{1,2}>" contained
+
 syn match todoListMarker "[-+*]" contained
-syn match todoList "[-+*]\s\+.*" contains=todoListMarker,@todoWords
+syn match todoList "[-+*]\s\+.*" contains=todoListMarker,@todoWords,todoDate
 
 syn match todoHeaderMarker ":" conceal contained
 syn match todoHeader "^.\S.*"
@@ -32,6 +35,7 @@ hi def link todoDONEwords Question
 hi def link todoListMarker Keyword
 hi def link todoHeader String
 hi def link todoSubHeader Constant
+hi def link todoDate PreProc
 
 let b:current_syntax = 'todo'
 
