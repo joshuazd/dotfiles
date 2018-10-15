@@ -13,8 +13,7 @@ filetype plugin indent on
 syntax enable
 colorscheme nier
 set termguicolors
-nnoremap L $
-nnoremap H ^
+nnoremap ' `
 nnoremap Y y$
 nnoremap gb :ls<CR>:b<space>
 inoremap jk <esc>
