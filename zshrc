@@ -2,8 +2,8 @@ case "$TERM" in
     xterm*|*rxvt*) TERM=xterm-256color
 esac
 
-# export LS_COLORS='di=00;94:ex=00;92:tw=00;94:ow=00;94:ln=00;36:*.mp4=00;35:*.tar=00,31:*.tgz=00;31:*.zip=00;31:*.rar=00;31:*.jar=00;31:*.car=00;31:*.war=00;31:*.gz=00;31:*.bz2=00;31:*.png=00;35:*.jpg=00;35:*.jpeg=00;35:*.bmp=00;35:*.gif=00;35:*.vim=00;33:*vimrc=00;33:*.py=00;95:*.xml=00;91:*.md=00;97'
-export LS_COLORS='di=00;34:ex=00;32:tw=00;34:ow=00;34:ln=00;36:*.mp4=00;35:*.tar=00,31:*.tgz=00;31:*.zip=00;31:*.rar=00;31:*.jar=00;31:*.car=00;31:*.war=00;31:*.gz=00;31:*.bz2=00;31:*.png=00;35:*.jpg=00;35:*.jpeg=00;35:*.bmp=00;35:*.gif=00;35:*.vim=00;33:*vimrc=00;33:*.py=00;35:*.xml=00;31:*.md=01;30'
+export LS_COLORS='di=00;94:ex=00;92:tw=00;94:ow=00;94:ln=00;36:*.mp4=00;35:*.tar=00,31:*.tgz=00;31:*.zip=00;31:*.rar=00;31:*.jar=00;31:*.car=00;31:*.war=00;31:*.gz=00;31:*.bz2=00;31:*.png=00;35:*.jpg=00;35:*.jpeg=00;35:*.bmp=00;35:*.gif=00;35:*.vim=00;33:*vimrc=00;33:*.py=00;95:*.xml=00;91:*.md=00;97'
+# export LS_COLORS='di=00;34:ex=00;32:tw=00;34:ow=00;34:ln=00;36:*.mp4=00;35:*.tar=00,31:*.tgz=00;31:*.zip=00;31:*.rar=00;31:*.jar=00;31:*.car=00;31:*.war=00;31:*.gz=00;31:*.bz2=00;31:*.png=00;35:*.jpg=00;35:*.jpeg=00;35:*.bmp=00;35:*.gif=00;35:*.vim=00;33:*vimrc=00;33:*.py=00;35:*.xml=00;31:*.md=01;30'
 export WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
 export LANG=en_US.UTF-8
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
@@ -18,11 +18,11 @@ promptinit
 # prompt pure
 prompt nier
 
-typeset -A ZSH_HIGHLIGHT_STYLES
-ZSH_HIGHLIGHT_STYLES[function]='none'
-ZSH_HIGHLIGHT_STYLES[command]='none'
-ZSH_HIGHLIGHT_STYLES[alias]='none'
-ZSH_HIGHLIGHT_STYLES[builtin]='none'
+# typeset -A ZSH_HIGHLIGHT_STYLES
+# ZSH_HIGHLIGHT_STYLES[function]='none'
+# ZSH_HIGHLIGHT_STYLES[command]='none'
+# ZSH_HIGHLIGHT_STYLES[alias]='none'
+# ZSH_HIGHLIGHT_STYLES[builtin]='none'
 
 # Options
 setopt autocd
@@ -179,59 +179,59 @@ setopt hist_ignore_all_dups
 setopt hist_ignore_space
 setopt hist_reduce_blanks
 
-# _gen_fzf_default_opts() {
-
-# local color00='#262626'
-# local color01='#ff5f5f'
-# local color02='#87d787'
-# local color03='#ffd787'
-# local color04='#6182b8'
-# local color05='#c792ea'
-# local color06='#89ddff'
-# local color07='#bbbbbb'
-# local color08='#3a3a3a'
-# local color09='#d75f5f'
-# local color0A='#87af87'
-# local color0B='#ffaf5f'
-# local color0C='#82aaff'
-# local color0D='#945eb8'
-# local color0E='#39adb5'
-# local color0F='#ffffff'
-
-# export FZF_DEFAULT_OPTS="
-#   --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
-#   --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
-#   --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
-# "
-
-# }
-
-
 _gen_fzf_default_opts() {
 
-local color00='#45403a'
-local color01='#bf4243'
-local color02='#525643'
-local color03='#5b5143'
-local color04='#4c5361'
-local color05='#614c61'
-local color06='#465953'
-local color07='#999483'
-local color08='#777467'
+local color00='#262626'
+local color01='#ff5f5f'
+local color02='#87d787'
+local color03='#ffd787'
+local color04='#6182b8'
+local color05='#c792ea'
+local color06='#89ddff'
+local color07='#bbbbbb'
+local color08='#3a3a3a'
 local color09='#d75f5f'
-local color0A='#81895d'
-local color0B='#957f5f'
-local color0C='#7382a0'
-local color0D='#9c739c'
-local color0E='#5f8c7d'
+local color0A='#87af87'
+local color0B='#ffaf5f'
+local color0C='#82aaff'
+local color0D='#945eb8'
+local color0E='#39adb5'
 local color0F='#ffffff'
 
 export FZF_DEFAULT_OPTS="
-  --color=bg+:$color07,bg:#b4af9a,spinner:$color0C,hl:$color01
-  --color=fg:$color08,header:$color0D,info:$color0A,pointer:$color04
-  --color=marker:$color04,fg+:$color00,prompt:$color04,hl+:$color01
+  --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
+  --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
+  --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
 "
 
 }
+
+
+# _gen_fzf_default_opts() {
+
+# local color00='#45403a'
+# local color01='#bf4243'
+# local color02='#525643'
+# local color03='#5b5143'
+# local color04='#4c5361'
+# local color05='#614c61'
+# local color06='#465953'
+# local color07='#999483'
+# local color08='#777467'
+# local color09='#d75f5f'
+# local color0A='#81895d'
+# local color0B='#957f5f'
+# local color0C='#7382a0'
+# local color0D='#9c739c'
+# local color0E='#5f8c7d'
+# local color0F='#ffffff'
+
+# export FZF_DEFAULT_OPTS="
+#   --color=bg+:$color07,bg:#b4af9a,spinner:$color0C,hl:$color01
+#   --color=fg:$color08,header:$color0D,info:$color0A,pointer:$color04
+#   --color=marker:$color04,fg+:$color00,prompt:$color04,hl+:$color01
+# "
+
+# }
 
 _gen_fzf_default_opts
