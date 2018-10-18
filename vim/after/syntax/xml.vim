@@ -16,7 +16,7 @@ syn keyword xmlArgs       args                                                  
 syn keyword xmlEnrich     enrich xslt schema datamapper fastxslt                                    contained
 syn match   xmlEnrich     '\<value-of\>'                                                    display contained
 syn keyword xmlSqlTag     sql script                                                                contained
-" syn keyword xmlInSequence inSequence outSequence faultSequence                                      contained
+syn keyword xmlInSequence inSequence outSequence faultSequence                                      contained
 syn match   xsltStatement '\<for-each\>'                                                    display contained
 
 syn match    xmlPropName '\%(name=\)\@5<="[^"]*"' contained
@@ -41,7 +41,7 @@ syn cluster xmlTagHook       add=xmlConnection,xmlParam,xmlFunction,xmlArgs,xmlE
 syn cluster xmlTagHook       add=xmlSqlTag,xmlSend,xmlLog,xmlLogParam,xmlInSequence
 syn cluster xmlTagHook       add=xsltStatement
 syn cluster xmlNamespaceHook add=xmlNs,xmlXsl
-" syn cluster xmlAttribHook    add=xmlExpression,xmlValue,xmlSelect,xmlName
+syn cluster xmlAttribHook    add=xmlExpression,xmlValue,xmlSelect,xmlName
 syn cluster xmlStringHook    add=xmlFile
 
 let s:cur_syntax = b:current_syntax
@@ -62,9 +62,9 @@ hi def link xmlNs           Identifier
 function! XmlAfterHighlight() abort
   highlight xmlXsl        ctermfg=1   guifg=#ff5370
 
-  " highlight xmlExpression ctermfg=203 guifg=#ff5f5f cterm=italic gui=italic
-  " highlight xmlSelect     ctermfg=222 guifg=#ffd787 cterm=italic gui=italic
-  " highlight xmlName       ctermfg=152 guifg=#afd7d7
+  highlight xmlExpression ctermfg=203 guifg=#ff5f5f cterm=italic gui=italic
+  highlight xmlSelect     ctermfg=222 guifg=#ffd787 cterm=italic gui=italic
+  highlight xmlName       ctermfg=152 guifg=#afd7d7
   highlight xmlLog        ctermfg=245 guifg=#8a8a8a
   highlight xmlSqlTag     ctermfg=209 guifg=#ff875f
   highlight xmlLogParam   ctermfg=243 guifg=#767676
@@ -74,7 +74,7 @@ augroup xmlAfterHighlight
   autocmd!
   autocmd ColorScheme material call XmlAfterHighlight()
 augroup END
-" call XmlAfterHighlight()
+call XmlAfterHighlight()
 
 hi def link xmlArgs         Primitive
 hi def link xmlConnection   Storage
@@ -95,5 +95,5 @@ hi def link xmlDb           StorageClass
 hi def link xmlFilter       Keyword
 hi def link xsltStatement   Statement
 hi def link xmlPropString   xmlString
-" hi def link xmlPropName Identifier
-hi def link xmlPropName Todo
+hi def link xmlPropName Identifier
+" hi def link xmlPropName Todo
