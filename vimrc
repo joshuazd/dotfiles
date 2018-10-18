@@ -117,7 +117,7 @@ if has('termguicolors')
   set termguicolors                           " use gui colors in terminal vim
 endif
 try
-  colorscheme nier                            " material color scheme
+  colorscheme material                        " material color scheme
 catch
 endtry
 if executable('rg')                           " use ripgrep when available
