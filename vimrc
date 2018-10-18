@@ -17,6 +17,7 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   Plug 'tpope/vim-obsession'
   Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-endwise'
   Plug 'tommcdo/vim-lion'
   Plug 'romainl/vim-qf'
   Plug 'romainl/vim-qlist'

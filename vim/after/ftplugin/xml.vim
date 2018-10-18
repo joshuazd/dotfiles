@@ -34,3 +34,7 @@ augroup XML
     endif
     autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml
 augroup END
+let b:endwise_addition = '\="</".submatch(0)[1:stridx(submatch(0)," ")-1].">"' |
+let b:endwise_words = '' |
+let b:endwise_pattern = '<[^ /!?"''<>][^>]*[^/>]>' |
+let b:endwise_syngroups = 'xmlTag,xmlEndTag,xmlTagPunct'
