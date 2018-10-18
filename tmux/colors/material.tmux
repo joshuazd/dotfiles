@@ -34,6 +34,9 @@ setw -g window-status-current-bg colour167
 
 setw -g window-status-fg colour248
 setw -g window-status-bg colour236
+setw -g window-status-format ' #I:#W#F '
+setw -g window-status-current-format ' #I:#W#F '
+setw -g window-status-separator ''
 
 setw -g window-status-bell-attr bold
 setw -g window-status-bell-fg colour255
