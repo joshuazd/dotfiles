@@ -23,14 +23,14 @@ while read -r line; do
    [ "$num" -le "9" ] && num="$num "
 
    # Change color and add * if active
-   if [ "$active" -eq "1" ]
-   then
-      actives+=("*")
-      nums+=("$GREEN$num$RESTORE")
-   else
+   # if [ "$active" -eq "1" ]
+   # then
+   #    actives+=("*")
+   #    nums+=("$GREEN$num$RESTORE")
+   # else
       actives+=(" ")
       nums+=("$num")
-   fi
+   # fi
 
    # Create output line
    out=$(echo -e "$name\t$dir_name")
@@ -60,7 +60,8 @@ do
 done
 
 # Run fzf and check result
-target=$(echo "$windows" | fzf-tmux +m --reverse --ansi)
+# target=$(echo "$windows" | fzf-tmux +m --reverse --ansi)
+target=$(echo "$windows" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS" fzf-tmux +m)
 res=$?
 [ "$res" -eq "130" ] && exit 0
 [ "$res" -eq "0" ] || exit $res
