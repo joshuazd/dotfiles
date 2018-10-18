@@ -15,8 +15,8 @@ source $ZSH_CUSTOM/mvncolor.sh
 # setup prompt
 autoload -Uz promptinit
 promptinit
-# prompt pure
-prompt nier
+prompt pure
+# prompt nier
 
 # typeset -A ZSH_HIGHLIGHT_STYLES
 # ZSH_HIGHLIGHT_STYLES[function]='none'
