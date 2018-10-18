@@ -23,19 +23,27 @@ syn cluster todoWords contains=todoTODOwords,todoDONEwords
 syn match todoDate "<\w\{3}\s\w\{3}\s\d\{1,2}>" contained
 syn match todoDate "<\d\{4}[\./-]\d\{1,2}[\./-]\d\{1,2}>" contained
 
+syn match todoBox "\s*\[\d*\/\d*\]" contained
+
 syn match todoListMarker "[-+*]" contained
-syn match todoList "[-+*]\s\+.*" contains=todoListMarker,@todoWords,todoDate
+syn match todoList "[-+*]\s\+.*" contains=todoListMarker,@todoWords,todoDate,todoBox
 
 syn match todoHeaderMarker ":" conceal contained
-syn match todoHeader "^.\S.*"
-syn match todoSubHeader "\s\+\zs:.*" contains=todoHeaderMarker
+syn match todoHeader "^.\S.*" contains=todoBox
+syn match todoSubHeader "\s\+\zs:.*" contains=todoHeaderMarker,todoBox
 
 hi def link todoTODOwords Todo
 hi def link todoDONEwords Question
 hi def link todoListMarker Keyword
-hi def link todoHeader String
+hi def link todoHeader Normal
+hi todoHeader cterm=reverse gui=reverse
 hi def link todoSubHeader Constant
 hi def link todoDate PreProc
+hi def link todoBox Statement
+augroup todo_syntax
+  autocmd!
+  autocmd ColorScheme * hi todoHeader cterm=reverse gui=reverse
+augroup END
 
 let b:current_syntax = 'todo'
 
