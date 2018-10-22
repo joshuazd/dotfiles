@@ -6,7 +6,7 @@
 let vimdir = '~/.vim'
 if has('win32')
   let vimdir = '~/dotfiles/vim'
-  set rtp+=~/dotfiles/vim
+  set rtp^=~/dotfiles/vim
 endif
 
 if !empty(glob(vimdir . '/autoload/plug.vim'))
