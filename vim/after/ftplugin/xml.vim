@@ -32,7 +32,9 @@ augroup XML
     if executable('xmllint')
       autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
     endif
-    autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml
+    if exists(':UltiSnipsAddFiletypes')
+      autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml 
+    endif
 augroup END
 let b:endwise_addition = '\="</".submatch(0)[1:stridx(submatch(0)," ")-1].">"' |
 let b:endwise_words = '' |
