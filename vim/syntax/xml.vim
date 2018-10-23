@@ -84,7 +84,7 @@ syn match   xmlEqual +=+ display contained
 syn match   xmlAttrib
     \ "\(\s\|^\)\<[a-zA-Z:_][-.0-9a-zA-Z:_]*\>\%(\s\|$\|=\)"
     \ contained
-    \ contains=xmlAttribPunct,@xmlAttribHook
+    \ contains=xmlAttribPunct,@xmlAttribHook,xmlEqual
     \ display
 
 
@@ -371,8 +371,8 @@ hi def link xmlCdataEnd		xmlQuote
 hi def link xmlDocTypeDecl	Function
 hi def link xmlDocTypeKeyword	Statement
 hi def link xmlInlineDTD	Function
-" hi def link xmlQuote            StringDelimiter
-hi def link xmlQuote            String
+hi def link xmlQuote            StringDelimiter
+" hi def link xmlQuote            String
 
 function! XmlHighlight() abort
   highlight xmlAttrib ctermfg=245 guifg=#8a8a8a
@@ -383,7 +383,7 @@ augroup xmlHighlight
   autocmd!
   autocmd ColorScheme material call XmlHighlight()
 augroup END
-" call XmlHighlight()
+call XmlHighlight()
 
 let b:current_syntax = 'xml'
 
