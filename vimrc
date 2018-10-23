@@ -148,7 +148,6 @@ endif
 "              KEYBINDINGS
 "===============================================
 " {{{
-let maplocalleader = ','
 " map Y behave like D and C
 nnoremap Y y$
 
@@ -166,7 +165,7 @@ nnoremap gk k
 nnoremap ' `
 
 " edit embedded scripts
-xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>s
+xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 " redraw
 nnoremap <C-w>a :redraw!<CR>
 " select column
@@ -269,17 +268,13 @@ augroup EditVim
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
-
-command! -range=% FormatJSON <line1>,<line2>!python2 -c
-      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
-
 command! -range=% AE <line1>,<line2>yank a|silent! call functions#AnsibleEdit()
 command! AC call functions#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
-
 command! Focus call functions#Focus()
-
 command! -nargs=1 -complete=color Theme colo <args>|!theme <args>
+command! -range=% FormatJSON <line1>,<line2>!python2 -c
+      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
 
 " }}}
 
