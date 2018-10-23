@@ -44,9 +44,10 @@ function! s:taskChange() abort
   if g:todo_update_boxes
     call s:updateBoxes()
   endif
+  silent! call repeat#set("\<Plug>(TodotaskChange)", v:count1)
 endfunction
 
-function! s:taskSelect() abort
+function! s:taskSelect(count) abort
   let flat_list = s:flatten(g:todo_words)
   let maxl = len(flat_list[0])
   for word in flat_list
@@ -78,15 +79,18 @@ function! s:taskSelect() abort
   bwipe
   if index(keys(tsel),char) >= 0
     let n_task = tsel[char]
-    if match(getline('.'),'^\s*[-+*]\s\+' . join(flat_list, '\|') . '\s') < 0
-      call setline(line('.'), substitute(getline('.'), '^\s*[-+*]\s\+\zs', n_task . ' ', ''))
-    else
-      call setline(line('.'), substitute(getline('.'), '^\s*[-+*]\s\+\zs\w*', n_task, ''))
-    endif
+    for i in range(a:count)
+      if match(getline(line('.')+i),'^\s*[-+*]\s\+' . join(flat_list, '\|') . '\s') < 0
+        call setline(line('.')+i, substitute(getline(line('.')+i), '^\s*[-+*]\s\+\zs', n_task . ' ', ''))
+      else
+        call setline(line('.')+i, substitute(getline(line('.')+i), '^\s*[-+*]\s\+\zs\w*', n_task, ''))
+      endif
+    endfor
     if g:todo_update_boxes
       call s:updateBoxes()
     endif
   endif
+  silent! call repeat#set("\<Plug>(TodotaskSelect)", a:count)
 endfunction
 
 function! s:updateBoxes() abort
@@ -118,11 +122,12 @@ function! s:updateBoxes() abort
       endif
     endif
   endfor
+  silent! call repeat#set("\<Plug>(TodoupdateBoxes)", -1)
 endfunction
 
 nnoremap <silent> <buffer> <Plug>(TodotaskChange) :call <SID>taskChange()<CR>
-nnoremap <silent> <buffer> <Plug>(TodotaskSelect) :call <SID>taskSelect()<CR>
-nnoremap <silent> <buffer> <Plug>(TodoupdateBoxes) :call <SID>updateBoxes()<CR>
+nnoremap <silent> <buffer> <Plug>(TodotaskSelect) :<C-u>call <SID>taskSelect(v:count1)<CR>
+nnoremap <silent> <buffer> <Plug>(TodoupdateBoxes) :<C-u>call <SID>updateBoxes()<CR>
 nmap <buffer> ,t <Plug>(TodotaskChange)
 nmap <buffer> ,ct <Plug>(TodotaskSelect)
 nmap <buffer> ,/ <Plug>(TodoupdateBoxes)
