@@ -136,6 +136,15 @@ snippet header "header" b
 <header name="${1:name}" scope="transport" value="${2:value}" />
 endsnippet
 
+snippet iter "iterate" b
+<iterate continueParent="true" expression="${1:xpath}" sequential="${2:false}">
+	<target>
+		<sequence>$0
+		</sequence>
+	</target>
+</iterate>
+endsnippet
+
 snippet log "log" b
 <log level="custom">$1
 </log>
