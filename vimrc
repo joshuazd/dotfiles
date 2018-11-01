@@ -11,6 +11,11 @@ endif
 
 if !empty(glob(vimdir . '/autoload/plug.vim'))
   call plug#begin(vimdir . '/bundle/')
+  Plug 'Shougo/echodoc.vim'
+  Plug 'autozimu/LanguageClient-neovim', {
+        \ 'branch': 'next',
+        \ 'do': 'bash install.sh',
+        \ }
   Plug 'lifepillar/vim-mucomplete'
   Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
@@ -318,7 +323,13 @@ let g:netrw_liststyle = 0
 let g:netrw_browse_split = 4
 let g:netrw_winsize = 15
 " markdown
-let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql']
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql', 'java']
+" LSP
+let g:LanguageClient_serverCommands = {
+      \ 'java': ['/home/vagrant/dotfiles/bin/java-language-server'],
+      \ }
+" echodoc
+let g:echodoc#enable_at_startup = 1
 " }}}
 
 "===============================================
