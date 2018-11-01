@@ -298,13 +298,13 @@ public `!p snip.rv = snip.basename or "untitled"`(${1:}) {
 endsnippet
 
 snippet cn "constructor, \w fields + assigments" b
-	`!p
+`!p
 indent = "\t"
 if vim.eval("&et") == "1":
 	indent = int(vim.eval("&sw")) * " "
 args = getArgs(t[1])
-for i in args:
-	snip.rv += "\n" + indent + "private " + i[0] + " " + i[1]+ ";"
+str_args = ("private " + i[0] + " " + i[1] + ";" for i in args)
+snip.rv = ("\n" + indent).join(str_args)
 if len(args) > 0:
 	snip.rv += "\n"`
 public `!p snip.rv = snip.basename or "unknown"`($1) {`!p
