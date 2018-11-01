@@ -235,11 +235,8 @@ nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
 
 " auto expansion
 inoremap {<CR> {<CR>}<C-o>O
-inoremap (<CR> (<CR>)<C-o>O
-inoremap [<CR> [<CR>]<C-o>O
-inoremap {; {<CR>};<C-o>O
-inoremap (; (<CR>);<C-o>O
-inoremap [; [<CR>];<C-o>O
+" inoremap (<CR> (<CR>)<C-o>O
+" inoremap [<CR> [<CR>]<C-o>O
 
 " select function
 onoremap am :<C-u>normal [mV]M<CR>
@@ -294,13 +291,15 @@ let g:mucomplete#no_popup_mappings      = 1
 let g:mucomplete#always_use_completeopt = 1
 let g:mucomplete#chains                 = {
       \ 'default' : ['file', 'omni', 'dict', 'uspl', 'ulti', 'c-n', 'tags'],
+      \ 'java'    : ['omni', 'c-n', 'tags', 'ulti', 'file'],
       \ 'vim'     : ['file', 'cmd', 'ulti', 'c-n', 'tags'],
       \ 'xml'     : ['ulti', 'tags', 'c-n'],
       \ 'sql'     : ['c-n', 'ulti', 'tags']
       \ }
 let mucomplete#can_complete = { }
-if has('+lambda')
+if has('lambda')
   let mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
+  let mucomplete#can_complete.java = { 'omni' : { t -> t =~# '\m\(\k\|)\|]\)\%\(\.\)$'} }
 endif
 " jedi
 let g:jedi#auto_vim_configuration     = 0
