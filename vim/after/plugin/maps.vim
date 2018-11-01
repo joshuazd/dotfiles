@@ -58,8 +58,11 @@ if exists('did_plugin_ultisnips')
 endif
 
 if exists('g:loaded_mucomplete')
-  imap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>\<Plug>DiscretionaryEnd"
-  " imap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>\<Plug>AlwaysEnd"
+  if exists('g:loaded_endwise')
+    imap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>\<Plug>DiscretionaryEnd"
+  else
+    imap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>"
+  endif
   imap <expr> <right> pumvisible() ? "\<plug>(MUcompleteExtendFwd)" : "\<right>"
   imap <expr> <left> pumvisible() ? "\<plug>(MUcompleteExtendBwd)" : "\<left>"
 endif
