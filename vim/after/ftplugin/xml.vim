@@ -28,15 +28,15 @@ set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
 nnoremap ,f zMzr
 augroup XML
-    autocmd!
-    if executable('xmllint')
-      autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
-    endif
-    if exists(':UltiSnipsAddFiletypes')
-      autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml 
-    endif
+  autocmd!
+  if executable('xmllint')
+    autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
+  endif
+  if exists(':UltiSnipsAddFiletypes')
+    autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml 
+  endif
 augroup END
-let b:endwise_addition = '\="</".submatch(0)[1:stridx(submatch(0)," ")-1].">"' |
-let b:endwise_words = '' |
-let b:endwise_pattern = '<[^ /!?"''<>][^>]*[^/>]>' |
+let b:endwise_addition = '\="</".submatch(0)[1:stridx(submatch(0)," ")-1].">"'
+let b:endwise_words = ''
+let b:endwise_pattern = '<[^ /!?"''<>][^>]*[^/>]>'
 let b:endwise_syngroups = 'xmlTag,xmlEndTag,xmlTagPunct'
