@@ -5,40 +5,31 @@ end_of_line = lf
 insert_final_newline = true
 indent_style = space
 indent_size = 4
-tab_width = 8
 local_vimrc = .local_vimrc
 
 [*.md]
 indent_size = 2
-tab_width = 8
 
 [{*.vim,vimrc}]
 indent_size = 2
-tab_width = 8
 
 [{*.xml,*.dbs}]
 indent_size = 2
-tab_width = 4
 
 [*.java]
 indent_size = 4
-tab_width = 8
 
 [*.yml]
 indent_size = 2
-tab_width = 8
 
 [{*.js,*.dmc}]
 indent_size = 2
-tab_width = 8
 
 [*.json]
 indent_size = 2
-tab_width = 8
 
 [*.todo]
 indent_size = 2
-tab_width = 8
 
 [{COMMIT_EDITMSG}]
 spell_enabled = true
