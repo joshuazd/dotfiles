@@ -251,6 +251,19 @@ xnoremap am :<C-u>normal [mV]M<CR>
 nnoremap <silent> <expr> <C-w>f winnr('$') > 1
       \? ":let fname=\"\<C-r>\<C-f>\"\|wincmd p\<CR>:find \<C-r>=fname\<CR>\<CR>"
       \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
+
+function LC_maps()
+  if has_key(g:LanguageClient_serverCommands, &filetype)
+    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
+    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
+    nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <buffer> <silent> ga :call LanguageClient#textDocument_codeAction()<CR>
+    nnoremap <buffer> <silent> gr :call LanguageClient#textDocument_references()<CR>
+    nnoremap <buffer> <silent> gs :call LanguageClient#textDocument_documentSymbol()<CR>
+    setlocal formatexpr=LanguageClient#textDocument_rangeFormatting_sync()
+    setl signcolumn=yes
+  endif
+endfunction
 " }}}
 
 "===============================================
@@ -267,6 +280,7 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
+  autocmd FileType           *            call LC_maps()
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
