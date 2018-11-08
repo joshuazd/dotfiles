@@ -1,23 +1,25 @@
 function! decselect#Select(visual) abort
-  let l:firstline = line('.')
-  let l:curcol = col('.')
-  let l:lastline = line('.')
-  let l:w = matchstr(getline(l:firstline), '^\s*\zs\S\+\ze\s*')
-  let l:firstline -= 1
-  while l:firstline > 0 && matchstr(getline(l:firstline), '^\s*\zs' . l:w. '\ze\s\+') !=# ''
-    let l:firstline -= 1
+  let firstline = line('.')
+  let curcol = col('.')
+  let lastline = line('.')
+  let char = get(b:, 'decselect_char', '\k')
+  let word = matchstr(getline(firstline), '^\s*\zs' . char . '\+\>\ze')
+  let match = '\C^\s*\zs' . word . '\>\ze'
+  let firstline -= 1
+  while firstline > 0 && matchstr(getline(firstline), match) !=# ''
+    let firstline -= 1
   endwhile
-  let l:firstline += 1
+  let firstline += 1
   if a:visual
-    execute 'normal! ' . l:firstline . "G^\<C-v>"
+    execute 'normal! ' . firstline . "G^\<C-v>"
   else
-    execute 'normal! ' . l:firstline . 'G^V'
+    execute 'normal! ' . firstline . 'G^V'
   endif
-  call cursor(l:lastline, l:curcol)
-  let l:lastline += 1
-  while l:lastline <= line('$') && matchstr(getline(l:lastline), '^\s*\zs' . l:w . '\ze\s\+') !=# ''
-    let l:lastline += 1
+  call cursor(lastline, curcol)
+  let lastline += 1
+  while lastline <= line('$') && matchstr(getline(lastline), match) !=# ''
+    let lastline += 1
   endwhile
-  let l:lastline -= 1
-  execute 'normal! ' . l:lastline . 'G$'
+  let lastline -= 1
+  execute 'normal! ' . lastline . 'G$'
 endfunction
