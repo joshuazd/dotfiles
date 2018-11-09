@@ -26,7 +26,7 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   Plug 'tommcdo/vim-lion'
   Plug 'romainl/vim-qf'
   Plug 'romainl/vim-qlist'
-  Plug 'xtal8/traces.vim'
+  Plug 'markonm/traces.vim'
   Plug 'sgur/vim-editorconfig'
   if !has('win32')
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -39,6 +39,10 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
     Plug 'SirVer/ultisnips'
     Plug 'davidhalter/jedi-vim', { 'for': 'python' }
   endif
+  Plug vimdir . '/local-bundle/vim-decselect'
+  Plug vimdir . '/local-bundle/vim-hilinktrace'
+  Plug vimdir . '/local-bundle/vim-indentmotion'
+  Plug vimdir . '/local-bundle/vim-marks'
   call plug#end()
 else
   syntax enable
@@ -300,7 +304,6 @@ command! -range=% FormatJSON <line1>,<line2>!python2 -c
 " {{{
 " Plugin mappings are specified in the after/plugin/settings folder
 " ultisnips
-let g:UltiSnipsExpandTrigger       = "\<nop>"
 let g:UltiSnipsListSnippets        = '<C-@>'
 let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
 let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
@@ -312,13 +315,14 @@ let g:mucomplete#chains                 = {
       \ 'default' : ['file', 'omni', 'dict', 'uspl', 'ulti', 'c-n', 'tags'],
       \ 'java'    : ['omni', 'c-n', 'tags', 'ulti', 'file'],
       \ 'vim'     : ['file', 'cmd', 'ulti', 'c-n', 'tags'],
-      \ 'xml'     : ['ulti', 'tags', 'c-n'],
+      \ 'xml'     : ['omni', 'ulti', 'tags', 'c-n'],
       \ 'sql'     : ['c-n', 'ulti', 'tags']
       \ }
-let mucomplete#can_complete = { }
+let g:mucomplete#can_complete = { }
 if has('lambda')
-  let mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
-  let mucomplete#can_complete.java = { 'omni' : { t -> t =~# '\m\(\k\|)\|]\)\%\(\.\)$'} }
+  let g:mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
+  let g:mucomplete#can_complete.java    = { 'omni' : { t -> t =~# '\m\(\k\|)\|]\)\%\(\.\)$'} }
+  let g:mucomplete#can_complete.xml     = { 'omni' : { t -> t =~# '\m\(\k\k\|<\| \)$'} }
 endif
 " jedi
 let g:jedi#auto_vim_configuration     = 0
