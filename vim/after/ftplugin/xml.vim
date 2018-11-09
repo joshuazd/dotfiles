@@ -3,7 +3,7 @@ setlocal smarttab
 setlocal conceallevel=0
 setlocal foldnestmax=2
 setlocal iskeyword+=-
-inoremap <buffer> </ </<C-x><C-o><C-n><C-y>
+inoremap <buffer> <expr> / getline('.')[col('.')-2] ==# '<' ? "/\<C-x>\<C-o>\<C-n>\<C-y>" : "/"
 nnoremap <buffer> { ?<[^\/]\+><CR>
 nnoremap <buffer> } /<[^\/]\+><CR>
 nnoremap <silent> <buffer> [m ?<resource<CR>
@@ -35,8 +35,161 @@ augroup XML
   if exists(':UltiSnipsAddFiletypes')
     autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml 
   endif
+  autocmd BufEnter,BufNewFile */api/*.xml XMLns api
+  autocmd BufEnter,BufNewFile */sequences/*.xml XMLns sequence
+  autocmd BufEnter,BufNewFile */templates/*.xml XMLns template
+  autocmd BufEnter,BufNewFile */endpoints/*.xml XMLns endpoint
+  autocmd BufEnter,BufNewFile */local-entries/*.xml XMLns xsl xsl
+  autocmd BufEnter,BufNewFile */local-entries/*.xml let g:mucomplete#can_complete.xml = { 'omni' : { t -> t =~# '\m\(<\k\+:\|\s\+\k\+\)$' } }
+  autocmd BufEnter,BufNewFile */proxy-services/*.xml XMLns proxyservice
 augroup END
 let b:endwise_addition = '\="</".submatch(0)[1:stridx(submatch(0)," ")-1].">"'
 let b:endwise_words = ''
-let b:endwise_pattern = '<[^ /!?"''<>][^>]*[^/>]>'
-let b:endwise_syngroups = 'xmlTag,xmlEndTag,xmlTagPunct'
+let b:endwise_pattern = '<\%([^ /!?"''<>][^>]*\)\?[^/>]>\s*$'
+let b:endwise_syngroups = 'xmlTag,xmlTagPunct'
+let b:decselect_char = '\S'
+
+let b:xmldata_endpoint = {
+      \ 'endpoint': [
+      \ ['http', 'address'],
+      \ {'key': []}
+      \ ],
+      \ 'http': [
+      \ [],
+      \ {'method': ['get', 'post', 'put', 'delete', 'path'], 'uri-template': []}
+      \ ],
+      \ 'address': [
+      \ ['enableSec'],
+      \ {'uri': [], 'format': ['soap11', 'soap10', 'pox']}
+      \ ],
+      \ 'enableSec': [
+      \ [],
+      \ {'policy': ['UTPasswordPolicy']}
+      \ ]
+      \ }
+let b:xml_mediator_names = ['property', 'call-template', 'filter', 'payloadFactory', 'respond', 'store', 'send', 'call', 'log', 'sequence', 'enrich', 'xslt', 'script', 'class', 'header', 'dbreport', 'dblookup', 'datamapper']
+let b:xmldata_mediators = {
+      \ 'property': [
+      \ [],
+      \ {'name': [], 'value': [], 'expression': [], 'scope': ['default', 'axis2', 'transport'], 'type': ['STRING', 'BOOLEAN', 'NUMBER']}
+      \ ],
+      \ 'call-template': [
+      \ ['with-param'],
+      \ {'target': []}
+      \ ],
+      \ 'with-param': [
+      \ [],
+      \ {'name': ['message'], 'value': []}
+      \ ],
+      \ 'filter': [
+      \ ['then', 'else'],
+      \ {'xpath': [], 'source': [], 'regex': []}
+      \ ],
+      \ 'then': [
+      \ b:xml_mediator_names,
+      \ {}
+      \ ],
+      \ 'else': [
+      \ b:xml_mediator_names,
+      \ {}
+      \ ],
+      \ 'sequence': [
+      \ [],
+      \ {'key': []}
+      \ ],
+      \ 'enrich': [
+      \ ['source', 'target'],
+      \ {}
+      \ ],
+      \ 'source': [
+      \ [],
+      \ {'clone': ['false', 'true'], 'property': [], 'type': ['body', 'property']}
+      \ ],
+      \ 'target': [
+      \ [],
+      \ {'property': [], 'type': ['body', 'property']}
+      \ ],
+      \ 'payloadFactory': [
+      \ ['format', 'args'],
+      \ {'media-type': ['xml', 'json']}
+      \ ],
+      \ 'args': [
+      \ ['arg'],
+      \ {}
+      \ ],
+      \ 'arg': [
+      \ [],
+      \ {'expression': [], 'evaluator': ['xml', 'json']}
+      \ ],
+      \ 'store': [
+      \ [],
+      \ {'messageStore': []}
+      \ ],
+      \ 'log': [
+      \ ['property'],
+      \ {'level': ['custom', 'full', 'simple']}
+      \ ],
+      \ 'send': [
+      \ ['endpoint'],
+      \ {}
+      \ ],
+      \ 'call': [
+      \ ['endpoint'],
+      \ {}
+      \ ],
+      \ 'xslt': [
+      \ ['property'],
+      \ {'key': []}
+      \ ],
+      \ 'class': [
+      \ ['property'],
+      \ {'name': ['com.panera.b:xml_mediator_names.BABuilder']}
+      \ ],
+      \ 'header': [
+      \ [],
+      \ {'name': [], 'scope': ['transport'], 'value': []}
+      \ ],
+      \ 'dbreport': [
+      \ ['connection', 'statement'],
+      \ {}
+      \ ],
+      \ 'dblookup': [
+      \ ['connection', 'statement'],
+      \ {}
+      \ ],
+      \ 'connection': [
+      \ ['pool'],
+      \ {}
+      \ ],
+      \ 'pool': [
+      \ ['dsName'],
+      \ {}
+      \ ],
+      \ 'statement': [
+      \ ['sql', 'parameter', 'result'],
+      \ {}
+      \ ],
+      \ 'parameter': [
+      \ [],
+      \ {'expression': [], 'type': ['VARCHAR']}
+      \ ],
+      \ 'result': [
+      \ [],
+      \ {'name': [], 'column': []}
+      \ ],
+      \ 'script': [
+      \ [],
+      \ {'language': ['groovy', 'js']}
+      \ ],
+      \ 'datamapper': [
+      \ [],
+      \ {'config': [], 'inputSchema': [], 'inputType': ['JSON', 'XML'], 'outputSchema': [], 'outputType': ['JSON', 'XML']}
+      \ ],
+      \ 'vimxmltaginfo': {
+      \ 'property': ['/>', ''],
+      \ 'respond': ['/>', ''],
+      \ 'with-param': ['/>', ''],
+      \ 'store': ['/>', '']
+      \ }
+      \ }
+let b:xmldata_mediators = extend(b:xmldata_mediators, b:xmldata_endpoint)
