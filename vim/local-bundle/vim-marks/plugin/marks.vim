@@ -1,4 +1,18 @@
-function! Marks() abort
+" vim-marks
+" Maintainer:	joshuazd
+" Version:	0.1.0
+" Location:	plugin/marks.vim
+"
+
+if exists('g:loaded_marks')
+  finish
+endif
+let g:loaded_marks = 1
+
+let s:save_cpo = &cpo
+set cpo&vim
+
+function! s:marks() abort
   redir => message
   silent! execute 'marks'
   redir END
@@ -14,4 +28,7 @@ function! Marks() abort
   wincmd p | close
   normal! 999zh
 endfunction
-nnoremap ' :call Marks()<CR>
+nnoremap ' :call <SID>marks()<CR>
+
+let &cpo = s:save_cpo
+unlet s:save_cpo

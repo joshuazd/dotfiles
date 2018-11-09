@@ -1,3 +1,9 @@
+" vim-indentmotion
+" Maintainer:	joshuazd
+" Version:	0.1.0
+" Location:	plugin/indentmotion.vim
+"
+
 function! indentmotion#findSameIndent(count, dir, visual, operator) abort
   let l:curline = line('.')
   let l:curcol = col('.')
