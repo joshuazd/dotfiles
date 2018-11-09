@@ -63,8 +63,8 @@ if exists('g:loaded_mucomplete')
   else
     imap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>"
   endif
-  imap <expr> <right> pumvisible() ? "\<plug>(MUcompleteExtendFwd)" : "\<right>"
-  imap <expr> <left> pumvisible() ? "\<plug>(MUcompleteExtendBwd)" : "\<left>"
+  imap <expr> <right> mucomplete#extend_fwd("\<right>")
+  imap <expr> <left> mucomplete#extend_bwd("\<left>")
 endif
 
 if exists('g:loaded_qlist') && g:loaded_qlist == 1
