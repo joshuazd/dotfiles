@@ -12,10 +12,6 @@ endif
 if !empty(glob(vimdir . '/autoload/plug.vim'))
   call plug#begin(vimdir . '/bundle/')
   Plug 'Shougo/echodoc.vim'
-  Plug 'autozimu/LanguageClient-neovim', {
-        \ 'branch': 'next',
-        \ 'do': 'bash install.sh',
-        \ }
   Plug 'lifepillar/vim-mucomplete'
   Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
@@ -31,6 +27,15 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   if !has('win32')
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
+    Plug 'autozimu/LanguageClient-neovim', {
+          \ 'branch': 'next',
+          \ 'do': 'bash install.sh',
+          \ }
+  else
+    Plug 'autozimu/LanguageClient-neovim', {
+          \ 'branch': 'next',
+          \ 'do': 'powershell -executionpolicy bypass -File install.ps1',
+          \ }
   endif
   if executable('ctags')
     Plug 'ludovicchabant/vim-gutentags'
