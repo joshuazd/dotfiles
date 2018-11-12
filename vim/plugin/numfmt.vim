@@ -1,4 +1,4 @@
-function! ConvertNum(num) abort
+function! s:convertNum(num) abort
   if a:num !~? '.\{-}\(\d\+,\?\)\{-1,}\d\+.\{-}'
     return
   endif
@@ -12,7 +12,7 @@ function! ConvertNum(num) abort
   endif
   let @n = substitute(a:num, '.\{-}\zs\(\d\+,\?\)\+\d\+\ze.\{-}', num, '')
 endfunction
-nnoremap <Plug>(NumFmt) :<C-u>let isk=&l:isk\|setl isk+=,<CR>mn"nyiw:call ConvertNum('<C-r>n')<CR>viw"np`n:<C-u>setl isk=<C-r>=isk<CR>\|silent! call repeat#set("\<lt>Plug>(NumFmt)", v:count)<CR>
-xnoremap <Plug>(NumFmt) mn"ny:call ConvertNum('<C-r>n')<CR>gv"np`ngv
+nnoremap <Plug>(NumFmt) :<C-u>let isk=&l:isk\|setl isk+=,<CR>mn"nyiw:call <SID>convertNum('<C-r>n')<CR>viw"np`n:<C-u>setl isk=<C-r>=isk<CR>\|silent! call repeat#set("\<lt>Plug>(NumFmt)", v:count)<CR>
+xnoremap <Plug>(NumFmt) mn"ny:call <SID>convertNum('<C-r>n')<CR>gv"np`ngv
 nmap ,, <Plug>(NumFmt)
 xmap ,, <Plug>(NumFmt)
