@@ -60,23 +60,23 @@ ${1:private} ${2:String} ${3:`!p snip.rv = varName(t[2])`};
 endsnippet
 
 snippet fg "field with getter" b
-${1:private} ${2:String} ${3:`!p snip.rv = varName(t[2])`};
+${1:private} ${2:String} ${3:`!p snip.rv = varName(t[2])`};$0
 
 public void set`!p snip.rv = camel(t[3])`(`!p snip.rv = t[2]` `!p snip.rv = t[3]`) {
 	this.`!p snip.rv = t[3]` = `!p snip.rv = t[3]`;
-}$0
+}
 endsnippet
 
 snippet fs "field with setter" b
-${1:private} ${2:String} ${3:`!p snip.rv = varName(t[2])`};
+${1:private} ${2:String} ${3:`!p snip.rv = varName(t[2])`};$0
 
 public `!p snip.rv = t[2]` get`!p snip.rv = camel(t[3])`() {
 	return `!p snip.rv = t[3]`;
-}$0
+}
 endsnippet
 
 snippet fgs "field with getter and setter" b
-${1:private} ${2:String} ${3:`!p snip.rv = varName(t[2])`};
+${1:private} ${2:String} ${3:`!p snip.rv = varName(t[2])`};$0
 
 public void set`!p snip.rv = camel(t[3]).split()[0]`(`!p snip.rv = t[2]` `!p snip.rv = t[3].split()[0]`) {
 	this.`!p snip.rv = t[3].split()[0]` = `!p snip.rv = t[3].split()[0]`;
@@ -84,7 +84,7 @@ public void set`!p snip.rv = camel(t[3]).split()[0]`(`!p snip.rv = t[2]` `!p sni
 
 public `!p snip.rv = t[2]` get`!p snip.rv = camel(t[3]).split()[0]`() {
 	return `!p snip.rv = t[3].split()[0]`;
-}$0
+}
 endsnippet
 
 snippet ab "abstract" b
@@ -373,8 +373,7 @@ indent = "\t"
 if vim.eval("&et") == "1":
 	indent = int(vim.eval("&sw")) * " "
 for i in getArgs(t[4]):
-	snip.rv += "\n" + indent + " * @param " + i[1] + " usage..."`
- *`!p
+	snip.rv += "\n" + indent + " * @param " + i[1] + " usage..."``!p
 if "throws" in t[5]:
 	snip.rv = "\n" + indent + " * @throws " + t[6]
 else:
