@@ -63,7 +63,7 @@ function! functions#MyFoldText() abort
     endif
   endif
   let n = v:foldend - v:foldstart + 1
-  let info = ' ' . n . ' lines  + ---'
+  let info = ' ' . n . ' lines  + ───'
   let filltext = '                                             '
   let filltext .= filltext
   let filltext .= filltext
@@ -71,21 +71,19 @@ function! functions#MyFoldText() abort
   let sub .= ' ' . filltext
   let num_w = getwinvar(0, '&number' ) * getwinvar( 0, '&numberwidth')
   let fold_w = getwinvar(0, '&foldcolumn')
-  let sub = strpart(sub, 0, winwidth(0) - strlen(info) - num_w - fold_w)
+  let sub = strpart(sub, 0, winwidth(0) - strchars(info) - num_w - fold_w)
   return sub . info
 endfunction
 
-function! functions#PutOp(type, ...) abort
-  let l:mode = 'v'
-  if a:type ==? 'line'
-    let l:mode = 'V'
-  elseif a:type ==? 'block'
-    let l:mode = ''
+function! functions#PutOperator(...) abort
+  if !a:0
+    return ":set opfunc=functions#PutOperator\<cr>\"" . v:register . 'g@'
+  else
+    let visual = get({'line': 'V', 'block': "\<c-v>"}, a:1, 'v')
+    let [rv, rt] = [getreg(v:register), getregtype(v:register)]
+    execute 'normal! g`[' . visual . 'g`]"' . v:register . 'p'
+    call setreg(v:register, rv, rt)
   endif
-  execute 'normal! g`[' . l:mode . 'g`]p'
-  let @+=@0
-  let @"=@0
-  let @*=@0
 endfunction
 
 function! functions#Focus() abort
@@ -109,43 +107,22 @@ function! functions#Focus() abort
   endif
 endfunction
 
-function! functions#HighlightComments(...) abort
-  let c = split(&commentstring, '%s')
-  let escape_chars = '*'
-  let multiline = 0
-  if len(c) == 1
-    " Put this here so single-line comments don't override strings
-    " This isn't perfect.  Vimscript comments with a double quote don't work,
-    " for example.  It's not ideal, but I don't have a better way to handle
-    " it.
-    execute 'syntax match ' . &ft . 'Comment +' . escape(c[0], escape_chars) . '.*+'
+function! functions#LC_maps() abort
+  if has_key(g:LanguageClient_serverCommands, &filetype)
+    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
+    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
+    nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <buffer> <silent> ga :call LanguageClient#textDocument_codeAction()<CR>
+    nnoremap <buffer> <silent> gr :call LanguageClient#textDocument_references()<CR>
+    nnoremap <buffer> <silent> gs :call LanguageClient#textDocument_documentSymbol()<CR>
+    setlocal formatexpr=LanguageClient#textDocument_rangeFormatting_sync()
+    setl signcolumn=yes
   endif
-  execute 'syntax region ' . &ft . 'String start=+"+ end=+"+ skip=+\\"+ oneline'
-  if &ft ==? 'vim' || &ft ==? 'python' || &ft ==? 'tmux' || &ft =~? 'sh'
-    execute 'syntax region ' . &ft . 'String start=+''+ end=+''+ skip=+\\''+ oneline'
-  endif
-  if len(c) == 2
-    " Multiline comments override everything
-    execute 'syntax region ' . &ft . 'Comment start=+' . escape(c[0], escape_chars) . '+ end=+' . escape(c[1], escape_chars) . '+'
-    let multiline = 1
-  endif
-  " Lets us pass in other valid commentstrings for languages with multiple
-  " comment styles (e.g. java)
-  if a:0
-    for comment in a:000
-      let c = split(comment, '%s')
-      if len(c) == 1
-        execute 'syntax match ' . &ft . 'Comment +' . escape(c[0], escape_chars) . '.*+'
-      elseif len(c) == 2
-        execute 'syntax region ' . &ft . 'Comment start=+' . escape(c[0], escape_chars) . '+ end=+' . escape(c[1], escape_chars) . '+'
-        let multiline = 1
-      endif
-    endfor
-  endif
+endfunction
 
-  execute 'hi def link ' . &ft . 'String String'
-  execute 'hi def link ' . &ft . 'Comment Comment'
-  if multiline
-    execute 'syntax sync ccomment ' . &ft . 'Comment'
-  endif
+function! functions#findFuncDefs() abort
+  let g:findfunc = {'vim'   : ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
+        \'xml'   : ['^\s*<resource', '<\/resource>', '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@='],
+        \'python': ['^\s*\(class\|def\|async def\)\>', '\S\n\=\zs\n*\(^\s*\(class\|def\|async def\)\|^\S\)', '^\s*\(class\|def\|async def\)\s\+\zs\h\w*\ze('],
+        \'java'  : ['^\(\t\| \{' . &shiftwidth . '}\)\S\+.*\(\n^.*\)\={', '^\(\t\| \{' . &shiftwidth . '}\)}', '\h\w*\ze(']}
 endfunction

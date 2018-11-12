@@ -89,9 +89,8 @@ set laststatus=2                              " always show statusline
 set scrolloff=10                              " Set 999 lines to the cursor - when moving vertically
 set sidescroll=1                              " scroll 1 character at a time
 set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
-set formatoptions-=o                          " Don't insert comment leader on `o`
 set sessionoptions-=options                   " make sessions work better with plugins
-set sessionoptions-=blank                     " don't save black buffers in sessions
+set sessionoptions-=blank                     " don't save blank buffers in sessions
 set noswapfile                                " do not create swap files
 set display+=lastline                         " show as much of the last line as possible
 set autoread                                  " automatically reread changed files
@@ -177,14 +176,17 @@ nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
 nnoremap gk k
 nnoremap ' `
+nnoremap * :set hlsearch<CR>*N
+nnoremap c* :set hlsearch<CR>*Ncgn
 
 " edit embedded scripts
-xnoremap <Space>e :yank\|vnew\|silent! put\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
+xnoremap <Space>e :yank\|vnew\|silent! put!\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 " redraw
 nnoremap <C-w>a :redraw!<CR>
 " select column
 xnoremap ,c :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'<") . "\|"<CR>
 onoremap ,c :normal v,c<CR>
+nnoremap ,c :normal v,c<CR>
 
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
@@ -199,7 +201,7 @@ nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>r "ay:<C-u>%s/<C-r>a//g<Left><Left>
 
-" settings toggles
+" vim-unimpaired settings toggles
 nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
 nnoremap =oc :setlocal cursorline!     \|setlocal cursorline?<CR>
 nnoremap =oz :setlocal list!           \|setlocal list?<CR>
@@ -228,7 +230,7 @@ nnoremap <silent> <Space>P P=']
 xnoremap <silent> <Space>p p=']
 xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
-nnoremap <silent> zp :set opfunc=functions#PutOp<CR>g@
+nnoremap <expr> <silent> zp functions#PutOperator()
 nmap <silent> zpp Vp
 
 " misc functions
@@ -261,18 +263,6 @@ nnoremap <silent> <expr> <C-w>f winnr('$') > 1
       \? ":let fname=\"\<C-r>\<C-f>\"\|wincmd p\<CR>:find \<C-r>=fname\<CR>\<CR>"
       \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
 
-function LC_maps()
-  if has_key(g:LanguageClient_serverCommands, &filetype)
-    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
-    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
-    nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-    nnoremap <buffer> <silent> ga :call LanguageClient#textDocument_codeAction()<CR>
-    nnoremap <buffer> <silent> gr :call LanguageClient#textDocument_references()<CR>
-    nnoremap <buffer> <silent> gs :call LanguageClient#textDocument_documentSymbol()<CR>
-    setlocal formatexpr=LanguageClient#textDocument_rangeFormatting_sync()
-    setl signcolumn=yes
-  endif
-endfunction
 " }}}
 
 "===============================================
@@ -289,7 +279,8 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
-  autocmd FileType           *            call LC_maps()
+  autocmd FileType           *            call functions#LC_maps()
+  autocmd FileType           *            call functions#findFuncDefs()
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
@@ -304,68 +295,12 @@ command! -range=% FormatJSON <line1>,<line2>!python2 -c
 " }}}
 
 "===============================================
-"              PLUGIN SETUP
-"===============================================
-" {{{
-" Plugin mappings are specified in the after/plugin/settings folder
-" ultisnips
-let g:UltiSnipsListSnippets        = '<C-@>'
-let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
-let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
-" mucomplete
-let g:mucomplete#enable_auto_at_startup = 1
-let g:mucomplete#no_popup_mappings      = 1
-let g:mucomplete#always_use_completeopt = 1
-let g:mucomplete#chains                 = {
-      \ 'default' : ['file', 'omni', 'dict', 'uspl', 'ulti', 'c-n', 'tags'],
-      \ 'java'    : ['omni', 'c-n', 'tags', 'ulti', 'file'],
-      \ 'vim'     : ['file', 'cmd', 'ulti', 'c-n', 'tags'],
-      \ 'xml'     : ['omni', 'ulti', 'tags', 'c-n'],
-      \ 'sql'     : ['c-n', 'ulti', 'tags']
-      \ }
-let g:mucomplete#can_complete = { }
-if has('lambda')
-  let g:mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
-  let g:mucomplete#can_complete.java    = { 'omni' : { t -> t =~# '\m\(\k\|)\|]\)\%\(\.\)$'} }
-  let g:mucomplete#can_complete.xml     = { 'omni' : { t -> t =~# '\m\(\k\k\|<\| \)$'} }
-endif
-" jedi
-let g:jedi#auto_vim_configuration     = 0
-let g:jedi#show_call_signatures       = 2
-let g:jedi#show_call_signatures_delay = 50
-let g:jedi#auto_close_doc             = 0
-" lion
-let g:lion_squeeze_spaces = 1
-" sneak
-let g:sneak#label      = 1
-let g:sneak#s_next     = 1
-let g:sneak#use_ic_scs = 1
-" netrw
-let g:netrw_banner = 0
-let g:netrw_liststyle = 0
-let g:netrw_browse_split = 4
-let g:netrw_winsize = 15
-" markdown
-let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql', 'java']
-" LSP
-let g:LanguageClient_serverCommands = {
-      \ 'java': ['/home/vagrant/dotfiles/bin/java-language-server'],
-      \ }
-" echodoc
-let g:echodoc#enable_at_startup = 1
-" }}}
-
-"===============================================
 "              STATUSLINE SETUP
 "===============================================
 " {{{
 if exists('+statusline')
   let g:in_snippet = 0
   let g:stl_snippet = ['', 'snippet ']
-  let g:findfunc = {'vim'   : ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
-                   \'xml'   : ['^\s*<resource', '<\/resource>', '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@='],
-                   \'python': ['^\s*\(class\|def\|async def\)\>', '\S\n\=\zs\n*\(^\s*\(class\|def\|async def\)\|^\S\)', '^\s*\(class\|def\|async def\)\s\+\zs\h\w*\ze('],
-                   \'java'  : ['^\(\t\| \{&shiftwidth}\)\S\+.*\(\n^.*\)\={', '^\(\t\| \{&shiftwidth}\)}', '\h\w*\ze(']}
   let g:modemap = {
         \ 'n' :'NORMAL', 'no':'NORMOP', 'v' :'VISUAL', 'V' :'V-LINE',
         \ '':'VBLOCK', 's' :'SELECT', 'S' :'S-LINE', '':'SBLOCK',
@@ -384,17 +319,4 @@ if exists('+statusline')
   set statusline+=%{&filetype}
   set statusline+=\ %03l:%02c\ 
 endif
-" }}}
-
-"===============================================
-"              EXTENDING VIM
-"===============================================
-" {{{
-" lots of new text objects
-for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', '`' ]
-  execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
-  execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
-  execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
-  execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
-endfor
 " }}}
