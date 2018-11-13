@@ -194,7 +194,7 @@ nnoremap c* :set hlsearch<CR>*Ncgn
 " verymagic search/replace
 nnoremap / /\v
 nnoremap ? ?\v
-cnoremap <expr> / getcmdtype() ==? ':' && getcmdline()[0:getcmdpos()-2] =~? '%\=s$' ? '/\v' : '/'
+cnoremap <expr> / getcmdtype() ==? ':' && getcmdline()[0:getcmdpos()-2] =~? '%\=[sgdv]!\=$' ? '/\v' : '/'
 
 " edit embedded scripts
 xnoremap <Space>e :yank\|vnew\|silent! put!\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
