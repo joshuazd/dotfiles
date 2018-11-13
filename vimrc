@@ -179,14 +179,18 @@ nnoremap ' `
 nnoremap * :set hlsearch<CR>*N
 nnoremap c* :set hlsearch<CR>*Ncgn
 
+" verymagic search/replace
+nnoremap / /\v
+nnoremap ? ?\v
+cnoremap <expr> / getcmdtype() ==? ':' && getcmdline()[0:getcmdpos()-2] =~? '%\=s$' ? '/\v' : '/'
+
 " edit embedded scripts
 xnoremap <Space>e :yank\|vnew\|silent! put!\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 " redraw
 nnoremap <C-w>a :redraw!<CR>
 " select column
-xnoremap ,c :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'<") . "\|"<CR>
-onoremap ,c :normal v,c<CR>
-nnoremap ,c :normal v,c<CR>
+xnoremap <silent> ac :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'<") . "\|"<CR>
+onoremap <silent> ac :normal vac<CR>
 
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
@@ -251,8 +255,6 @@ nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
 
 " auto expansion
 inoremap {<CR> {<CR>}<C-o>O
-" inoremap (<CR> (<CR>)<C-o>O
-" inoremap [<CR> [<CR>]<C-o>O
 
 " select function
 onoremap am :<C-u>normal [mV]M<CR>
@@ -279,8 +281,7 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
-  autocmd FileType           *            call functions#LC_maps()
-  autocmd FileType           *            call functions#findFuncDefs()
+  autocmd FileType           *            call functions#LC_maps() | call functions#findFuncDefs()
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
