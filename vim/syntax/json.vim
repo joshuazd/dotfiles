@@ -102,7 +102,7 @@ hi def link jsonFold1 Keyword
 hi def link jsonFold2 Identifier
 hi def link jsonFold3 Directory
 hi def link jsonFold4 Tag
-highlight jsonFold5 ctermfg=72
+highlight jsonFold5 ctermfg=72 guifg=#5faf87
 hi def link jsonFold6 Builtin
 
 syn cluster jsonAll add=jsonNull,jsonBoolean,jsonString,jsonKeywordMatch,jsonEscape,jsonNumber,jsonNoise,jsonFold
