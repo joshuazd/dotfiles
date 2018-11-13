@@ -192,6 +192,14 @@ nnoremap <C-w>a :redraw!<CR>
 xnoremap <silent> ac :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'<") . "\|"<CR>
 onoremap <silent> ac :normal vac<CR>
 
+" new text objects
+for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', '`' ]
+  execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
+  execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
+  execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
+  execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
+endfor
+
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
@@ -203,7 +211,7 @@ nnoremap <Space>j :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
-xnoremap <Space>r "ay:<C-u>%s/<C-r>a//g<Left><Left>
+xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=escape(@a,'/\|')<CR>//g<Left><Left>
 
 " vim-unimpaired settings toggles
 nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
