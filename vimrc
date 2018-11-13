@@ -91,7 +91,6 @@ set sidescroll=1                              " scroll 1 character at a time
 set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
 set sessionoptions-=options                   " make sessions work better with plugins
 set sessionoptions-=blank                     " don't save blank buffers in sessions
-set noswapfile                                " do not create swap files
 set display+=lastline                         " show as much of the last line as possible
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
@@ -115,6 +114,14 @@ set winminwidth=0                             " minimum window width
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 set virtualedit+=block                        " allow virtual editing in v-block mode
 set fillchars=vert:│,diff:─                   " set characters for vert splits and diffs
+set backup                                    " write backups
+set directory=$HOME/.tmp/swap//               " where to put swap files
+set backupdir=$HOME/.tmp/backup//             " where to put backup files
+for dir in [&directory, &backupdir]           " create swap/backup dirs if they don't exist
+  if empty(glob(dir))
+    call system((has('win32') ? 'md ' : 'mkdir -p ') . dir)
+  endif
+endfor
 set completeopt+=menuone                      " configure popup menu
 if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
@@ -289,7 +296,9 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
-  autocmd FileType           *            call functions#LC_maps() | call functions#findFuncDefs()
+  if !empty(glob(vimdir . '/autoload/functions.vim'))
+    autocmd FileType           *            call functions#LC_maps() | call functions#findFuncDefs()
+  endif
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
@@ -321,7 +330,7 @@ if exists('+statusline')
   set statusline=\ %{g:modemap[mode()]}
   set statusline+=\ %<%f%m%r
   set statusline+=\ %w%q%=
-  if !empty(glob('~/.vim/autoload/findfunc.vim'))
+  if !empty(glob(vimdir . '/autoload/findfunc.vim'))
     set statusline+=%{findfunc#FindFunc()}
   endif
   set statusline+=\ %{g:stl_snippet[g:in_snippet]}
