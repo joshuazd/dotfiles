@@ -114,14 +114,19 @@ set winminwidth=0                             " minimum window width
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 set virtualedit+=block                        " allow virtual editing in v-block mode
 set fillchars=vert:│,diff:─                   " set characters for vert splits and diffs
-set backup                                    " write backups
-set directory=$HOME/.tmp/swap//               " where to put swap files
-set backupdir=$HOME/.tmp/backup//             " where to put backup files
-for dir in [&directory, &backupdir]           " create swap/backup dirs if they don't exist
-  if empty(glob(dir))
-    call system((has('win32') ? 'md ' : 'mkdir -p ') . dir)
-  endif
-endfor
+if has('win32')
+  set nobackup
+  set noswapfile
+else
+  set backup                                  " write backups
+  set directory=$HOME/.tmp/swap//             " where to put swap files
+  set backupdir=$HOME/.tmp/backup//           " where to put backup files
+  for dir in [&directory, &backupdir]         " create swap/backup dirs if they don't exist
+    if empty(glob(dir))
+      call system('mkdir -p ' . dir)
+    endif
+  endfor
+endif
 set completeopt+=menuone                      " configure popup menu
 if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
