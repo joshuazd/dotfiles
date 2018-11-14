@@ -18,7 +18,7 @@ xnoremap <silent> <buffer> [M ?<\/resource<CR>
 xnoremap <silent> <buffer> ]M /<\/resource<CR>
 onoremap <silent> <buffer> [M ?<\/resource<CR>
 onoremap <silent> <buffer> ]M /<\/resource<CR>
-setlocal omnifunc=xmlcomplete#CompleteTags
+setlocal omnifunc=xml#complete#CompleteTags
 compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
 setlocal formatprg=xmllint\ --format\ -
@@ -27,6 +27,7 @@ setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/,*_DataMappe
 set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
 nnoremap ,f zMzr
+
 augroup XML
   autocmd!
   if executable('xmllint')
@@ -35,19 +36,21 @@ augroup XML
   if exists(':UltiSnipsAddFiletypes')
     autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml 
   endif
-  autocmd BufEnter,BufNewFile */api/*.xml XMLns api
-  autocmd BufEnter,BufNewFile */sequences/*.xml XMLns sequence
-  autocmd BufEnter,BufNewFile */templates/*.xml XMLns template
-  autocmd BufEnter,BufNewFile */endpoints/*.xml XMLns endpoint
-  autocmd BufEnter,BufNewFile */local-entries/*.xml XMLns xsl xsl
-  autocmd BufEnter,BufNewFile */local-entries/*.xml let g:mucomplete#can_complete.xml = { 'omni' : { t -> t =~# '\m\(<\k\+:\|\s\+\k\+\)$' } }
-  autocmd BufEnter,BufNewFile */proxy-services/*.xml XMLns proxyservice
+  autocmd BufEnter */api/*.xml XMLns api
+  autocmd BufEnter */sequences/*.xml XMLns sequence
+  autocmd BufEnter */templates/*.xml XMLns template
+  autocmd BufEnter */endpoints/*.xml XMLns endpoint
+  autocmd BufEnter */local-entries/*.xml execute('XMLns xsl xsl') | XMLns localEntry
+  autocmd BufEnter */proxy-services/*.xml XMLns proxyservice
 augroup END
+
 let b:endwise_addition = '\="</".submatch(0)[1:stridx(submatch(0)," ")-1].">"'
 let b:endwise_words = ''
 let b:endwise_pattern = '<\%([^ /!?"''<>][^>]*\)\?[^/>]>\s*$'
 let b:endwise_syngroups = 'xmlTag,xmlTagPunct'
 let b:decselect_char = '\S'
+
+let g:xmldata_none = {}
 
 let b:xmldata_endpoint = {
       \ 'endpoint': [
