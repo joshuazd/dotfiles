@@ -1,3 +1,9 @@
+" vim-previewdoc
+" Maintainer:	joshuazd
+" Version:	0.1.0
+" Location:	autoload/previewdoc.vim
+"
+
 function! previewdoc#PreviewDoc(prg,word) abort
   if a:prg =~? '^:'
     silent! execute a:prg.' '.a:word
@@ -11,5 +17,3 @@ function! previewdoc#PreviewDoc(prg,word) abort
   silent! setl previewwindow
   wincmd p
 endfunction
-
-

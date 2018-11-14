@@ -1,3 +1,9 @@
+" vim-previewdoc
+" Maintainer:	joshuazd
+" Version:	0.1.0
+" Location:	plugin/previewdoc.vim
+"
+
 nnoremap <Plug>(PreviewDoc) :call previewdoc#PreviewDoc('<C-R>=&keywordprg<CR>','<C-R><C-w>')<CR>
 xnoremap <Plug>(PreviewDoc) "ay:call previewdoc#PreviewDoc('<C-R>=&keywordprg<CR>','<C-R>a')<CR>
 if !hasmapto('<Plug>(PreviewDoc)','n')
