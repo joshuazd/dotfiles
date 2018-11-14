@@ -48,6 +48,7 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   Plug vimdir . '/local-bundle/vim-hilinktrace'
   Plug vimdir . '/local-bundle/vim-indentmotion'
   Plug vimdir . '/local-bundle/vim-marks'
+  Plug vimdir . '/local-bundle/vim-previewdoc'
   call plug#end()
 else
   syntax enable
@@ -334,7 +335,7 @@ if exists('+statusline')
 
   set statusline=\ %{g:modemap[mode()]}
   set statusline+=\ %<%f%m%r
-  set statusline+=\ %w%q%=
+  set statusline+=\ %w%q%h%=
   if !empty(glob(vimdir . '/autoload/findfunc.vim'))
     set statusline+=%{findfunc#FindFunc()}
   endif
