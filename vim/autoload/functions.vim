@@ -39,8 +39,8 @@ endfunction
 
 function! functions#MyFoldText() abort
   let line = getline(v:foldstart)
-  if match(line, '^[ \t]*\(\/\*\|\/\/\)[*/\\]*[ \t]*$') == 0
-    let initial = substitute(line, '^\([ \t]\)*\(\/\*\|\/\/\)\(.*\)', '\1\2', '')
+  if match(line, '^\s*\(\/\*\|\/\/\)[*/\\]*\s*$') == 0
+    let initial = substitute(line, '^\(\s\)*\(\/\*\|\/\/\)\(.*\)', '\1\2', '')
     let linenum = v:foldstart + 1
     while linenum < v:foldend
       let line = getline(linenum)
@@ -53,12 +53,12 @@ function! functions#MyFoldText() abort
     let sub = initial . ' ' . comment_content
   else
     let sub = line
-    let startbrace = substitute(line, '^.*{[ \t]*$', '{', 'g')
+    let startbrace = substitute(line, '^.*{\s*$', '{', 'g')
     if startbrace ==# '{'
       let line = getline(v:foldend)
-      let endbrace = substitute(line, '^[ \t]*}\(.*\)$', '}', 'g')
+      let endbrace = substitute(line, '^\s*}\(.*\)$', '}', 'g')
       if endbrace ==# '}'
-        let sub = sub.substitute(line, '^[ \t]*}\(.*\)$', '...}\1', 'g')
+        let sub = sub.substitute(line, '^\s*}\(.*\)$', '...}\1', 'g')
       endif
     endif
   endif
