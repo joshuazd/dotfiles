@@ -115,7 +115,7 @@ set winminheight=0                            " minimum window height
 set winminwidth=0                             " minimum window width
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 set virtualedit+=block                        " allow virtual editing in v-block mode
-set fillchars=vert:│,diff:─                   " set characters for vert splits and diffs
+set fillchars=vert:┃,diff:━                   " set characters for vert splits and diffs
 if has('win32')
   set nobackup
   set noswapfile
