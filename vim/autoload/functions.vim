@@ -39,40 +39,13 @@ endfunction
 
 function! functions#MyFoldText() abort
   let line = getline(v:foldstart)
-  if match(line, '^\s*\(\/\*\|\/\/\)[*/\\]*\s*$') == 0
-    let initial = substitute(line, '^\(\s\)*\(\/\*\|\/\/\)\(.*\)', '\1\2', '')
-    let linenum = v:foldstart + 1
-    while linenum < v:foldend
-      let line = getline(linenum)
-      let comment_content = substitute( line, '^\([ \t\/\*]*\)\(.*\)$', '\2', 'g' )
-      if comment_content !=# ''
-        break
-      endif
-      let linenum = linenum + 1
-    endwhile
-    let sub = initial . ' ' . comment_content
-  else
-    let sub = line
-    let startbrace = substitute(line, '^.*{\s*$', '{', 'g')
-    if startbrace ==# '{'
-      let line = getline(v:foldend)
-      let endbrace = substitute(line, '^\s*}\(.*\)$', '}', 'g')
-      if endbrace ==# '}'
-        let sub = sub.substitute(line, '^\s*}\(.*\)$', '...}\1', 'g')
-      endif
-    endif
-  endif
   let n = v:foldend - v:foldstart + 1
   let info = ' ' . n . ' lines  + ───'
-  let filltext = '                                             '
-  let filltext .= filltext
-  let filltext .= filltext
-  let filltext .= filltext
-  let sub .= ' ' . filltext
+  let line .= repeat(' ',999)
   let num_w = getwinvar(0, '&number' ) * getwinvar( 0, '&numberwidth')
   let fold_w = getwinvar(0, '&foldcolumn')
-  let sub = strpart(sub, 0, winwidth(0) - strchars(info) - num_w - fold_w)
-  return sub . info
+  let line = strpart(line, 0, winwidth(0) - strchars(info) - num_w - fold_w)
+  return line . info
 endfunction
 
 function! functions#PutOperator(...) abort
