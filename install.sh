@@ -78,9 +78,9 @@ if [ -f /usr/local/share/zsh/site-functions/async ]; then
     rm /usr/local/share/zsh/site-functions/async
 fi
 if [[ $(uname -s) == CYGWIN* ]]; then
-    ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup 
-    ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup 
-    ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async                         
+    ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup
+    ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup
+    ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async
 else
     sudo ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup
     sudo ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup
@@ -88,6 +88,3 @@ else
 fi
 
 vim +PlugInstall +helptags\ ALL +qall
-
-# echo "To install vim plugins, open vim and run :PlugInstall"
-
