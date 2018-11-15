@@ -14,5 +14,5 @@ function! s:convertNum(num) abort
 endfunction
 nnoremap <Plug>(NumFmt) :<C-u>let isk=&l:isk\|setl isk+=,<CR>mn"nyiw:call <SID>convertNum('<C-r>n')<CR>viw"np`n:<C-u>setl isk=<C-r>=isk<CR>\|silent! call repeat#set("\<lt>Plug>(NumFmt)", v:count)<CR>
 xnoremap <Plug>(NumFmt) mn"ny:call <SID>convertNum('<C-r>n')<CR>gv"np`ngv
-nmap ,, <Plug>(NumFmt)
-xmap ,, <Plug>(NumFmt)
+nmap <Space>, <Plug>(NumFmt)
+xmap <Space>, <Plug>(NumFmt)
