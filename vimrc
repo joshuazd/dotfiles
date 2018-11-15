@@ -49,6 +49,7 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   Plug vimdir . '/local-bundle/vim-indentmotion'
   Plug vimdir . '/local-bundle/vim-marks'
   Plug vimdir . '/local-bundle/vim-previewdoc'
+  Plug vimdir . '/local-bundle/vim-verymagic'
   call plug#end()
 else
   syntax enable
@@ -192,11 +193,6 @@ nnoremap ' `
 nnoremap * :set hlsearch<CR>*N
 nnoremap c* :set hlsearch<CR>*Ncgn
 
-" verymagic search/replace
-nnoremap / /\v
-nnoremap ? ?\v
-cnoremap <expr> / getcmdtype() ==? ':' && getcmdline()[0:getcmdpos()-2] =~? '%\=[sgdv]!\=$' ? '/\v' : '/'
-
 " edit embedded scripts
 xnoremap <Space>e :yank\|vnew\|silent! put!\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 " redraw
@@ -220,8 +216,10 @@ nnoremap <Space>f :find<space>
 nnoremap <Space>s :sfind<space>
 nnoremap <Space>v :vert sfind<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
-nnoremap <Space>j :tjump /
+nnoremap <Space>t :tjump /
 nnoremap <Space>l :set colorcolumn=
+nnoremap <Space>g :g/\v/#<Left><Left>
+xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#
 nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=escape(@a,'/\|')<CR>//g<Left><Left>
