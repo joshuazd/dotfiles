@@ -24,7 +24,7 @@ if exists('g:loaded_sneak_plugin') && g:loaded_sneak_plugin == 1
     omap , <Plug>Sneak_,
     xmap , <Plug>Sneak_,
 
-    unmap \
+    silent! unmap \
 
 endif
 
