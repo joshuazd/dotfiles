@@ -38,15 +38,15 @@ if !hasmapto('<Plug>(indentmotion_innerindent')
 endif
 
 if !hasmapto('<Plug>(indentmotion_nextindent')
-  nmap <silent> ,j <Plug>(indentmotion_nextindent)
-  xmap <silent> ,j <Plug>(indentmotion_nextindent)
-  omap <silent> ,j <Plug>(indentmotion_nextindent)
+  nmap <silent> <Space>j <Plug>(indentmotion_nextindent)
+  xmap <silent> <Space>j <Plug>(indentmotion_nextindent)
+  omap <silent> <Space>j <Plug>(indentmotion_nextindent)
 endif
 
 if !hasmapto('<Plug>(indentmotion_previndent')
-  nmap <silent> ,k <Plug>(indentmotion_previndent)
-  xmap <silent> ,k <Plug>(indentmotion_previndent)
-  omap <silent> ,k <Plug>(indentmotion_previndent)
+  nmap <silent> <Space>k <Plug>(indentmotion_previndent)
+  xmap <silent> <Space>k <Plug>(indentmotion_previndent)
+  omap <silent> <Space>k <Plug>(indentmotion_previndent)
 endif
 
 if !hasmapto('<Plug>(indentmotion_blockindent')
