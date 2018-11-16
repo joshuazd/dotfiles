@@ -1,7 +1,7 @@
 # panes {{{
-set -g pane-border-fg colour235
+set -g pane-border-fg colour8
 set -g pane-border-bg colour235
-set -g pane-active-border-fg colour235
+set -g pane-active-border-fg colour8
 set -g pane-active-border-bg colour235
 # }}}
 
