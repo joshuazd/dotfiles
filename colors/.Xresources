@@ -5,77 +5,77 @@
 xterm*dynamicColors: true
 urxvt*dynamicColors: on
 
-! nier theme
-# define bg #b4af9a
-# define fg #45403a
-! black
-# define c_0 #45403a
-! red
-# define c_1 #bf4243
-! green
-# define c_2 #525643
-! yellow
-# define c_3 #5b5143
-! blue
-# define c_4 #4c5361
-! purple
-# define c_5 #614c61
-! cyan
-# define c_6 #465953
-! white
-# define c_7 #999483
-! bright black
-# define c_8 #777467
-! bright red
-# define c_9 #d75f5f
-! bright green
-# define c_10 #81895d
-! bright yellow
-# define c_11 #957f5f
-! bright blue
-# define c_12 #7382a0
-! bright purple
-# define c_13 #9c739c
-! bright cyan
-# define c_14 #5f8c7d
-! bright white
-# define c_15 #ffffff
-
-!! material theme
-!# define bg #262626
-!# define fg #cccccc
+!! nier theme
+!# define bg #b4af9a
+!# define fg #45403a
 !! black
-!# define c_0 #1c1c1c
+!# define c_0 #45403a
 !! red
-!# define c_1 #ff5f5f
+!# define c_1 #bf4243
 !! green
-!# define c_2 #87d787
+!# define c_2 #525643
 !! yellow
-!# define c_3 #ffd787
+!# define c_3 #5b5143
 !! blue
-!# define c_4 #6182b8
+!# define c_4 #4c5361
 !! purple
-!# define c_5 #c792ea
+!# define c_5 #614c61
 !! cyan
-!# define c_6 #89ddff
+!# define c_6 #465953
 !! white
-!# define c_7 #bbbbbb
+!# define c_7 #999483
 !! bright black
-!# define c_8 #3e515b
+!# define c_8 #777467
 !! bright red
 !# define c_9 #d75f5f
 !! bright green
-!# define c_10 #87af87
+!# define c_10 #81895d
 !! bright yellow
-!# define c_11 #ffaf5f
+!# define c_11 #957f5f
 !! bright blue
-!# define c_12 #82aaff
+!# define c_12 #7382a0
 !! bright purple
-!# define c_13 #945eb8
+!# define c_13 #9c739c
 !! bright cyan
-!# define c_14 #39adb5
+!# define c_14 #5f8c7d
 !! bright white
 !# define c_15 #ffffff
+
+! material theme
+# define bg #262626
+# define fg #cccccc
+! black
+# define c_0 #1c1c1c
+! red
+# define c_1 #ff5f5f
+! green
+# define c_2 #87d787
+! yellow
+# define c_3 #ffd787
+! blue
+# define c_4 #6182b8
+! purple
+# define c_5 #c792ea
+! cyan
+# define c_6 #89ddff
+! white
+# define c_7 #bbbbbb
+! bright black
+# define c_8 #3e515b
+! bright red
+# define c_9 #d75f5f
+! bright green
+# define c_10 #87af87
+! bright yellow
+# define c_11 #ffaf5f
+! bright blue
+# define c_12 #82aaff
+! bright purple
+# define c_13 #945eb8
+! bright cyan
+# define c_14 #39adb5
+! bright white
+# define c_15 #ffffff
 
 
 
@@ -85,57 +85,57 @@ urxvt*dynamicColors: on
 *background:   bg
 *cursorColor:  #eeffff
 /* urxvt*background: [90]#262626 */
-/* XTerm*foreground:   #cccccc */
-/* XTerm*background:   #262626 */
-/* XTerm*cursorColor:  #eeffff */
+XTerm*foreground:   fg
+XTerm*background:   bg
+/* XTerm*cursorColor:  bg */
 
 !black
 *color0:       c_0
 *color8:       c_8
-/* XTerm*color0:       #1c1c1c */
-/* XTerm*color8:       #3e515b */
+XTerm*color0:  c_0
+XTerm*color8:  c_8
 
 !red
 *color1:       c_1
 *color9:       c_9
-/* XTerm*color1:       #e53935 */
-/* XTerm*color9:       #ff5370 */
+XTerm*color1:  c_1
+XTerm*color9:  c_9
 
 !green
 *color2:       c_2
 *color10:      c_10
-/* XTerm*color2:       #c3e88d */
-/* XTerm*color10:      #91b859 */
+XTerm*color2:  c_2
+XTerm*color10: c_10
 
 !yellow
 *color3:       c_3
 *color11:      c_11
-/* XTerm*color3:       #ffb62c */
-/* XTerm*color11:      #ffcb6b */
+XTerm*color3:  c_3
+XTerm*color11: c_11
 
 !blue
-*color4:      c_4
-*color12:       c_12
-/* XTerm*color4:       #82aaff */
-/* XTerm*color12:      #6182b8 */
+*color4:       c_4
+*color12:      c_12
+XTerm*color4:  c_4
+XTerm*color12: c_12
 
 !magenta
 *color5:       c_5
 *color13:      c_13
-/* XTerm*color5:       #c792ea */
-/* XTerm*color13:      #945eb8 */
+XTerm*color5:  c_5
+XTerm*color13: c_13
 
 !cyan
 *color6:       c_6
 *color14:      c_14
-/* XTerm*color6:       #89ddff */
-/* XTerm*color14:      #39adb5 */
+XTerm*color6:  c_6
+XTerm*color14: c_14
 
 !white
 *color7:       c_7
 *color15:      c_15
-/* XTerm*color7:       #bbbbbb */
-/* XTerm*color15:      #ffffff */
+XTerm*color7:  c_7
+XTerm*color15: c_15
 
 
 XTerm.termName: xterm-256color
@@ -177,6 +177,12 @@ URxvt.perl-ext-common: selection-to-clipboard
 
 Xft.rgba: rgb
 Xft.hintstyle: hintslight
+
+rofi.color-enabled: true
+!                  bg       fg       bg-alt   hl-bg    hl-fg
+rofi.color-normal: bg,      fg,      c_0,     c_0,     c_1
+rofi.color-active: fg,      c_1,     c_1,     c_1,     c_1
+rofi.color-window: bg,      fg
 /* urxvt*blurRadius: 20 */
 /* urxvt*transparent: true */
 /* urxvt*shading: 110 */
