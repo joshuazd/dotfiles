@@ -87,6 +87,7 @@ git-files() {
 zle     -N   git-files
 bindkey '^g' git-files
 
+bindkey '\e.' insert-last-word
 
 fgitbranch() {
     fbr
