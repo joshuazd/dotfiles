@@ -5,7 +5,7 @@ function! verymagic#verymagic(...) abort
     let char = '/'
   endif
   let cmdline = getcmdline()[0:getcmdpos()-2]
-  if cmdline =~? (getcmdtype() ==? ':' ? '[/?]' : '') . '\\v$'
+  if cmdline =~# (getcmdtype() ==? ':' ? escape(char,'~^') : '') . '\\v$'
     return "\<BS>\<BS>" . char
   elseif getcmdtype() !=? ':'
     return char
@@ -14,7 +14,7 @@ function! verymagic#verymagic(...) abort
   let commands = '%(s%[ubstitute]|v%[global]|g%[lobal]\!?|sor%[t]\!?%(\s+[bfinorux]*)?\s+)'
   let sub_pat = '\v^%(%(' . linenum_pat . '%([,;]' . linenum_pat . ')*)?' . commands . ')$'
   let range_pat = '\v^%(%(' . linenum_pat . '[,;])+)$'
-  if cmdline =~? sub_pat || ((cmdline =~? range_pat || cmdline ==? '') && char =~? '[/?]')
+  if cmdline =~# sub_pat || ((cmdline =~# range_pat || cmdline ==? '') && char =~? '[/?]')
     return char .'\v'
   else
     return char
