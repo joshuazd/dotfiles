@@ -29,12 +29,14 @@ if exists('g:loaded_sneak_plugin') && g:loaded_sneak_plugin == 1
 endif
 
 if exists(':Files')
+  command! -bang -nargs=? -complete=dir Files
+        \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
   nnoremap \f :Files<CR>
   command! -bang -nargs=* Rg
         \ call fzf#vim#grep(
         \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
         \   <bang>0 ? fzf#vim#with_preview('up:60%')
-        \           : fzf#vim#with_preview('right:50%:hidden', '?'),
+        \           : fzf#vim#with_preview('right:50%', '?'),
         \   <bang>0)
   nnoremap \g :Rg<CR>
   nnoremap \l :Lines<CR>
