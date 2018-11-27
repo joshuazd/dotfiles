@@ -117,8 +117,14 @@ set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 set virtualedit+=block                        " allow virtual editing in v-block mode
 set fillchars=vert:┃,diff:━                   " set characters for vert splits and diffs
 if has('win32')
-  set nobackup
-  set noswapfile
+  if !empty($TEMP)
+      set backup
+      set swapfile
+      set backupdir=$TEMP//
+      set directory=$TEMP//
+  else
+      set noswapfile
+  endif
 else
   set backup                                  " write backups
   set directory=$HOME/.tmp/swap//             " where to put swap files
@@ -141,8 +147,8 @@ endif
 if exists('+signcolumn')
   set signcolumn=no                           " don't have signcolumn on
 endif
-if has('termguicolors')
-  set termguicolors                           " use gui colors in terminal vim
+if has('termguicolors')                       " this check only looks at the vim option,
+  set termguicolors                           " not if the terminal supports truecolor
 endif
 try
   colorscheme material                        " material color scheme
@@ -295,7 +301,7 @@ augroup EditVim
   autocmd BufNewFile,BufRead *.zsh-theme  set filetype=zsh
   autocmd BufNewFile,BufRead *.dbs        set filetype=xml
   autocmd BufNewFile,BufRead *.dmc        set filetype=javascript
-  autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+  autocmd BufEnter           *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
   autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
@@ -324,14 +330,15 @@ if exists('+statusline')
   let g:in_snippet = 0
   let g:stl_snippet = ['', 'snippet ']
   let g:modemap = {
-        \ 'n' :'NORMAL', 'no':'NORMOP', 'v' :'VISUAL', 'V' :'V-LINE',
-        \ '':'VBLOCK', 's' :'SELECT', 'S' :'S-LINE', '':'SBLOCK',
-        \ 'i' :'INSERT', 'ic':'COMPLT', 'ix':'XCOMPL', 'R' :'REPLCE',
-        \ 'Rc':'RCOMPL', 'Rv':'VREPLC', 'Rx':'RXCOMP', 'c' :'COMMND',
-        \ 'cv':'VIM-EX', 'ce':'  EX  ', 'r' :'PROMPT', 'rm':' MORE ',
-        \ 'r?':'CONFRM', '!' :' SHELL', 't' :' TERM '}
+        \ 'n'   : 'NORMAL', 'no' : 'NORMOP', 'niI' : 'NORMIN', 'niR' : 'NORMRE',
+        \ 'niV' : 'NORMVR', 'v'  : 'VISUAL', 'V'   : 'V-LINE', ''  : 'VBLOCK',
+        \ 's'   : 'SELECT', 'S'  : 'S-LINE', ''  : 'SBLOCK', 'i'   : 'INSERT',
+        \ 'ic'  : 'COMPLT', 'ix' : 'XCOMPL', 'R'   : 'REPLCE', 'Rc'  : 'RCOMPL',
+        \ 'Rv'  : 'VREPLC', 'Rx' : 'RXCOMP', 'c'   : 'COMMND', 'cv'  : 'VIM-EX',
+        \ 'ce'  : '  EX  ', 'r'  : 'PROMPT', 'rm'  : ' MORE ', 'r?'  : 'CONFRM',
+        \ '!'   : ' SHELL', 't'  : ' TERM '}
 
-  set statusline=\ %{g:modemap[mode()]}
+  set statusline=\ %{get(g:modemap,mode('1'),'NORMAL')}
   set statusline+=\ %<%f%m%r
   set statusline+=\ %w%q%h%=
   if !empty(glob(vimdir . '/autoload/findfunc.vim'))
