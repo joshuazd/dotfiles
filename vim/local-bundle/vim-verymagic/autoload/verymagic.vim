@@ -1,3 +1,10 @@
+let s:linenum_pat = '%(\d+|\.|\$|\%|''[a-zA-Z<>]|\?|\&|\/.*\/|\?.*\?|\/)'
+let s:commands = '\s*%(s%[ubstitute]|v%[global]|g%[lobal]\!?|sor%[t]\!?%(\s+[bfinorux]*)?\s+)'
+let s:range = '%(' . s:linenum_pat . '%([,;]' . s:linenum_pat . ')*)?'
+let s:do_pat = '\v^%(' . s:range . '%(windo|bufdo\!?)\s+' . s:range . s:commands . ')$'
+let s:sub_pat = '\v^%(' . s:range . s:commands . ')$'
+let s:range_pat = '\v^%(%(' . s:linenum_pat . '[,;])+)$'
+
 function! verymagic#verymagic(...) abort
   if a:0
     let char = a:1
@@ -11,13 +18,7 @@ function! verymagic#verymagic(...) abort
   elseif getcmdtype() !=? ':'
     return char
   endif
-  let linenum_pat = '%(\d+|\.|\$|\%|''[a-zA-Z<>]|\?|\&|\/.*\/|\?.*\?|\/)'
-  let commands = '\s*%(s%[ubstitute]|v%[global]|g%[lobal]\!?|sor%[t]\!?%(\s+[bfinorux]*)?\s+)'
-  let range = '%(' . linenum_pat . '%([,;]' . linenum_pat . ')*)?'
-  let do_pat = '\v^%(' . range . '%(windo|bufdo\!?)\s+' . range . commands . ')$'
-  let sub_pat = '\v^%(' . range . commands . ')$'
-  let range_pat = '\v^%(%(' . linenum_pat . '[,;])+)$'
-  if cmdline =~# sub_pat || ((cmdline =~# range_pat || cmdline ==? '') && char =~? '[/?]') || cmdline =~# do_pat
+  if cmdline =~# s:sub_pat || ((cmdline =~# s:range_pat || cmdline ==? '') && char =~? '[/?]') || cmdline =~# s:do_pat
     return char .'\v'
   else
     return char
