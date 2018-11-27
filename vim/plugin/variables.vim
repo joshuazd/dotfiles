@@ -45,3 +45,4 @@ let g:LanguageClient_serverCommands = {
 let g:echodoc#enable_at_startup = 1
 " gutentags
 let g:gutentags_ctags_exclude = split(&wildignore, ',')
+let g:todo_words = [['TODO', '|', 'DONE'], ['ASSIGNED', 'DEVELOP', 'TESTING', '|', 'READY', 'COMPLETE']]
