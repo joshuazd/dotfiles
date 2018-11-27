@@ -275,7 +275,7 @@ snippet class "class mediator" b
 endsnippet
 
 snippet res "resource (blank)" b
-<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" url-mapping="${3}">
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" uri-template="${3}">
 	<inSequence>$0
 	</inSequence>
 	<outSequence>
@@ -284,7 +284,7 @@ snippet res "resource (blank)" b
 endsnippet
 
 snippet resource "resource (proxy)" b
-<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" url-mapping="${3}">
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" uri-template="${3}">
 	<inSequence>
 		<call-template target="${4:Project}${5:Resource}_Logger">
 			<with-param name="message" value="$4 $5 Service Invoked"/>
@@ -318,7 +318,7 @@ snippet resource "resource (proxy)" b
 endsnippet
 
 snippet resource "resource (proxy with BA)" b
-<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" url-mapping="${3}">
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" uri-template="${3}">
 	<inSequence>
 		<call-template target="${4:Project}${5:Resource}_Logger">
 			<with-param name="message" value="$4 $5 Service Invoked"/>
