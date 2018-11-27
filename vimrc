@@ -228,7 +228,7 @@ nnoremap <Space>g :g/\v/#<Left><Left>
 xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#
 nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
-xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=escape(@a,'/\|')<CR>//g<Left><Left>
+xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=escape(@a,'\\/\|')<CR>//g<Left><Left>
 
 " vim-unimpaired settings toggles
 nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
@@ -301,7 +301,7 @@ augroup EditVim
   autocmd BufNewFile,BufRead *.zsh-theme  set filetype=zsh
   autocmd BufNewFile,BufRead *.dbs        set filetype=xml
   autocmd BufNewFile,BufRead *.dmc        set filetype=javascript
-  autocmd BufEnter           *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+  autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
   autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
