@@ -5,7 +5,8 @@ function! verymagic#verymagic(...) abort
     let char = '/'
   endif
   let cmdline = getcmdline()[0:getcmdpos()-2]
-  if cmdline =~# (getcmdtype() ==? ':' ? escape(char,'~^') : '') . '\\v$'
+  if cmdline =~# (getcmdtype() ==? ':' ? escape(char,'~^') : '') . '\\v$' &&
+        \ ((xor(getcmdtype() !~? '/', char ==? '/') && xor(getcmdtype() !~? '?', char ==? '?')) || getcmdtype() ==? ':')
     return "\<BS>\<BS>" . char
   elseif getcmdtype() !=? ':'
     return char
