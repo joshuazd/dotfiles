@@ -36,7 +36,7 @@ function! s:active_getchar ()
 endfunction
 
 " Retrieve the digraph list (should be called in a :silent)...
-function! s:get_digraphs ()
+function! Get_digraphs ()
     redir => digraphs
     digraphs
     redir END
@@ -50,7 +50,7 @@ function! s:show_digraphs (digraphs, cursor_char, context)
     " Display first half of digraph table...
     echon "\n"
     echohl SpecialKey
-    echon join(digraphs[0 : a:context.line-2], "\n") . "\n"
+    echon join(digraphs[0 : a:context.line-3], "\n") . "\n"
 
     " Display cursor line with emulated digraph marker...
     echohl Normal
@@ -62,62 +62,71 @@ function! s:show_digraphs (digraphs, cursor_char, context)
 
     " Display remainder of digraph table...
     echohl SpecialKey
-    echon join(digraphs[a:context.line-1 : winheight(0)-2], "\n") . "\n"
+    echon join(digraphs[a:context.line-2 : winheight(0)-2], "\n") . "\n"
     echohl None
 endfunction
 
 let g:HUDG_filtering = 1
 
-" Filter out digraphs that don't start or end with the specified character...
-function! s:filter_digraphs (digraphs, char)
-    if !g:HUDG_filtering
-        return a:digraphs
-    endif
-    let digraphs = copy(a:digraphs)
+function! s:filter_digraphs(digraphs, char) abort
+  if !g:HUDG_filtering
+    return a:digraphs
+  endif
+  let digraphs = copy(a:digraphs)
 
-    for line in range(len(digraphs))
-        let filtered_line = []
-        for digraph_spec in split(digraphs[line], '.\{9}\zs  ')
-            let filtered_spec = substitute(digraph_spec, '\C^.. --> [^'.a:char.']\{2}\s*$', repeat(' ',9), '')
-            let filtered_spec = substitute(filtered_spec, '\C^.. --> \S\zs['.a:char.']\ze\s*$', ' ', '')
-            let filtered_spec = substitute(filtered_spec, '\C^.. --> \zs['.a:char.']\ze\S\s*$', ' ', '')
-            let filtered_line += [filtered_spec]
-        endfor
-        let digraphs[line] = join(filtered_line, '  ')
+  for line in range(len(digraphs))
+    let filtered_line = ''
+    for digraph_spec in split(digraphs[line], '..\s*.\zs\s*')
+      let [key_code, digraph] = split(digraph_spec, '\s\+')
+      if key_code =~# '\V\^' . a:char
+        let filtered_line .= ' ' . key_code[1:] . ' ' . digraph . "\t"
+      else
+        let filtered_line .= repeat(' ',strdisplaywidth(digraph_spec)) . "\t"
+      endif
     endfor
+    let digraphs[line] = filtered_line
+  endfor
 
-    return digraphs
+  return digraphs
 endfunction
 
-" Rearrange digraph table more usefully...
-function! s:get_retabulated_digraphs ()
-    " Get raw data...
-    silent let digraphs_list = split(s:get_digraphs(), "\n")
+function! s:digraphs_table() abort
+  silent! let digraphs_list = split(Get_digraphs(), "\n")
 
-    " Convert to table...
-    let digraphs_table = []
-    for line in range(len(digraphs_list))
-        let table_line = []
-        for digraph_spec in split(digraphs_list[line], '.\{9}\zs  ')
-            let match_parts = matchlist(digraph_spec, '^\(..\) \(\S\{1,2}\)')
-            if !len(match_parts)
-                let match_parts = ['','??','?']
-            endif
-            let table_line += [printf('%2s',match_parts[2]) . ' --> ' . match_parts[1]]
-        endfor
-        let digraphs_table += [join(table_line, '  ')]
+  let digraphs_table = []
+  for line in range(len(digraphs_list))
+    let table_line = ''
+    for digraph_spec in split(digraphs_list[line], '..\s*.\s*\d\+\s\zs\s*')
+      try
+        let [key_code, digraph, unicode] = split(digraph_spec, '\s\+')
+      catch
+        let [key_code, digraph, unicode] = ['','',0]
+      endtry
+      if (unicode >= 160 && unicode < 1488) || unicode > 1700
+        " let digraphs_table += [digraph_spec]
+        let table_line .= key_code . ' ' . digraph . "\t"
+        " let digraphs_table += [key_code . ' ' . digraph . ' ']
+      endif
     endfor
+    if !empty(table_line)
+      let digraphs_table += [table_line]
+    endif
+  endfor
 
-    return digraphs_table
+
+
+  return digraphs_table
 endfunction
 
 " Emulate a more helpful ^K...
 function! HUDG_GetDigraph ()
+  let more = &more
+  set nomore
     " Locate cursor...
     let context = { 'line': winline(), 'col': wincol(), 'text': getline('.') }
 
     " Grab list of digraphs...
-    let digraphs = s:get_retabulated_digraphs()
+    let digraphs = s:digraphs_table()
 
     " Simulate first char of two-character digraph code (with <C-K> or <ESC> to escape)...
     call s:show_digraphs(digraphs, '?', context)
@@ -133,7 +142,10 @@ function! HUDG_GetDigraph ()
 
     " Return the digraph-constructing sequence...
     return "\<C-K>".char1.char2
+    let &more = more
 endfunction
+
+inoremap <expr> <C-k> HUDG_GetDigraph()
 
 
 
