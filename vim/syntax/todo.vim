@@ -29,7 +29,7 @@ syn match todoListMarker "[-+*]" contained
 syn match todoList "[-+*]\s\+.*" contains=todoListMarker,@todoWords,todoDate,todoBox
 
 syn match todoHeaderMarker ":" conceal contained
-syn match todoHeader "^.\S.*" contains=todoBox
+syn match todoHeader "^\S.*" contains=todoBox
 syn match todoSubHeader "\s\+\zs:.*" contains=todoHeaderMarker,todoBox
 
 hi def link todoTODOwords Todo
