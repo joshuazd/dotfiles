@@ -12,10 +12,12 @@ function! verymagic#verymagic(...) abort
     return char
   endif
   let linenum_pat = '%(\d+|\.|\$|\%|''[a-zA-Z<>]|\?|\&|\/.*\/|\?.*\?|\/)'
-  let commands = '%(s%[ubstitute]|v%[global]|g%[lobal]\!?|sor%[t]\!?%(\s+[bfinorux]*)?\s+)'
-  let sub_pat = '\v^%(%(' . linenum_pat . '%([,;]' . linenum_pat . ')*)?' . commands . ')$'
+  let commands = '\s*%(s%[ubstitute]|v%[global]|g%[lobal]\!?|sor%[t]\!?%(\s+[bfinorux]*)?\s+)'
+  let range = '%(' . linenum_pat . '%([,;]' . linenum_pat . ')*)?'
+  let do_pat = '\v^%(' . range . '%(windo|bufdo\!?)\s+' . range . commands . ')$'
+  let sub_pat = '\v^%(' . range . commands . ')$'
   let range_pat = '\v^%(%(' . linenum_pat . '[,;])+)$'
-  if cmdline =~# sub_pat || ((cmdline =~# range_pat || cmdline ==? '') && char =~? '[/?]')
+  if cmdline =~# sub_pat || ((cmdline =~# range_pat || cmdline ==? '') && char =~? '[/?]') || cmdline =~# do_pat
     return char .'\v'
   else
     return char
