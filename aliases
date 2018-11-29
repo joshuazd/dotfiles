@@ -23,6 +23,7 @@ alias mcar='cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /h/car-files/'
 alias build='mvn install; mcar'
 
 alias cvi='vi -u ~/dotfiles/microvimrc --noplugin -N'
+alias e='vi -Nu ~/dotfiles/microvimrc'
 alias mvi='vi -u ~/dotfiles/minvimrc -N'
 alias nvi='vi -u ~/dotfiles/nanovimrc -N'
 

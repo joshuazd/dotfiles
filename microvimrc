@@ -40,16 +40,14 @@ set completeopt+=menuone,noselect,longest     " configure popup menu
 set autoread                                  " automatically reread changed files
 set path=.,**                                 " set path to all subdirectories
 set tags=./tags,tags
+colorscheme default
+set background=dark
 filetype plugin indent on
 
 nnoremap L $
 nnoremap H ^
 xnoremap L $
 xnoremap H ^
-
-nnoremap <expr> n &hlsearch ? 'n' : ':set hlsearch<CR>'
-nnoremap <expr> N &hlsearch ? 'N' : ':set hlsearch<CR>'
-nnoremap <Space>q :nohlsearch<CR>:setlocal nohlsearch<CR>
 
 nnoremap Y y$
 
@@ -62,13 +60,38 @@ nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
 nnoremap gk k
+nnoremap ' `
+nnoremap * :set hlsearch<CR>*N
+nnoremap c* :set hlsearch<CR>*Ncgn
 
+" select column
+xnoremap <silent> ac :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'<") . "\|"<CR>
+onoremap <silent> ac :normal vac<CR>
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find<space>
+nnoremap <Space>s :sfind<space>
+nnoremap <Space>v :vert sfind<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
-nnoremap <Space>j :tjump /
+nnoremap <Space>t :tjump /
+nnoremap <Space>g :g/\v/#<Left><Left>
+xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#
 nnoremap <Space>i :ilist /
+nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
+xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=escape(@a,'\\/\|')<CR>//g<Left><Left>
+
+" vim-unimpaired settings toggles
+nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
+nnoremap =oc :setlocal cursorline!     \|setlocal cursorline?<CR>
+nnoremap =oz :setlocal list!           \|setlocal list?<CR>
+nnoremap =on :setlocal number!         \|setlocal number?<CR>
+nnoremap =or :setlocal relativenumber! \|setlocal relativenumber?<CR>
+nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
+nnoremap =ou :setlocal cursorcolumn!   \|setlocal cursorcolumn?<CR>
+nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
+nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR>\|setlocal signcolumn?<CR>
+nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR>\|setlocal conceallevel?<CR>
+nnoremap =oy :if exists('g:syntax_on') \| syntax off \| else \| syntax enable \| endif<CR>
 
 inoremap jk <esc>
 
