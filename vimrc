@@ -11,14 +11,13 @@ endif
 
 if !empty(glob(vimdir . '/autoload/plug.vim'))
   call plug#begin(vimdir . '/bundle/')
-  Plug 'Shougo/echodoc.vim'
+  Plug 'Shougo/echodoc.vim', { 'for': ['java'] }
   Plug 'lifepillar/vim-mucomplete'
   Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-obsession'
+  Plug 'tpope/vim-obsession', { 'on' : 'Obsession' }
   Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-commentary'
-  Plug 'tpope/vim-endwise'
   Plug 'tommcdo/vim-lion'
   Plug 'romainl/vim-qf'
   Plug 'romainl/vim-qlist'
@@ -27,15 +26,9 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   if !has('win32')
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
-    Plug 'autozimu/LanguageClient-neovim', {
-          \ 'branch': 'next',
-          \ 'do': 'bash install.sh',
-          \ }
+    Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'on': [] }
   else
-    Plug 'autozimu/LanguageClient-neovim', {
-          \ 'branch': 'next',
-          \ 'do': 'powershell -executionpolicy bypass -File install.ps1',
-          \ }
+    Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'powershell -executionpolicy bypass -File install.ps1', 'on': [] }
   endif
   if executable('ctags')
     Plug 'ludovicchabant/vim-gutentags'
@@ -44,13 +37,15 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
     Plug 'SirVer/ultisnips'
     Plug 'davidhalter/jedi-vim', { 'for': 'python' }
   endif
-  Plug vimdir . '/local-bundle/vim-decselect'
-  Plug vimdir . '/local-bundle/vim-hilinktrace'
-  Plug vimdir . '/local-bundle/vim-indentmotion'
-  Plug vimdir . '/local-bundle/vim-marks'
-  Plug vimdir . '/local-bundle/vim-previewdoc'
-  Plug vimdir . '/local-bundle/vim-verymagic'
   call plug#end()
+  augroup plug_lsp
+    autocmd!
+    autocmd CursorHold *.java call plug#load('LanguageClient-neovim') | call LanguageClient#startServer() | autocmd! plug_lsp
+  augroup END
+    augroup plug_obsession
+    autocmd!
+    autocmd SessionLoadPost * call plug#load('vim-obsession') | autocmd! plug_obsession
+  augroup END
 else
   syntax enable
   filetype plugin indent on
@@ -307,8 +302,10 @@ augroup EditVim
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
   if !empty(glob(vimdir . '/autoload/functions.vim'))
-    autocmd FileType           *            call functions#LC_maps() | call functions#findFuncDefs()
+    autocmd FileType         *            call functions#LC_maps() | call functions#findFuncDefs()
   endif
+  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == '' | set filetype=xml | endif
+  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' | set filetype=java | endif
 augroup END
 
 command! TrimWhiteSpace call functions#TrimWhiteSpace()
