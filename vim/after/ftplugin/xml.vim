@@ -3,9 +3,11 @@ setlocal smarttab
 setlocal conceallevel=0
 setlocal foldnestmax=2
 setlocal iskeyword+=-
+setlocal expandtab
+setlocal tabstop=2
+setlocal shiftwidth=2
+setlocal softtabstop=2
 inoremap <buffer> <expr> / getline('.')[col('.')-2] ==# '<' ? "/\<C-x>\<C-o>\<C-n>\<C-y>" : "/"
-nnoremap <buffer> { ?<[^\/]\+><CR>
-nnoremap <buffer> } /<[^\/]\+><CR>
 nnoremap <silent> <buffer> [m ?<resource<CR>
 nnoremap <silent> <buffer> ]m /<resource<CR>
 xnoremap <silent> <buffer> [m ?<resource<CR>
@@ -23,7 +25,7 @@ compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
 setlocal formatprg=xmllint\ --format\ -
 setlocal syntax=xml
-setlocal path=.,*/src/main/synapse-config/*/,*/src/main/dataservice/,*_DataMapper/,*/dataservice/
+setlocal path=.,*/src/main/synapse-config/,*/src/main/dataservice/,*_DataMapper/,*/dataservice/
 set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
 nnoremap ,f zMzr
@@ -44,10 +46,11 @@ augroup XML
   autocmd BufEnter */proxy-services/*.xml XMLns proxyservice
 augroup END
 
-let b:endwise_addition = '\="</".submatch(0)[1:stridx(submatch(0)," ")-1].">"'
-let b:endwise_words = ''
-let b:endwise_pattern = '<\%([^ /!?"''<>][^>]*\)\?[^/>]>\s*$'
-let b:endwise_syngroups = 'xmlTag,xmlTagPunct'
+" let b:endwise_addition = '\="</".submatch(0)[1:stridx(submatch(0)," ")-1].">"'
+" let b:endwise_words = ''
+" let b:endwise_pattern = '<\%([^ /!?"''<>][^>]*\)\?[^/>]>\s*$'
+" let b:endwise_syngroups = 'xmlTag,xmlTagPunct'
+
 let b:decselect_char = '\S'
 
 let g:xmldata_none = {}
