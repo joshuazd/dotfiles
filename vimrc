@@ -44,13 +44,13 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   augroup END
     augroup plug_obsession
     autocmd!
-    autocmd SessionLoadPost * call plug#load('vim-obsession') | autocmd! plug_obsession
+    autocmd SessionLoadPost * if exists('g:this_obsession') | call plug#load('vim-obsession') | endif | autocmd! plug_obsession
   augroup END
 else
   syntax enable
   filetype plugin indent on
 endif
-runtime macros/matchit.vim
+packadd! matchit
 " }}}
 
 "===============================================
