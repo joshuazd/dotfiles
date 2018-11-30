@@ -11,38 +11,38 @@ endif
 
 if !empty(glob(vimdir . '/autoload/plug.vim'))
   call plug#begin(vimdir . '/bundle/')
-  Plug 'Shougo/echodoc.vim', { 'for': ['java'] }
-  Plug 'lifepillar/vim-mucomplete'
-  Plug 'justinmk/vim-sneak'
-  Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-obsession', { 'on' : 'Obsession' }
-  Plug 'tpope/vim-repeat'
-  Plug 'tpope/vim-commentary'
-  Plug 'tommcdo/vim-lion'
-  Plug 'romainl/vim-qf'
-  Plug 'romainl/vim-qlist'
-  Plug 'markonm/traces.vim'
-  Plug 'sgur/vim-editorconfig'
-  if !has('win32')
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-    Plug 'junegunn/fzf.vim'
-    Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'on': [] }
-  else
-    Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'powershell -executionpolicy bypass -File install.ps1', 'on': [] }
-  endif
-  if executable('ctags')
-    Plug 'ludovicchabant/vim-gutentags'
-  endif
-  if has('python') || has('python3')
-    Plug 'SirVer/ultisnips'
-    Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-  endif
+    Plug 'Shougo/echodoc.vim', { 'for': ['java'] }
+    Plug 'lifepillar/vim-mucomplete'
+    Plug 'justinmk/vim-sneak'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-obsession', { 'on' : 'Obsession' }
+    Plug 'tpope/vim-repeat'
+    Plug 'tpope/vim-commentary'
+    Plug 'tommcdo/vim-lion'
+    Plug 'romainl/vim-qf'
+    Plug 'romainl/vim-qlist'
+    Plug 'markonm/traces.vim'
+    Plug 'sgur/vim-editorconfig'
+    if !has('win32')
+      Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+      Plug 'junegunn/fzf.vim'
+      Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'on': [] }
+    else
+      Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'powershell -executionpolicy bypass -File install.ps1', 'on': [] }
+    endif
+    if executable('ctags')
+      Plug 'ludovicchabant/vim-gutentags'
+    endif
+    if has('python') || has('python3')
+      Plug 'SirVer/ultisnips'
+      Plug 'davidhalter/jedi-vim', { 'for': 'python' }
+    endif
   call plug#end()
   augroup plug_lsp
     autocmd!
     autocmd CursorHold *.java call plug#load('LanguageClient-neovim') | call LanguageClient#startServer() | autocmd! plug_lsp
   augroup END
-    augroup plug_obsession
+  augroup plug_obsession
     autocmd!
     autocmd SessionLoadPost * if exists('g:this_obsession') | call plug#load('vim-obsession') | endif | autocmd! plug_obsession
   augroup END
