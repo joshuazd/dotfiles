@@ -1,3 +1,4 @@
+" Remove whitespace from end of lines
 function! functions#TrimWhiteSpace() abort
   if !&binary && &filetype !=? 'diff'
     let l:save = winsaveview()
@@ -8,6 +9,7 @@ function! functions#TrimWhiteSpace() abort
   endif
 endfunction
 
+" Refresh anything that needs to be refreshed
 function! functions#VimRefresh() abort
   if exists('g:loaded_gutentags') && g:loaded_gutentags == 1
     GutentagsUpdate!
@@ -17,6 +19,7 @@ function! functions#VimRefresh() abort
   echo 'Vim is refreshed'
 endfunction
 
+" Edit an encrypted ansible file
 function! functions#AnsibleEdit() abort
   silent! new
   silent! put! a
@@ -29,6 +32,7 @@ function! functions#AnsibleEdit() abort
   echo 'Ansible vault decrypted'
 endfunction
 
+" Re-encrypt a file with ansible
 function! functions#AnsibleEncrypt() abort
   silent! set buftype=
   silent! execute 'write!' fnameescape(tempname())
@@ -37,6 +41,7 @@ function! functions#AnsibleEncrypt() abort
   echo 'Ansible vault encrypted'
 endfunction
 
+" function for 'foldtext'
 function! functions#MyFoldText() abort
   let line = getline(v:foldstart)
   let n = v:foldend - v:foldstart + 1
@@ -48,6 +53,7 @@ function! functions#MyFoldText() abort
   return line . info
 endfunction
 
+" function to create a put operator
 function! functions#PutOperator(...) abort
   if !a:0
     return ":set opfunc=functions#PutOperator\<cr>\"" . v:register . 'g@'
@@ -59,6 +65,7 @@ function! functions#PutOperator(...) abort
   endif
 endfunction
 
+" Clears some distractions, toggleable
 function! functions#Focus() abort
   if exists('g:focus_enabled') && g:focus_enabled == 1
     let &laststatus = g:old_laststatus
@@ -80,6 +87,7 @@ function! functions#Focus() abort
   endif
 endfunction
 
+" Sets up maps for language server client
 function! functions#LC_maps() abort
   if has_key(g:LanguageClient_serverCommands, &filetype)
     nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
@@ -93,6 +101,7 @@ function! functions#LC_maps() abort
   endif
 endfunction
 
+" regexes for function names for findfunc#FindFunc
 function! functions#findFuncDefs() abort
   let g:findfunc = {'vim'   : ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
         \'xml'   : ['^\s*<resource', '<\/resource>', '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@='],
