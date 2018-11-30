@@ -25,9 +25,10 @@ compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
 setlocal formatprg=xmllint\ --format\ -
 setlocal syntax=xml
-setlocal path=.,*/src/main/synapse-config/,*/src/main/dataservice/,*_DataMapper/,*/dataservice/
+setlocal path=.,*/src/main/synapse-config,*/src/main/dataservice/,*_DataMapper/,*/dataservice/,*/src/main/synapse-config/*
 set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
+setlocal include=\\%(target\\\|key\\)=\"\\zs\\w\\+\\ze\"
 nnoremap ,f zMzr
 
 augroup XML
