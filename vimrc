@@ -103,6 +103,7 @@ set wildignore+=*target/*,*bin/*,*build/*     " Ignore build artifacts
 set wildignore+=tags,Session.vim              " Ignore tags and session files
 set foldmethod=marker                         " fold based on marker by default
 set foldlevelstart=4                          " don't fold things by default
+set complete-=i                               " don't scan included files for completion
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
 set concealcursor+=n                          " conceal characters in normal mode
 set conceallevel=2                            " conceal characters by default
@@ -152,10 +153,10 @@ catch
 endtry
 if executable('rg')                           " use ripgrep when available
   set grepprg=rg\ --vimgrep
-  set grepformat=%f:%l:%c:%m,%f:%l:%m
+  set grepformat=%f:%l:%c:%m
 elseif executable('ag')                       " use ag when available and ripgrep is not
   set grepprg=ag\ --vimgrep
-  set grepformat=%f:%l:%c:%m,%f:%l:%m
+  set grepformat=%f:%l:%c:%m
 endif
 if has('gui_running')
   if has('win32')
@@ -200,7 +201,7 @@ xnoremap <Space>e :yank\|vnew\|silent! put!\|set bt=nofile bh=wipe ft= \|normal!
 " redraw
 nnoremap <C-w>a :redraw!<CR>
 " select column
-xnoremap <silent> ac :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'<") . "\|"<CR>
+xnoremap <silent> ac :<C-u>execute "normal! vip\<lt>C-v>" . virtcol("'>") . "\|O" . virtcol("'<") . "\|"<CR>
 onoremap <silent> ac :normal vac<CR>
 
 " new text objects
@@ -221,19 +222,15 @@ nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
 nnoremap <Space>t :tjump /
 nnoremap <Space>l :set colorcolumn=
 nnoremap <Space>g :g/\v/#<Left><Left>
-xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#
+xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>
 nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=escape(@a,'\\/\|')<CR>//g<Left><Left>
 
 " vim-unimpaired settings toggles
 nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
-nnoremap =oc :setlocal cursorline!     \|setlocal cursorline?<CR>
 nnoremap =oz :setlocal list!           \|setlocal list?<CR>
-nnoremap =on :setlocal number!         \|setlocal number?<CR>
-nnoremap =or :setlocal relativenumber! \|setlocal relativenumber?<CR>
 nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
-nnoremap =ou :setlocal cursorcolumn!   \|setlocal cursorcolumn?<CR>
 nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR>\|setlocal signcolumn?<CR>
 nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR>\|setlocal conceallevel?<CR>
@@ -251,9 +248,6 @@ inoremap jk <Esc>
 
 " smarter pasting
 nnoremap <silent> <Space>p p=']
-nnoremap <silent> <Space>P P=']
-xnoremap <silent> <Space>p p=']
-xnoremap <silent> <Space>P P=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
 nnoremap <expr> <silent> zp functions#PutOperator()
 nmap <silent> zpp Vp
@@ -302,7 +296,7 @@ augroup EditVim
   if !empty(glob(vimdir . '/autoload/functions.vim'))
     autocmd FileType         *            call functions#LC_maps() | call functions#findFuncDefs()
   endif
-  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == '' | set filetype=xml | endif
+  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == ''      | set filetype=xml  | endif
   autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' | set filetype=java | endif
 augroup END
 
