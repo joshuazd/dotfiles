@@ -74,7 +74,7 @@ let b:xmldata_endpoint = {
       \ {'policy': ['UTPasswordPolicy']}
       \ ]
       \ }
-let b:xml_mediator_names = ['property', 'call-template', 'filter', 'payloadFactory', 'respond', 'store', 'send', 'call', 'log', 'sequence', 'enrich', 'xslt', 'script', 'class', 'header', 'dbreport', 'dblookup', 'datamapper']
+let b:xml_mediator_names = ['property', 'call-template', 'filter', 'payloadFactory', 'respond', 'store', 'send', 'call', 'log', 'sequence', 'enrich', 'xslt', 'script', 'class', 'header', 'dbreport', 'dblookup', 'datamapper', 'loopback']
 let b:xmldata_mediators = {
       \ 'property': [
       \ [],
@@ -196,7 +196,8 @@ let b:xmldata_mediators = {
       \ 'property': ['/>', ''],
       \ 'respond': ['/>', ''],
       \ 'with-param': ['/>', ''],
-      \ 'store': ['/>', '']
+      \ 'store': ['/>', ''],
+      \ 'loopback': ['/>', '']
       \ }
       \ }
 let b:xmldata_mediators = extend(b:xmldata_mediators, b:xmldata_endpoint)
