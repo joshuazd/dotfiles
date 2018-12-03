@@ -9,6 +9,7 @@ if has('win32')
   set rtp^=~/dotfiles/vim
 endif
 
+" plug configuration found in ~/.vim/plugin/variables.vim
 if !empty(glob(vimdir . '/autoload/plug.vim'))
   call plug#begin(vimdir . '/bundle/')
     Plug 'Shougo/echodoc.vim', { 'for': ['java'] }
@@ -293,9 +294,6 @@ nnoremap <silent> <expr> <C-w>f winnr('$') > 1
 " {{{
 augroup EditVim
   autocmd!
-  autocmd BufNewFile,BufRead *.zsh-theme  set filetype=zsh
-  autocmd BufNewFile,BufRead *.dbs        set filetype=xml
-  autocmd BufNewFile,BufRead *.dmc        set filetype=javascript
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
   autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
