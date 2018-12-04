@@ -249,12 +249,12 @@ inoremap jk <Esc>
 " smarter pasting
 nnoremap <silent> <Space>p p=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
-nnoremap <expr> <silent> zp functions#PutOperator()
+nnoremap <expr> <silent> zp putoperator#PutOperator()
 nmap <silent> zpp Vp
 
 " misc functions
-nnoremap <silent> <F5> :call functions#VimRefresh()<CR>
-nnoremap <silent> <F11> :call functions#Focus()<CR>
+nnoremap <silent> <F5> :call vim#VimRefresh()<CR>
+nnoremap <silent> <F11> :call vim#Focus()<CR>
 nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 
 " better tag jumping
@@ -300,11 +300,11 @@ augroup EditVim
   autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' | set filetype=java | endif
 augroup END
 
-command! TrimWhiteSpace call functions#TrimWhiteSpace()
-command! -range=% AE <line1>,<line2>yank a|silent! call functions#AnsibleEdit()
-command! AC call functions#AnsibleEncrypt()
+command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
+command! -range=% AE <line1>,<line2>yank a|silent! call ansible#AnsibleEdit()
+command! AC call ansible#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
-command! Focus call functions#Focus()
+command! Focus call vim#Focus()
 command! -nargs=1 -complete=color Theme colo <args>|!theme <args>
 command! -range=% FormatJSON <line1>,<line2>!python2 -c
       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"

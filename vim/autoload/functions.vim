@@ -1,46 +1,3 @@
-" Remove whitespace from end of lines
-function! functions#TrimWhiteSpace() abort
-  if !&binary && &filetype !=? 'diff'
-    let l:save = winsaveview()
-    " vint: -ProhibitCommandRelyOnUser -ProhibitCommandWithUnintendedSideEffect
-    keeppatterns %s/\s\+$//e
-    " vint: +ProhibitCommandRelyOnUser +ProhibitCommandWithUnintendedSideEffect
-    call winrestview(l:save)
-  endif
-endfunction
-
-" Refresh anything that needs to be refreshed
-function! functions#VimRefresh() abort
-  if exists('g:loaded_gutentags') && g:loaded_gutentags == 1
-    GutentagsUpdate!
-  endif
-  redraw!
-  syntax sync fromstart
-  echo 'Vim is refreshed'
-endfunction
-
-" Edit an encrypted ansible file
-function! functions#AnsibleEdit() abort
-  silent! new
-  silent! put! a
-  silent! keeppatterns %s/^\s\+//
-  silent! execute 'write!' fnameescape(tempname())
-  silent! !cp % temp
-  silent! !ansible-vault view temp >| %
-  silent! !rm temp
-  silent! redraw!
-  echo 'Ansible vault decrypted'
-endfunction
-
-" Re-encrypt a file with ansible
-function! functions#AnsibleEncrypt() abort
-  silent! set buftype=
-  silent! execute 'write!' fnameescape(tempname())
-  silent! !ansible-vault encrypt %
-  silent! redraw!
-  echo 'Ansible vault encrypted'
-endfunction
-
 " function for 'foldtext'
 function! functions#MyFoldText() abort
   let line = getline(v:foldstart)
@@ -51,40 +8,6 @@ function! functions#MyFoldText() abort
   let fold_w = getwinvar(0, '&foldcolumn')
   let line = strpart(line, 0, winwidth(0) - strchars(info) - num_w - fold_w)
   return line . info
-endfunction
-
-" function to create a put operator
-function! functions#PutOperator(...) abort
-  if !a:0
-    return ":set opfunc=functions#PutOperator\<cr>\"" . v:register . 'g@'
-  else
-    let visual = get({'line': 'V', 'block': "\<c-v>"}, a:1, 'v')
-    let [rv, rt] = [getreg(v:register), getregtype(v:register)]
-    execute 'normal! g`[' . visual . 'g`]"' . v:register . 'p'
-    call setreg(v:register, rv, rt)
-  endif
-endfunction
-
-" Clears some distractions, toggleable
-function! functions#Focus() abort
-  if exists('g:focus_enabled') && g:focus_enabled == 1
-    let &laststatus = g:old_laststatus
-    set noshowmode
-    if executable('tmux') && $TMUX !=? ''
-      silent! !tmux resize-pane -Z
-      silent! !tmux set status on
-    endif
-    let g:focus_enabled = 0
-  else
-    let g:focus_enabled = 1
-    let g:old_laststatus = &laststatus
-    set laststatus=0
-    set showmode
-    if executable('tmux') && $TMUX !=? ''
-      silent! !tmux resize-pane -Z
-      silent! !tmux set status off
-    endif
-  endif
 endfunction
 
 " Sets up maps for language server client
