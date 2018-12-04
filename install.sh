@@ -3,69 +3,38 @@
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
-if [[ $(uname -s) != CYGWIN* ]]; then
+if [ $(uname -s) != CYGWIN* ]; then
     ./tools.sh
 fi
 
-if [ -d $HOME/.vim ]; then
-    echo "Backing up exising vim config to .vim.old"
-    mv $HOME/.vim $HOME/.vim.old
+read -p 'Backup existing files (Y/n)' backup
+if [ -z $backup ]; then
+    backup='y'
 fi
-ln -s $PWD/vim $HOME/.vim
 
-if [ -f $HOME/.vimrc ]; then
-    echo "Backing up existing vimrc to .vimrc.old"
-    mv $HOME/.vimrc $HOME/.vimrc.old
-fi
-ln -s $PWD/vimrc $HOME/.vimrc
+install() {
+    if [ -f "$HOME/.$1" ] || [ -d "$HOME/.$1" ]; then
+        if [ "$backup" = 'y' ] || [ "$backup" = 'Y' ]; then
+            echo "Backing up existing $1 to .$1.old"
+            mv "$HOME/.$1" "$HOME/.$1.old"
+        else
+            rm "$HOME/.$1"
+        fi
+    fi
+    echo "Installing $1"
+    ln -s "$PWD/$1" "$HOME/.$1"
+}
 
-if [ -f $HOME/.inputrc ]; then
-    echo "Backing up existing inputrc to .inputrc.old"
-    mv $HOME/.inputrc $HOME/.inputrc.old
-fi
-ln -s $PWD/inputrc $HOME/.inputrc
-
-if [ -f $HOME/.bashrc ]; then
-    echo "Backing up existing bashrc to .bashrc.old"
-    mv $HOME/.bashrc $HOME/.bashrc.old
-fi
-ln -s $PWD/bashrc $HOME/.bashrc
-
-if [ -f $HOME/.zshrc ]; then
-    echo "Backing up existing zshrc to .zshrc.old"
-    mv $HOME/.zshrc $HOME/.zshrc.old
-fi
-ln -s $PWD/zshrc $HOME/.zshrc
-
-if [ -f $HOME/.aliases ]; then
-    echo "Backing up existing aliases to .aliases.old"
-    mv $HOME/.aliases $HOME/.aliases.old
-fi
-ln -s $PWD/aliases $HOME/.aliases
-
-if [ -f $HOME/.functions ]; then
-    echo "Backing up existing functions to .functions.old"
-    mv $HOME/.functions $HOME/.functions.old
-fi
-ln -s $PWD/functions $HOME/.functions
-
-if [ -f $HOME/.tmux.conf ]; then
-    echo "Backing up existing tmux.conf to .tmux.conf.old"
-    mv $HOME/.tmux.conf $HOME/.tmux.conf.old
-fi
-ln -s $PWD/tmux.conf $HOME/.tmux.conf
-
-if [ -f $HOME/.editorconfig ]; then
-    echo "Backing up existing editorconfig to .editorconfig.old"
-    mv $HOME/.editorconfig $HOME/.editorconfig.old
-fi
-ln -s $PWD/editorconfig $HOME/.editorconfig
-
-if [ -f $HOME/.bin ]; then
-    echo "Backing up existing bin to .bin.old"
-    mv $HOME/.bin $HOME/.bin.old
-fi
-ln -s $PWD/bin $HOME/.bin
+install vim
+install vimrc
+install inputrc
+install bashrc
+install zshrc
+install aliases
+install functions
+install tmux.conf
+install editorconfig
+install bin
 
 echo "Creating symlinks for theme"
 if [ -f /usr/local/share/zsh/site-functions/prompt_nier_setup ]; then
