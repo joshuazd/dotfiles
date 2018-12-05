@@ -11,6 +11,7 @@ endif
 
 " plug configuration found in ~/.vim/plugin/variables.vim
 if !empty(glob(vimdir . '/autoload/plug.vim'))
+  filetype off
   call plug#begin(vimdir . '/bundle/')
     Plug 'Shougo/echodoc.vim', { 'for': ['java'] }
     Plug 'lifepillar/vim-mucomplete'
@@ -47,11 +48,10 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
     autocmd!
     autocmd SessionLoadPost * if exists('g:this_obsession') | call plug#load('vim-obsession') | endif | autocmd! plug_obsession
   augroup END
-else
-  syntax enable
-  filetype plugin indent on
 endif
 packadd! matchit
+syntax off
+filetype plugin indent on
 " }}}
 
 "===============================================
