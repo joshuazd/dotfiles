@@ -99,14 +99,14 @@ syn match   xmlAttrib
 "
 if exists('g:xml_namespace_transparent')
 syn match   xmlNamespace
-    \ +\(<\|</\)\@2<=[^ /!?<>"':]\+[:]\@=+
+    \ +\(<\/\?\)\@2<=[^ /!?<>"':]\+:\@=+
     \ contained
     \ contains=@xmlNamespaceHook
     \ transparent
     \ display
 else
 syn match   xmlNamespace
-    \ +\(<\|</\)\@2<=[^ /!?<>"':]\+[:]\@=+
+    \ +\(<\/\?\)\@2<=[^ /!?<>"':]\+:\@=+
     \ contained
     \ contains=@xmlNamespaceHook
     \ display
