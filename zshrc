@@ -40,8 +40,8 @@ setopt listpacked
 # Editing settings
 stty -ixon
 bindkey -v
-export EDITOR=vim\ -u\ ~/dotfiles/nanovimrc\ -N
-export VISUAL=vim\ -u\ ~/dotfiles/nanovimrc\ -N
+export EDITOR=vim\ -Nu\ ~/dotfiles/nanovimrc
+export VISUAL=vim\ -Nu\ ~/dotfiles/nanovimrc
 export KEYTIMEOUT=1
 autoload zmv
 autoload -U edit-command-line
