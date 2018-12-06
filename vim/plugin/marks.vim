@@ -1,9 +1,3 @@
-" vim-marks
-" Maintainer:	joshuazd
-" Version:	0.1.0
-" Location:	plugin/marks.vim
-"
-
 if exists('g:loaded_marks')
   finish
 endif

@@ -1,9 +1,3 @@
-" vim-decselect
-" Maintainer:	joshuazd
-" Version:	0.1.0
-" Location:	plugin/decselect.vim
-"
-
 if exists('g:loaded_decselect')
   finish
 endif

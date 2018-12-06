@@ -1,3 +1,11 @@
+if exists('g:loaded_tmuxnavigate')
+  finish
+endif
+let g:loaded_tmuxnavigate = 1
+
+let s:save_cpo = &cpo
+set cpo&vim
+
 let s:tmux_is_last_pane = 0
 augroup tmux_navigator
   autocmd!
@@ -13,3 +21,6 @@ nmap <silent> <C-h> <Plug>(tmuxLeft)
 nmap <silent> <C-l> <Plug>(tmuxRight)
 nmap <silent> <C-k> <Plug>(tmuxUp)
 nmap <silent> <C-j> <Plug>(tmuxDown)
+
+let &cpo = s:save_cpo
+unlet s:save_cpo

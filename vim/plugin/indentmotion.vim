@@ -1,9 +1,3 @@
-" vim-indentmotion
-" Maintainer:	joshuazd
-" Version:	0.1.0
-" Location:	plugin/indentmotion.vim
-"
-
 if exists('g:loaded_indentmotion')
   finish
 endif

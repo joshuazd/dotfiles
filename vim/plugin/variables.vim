@@ -1,3 +1,8 @@
+if exists('g:loaded_variables')
+  finish
+endif
+let g:loaded_variables = 1
+
 " ultisnips
 let g:UltiSnipsListSnippets        = '<C-@>'
 let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
