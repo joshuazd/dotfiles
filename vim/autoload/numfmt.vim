@@ -12,5 +12,3 @@ function! numfmt#convertNum(num) abort
   endif
   let @n = substitute(a:num, '.\{-}\zs\(\d\+,\?\)\+\d\+\ze.\{-}', num, '')
 endfunction
-
-

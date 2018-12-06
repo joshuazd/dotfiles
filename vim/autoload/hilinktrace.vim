@@ -1,6 +1,3 @@
-" ---------------------------------------------------------------------
-" HiLinkTrace: this function traces the highlighting group names {{{1
-"             from transparent/top level through to the bottom
 function! hilinktrace#HiLinkTrace(always)
 
   " save register a
@@ -90,6 +87,4 @@ function! hilinktrace#HiLinkTrace(always)
     endif
   endif
 
-  "  call Dret("HiLinkTrace : hilink<".hilink.">")
 endfunction
-

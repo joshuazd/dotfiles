@@ -1,4 +1,3 @@
-" Remove whitespace from end of lines
 function! whitespace#TrimWhiteSpace() abort
   if !&binary && &filetype !=? 'diff'
     let l:save = winsaveview()

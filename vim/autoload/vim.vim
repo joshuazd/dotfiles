@@ -1,4 +1,3 @@
-" Refresh anything that needs to be refreshed
 function! vim#VimRefresh() abort
   if exists('g:loaded_gutentags') && g:loaded_gutentags == 1
     GutentagsUpdate!
@@ -8,7 +7,6 @@ function! vim#VimRefresh() abort
   echo 'Vim is refreshed'
 endfunction
 
-" Clears some distractions, toggleable
 function! vim#Focus() abort
   if exists('g:focus_enabled') && g:focus_enabled == 1
     let &laststatus = g:old_laststatus

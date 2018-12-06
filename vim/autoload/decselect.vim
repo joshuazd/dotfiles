@@ -1,9 +1,3 @@
-" vim-decselect
-" Maintainer:	joshuazd
-" Version:	0.1.0
-" Location:	autoload/decselect.vim
-"
-
 function! decselect#Select(visual) abort
   let firstline = line('.')
   let curcol = col('.')

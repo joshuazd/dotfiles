@@ -1,7 +1,6 @@
-" function to create a put operator
 function! putoperator#PutOperator(...) abort
   if !a:0
-    return ":set opfunc=functions#PutOperator\<cr>\"" . v:register . 'g@'
+    return ":set opfunc=putoperator#PutOperator\<cr>\"" . v:register . 'g@'
   else
     let visual = get({'line': 'V', 'block': "\<c-v>"}, a:1, 'v')
     let [rv, rt] = [getreg(v:register), getregtype(v:register)]
