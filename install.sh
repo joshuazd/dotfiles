@@ -3,9 +3,10 @@
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
-if [ $(uname -s) != CYGWIN* ]; then
-    ./tools.sh
-fi
+case $(uname -s) in
+    Linux*) ./tools.sh ;;
+    *) ;;
+esac
 
 read -p 'Backup existing files (Y/n)' backup
 if [ -z $backup ]; then
