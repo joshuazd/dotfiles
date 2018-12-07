@@ -17,7 +17,6 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
     Plug 'lifepillar/vim-mucomplete'
     Plug 'justinmk/vim-sneak'
     Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-obsession', { 'on' : 'Obsession' }
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-commentary'
     Plug 'tommcdo/vim-lion'
@@ -28,9 +27,9 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
     if !has('win32')
       Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
       Plug 'junegunn/fzf.vim'
-      Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'on': [] }
+      Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'for': ['java'] }
     else
-      Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'powershell -executionpolicy bypass -File install.ps1', 'on': [] }
+      Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'powershell -executionpolicy bypass -File install.ps1', 'for': ['java'] }
     endif
     if executable('ctags')
       Plug 'ludovicchabant/vim-gutentags'
@@ -40,17 +39,9 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
       Plug 'davidhalter/jedi-vim', { 'for': 'python' }
     endif
   call plug#end()
-  augroup plug_lsp
-    autocmd!
-    autocmd CursorHold *.java call plug#load('LanguageClient-neovim') | call LanguageClient#startServer() | autocmd! plug_lsp
-  augroup END
-  augroup plug_obsession
-    autocmd!
-    autocmd SessionLoadPost * if exists('g:this_obsession') | call plug#load('vim-obsession') | endif | autocmd! plug_obsession
-  augroup END
 endif
 packadd! matchit
-syntax off
+syntax enable
 filetype plugin indent on
 " }}}
 
