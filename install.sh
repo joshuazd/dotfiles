@@ -23,7 +23,18 @@ install() {
         fi
     fi
     echo "Installing $1"
-    ln -s "$PWD/$1" "$HOME/.$1"
+
+    case $(uname -s) in
+        Linux*|Darwin*) ln -s "$PWD/$1" "$HOME/.$1" ;;
+        CYGWIN*)
+            currentdir=$(cygpath -w "$scriptdir")
+            if [ -d "$PWD/$1" ]; then
+                cygstart --action=runas cmd /C "cd %HOME% && mklink /D .$1 $currentdir\\$1"
+            elif [ -f "$PWD/$1" ]; then
+                cygstart --action=runas cmd /C "cd %HOME% && mklink .$1 $currentdir\\$1"
+            fi ;;
+        *) ;;
+    esac
 }
 
 install vim
