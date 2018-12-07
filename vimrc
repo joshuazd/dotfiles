@@ -5,14 +5,14 @@
 " Set up vim to work in windows(+cygwin) or linux environments
 let vimdir = '~/.vim'
 if has('win32')
-  let vimdir = '~/dotfiles/vim'
-  set rtp^=~/dotfiles/vim
+  set rtp^=~/.vim
+  set rtp+=~/.vim/after
 endif
 
 " plug configuration found in ~/.vim/plugin/variables.vim
-if !empty(glob(vimdir . '/autoload/plug.vim'))
+if !empty(glob('$HOME/.vim/autoload/plug.vim'))
   filetype off
-  call plug#begin(vimdir . '/bundle/')
+  call plug#begin('$HOME/.vim/bundle/')
     Plug 'Shougo/echodoc.vim', { 'for': ['java'] }
     Plug 'lifepillar/vim-mucomplete'
     Plug 'justinmk/vim-sneak'
@@ -50,7 +50,7 @@ if !empty(glob(vimdir . '/autoload/plug.vim'))
   augroup END
 endif
 packadd! matchit
-syntax off
+" syntax off
 filetype plugin indent on
 " }}}
 
@@ -293,7 +293,7 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
   autocmd InsertEnter        *            set listchars-=trail:─
   autocmd InsertLeave        *            set listchars+=trail:─
-  if !empty(glob(vimdir . '/autoload/functions.vim'))
+  if !empty(glob('$HOME/.vim/autoload/functions.vim'))
     autocmd FileType         *            call functions#LC_maps() | call functions#findFuncDefs()
   endif
   autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == ''      | set filetype=xml  | endif
@@ -330,7 +330,7 @@ if exists('+statusline')
   set statusline=\ %{get(g:modemap,mode('1'),'NORMAL')}
   set statusline+=\ %<%f%m%r
   set statusline+=\ %w%q%h%=
-  if !empty(glob(vimdir . '/autoload/findfunc.vim'))
+  if !empty(glob('$HOME/.vim/autoload/findfunc.vim'))
     set statusline+=%{findfunc#FindFunc()}
   endif
   set statusline+=\ %{g:stl_snippet[g:in_snippet]}
