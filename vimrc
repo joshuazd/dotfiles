@@ -104,6 +104,7 @@ set winminwidth=0                             " minimum window width
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 set virtualedit+=block                        " allow virtual editing in v-block mode
 set fillchars=vert:┃,diff:━                   " set characters for vert splits and diffs
+set diffopt+=algorithm:patience,indent-heuristic
 if has('win32')
   if !empty($TEMP)
       set backup
