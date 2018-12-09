@@ -227,7 +227,7 @@ hi! def link i3FocusOnActivationKeyword Identifier
 hi! def link i3DrawingMarksKeyword      Identifier
 hi! def link i3BlockKeyword             Identifier
 hi! def link i3Variable                 Statement
-hi! def link i3ArbitraryCommand         Ignore
+hi! def link i3ArbitraryCommand         Statement
 
 let b:current_syntax = 'i3'
 
