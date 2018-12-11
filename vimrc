@@ -19,6 +19,7 @@ if !empty(glob('$HOME/.vim/autoload/plug.vim'))
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-repeat'
     Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-apathy'
     Plug 'tommcdo/vim-lion'
     Plug 'romainl/vim-qf'
     Plug 'romainl/vim-qlist'
@@ -34,13 +35,13 @@ if !empty(glob('$HOME/.vim/autoload/plug.vim'))
     if executable('ctags')
       Plug 'ludovicchabant/vim-gutentags'
     endif
-    if has('python') || has('python3')
+    if has('python_compiled') || has('python3_compiled')
       Plug 'SirVer/ultisnips'
       Plug 'davidhalter/jedi-vim', { 'for': 'python' }
     endif
   call plug#end()
 endif
-packadd! matchit
+runtime! macros/matchit.vim
 syntax enable
 filetype plugin indent on
 " }}}
@@ -104,7 +105,9 @@ set winminwidth=0                             " minimum window width
 set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
 set virtualedit+=block                        " allow virtual editing in v-block mode
 set fillchars=vert:┃,diff:━                   " set characters for vert splits and diffs
-set diffopt+=algorithm:patience,indent-heuristic
+if has('patch-8.1.0513')
+  set diffopt+=algorithm:patience,indent-heuristic
+endif
 if has('win32')
   if !empty($TEMP)
       set backup
