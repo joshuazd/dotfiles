@@ -7,7 +7,7 @@ function! edit#open(...) abort
     execute 'edit ' a:1
   else
     try
-      if len(globpath(&path, a:1, 0, 1)) <= 1
+      if len(globpath(&path, a:1, 0, 1)) == 1
         execute 'find' a:1
       else
         throw 'Too many files'

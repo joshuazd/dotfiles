@@ -37,7 +37,7 @@ augroup XML
     autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
   endif
   if exists(':UltiSnipsAddFiletypes')
-    autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml 
+    autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml
   endif
   autocmd BufEnter */api/*.xml XMLns api
   autocmd BufEnter */sequences/*.xml XMLns sequence
