@@ -32,7 +32,6 @@ set sessionoptions-=options                   " make sessions work better with p
 set sessionoptions-=blank                     " don't save black buffers in sessions
 set noswapfile                                " do not create swap files
 set foldlevelstart=10                         " don't fold things by default
-set foldlevel=10
 set listchars=tab:->,trail:~,extends:>,eol:$  " what to show for whitespace chars
 set display+=lastline                         " show as much of the last line as possible
 set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
