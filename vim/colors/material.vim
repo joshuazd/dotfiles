@@ -50,7 +50,7 @@ elseif &t_Co == 8 || &t_Co == 16
   function! s:h(hl, fg, bg, fmt) abort
     exe 'hi! '.a:hl.' ctermfg='.a:fg['ansi']
           \.' ctermbg='.a:bg['ansi']
-          \.' cterm='.a:fmt
+          \.' cterm='.(a:fmt ==? 'reverse' ? a:fmt : '')
   endfunction
 endif
 
