@@ -139,7 +139,7 @@ endif
 if exists('+signcolumn')
   set signcolumn=no                           " don't have signcolumn on
 endif
-if has('termguicolors')                       " this check only looks at the vim option,
+if has('termguicolors') && &t_Co >= 256       " this check only looks at the vim option,
   set termguicolors                           " not if the terminal supports truecolor
 endif
 try
