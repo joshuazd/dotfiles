@@ -41,19 +41,24 @@ hi def link xmlEntity		Statement
 hi def link xmlEntityPunct	PreProc
 
 function! s:hi(group, target) abort
-  let l:t_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'cterm')
-  let l:t_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'cterm')
-  let l:t_fmt = synIDattr(synIDtrans(hlID(a:target)), 'reverse', 'cterm') ? 'reverse,' : ''
-  let l:g_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'gui')
-  let l:g_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'gui')
-  let l:g_fmt = synIDattr(synIDtrans(hlID(a:target)), 'reverse', 'gui') ? 'reverse,' : ''
-  let l:t_fg = l:t_fg ==? '' ? 'NONE' : l:t_fg
-  let l:t_bg = l:t_bg ==? '' ? 'NONE' : l:t_bg
-  let l:g_fg = l:g_fg ==? '' ? 'NONE' : l:g_fg
-  let l:g_bg = l:g_bg ==? '' ? 'NONE' : l:g_bg
-  execute 'highlight ' . a:group . ' ctermfg=' . l:t_fg . ' ctermbg=' . l:t_bg .
-        \ ' guifg=' . l:g_fg . ' guibg=' . l:g_bg .
-        \ ' cterm=' . l:t_fmt . 'italic gui=' . l:g_fmt . 'italic'
+  if &t_Co >= 256 || has('gui_running')
+    let italic = 1
+  else
+    let italic = 0
+  endif
+  let t_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'cterm')
+  let t_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'cterm')
+  let t_fmt = synIDattr(synIDtrans(hlID(a:target)), 'reverse', 'cterm') ? 'reverse,' : ''
+  let g_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'gui')
+  let g_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'gui')
+  let g_fmt = synIDattr(synIDtrans(hlID(a:target)), 'reverse', 'gui') ? 'reverse,' : ''
+  let t_fg = t_fg ==? '' ? 'NONE' : t_fg
+  let t_bg = t_bg ==? '' ? 'NONE' : t_bg
+  let g_fg = g_fg ==? '' ? 'NONE' : g_fg
+  let g_bg = g_bg ==? '' ? 'NONE' : g_bg
+  execute 'highlight ' . a:group . ' ctermfg=' . t_fg . ' ctermbg=' . t_bg .
+        \ ' guifg=' . g_fg . ' guibg=' . g_bg .
+        \ (italic ? ' cterm=' . t_fmt . 'italic gui=' . g_fmt . 'italic' : '')
 endfunction
 
 function! s:xpathHighlight() abort
