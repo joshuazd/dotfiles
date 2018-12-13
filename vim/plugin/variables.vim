@@ -8,7 +8,9 @@ let g:UltiSnipsListSnippets        = '<C-@>'
 let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
 let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
 " mucomplete
-let g:mucomplete#enable_auto_at_startup = 1
+if !has('win32unix') " this is slow on cygwin
+  let g:mucomplete#enable_auto_at_startup = 1
+endif
 let g:mucomplete#no_popup_mappings      = 1
 let g:mucomplete#always_use_completeopt = 1
 let g:mucomplete#chains                 = {
@@ -50,6 +52,9 @@ let g:LanguageClient_serverCommands = {
 let g:echodoc#enable_at_startup = 1
 " gutentags
 let g:gutentags_ctags_exclude = split(&wildignore, ',')
+if has('win32')
+  let g:gutentags_ctags_extra_args=['--options=%HOME%\.ctags']
+endif
 let g:todo_words = [['TODO', '|', 'DONE'], ['ASSIGNED', 'DEVELOP', 'TESTING', '|', 'READY', 'COMPLETE']]
 if executable('python3')
   let g:python_executable = 'python3'
