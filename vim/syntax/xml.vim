@@ -375,8 +375,13 @@ hi def link xmlQuote            StringDelimiter
 " hi def link xmlQuote            String
 
 function! XmlHighlight() abort
-  highlight xmlAttrib ctermfg=245 guifg=#8a8a8a
-  highlight xmlEqual ctermfg=242 guifg=#6c6c6c
+  if &t_Co >= 256 || has('gui_running')
+    highlight xmlAttrib ctermfg=245 guifg=#8a8a8a
+    highlight xmlEqual ctermfg=242 guifg=#6c6c6c
+  else
+    highlight xmlAttrib ctermfg=grey
+    highlight xmlEqual ctermfg=darkgrey
+  endif
 endfunction
 
 augroup xmlHighlight
