@@ -25,13 +25,13 @@ nnoremap <silent> <Plug>(MDtoggleTaskLine) :call <SID>toggleTask(line('.'))<CR>
 xnoremap <silent> <Plug>(MDtoggleTask) :<C-u>call <SID>toggleTaskRange(visualmode(), 1)<CR>
 nnoremap <silent> <Plug>(MDtoggleTask) :set operatorfunc=<SID>toggleTaskRange<CR>g@
 if !hasmapto('<Plug>(MDtoggleTask)', 'n')
-  nmap gcc <Plug>(MDtoggleTaskLine)
+  nmap <buffer> gcc <Plug>(MDtoggleTaskLine)
 endif
 if !hasmapto('<Plug>(MDtoggleTaskOp)', 'n')
-  nmap gc <Plug>(MDtoggleTask)
+  nmap <buffer> gc <Plug>(MDtoggleTask)
 endif
 if !hasmapto('<Plug>(MDtoggleTask)', 'v')
-  xmap gc <Plug>(MDtoggleTask)
+  xmap <buffer> gc <Plug>(MDtoggleTask)
 endif
 
 
@@ -48,5 +48,5 @@ function! s:MDindent(dir) abort
   endif
   startinsert!
 endfunction
-inoremap ;l <esc>:call <SID>MDindent('>>')<CR>
-inoremap ;h <esc>:call <SID>MDindent('<<')<CR>
+inoremap <buffer> ;l <esc>:call <SID>MDindent('>>')<CR>
+inoremap <buffer> ;h <esc>:call <SID>MDindent('<<')<CR>
