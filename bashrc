@@ -50,7 +50,6 @@ if [ -f "${HOME}/.aliases" ]; then
 fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-export FZF_DEFAULT_COMMAND='ag -l'
 export PATH=$PATH:/snap/bin/
 
 PATH="$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH"
@@ -61,5 +60,8 @@ if type fd > /dev/null; then
     export FZF_ALT_C_COMMAND='fd --type d'
 elif type rg > /dev/null; then
     export FZF_DEFAULT_COMMAND='rg --files'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+elif type ag > /dev/null; then
+    export FZF_DEFAULT_COMMAND='ag -l'
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
