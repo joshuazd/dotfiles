@@ -254,6 +254,7 @@ nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
 
 " better tag jumping
 nnoremap <C-]> g<C-]>
+xnoremap <C-]> g<C-]>
 nnoremap <expr> <C-w><C-]> winnr('$') > 1
       \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
       \: ":vertical stjump \<C-r>\<C-w>\<CR>"
