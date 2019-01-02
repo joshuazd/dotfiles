@@ -3,7 +3,6 @@
 "===============================================
 " {{{
 " Set up vim to work in windows(+cygwin) or linux environments
-let vimdir = '~/.vim'
 if has('win32')
   set rtp^=~/.vim
   set rtp+=~/.vim/after
@@ -50,61 +49,61 @@ filetype plugin indent on
 "              GENERAL OPTIONS
 "===============================================
 " {{{
-set encoding=utf-8                            " set file encoding to utf-8
-set hidden                                    " A buffer becomes hidden when it is abandoned
-set backspace=eol,start,indent                " Configure backspace so it acts as it should act
-set whichwrap+=<,>                            " arrow keys move to the next line
-set showcmd                                   " show keystrokes
-set breakindent                               " Indent wrapped lines
-set breakindentopt+=shift:2                   " shift wrapped lines by 2 spaces
-set ignorecase                                " Ignore case when searching
-set smartcase                                 " When searching try to be smart about cases
-set incsearch                                 " Makes search act like search in modern browsers
-set lazyredraw                                " Don't redraw while executing macros
-set showmatch                                 " Show matching brackets when text indicator is over them
-set matchtime=2                               " How many tenths of a second to blink when matching brackets
-set timeoutlen=500                            " shorter timeout
-set ttimeoutlen=100                           " shorter timeout
-set splitbelow                                " Split horizontally below by default
-set splitright                                " Split vertically to the right by default
-set softtabstop=4                             " number of spaces when inserting/backspacing
-set shiftwidth=4                              " shift 4 spaces for indentation
-set expandtab                                 " expand tabs into spaces
-set smarttab                                  " use shiftwidth with <TAB>
-set autoindent                                " use the previous lines indentation level
-set noshowmode                                " don't show mode in the commandline
-set nowrap                                    " don't wrap lines by default
-set linebreak                                 " wrap lines at words
-set laststatus=2                              " always show statusline
-set scrolloff=10                              " Set 999 lines to the cursor - when moving vertically
-set sidescroll=1                              " scroll 1 character at a time
-set sidescrolloff=15                          " scroll within 15 characters - when moving horizontally
-set sessionoptions-=options                   " make sessions work better with plugins
-set sessionoptions-=blank                     " don't save blank buffers in sessions
-set display+=lastline                         " show as much of the last line as possible
-set autoread                                  " automatically reread changed files
-set path=.,**                                 " set path to all subdirectories
-set tags=./tags,tags                          " where to find tag files
-set modeline                                  " read modelines
-set shortmess+=cmrw                           " don't show completion errors
-set wildmenu                                  " Turn on the wild menu
-set wildmode=list:longest,list:full           " setup wildmenu
-set wildignorecase                            " ignore case in wildmenu
-set wildignore+=*.o,*~,*.pyc,*.versionsBackup " Ignore compiled files
-set wildignore+=*target/*,*bin/*,*build/*     " Ignore build artifacts
-set wildignore+=tags,Session.vim              " Ignore tags and session files
-set foldmethod=marker                         " fold based on marker by default
-set foldlevelstart=4                          " don't fold things by default
-set complete-=i                               " don't scan included files for completion
-set omnifunc=syntaxcomplete#Complete          " enable omnicompletion
-set concealcursor+=n                          " conceal characters in normal mode
-set conceallevel=2                            " conceal characters by default
-set spellfile=~/.vim/spell/en.utf-8.add       " keep list of good/bad words
-set winminheight=0                            " minimum window height
-set winminwidth=0                             " minimum window width
-set foldtext=functions#MyFoldText()           " Set a nicer foldtext function
-set virtualedit+=block                        " allow virtual editing in v-block mode
-set fillchars=vert:┃,diff:━                   " set characters for vert splits and diffs
+set encoding=utf-8
+set hidden
+set backspace=eol,start,indent
+set whichwrap+=<,>
+set showcmd
+set breakindent
+set breakindentopt+=shift:2
+set ignorecase
+set smartcase
+set incsearch
+set lazyredraw
+set showmatch
+set matchtime=2
+set timeoutlen=500
+set ttimeoutlen=100
+set splitbelow
+set splitright
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set smarttab
+set autoindent
+set noshowmode
+set nowrap
+set linebreak
+set laststatus=2
+set scrolloff=10
+set sidescroll=1
+set sidescrolloff=15
+set sessionoptions-=options
+set sessionoptions-=blank
+set display+=lastline
+set autoread
+set path=.,**
+set tags=./tags,tags
+set modeline
+set shortmess+=cmrw
+set wildmenu
+set wildmode=list:longest,list:full
+set wildignorecase
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup
+set wildignore+=*target/*,*bin/*,*build/*
+set wildignore+=tags,Session.vim
+set foldmethod=marker
+set foldlevelstart=4
+set complete-=i
+set omnifunc=syntaxcomplete#Complete
+set concealcursor+=n
+set conceallevel=2
+set spellfile=~/.vim/spell/en.utf-8.add
+set winminheight=0
+set winminwidth=0
+set foldtext=functions#MyFoldText()
+set virtualedit+=block
+set fillchars=vert:│,diff:─
 if has('patch-8.1.0513')
   set diffopt+=algorithm:patience,indent-heuristic
 endif
@@ -118,38 +117,38 @@ if has('win32')
       set noswapfile
   endif
 else
-  set backup                                  " write backups
-  set directory=$HOME/.tmp/swap//             " where to put swap files
-  set backupdir=$HOME/.tmp/backup//           " where to put backup files
-  for dir in [&directory, &backupdir]         " create swap/backup dirs if they don't exist
+  set backup
+  set directory=$HOME/.tmp/swap//
+  set backupdir=$HOME/.tmp/backup//
+  for dir in [&directory, &backupdir]
     if empty(glob(dir))
       call system('mkdir -p ' . dir)
     endif
   endfor
 endif
-set completeopt+=menuone                      " configure popup menu
+set completeopt+=menuone
 if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
 endif
-set listchars=tab:│\ ,trail:─,extends:>,nbsp:␣ " what to show for whitespace chars
+set listchars=tab:│\ ,trail:─,extends:>,nbsp:␣
 set list
 if exists('+clipboard')
-  set clipboard^=unnamed,unnamedplus          " make clipboard work better
+  set clipboard^=unnamed,unnamedplus
 endif
 if exists('+signcolumn')
-  set signcolumn=no                           " don't have signcolumn on
+  set signcolumn=no
 endif
-if has('termguicolors') && &t_Co >= 256       " this check only looks at the vim option,
-  set termguicolors                           " not if the terminal supports truecolor
+if has('termguicolors') && &t_Co >= 256
+  set termguicolors
 endif
 try
-  colorscheme material                        " material color scheme
+  colorscheme material
 catch
 endtry
-if executable('rg')                           " use ripgrep when available
+if executable('rg')
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m
-elseif executable('ag')                       " use ag when available and ripgrep is not
+elseif executable('ag')
   set grepprg=ag\ --vimgrep
   set grepformat=%f:%l:%c:%m
 endif
@@ -195,7 +194,7 @@ nnoremap c* :set hlsearch<CR>*Ncgn
 xnoremap <Space>e :yank\|vnew\|silent! put!\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 " redraw
 nnoremap <C-w>a :redraw!<CR>
-" select column
+" select column; TODO: improve this?
 xnoremap <silent> ac :<C-u>execute "normal! vip\<lt>C-v>" . virtcol("'>") . "\|O" . virtcol("'<") . "\|"<CR>
 onoremap <silent> ac :normal vac<CR>
 
@@ -222,7 +221,7 @@ nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=escape(@a,'\\/\|')<CR>//g<Left><Left>
 
-" vim-unimpaired settings toggles
+" vim-unimpaired inspired settings toggles
 nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
 nnoremap =oz :setlocal list!           \|setlocal list?<CR>
 nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
