@@ -1,6 +1,6 @@
 function! edit#open(...) abort
   if !a:0 || empty(a:1)
-    call feedkeys(":B \<C-d>")
+    call feedkeys(":E \<C-d>")
     return
   endif
   if len(glob(a:1, 0, 1)) == 1
