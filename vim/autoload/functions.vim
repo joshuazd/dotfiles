@@ -29,5 +29,9 @@ function! functions#findFuncDefs() abort
   let g:findfunc = {'vim'   : ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
         \'xml'   : ['^\s*<resource', '<\/resource>', '\%(ur[il]-\(mapping\|template\)="\)\@<=[^"]*"\@='],
         \'python': ['^\s*\(class\|def\|async def\)\>', '\S\n\=\zs\n*\(^\s*\(class\|def\|async def\)\|^\S\)', '^\s*\(class\|def\|async def\)\s\+\zs\h\w*\ze('],
-        \'java'  : ['^\(\t\| \{' . &shiftwidth . '}\)\S\+.*\(\n^.*\)\={', '^\(\t\| \{' . &shiftwidth . '}\)}', '\h\w*\ze(']}
+        \'java'  : ['^\(\t\| \{' . &shiftwidth . '}\)\S\+.*\(\n^.*\)\={', '^\(\t\| \{' . &shiftwidth . '}\)}', '\h\w*\ze('],
+        \'sh'    : ['^\s*[A-Za-z_0-9:][-a-zA-Z_0-9:]*\s*()\_s*{', '^\s*}', '[A-Za-z_0-9:][-a-zA-Z_0-9:]*'],
+        \'zsh'   : ['^\s*\h[[:alnum:]_-]*\s*()\_s*{', '^\s*}', '\h[[:alnum:]_-]*'],
+        \'c'     : ['\h\w*\s*(.*)\_s*{', '^\s*}', '\h\w*\ze\s*('],
+        \'cpp'   : ['\h\w*\s*(.*)\_s*{', '^\s*}', '\h\w*\ze\s*(']}
 endfunction
