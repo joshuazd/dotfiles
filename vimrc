@@ -27,8 +27,6 @@ if !empty(glob('$HOME/.vim/autoload/plug.vim'))
       Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
       Plug 'junegunn/fzf.vim'
       Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'for': ['java'] }
-    else
-      Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'powershell -executionpolicy bypass -File install.ps1', 'for': ['java'] }
     endif
     if executable('ctags')
       Plug 'ludovicchabant/vim-gutentags'
