@@ -4,7 +4,6 @@ if exists(':JediDebugInfo')
   nunmap <buffer> K
 else
   setlocal omnifunc=python3complete#Complete
-  inoremap <buffer> <silent> . .<C-x><C-o>
 endif
 setlocal keywordprg=pydoc3
 setlocal makeprg=flake8\ %:S
