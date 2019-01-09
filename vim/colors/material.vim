@@ -78,7 +78,7 @@ call s:h('IncSearch',       s:black,      s:yellow,       'none')
 call s:h('WildMenu',        s:boldgreen,  s:mediumgrey,   'none')
 call s:h('Question',        s:boldgreen,  s:background,   'none')
 call s:h('Title',           s:yellow,     s:background,   'none')
-call s:h('ModeMsg',         s:boldgreen,  s:background,   'none')
+call s:h('ModeMsg',         s:boldblue,   s:background,   'none')
 call s:h('MoreMsg',         s:boldgreen,  s:background,   'none')
 
 call s:h('MatchParen',      s:boldcyan,   s:mediumgrey,   'none')
