@@ -28,6 +28,7 @@ if has('lambda')
 endif
 " jedi
 let g:jedi#auto_vim_configuration     = 0
+let g:jedi#popup_on_dot               = 0
 let g:jedi#show_call_signatures       = 2
 let g:jedi#show_call_signatures_delay = 50
 let g:jedi#auto_close_doc             = 0
