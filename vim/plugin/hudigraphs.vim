@@ -1,7 +1,7 @@
-if exists('loaded_hudigraphs')
-    finish
+if exists('g:loaded_hudigraphs')
+  finish
 endif
-let loaded_hudigraphs = 1
+let g:loaded_hudigraphs = 1
 
 let s:save_cpo = &cpo
 set cpo&vim

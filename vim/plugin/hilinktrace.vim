@@ -1,7 +1,7 @@
 if exists('g:loaded_hilinks')
   finish
 endif
-let g:loaded_hilinks= '1'
+let g:loaded_hilinks = 1
 
 let s:save_cpo = &cpo
 set cpo&vim
