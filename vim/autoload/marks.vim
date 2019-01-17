@@ -3,7 +3,7 @@ function! marks#marks() abort
   silent! execute 'marks'
   redir END
   vnew
-  silent! setlocal buftype=nofile bufhidden=wipe nobuflisted
+  silent! setlocal buftype=nofile bufhidden=wipe nobuflisted filetype=
   put! =message
   wincmd p
   normal! 999zh
