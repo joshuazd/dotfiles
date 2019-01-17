@@ -285,8 +285,8 @@ augroup EditVim
   autocmd InsertEnter        *            setl listchars-=trail:─
   autocmd InsertLeave        *            setl listchars+=trail:─
   autocmd FileType           *            silent! call functions#LC_maps() | silent! call functions#findFuncDefs()
-  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == ''      | set filetype=xml  | endif
-  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' | set filetype=java | endif
+  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == ''      | setl filetype=xml  | endif
+  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' | setl filetype=java | endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
