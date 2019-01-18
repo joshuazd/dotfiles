@@ -21,32 +21,28 @@ onoremap <silent> <Plug>(indentmotion_previndent) :<C-u>call indentmotion#findSa
 onoremap <silent> <Plug>(indentmotion_blockindent) :<C-u>call indentmotion#blockTextObj()<CR>
 xnoremap <silent> <Plug>(indentmotion_blockindent) <Esc>:call indentmotion#blockTextObj()<CR><Esc>gv
 
-if !hasmapto('<Plug>(indentmotion_aroundindent')
-  omap <silent> ai <Plug>(indentmotion_aroundindent)
-  xmap <silent> ai <Plug>(indentmotion_aroundindent)
-endif
+function! s:define_map(mode, lhs, rhs) abort
+  if !hasmapto(a:rhs, get({'x':'v'}, a:mode, a:mode)) && maparg(a:lhs, a:mode) ==? ''
+    execute a:mode . 'map <silent> ' . a:lhs . ' ' . a:rhs
+  endif
+endfunction
 
-if !hasmapto('<Plug>(indentmotion_innerindent')
-  omap <silent> ii <Plug>(indentmotion_innerindent)
-  xmap <silent> ii <Plug>(indentmotion_innerindent)
-endif
+call <SID>define_map('o', 'ai', '<Plug>(indentmotion_aroundindent)')
+call <SID>define_map('x', 'ai', '<Plug>(indentmotion_aroundindent)')
 
-if !hasmapto('<Plug>(indentmotion_nextindent')
-  nmap <silent> <Space>j <Plug>(indentmotion_nextindent)
-  xmap <silent> <Space>j <Plug>(indentmotion_nextindent)
-  omap <silent> <Space>j <Plug>(indentmotion_nextindent)
-endif
+call <SID>define_map('o', 'ii', '<Plug>(indentmotion_innerindent)')
+call <SID>define_map('x', 'ii', '<Plug>(indentmotion_innerindent)')
 
-if !hasmapto('<Plug>(indentmotion_previndent')
-  nmap <silent> <Space>k <Plug>(indentmotion_previndent)
-  xmap <silent> <Space>k <Plug>(indentmotion_previndent)
-  omap <silent> <Space>k <Plug>(indentmotion_previndent)
-endif
+call <SID>define_map('n', '<Space>j', '<Plug>(indentmotion_nextindent)')
+call <SID>define_map('x', '<Space>j', '<Plug>(indentmotion_nextindent)')
+call <SID>define_map('o', '<Space>j', '<Plug>(indentmotion_nextindent)')
 
-if !hasmapto('<Plug>(indentmotion_blockindent')
-  omap <silent> iI <Plug>(indentmotion_blockindent)
-  xmap <silent> iI <Plug>(indentmotion_blockindent)
-endif
+call <SID>define_map('n', '<Space>k', '<Plug>(indentmotion_previndent)')
+call <SID>define_map('x', '<Space>k', '<Plug>(indentmotion_previndent)')
+call <SID>define_map('o', '<Space>k', '<Plug>(indentmotion_previndent)')
+
+call <SID>define_map('o', 'iI', '<Plug>(indentmotion_blockindent)')
+call <SID>define_map('x', 'iI', '<Plug>(indentmotion_blockindent)')
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
