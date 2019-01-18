@@ -1,0 +1,38 @@
+if exists('g:loaded_textobj#declaration')
+  finish
+endif
+let g:loaded_textobj#declaration = 1
+
+let s:save_cpo = &cpo
+set cpo&vim
+
+function! s:declaration(whitespace, visualmode) abort
+  let ws = a:whitespace
+  " find the first word on the current line
+  let match = escape(matchstr(getline('.'), '\v^\s*\zs' . get(b:, 'textobj#declaration_char', '\k') . '+'), '!@#$%^&*()[]-+={};:<>,.\|?/`~')
+  normal! ^
+  " jump back to the first line after a line that doesn't start with the match
+  call searchpos('\v^\s*%(%(^\s*' . match . ')@<!.)+$' . (ws ? '\n%(^\s*$\n|.)\ze' : '') . '\_s*.', 'bWec')
+  execute 'normal! ' . a:visualmode
+  " jump forward to the line before the next line that doesn't match
+  call searchpos('\v' . (ws ? '\n^\s*\S' : '\S\s*\n^\_s*') . '%(%(' . match . ')@<!.)*$', 'Wc')
+endfunction
+
+xnoremap <silent> <Plug>(textobj#declaration_inner) :<C-u>call <SID>declaration(0,visualmode())<CR>
+onoremap <silent> <Plug>(textobj#declaration_inner) :<C-u>call <SID>declaration(0,'V')<CR>
+xnoremap <silent> <Plug>(textobj#declaration_around) :<C-u>call <SID>declaration(1,visualmode())<CR>
+onoremap <silent> <Plug>(textobj#declaration_around) :<C-u>call <SID>declaration(1,'V')<CR>
+
+function! s:define_map(mode, lhs, rhs) abort
+  if !hasmapto(a:rhs, get({'x':'v'}, a:mode, a:mode)) && maparg(a:lhs, a:mode) ==? ''
+    execute a:mode . 'map <silent> ' . a:lhs . ' ' . a:rhs
+  endif
+endfunction
+
+call textobj#define_map('x', 'id', '<Plug>(textobj#declaration_inner)')
+call textobj#define_map('o', 'id', '<Plug>(textobj#declaration_inner)')
+call textobj#define_map('x', 'ad', '<Plug>(textobj#declaration_around)')
+call textobj#define_map('o', 'ad', '<Plug>(textobj#declaration_around)')
+
+let &cpo = s:save_cpo
+unlet s:save_cpo

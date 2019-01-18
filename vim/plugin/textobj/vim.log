@@ -1,0 +1,122 @@
+
+
+times in msec
+ clock   self+sourced   self:  sourced script
+ clock   elapsed:              other lines
+
+000.003  000.003: --- VIM STARTING ---
+000.100  000.097: Allocated generic buffers
+000.193  000.093: locale set
+000.233  000.040: GUI prepared
+000.242  000.009: clipboard setup
+000.255  000.013: window checked
+000.943  000.688: inits 1
+000.983  000.040: parsing arguments
+000.984  000.001: expanding arguments
+000.993  000.009: shell init
+014.508  013.515: Termcap init
+014.551  000.043: inits 2
+014.669  000.118: init highlight
+014.980  000.215  000.215: sourcing /usr/share/vim/vim81/debian.vim
+019.793  004.680  004.680: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+019.933  004.866  000.186: sourcing /usr/share/vim/vim81/syntax/synload.vim
+040.068  000.017  000.017: sourcing /home/vagrant/.vim/ftdetect/javascript.vim
+040.088  000.008  000.008: sourcing /home/vagrant/.vim/ftdetect/todo.vim
+040.121  000.025  000.025: sourcing /home/vagrant/.vim/ftdetect/toml.vim
+040.137  000.008  000.008: sourcing /home/vagrant/.vim/ftdetect/xml.vim
+040.153  000.008  000.008: sourcing /home/vagrant/.vim/ftdetect/zsh.vim
+040.235  000.015  000.015: sourcing /home/vagrant/.vim/after/ftdetect/editorconfig.vim
+040.299  020.203  020.122: sourcing /usr/share/vim/vim81/filetype.vim
+040.334  025.316  000.247: sourcing /usr/share/vim/vim81/syntax/syntax.vim
+040.354  025.630  000.099: sourcing $VIM/vimrc
+041.184  000.769  000.769: sourcing /usr/share/vim/vim81/ftoff.vim
+044.856  003.624  003.624: sourcing /home/vagrant/.vim/autoload/plug.vim
+050.919  000.726  000.726: sourcing /usr/share/vim/vim81/pack/dist/opt/matchit/plugin/matchit.vim
+051.032  002.489  001.763: sourcing /usr/share/vim/vim81/macros/matchit.vim
+051.198  000.041  000.041: sourcing /usr/share/vim/vim81/syntax/nosyntax.vim
+051.738  000.224  000.224: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+051.879  000.468  000.244: sourcing /usr/share/vim/vim81/syntax/synload.vim
+060.675  000.019  000.019: sourcing /home/vagrant/.vim/ftdetect/javascript.vim
+060.698  000.008  000.008: sourcing /home/vagrant/.vim/ftdetect/todo.vim
+060.729  000.023  000.023: sourcing /home/vagrant/.vim/ftdetect/toml.vim
+060.745  000.007  000.007: sourcing /home/vagrant/.vim/ftdetect/xml.vim
+060.760  000.008  000.008: sourcing /home/vagrant/.vim/ftdetect/zsh.vim
+060.887  000.015  000.015: sourcing /home/vagrant/.vim/bundle/vim-editorconfig/ftdetect/editorconfig.vim
+060.950  000.021  000.021: sourcing /home/vagrant/.vim/bundle/ultisnips/ftdetect/snippets.vim
+061.103  000.014  000.014: sourcing /home/vagrant/.vim/after/ftdetect/editorconfig.vim
+061.164  009.174  009.059: sourcing /usr/share/vim/vim81/filetype.vim
+061.213  010.087  000.404: sourcing /usr/share/vim/vim81/syntax/syntax.vim
+064.226  000.029  000.029: sourcing /usr/share/vim/vim81/filetype.vim
+064.430  000.098  000.098: sourcing /usr/share/vim/vim81/ftplugin.vim
+064.581  000.032  000.032: sourcing /usr/share/vim/vim81/indent.vim
+066.166  000.224  000.224: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+066.636  000.175  000.175: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+067.179  000.243  000.243: sourcing /usr/share/vim/vim81/syntax/syncolor.vim
+068.863  003.746  003.104: sourcing /home/vagrant/.vim/colors/material.vim
+079.018  038.646  017.772: sourcing $HOME/.vimrc
+079.044  000.099: sourcing vimrc file(s)
+079.471  000.063  000.063: sourcing /home/vagrant/.vim/plugin/ccr.vim
+079.517  000.036  000.036: sourcing /home/vagrant/.vim/plugin/edit.vim
+079.579  000.052  000.052: sourcing /home/vagrant/.vim/plugin/hilinktrace.vim
+079.629  000.042  000.042: sourcing /home/vagrant/.vim/plugin/hudigraphs.vim
+088.035  008.397  008.397: sourcing /home/vagrant/.vim/plugin/indentmotion.vim
+088.117  000.041  000.041: sourcing /home/vagrant/.vim/plugin/marks.vim
+088.218  000.090  000.090: sourcing /home/vagrant/.vim/plugin/numfmt.vim
+088.319  000.084  000.084: sourcing /home/vagrant/.vim/plugin/previewdoc.vim
+102.609  014.280  014.280: sourcing /home/vagrant/.vim/plugin/textobj/column.vim
+107.901  005.262  005.262: sourcing /home/vagrant/.vim/plugin/textobj/declaration.vim
+108.068  000.048  000.048: sourcing /home/vagrant/.vim/plugin/textobj.vim
+108.425  000.346  000.346: sourcing /home/vagrant/.vim/plugin/tmuxnavigate.vim
+108.601  000.166  000.166: sourcing /home/vagrant/.vim/plugin/variables.vim
+112.730  004.113  004.113: sourcing /home/vagrant/.vim/plugin/verymagic.vim
+112.807  000.039  000.039: sourcing /home/vagrant/.vim/plugin/win.vim
+113.217  000.075  000.075: sourcing /home/vagrant/.vim/bundle/vim-mucomplete/autoload/mucomplete/auto.vim
+114.734  001.808  001.733: sourcing /home/vagrant/.vim/bundle/vim-mucomplete/plugin/mucomplete.vim
+119.600  004.756  004.756: sourcing /home/vagrant/.vim/bundle/vim-sneak/plugin/sneak.vim
+120.384  000.697  000.697: sourcing /home/vagrant/.vim/bundle/vim-surround/plugin/surround.vim
+120.732  000.276  000.276: sourcing /home/vagrant/.vim/bundle/vim-commentary/plugin/commentary.vim
+120.862  000.062  000.062: sourcing /home/vagrant/.vim/bundle/vim-apathy/plugin/apathy.vim
+121.227  000.326  000.326: sourcing /home/vagrant/.vim/bundle/vim-lion/plugin/lion.vim
+122.377  000.475  000.475: sourcing /home/vagrant/.vim/bundle/vim-qf/plugin/qf.vim
+122.900  000.460  000.460: sourcing /home/vagrant/.vim/bundle/vim-qlist/plugin/qlist.vim
+123.435  000.457  000.457: sourcing /home/vagrant/.vim/bundle/traces.vim/plugin/traces.vim
+123.586  000.098  000.098: sourcing /home/vagrant/.vim/bundle/vim-editorconfig/plugin/editorconfig.vim
+124.346  000.676  000.676: sourcing /home/vagrant/.fzf/plugin/fzf.vim
+134.364  009.927  009.927: sourcing /home/vagrant/.vim/bundle/fzf.vim/plugin/fzf.vim
+135.045  000.463  000.463: sourcing /home/vagrant/.vim/bundle/vim-gutentags/plugin/gutentags.vim
+136.732  000.091  000.091: sourcing /home/vagrant/.vim/bundle/ultisnips/autoload/UltiSnips/map_keys.vim
+136.854  001.742  001.651: sourcing /home/vagrant/.vim/bundle/ultisnips/plugin/UltiSnips.vim
+137.219  000.100  000.100: sourcing /usr/share/vim/vim81/plugin/getscriptPlugin.vim
+142.621  005.390  005.390: sourcing /usr/share/vim/vim81/plugin/gzip.vim
+143.177  000.504  000.504: sourcing /usr/share/vim/vim81/plugin/logiPat.vim
+143.265  000.063  000.063: sourcing /usr/share/vim/vim81/plugin/manpager.vim
+143.619  000.337  000.337: sourcing /usr/share/vim/vim81/plugin/matchparen.vim
+145.176  001.536  001.536: sourcing /usr/share/vim/vim81/plugin/netrwPlugin.vim
+145.368  000.089  000.089: sourcing /usr/share/vim/vim81/plugin/rrhelper.vim
+154.892  009.493  009.493: sourcing /usr/share/vim/vim81/plugin/spellfile.vim
+155.520  000.589  000.589: sourcing /usr/share/vim/vim81/plugin/tarPlugin.vim
+155.644  000.094  000.094: sourcing /usr/share/vim/vim81/plugin/tohtml.vim
+155.928  000.269  000.269: sourcing /usr/share/vim/vim81/plugin/vimballPlugin.vim
+156.256  000.285  000.285: sourcing /usr/share/vim/vim81/plugin/zipPlugin.vim
+156.382  000.023  000.023: sourcing /usr/share/vim/vim81/pack/dist/opt/matchit/plugin/matchit.vim
+156.387  003.289: loading plugins
+156.427  000.040: loading packages
+156.657  000.143  000.143: sourcing /home/vagrant/.vim/bundle/ultisnips/after/plugin/UltiSnips_after.vim
+157.124  000.422  000.422: sourcing /home/vagrant/.vim/after/plugin/maps.vim
+157.128  000.136: loading after plugins
+157.161  000.033: inits 3
+157.429  000.268: reading viminfo
+194.833  037.404: setup clipboard
+195.100  000.267: setting raw mode
+796.319  601.219: waiting for return
+796.330  000.011: start termcap
+796.351  000.021: clearing screen
+796.782  000.431: opening buffers
+796.861  000.079: BufEnter autocommands
+796.863  000.002: editing files in windows
+797.131  000.139  000.139: sourcing /home/vagrant/.vim/bundle/vim-qf/autoload/qf.vim
+798.828  000.473  000.473: sourcing /home/vagrant/.vim/bundle/vim-gutentags/autoload/gutentags.vim
+798.947  001.472: VimEnter autocommands
+798.949  000.002: before starting main loop
+800.797  001.848: first screen update
+800.800  000.003: --- VIM STARTED ---
