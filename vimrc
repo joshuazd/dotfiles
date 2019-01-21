@@ -103,6 +103,7 @@ set fillchars=vert:│,diff:─
 if has('patch-8.1.0513')
   set diffopt+=algorithm:patience,indent-heuristic
 endif
+
 if has('win32')
   if !empty($TEMP)
       set backup
@@ -122,18 +123,22 @@ else
     endif
   endfor
 endif
+
 set completeopt+=menuone
 if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
 endif
+
 set listchars=tab:│\ ,trail:─,extends:>,nbsp:␣
 set list
+
 if exists('+clipboard')
   set clipboard^=unnamed,unnamedplus
 endif
 if exists('+signcolumn')
   set signcolumn=no
 endif
+
 if has('termguicolors') && &t_Co >= 256
   set termguicolors
 endif
@@ -141,6 +146,7 @@ try
   colorscheme material
 catch
 endtry
+
 if executable('rg')
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m
@@ -148,6 +154,7 @@ elseif executable('ag')
   set grepprg=ag\ --vimgrep
   set grepformat=%f:%l:%c:%m
 endif
+
 if has('gui_running')
   if has('win32')
     set guifont=Consolas:h10:cANSI:qDRAFT
