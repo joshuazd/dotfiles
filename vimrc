@@ -182,7 +182,7 @@ nnoremap Y y$
 nnoremap [b :bprevious<CR>
 nnoremap ]b :bnext<CR>
 nnoremap <BS> <C-^>
-nnoremap <silent> <Space>x :bn\|bd #<CR>
+nnoremap <silent> <Space>x :bn<Bar>bd #<CR>
 
 " line navigation
 nnoremap <expr> j v:count ? 'j' : 'gj'
@@ -194,7 +194,7 @@ nnoremap * :set hlsearch<CR>*N
 nnoremap c* :set hlsearch<CR>*Ncgn
 
 " edit embedded scripts
-xnoremap <Space>e :yank\|vnew\|silent! put!\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
+xnoremap <Space>e :yank<Bar>vnew<Bar>silent! put!<Bar>set bt=nofile bh=wipe ft= <Bar>normal! gg=G<S-Left><S-Left><Left>
 " redraw
 nnoremap <C-w>a :redraw!<CR>
 
@@ -222,13 +222,13 @@ nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
 
 " vim-unimpaired inspired settings toggles
-nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
-nnoremap =oz :setlocal list!           \|setlocal list?<CR>
-nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
-nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
-nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR>\|setlocal signcolumn?<CR>
-nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR>\|setlocal conceallevel?<CR>
-nnoremap =oy :if exists('g:syntax_on') \| syntax off \| else \| syntax enable \| endif<CR>
+nnoremap =ow :setlocal wrap!           <Bar>setlocal wrap?<CR>
+nnoremap =oz :setlocal list!           <Bar>setlocal list?<CR>
+nnoremap =os :setlocal spell!          <Bar>setlocal spell?<CR>
+nnoremap =oh :setlocal hlsearch!       <Bar>setlocal hlsearch?<CR>
+nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><Bar>setlocal signcolumn?<CR>
+nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><Bar>setlocal conceallevel?<CR>
+nnoremap =oy :if exists('g:syntax_on') <Bar> syntax off <Bar> else <Bar> syntax enable <Bar> endif<CR>
 
 " quickfix maps
 nnoremap ]q :cnext<CR>
@@ -249,7 +249,7 @@ nmap <silent> zpp Vp
 " misc functions
 nnoremap <silent> <F5> :call vim#VimRefresh()<CR>
 nnoremap <silent> <F11> :call vim#Focus()<CR>
-nnoremap <silent> <Space>m :silent! make\|cwindow\|redraw!<CR>
+nnoremap <silent> <Space>m :silent! make<Bar>cwindow<Bar>redraw!<CR>
 
 " better tag jumping
 nnoremap <C-]> g<C-]>
@@ -274,6 +274,9 @@ xnoremap am :<C-u>normal [mV]M<CR>
 nnoremap <silent> <expr> <C-w>f winnr('$') > 1
       \? ":let fname=\"\<C-r>\<C-f>\"\|wincmd p\<CR>:find \<C-r>=fname\<CR>\<CR>"
       \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
+
+" make <C-w>z more robust
+nnoremap <silent> <C-w>z :pclose<Bar>helpclose<CR>
 
 " }}}
 
