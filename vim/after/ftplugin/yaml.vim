@@ -9,3 +9,5 @@ augroup YAML
       autocmd BufWritePost *.yaml,*.yml silent! make|cwindow|redraw!
     endif
 augroup END
+
+let b:undo_ftplugin = 'setlocal makeprg< errorformat< commentstring<'

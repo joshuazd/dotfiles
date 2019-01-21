@@ -23,3 +23,5 @@ augroup VIM
       autocmd BufWritePost *.vim,.vimrc,vimrc silent! make|cwindow|redraw!
     endif
 augroup END
+
+let b:undo_ftplugin = 'setlocal shiftwidth< softtabstop< foldmethod< makeprg< keywordprg< errorformat< path< suffixesadd<'

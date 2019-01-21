@@ -33,3 +33,4 @@ let g:jedi#rename_command = ',r'
 
 " }}}
 
+let b:undo_ftplugin = 'setlocal omnifunc< foldmethod< keywordprg< makeprg< errorformat< formatprg< foldlevel< foldnestmax<'

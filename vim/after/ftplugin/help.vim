@@ -1,2 +1,3 @@
 nnoremap <silent> <buffer> q :q<CR>
-set cms=
+setlocal commentstring=
+let b:undo_ftplugin = 'setlocal commentstring<'
