@@ -73,7 +73,7 @@ set linebreak
 set laststatus=2
 set scrolloff=10
 set sidescroll=1
-set sidescrolloff=15
+set sidescrolloff=10
 set sessionoptions-=options
 set sessionoptions-=blank
 set display+=lastline
@@ -190,9 +190,6 @@ nnoremap c* :set hlsearch<CR>*Ncgn
 xnoremap <Space>e :yank\|vnew\|silent! put!\|set bt=nofile bh=wipe ft= \|normal! gg=G<S-Left><S-Left><Left>
 " redraw
 nnoremap <C-w>a :redraw!<CR>
-" select column; TODO: improve this?
-xnoremap <silent> ac :<C-u>execute "normal! vip\<lt>C-v>" . virtcol("'>") . "\|O" . virtcol("'<") . "\|"<CR>
-onoremap <silent> ac :normal vac<CR>
 
 " new text objects
 for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', '`' ]
