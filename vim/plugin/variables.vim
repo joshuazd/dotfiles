@@ -44,7 +44,7 @@ let g:netrw_liststyle = 0
 let g:netrw_browse_split = 4
 let g:netrw_winsize = 15
 " markdown
-let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql', 'java']
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql']
 " LSP
 let g:LanguageClient_serverCommands = {
       \ 'java': ['/home/vagrant/dotfiles/bin/java-language-server'],
