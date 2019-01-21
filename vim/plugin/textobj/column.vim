@@ -26,10 +26,10 @@ onoremap <silent> <Plug>(textobj#column_inner) :<C-u>call <SID>column(0, 0)<CR>
 xnoremap <silent> <Plug>(textobj#column_around) :<C-u>call <SID>column(1, 1)<CR>
 onoremap <silent> <Plug>(textobj#column_around) :<C-u>call <SID>column(1, 0)<CR>
 
-call textobj#define_map('x', 'ic', '<Plug>(textobj#column_inner)')
-call textobj#define_map('o', 'ic', '<Plug>(textobj#column_inner)')
-call textobj#define_map('x', 'ac', '<Plug>(textobj#column_around)')
-call textobj#define_map('o', 'ac', '<Plug>(textobj#column_around)')
+call textobj#textobj#define_map('x', 'ic', '<Plug>(textobj#column_inner)')
+call textobj#textobj#define_map('o', 'ic', '<Plug>(textobj#column_inner)')
+call textobj#textobj#define_map('x', 'ac', '<Plug>(textobj#column_around)')
+call textobj#textobj#define_map('o', 'ac', '<Plug>(textobj#column_around)')
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

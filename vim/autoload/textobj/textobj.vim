@@ -6,7 +6,7 @@ let g:loaded_textobj = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
-function! textobj#define_map(mode, lhs, rhs) abort
+function! textobj#textobj#define_map(mode, lhs, rhs) abort
   if !hasmapto(a:rhs, get({'x':'v'}, a:mode, a:mode)) && maparg(a:lhs, a:mode) ==? ''
     execute a:mode . 'map <silent> ' . a:lhs . ' ' . a:rhs
   endif

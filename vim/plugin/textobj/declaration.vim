@@ -29,10 +29,10 @@ function! s:define_map(mode, lhs, rhs) abort
   endif
 endfunction
 
-call textobj#define_map('x', 'id', '<Plug>(textobj#declaration_inner)')
-call textobj#define_map('o', 'id', '<Plug>(textobj#declaration_inner)')
-call textobj#define_map('x', 'ad', '<Plug>(textobj#declaration_around)')
-call textobj#define_map('o', 'ad', '<Plug>(textobj#declaration_around)')
+call textobj#textobj#define_map('x', 'id', '<Plug>(textobj#declaration_inner)')
+call textobj#textobj#define_map('o', 'id', '<Plug>(textobj#declaration_inner)')
+call textobj#textobj#define_map('x', 'ad', '<Plug>(textobj#declaration_around)')
+call textobj#textobj#define_map('o', 'ad', '<Plug>(textobj#declaration_around)')
 
 let &cpo = s:save_cpo
 unlet s:save_cpo
