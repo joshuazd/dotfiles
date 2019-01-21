@@ -4,8 +4,8 @@
 " {{{
 " Set up vim to work in windows+cygwin
 if has('win32')
-  set rtp^=~/.vim
-  set rtp+=~/.vim/after
+  set runtimepath^=~/.vim
+  set runtimepath+=~/.vim/after
 endif
 
 if !empty(glob('$HOME/.vim/autoload/plug.vim'))
