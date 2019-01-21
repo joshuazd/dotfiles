@@ -8,34 +8,32 @@ if has('win32')
   set runtimepath+=~/.vim/after
 endif
 
-if !empty(glob('$HOME/.vim/autoload/plug.vim'))
+silent! call plug#begin('$HOME/.vim/bundle/')
+if exists('*plug#begin')
   filetype off
-  call plug#begin('$HOME/.vim/bundle/')
-    Plug 'Shougo/echodoc.vim', { 'for': ['java'] }
-    Plug 'lifepillar/vim-mucomplete'
-    Plug 'justinmk/vim-sneak'
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-repeat'
-    Plug 'tpope/vim-commentary'
-    Plug 'tpope/vim-apathy'
-    Plug 'tommcdo/vim-lion'
-    Plug 'romainl/vim-qf'
-    Plug 'romainl/vim-qlist'
-    Plug 'markonm/traces.vim'
-    Plug 'sgur/vim-editorconfig'
-    if !has('win32')
-      Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-      Plug 'junegunn/fzf.vim'
-      Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'for': ['java'] }
-    endif
-    if executable('ctags')
-      Plug 'ludovicchabant/vim-gutentags'
-    endif
-    if has('python_compiled') || has('python3_compiled')
-      Plug 'SirVer/ultisnips'
-      Plug 'davidhalter/jedi-vim', { 'for': 'python' }
-    endif
-  call plug#end()
+  Plug 'lifepillar/vim-mucomplete'
+  Plug 'justinmk/vim-sneak'
+  Plug 'tpope/vim-surround'
+  Plug 'tpope/vim-repeat'
+  Plug 'tpope/vim-commentary'
+  Plug 'tpope/vim-apathy'
+  Plug 'tommcdo/vim-lion'
+  Plug 'romainl/vim-qf'
+  Plug 'romainl/vim-qlist'
+  Plug 'markonm/traces.vim'
+  Plug 'sgur/vim-editorconfig'
+  if !has('win32')
+    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+    Plug 'junegunn/fzf.vim'
+    Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'for': ['java'] }
+  endif
+  if executable('ctags')
+    Plug 'ludovicchabant/vim-gutentags'
+  endif
+  if has('python_compiled') || has('python3_compiled')
+    Plug 'SirVer/ultisnips'
+  endif
+  silent! call plug#end()
 endif
 runtime! macros/matchit.vim
 syntax enable
