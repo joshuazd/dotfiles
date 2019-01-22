@@ -20,7 +20,7 @@ function! functions#LC_maps() abort
     nnoremap <buffer> <silent> gr :call LanguageClient#textDocument_references()<CR>
     nnoremap <buffer> <silent> gs :call LanguageClient#textDocument_documentSymbol()<CR>
     setlocal formatexpr=LanguageClient#textDocument_rangeFormatting_sync()
-    setl signcolumn=yes
+    setlocal signcolumn=yes
   endif
 endfunction
 

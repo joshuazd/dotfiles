@@ -212,9 +212,10 @@ nnoremap <Space>s :sfind<space>
 nnoremap <Space>v :vert sfind<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
 nnoremap <Space>t :tjump /
+
 nnoremap <Space>l :set colorcolumn=
-nnoremap <Space>g :g/\v/#<Left><Left>
-xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>
+nnoremap <Space>g :g/\v/#<Left><Left>:
+xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
 nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
@@ -234,9 +235,6 @@ nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
 nnoremap =q :cclose<CR>
-
-" easier to exit insert mode
-inoremap jk <Esc>
 
 " smarter pasting
 nnoremap <silent> <Space>p p=']
@@ -285,11 +283,11 @@ nnoremap <silent> <C-w>z :pclose<Bar>helpclose<CR>
 augroup EditVim
   autocmd!
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
-  autocmd User UltiSnipsEnterFirstSnippet let g:in_snippet = 1
-  autocmd User UltiSnipsExitLastSnippet   let g:in_snippet = 0
+  autocmd User UltiSnipsEnterFirstSnippet let in_snippet = 1
+  autocmd User UltiSnipsExitLastSnippet   let in_snippet = 0
   autocmd InsertEnter        *            setl listchars-=trail:─
   autocmd InsertLeave        *            setl listchars+=trail:─
-  autocmd FileType           *            silent! call functions#LC_maps() | silent! call functions#findFuncDefs()
+  autocmd FileType           *            silent! call functions#LC_maps()
   autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == ''      | setl filetype=xml  | endif
   autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' | setl filetype=java | endif
 augroup END
@@ -310,12 +308,12 @@ command! -range=% FormatJSON <line1>,<line2>!python2 -c
 "===============================================
 " {{{
 if exists('+statusline')
-  let g:in_snippet = 0
-  let g:stl_snippet = ['', 'snippet ']
+  let in_snippet = 0
+  let stl_snippet = ['', 'snippet ']
 
   set statusline=\ %<%f%m%r
   set statusline+=\ %w%q%h%=
-  set statusline+=\ %{g:stl_snippet[g:in_snippet]}
+  set statusline+=\ %{stl_snippet[in_snippet]}
   set statusline+=%{&filetype}
   set statusline+=\ %03l:%02c\ 
 endif
