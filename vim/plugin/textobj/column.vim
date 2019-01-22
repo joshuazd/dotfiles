@@ -21,9 +21,9 @@ function! s:column(whitespace, visualmode) abort
   execute 'normal! ' . (a:visualmode ? "`<\<C-v>`>" : "\<C-v>" ) . (up ? up . 'k' : '' ) . 'o' . (down ? down . 'j' : '')
 endfunction
 
-xnoremap <silent> <Plug>(textobj#column_inner) :<C-u>call <SID>column(0, 1)<CR>
+xnoremap <silent> <Plug>(textobj#column_inner) m':<C-u>call <SID>column(0, 1)<CR>
 onoremap <silent> <Plug>(textobj#column_inner) :<C-u>call <SID>column(0, 0)<CR>
-xnoremap <silent> <Plug>(textobj#column_around) :<C-u>call <SID>column(1, 1)<CR>
+xnoremap <silent> <Plug>(textobj#column_around) m':<C-u>call <SID>column(1, 1)<CR>
 onoremap <silent> <Plug>(textobj#column_around) :<C-u>call <SID>column(1, 0)<CR>
 
 call textobj#textobj#define_map('x', 'ic', '<Plug>(textobj#column_inner)')
