@@ -1,9 +1,11 @@
 let s:linenum_pat = '%(\d+|\.|\$|\%|''[a-zA-Z<>]|\?|\&|\/.*\/|\?.*\?|\/)'
-let s:commands = '\s*%(s%[ubstitute]|v%[global]|g%[lobal]\!?|sor%[t]\!?%(\s+[bfinorux]*)?\s+)'
+let s:cmd_commands = 'v%[global]|g%[lobal]\!?'
+let s:commands = '\s*%(s%[ubstitute]|' . s:cmd_commands . '|sor%[t]\!?%(\s+[bfinorux]*)?\s+)'
 let s:range = '%(' . s:linenum_pat . '%([,;]' . s:linenum_pat . ')*)?'
 let s:do_pat = '\v^%(' . s:range . '%(windo|bufdo\!?)\s+' . s:range . s:commands . ')$'
 let s:sub_pat = '\v^%(' . s:range . s:commands . ')$'
 let s:range_pat = '\v^%(%(' . s:linenum_pat . '[,;])+)$'
+let s:global_pat = '\v^\s*' . s:range . '%(' . s:cmd_commands . ')([-~`!@#$%^&*()_+={}\[\]:;'', <>,.?/]).*\1' . s:commands . '$'
 
 function! verymagic#verymagic(...) abort
   if a:0
@@ -18,7 +20,7 @@ function! verymagic#verymagic(...) abort
   elseif getcmdtype() !=? ':'
     return char
   endif
-  if cmdline =~# s:sub_pat || ((cmdline =~# s:range_pat || cmdline ==? '') && char =~? '[/?]') || cmdline =~# s:do_pat
+  if cmdline =~# s:sub_pat || ((cmdline =~# s:range_pat || cmdline ==? '') && char =~? '[/?]') || cmdline =~# s:do_pat || cmdline =~# s:global_pat
     return char .'\v'
   else
     return char
