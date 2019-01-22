@@ -6,11 +6,11 @@ function! marks#marks() abort
   silent! setlocal buftype=nofile bufhidden=wipe nobuflisted filetype=
   put! =message
   wincmd p
-  normal! 999zh
+  keepjumps normal! mz999zh`z
   redraw!
   echom '`'
   let m = nr2char(getchar())
   execute 'normal! `' . m
   wincmd p | close
-  normal! 999zh
+  keepjumps normal! mz999zh`z
 endfunction
