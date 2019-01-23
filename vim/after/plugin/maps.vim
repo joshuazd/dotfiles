@@ -1,4 +1,4 @@
-if exists('g:loaded_sneak_plugin') && g:loaded_sneak_plugin == 1
+if exists('g:loaded_sneak_plugin')
 
     nmap f <Plug>Sneak_f
     nmap F <Plug>Sneak_F
@@ -22,24 +22,6 @@ if exists('g:loaded_sneak_plugin') && g:loaded_sneak_plugin == 1
 
 endif
 
-if exists(':Files')
-  command! -bang -nargs=? -complete=dir Files
-        \ call fzf#vim#files(<q-args>, fzf#vim#with_preview(), <bang>0)
-  nnoremap \f :Files<CR>
-  command! -bang -nargs=* Rg
-        \ call fzf#vim#grep(
-        \   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
-        \   <bang>0 ? fzf#vim#with_preview('up:60%')
-        \           : fzf#vim#with_preview('right:50%', '?'),
-        \   <bang>0)
-  nnoremap \g :Rg<CR>
-  nnoremap \l :Lines<CR>
-  nnoremap \j :Tags<CR>
-  nnoremap \b :Buffers<CR>
-  nnoremap \' :Marks<CR>
-  nnoremap \h :Helptags<CR>
-endif
-
 if exists('did_plugin_ultisnips')
   let g:ulti_expand_or_jump_res = 0
   function! UltiSnips_ExpandJump() abort
@@ -58,15 +40,13 @@ if exists('g:loaded_mucomplete')
   if exists('g:loaded_endwise')
     imap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>\<Plug>DiscretionaryEnd"
   else
-    imap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>"
+    inoremap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>"
   endif
-  imap <expr> <right> mucomplete#extend_fwd("\<right>")
-  imap <expr> <left> mucomplete#extend_bwd("\<left>")
+  inoremap <expr> <right> mucomplete#extend_fwd("\<right>")
+  inoremap <expr> <left> mucomplete#extend_bwd("\<left>")
 endif
 
-if exists('g:loaded_qlist') && g:loaded_qlist == 1
-
+if exists('g:loaded_qlist')
   nnoremap <Space>i :Ilist<space>
   nmap <Space>8 <Plug>QlistIncludefromtop:cdo s//g<Left><Left>
-
 endif
