@@ -30,6 +30,8 @@ set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
 setlocal include=\\%(target\\\|key\\)=\"\\zs\\w\\+\\ze\"
 nnoremap <buffer> ,f zMzr
+nnoremap <buffer> cx :set operatorfunc=xml#escape#escape<CR>g@
+xnoremap <buffer> X :<C-u>call xml#escape#escape()<CR>
 
 let b:undo_ftplugin = 'setlocal foldmethod< smarttab< conceallevel< foldnestmax< iskeyword< expandtab< tabstop< shiftwidth< softtabstop< omnifunc< makeprg< formatprg< syntax< path< suffixesadd< isfname< include<'
 
