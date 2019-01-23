@@ -23,8 +23,6 @@ if exists('*plug#begin')
   Plug 'markonm/traces.vim'
   Plug 'sgur/vim-editorconfig'
   if !has('win32')
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-    Plug 'junegunn/fzf.vim'
     Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'for': ['java'] }
   endif
   if executable('ctags')
