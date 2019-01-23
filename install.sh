@@ -46,6 +46,7 @@ install aliases
 install functions
 install tmux.conf
 install editorconfig
+install ctags
 install bin
 
 echo "Creating symlinks for theme"

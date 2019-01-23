@@ -4,8 +4,8 @@
 --regex-XML=/(<api|<template|<sequence|<messageStore|<messageProcessor|<data|<task|<proxy) .*name="([a-zA-Z0-9_]+)"/\2/d,definition/
 --regex-XML=/<localEntry .*key="([a-zA-Z0-9_]+)"/\1/d,definition/
 --regex-XML=/<token>@([a-zA-Z0-9_]+)/\1/t,token/
---regex-XML=/<resource.*url-mapping="\/([a-zA-Z0-9_\/{}-]+)"/\1/u,url/
---regex-XML=/<resource.*uri-template="\/([a-zA-Z0-9_\/{}-]+)"/\1/u,url/
+--regex-XML=/<resource.*url-mapping="\/([a-zA-Z0-9_\/{}?=-]+)"/\1/u,url/
+--regex-XML=/<resource.*uri-template="\/([a-zA-Z0-9_\/{}?=-]+)"/\1/u,url/
 --regex-XML=/<query.*id="([a-zA-Z0-9_]+)"/\1/q,query/
 --regex-XML=/<operation.*name="([a-zA-Z0-9_]+)"/\1/o,operation/
 --exclude=artifact.xml
@@ -22,3 +22,4 @@
 --regex-Rust=/(static|const) +([a-zA-Z0-9_]+) *[:=]/\2/c,consts,static constants/
 --regex-Rust=/macro_rules! +([a-zA-Z0-9_]+) *[{]/\1/d,macros,macro definitions/
 --regex-Rust=/impl([ \t\n]*<[^>]*>)?[ \t]+(([a-zA-Z0-9_:]+)[ \t]*(<[^>]*>)?[ \t]+(for)[ \t]+)?([a-zA-Z0-9_]+)/\6/i,impls,trait implementations/
+--langmap=Vim:+(vimrc)
