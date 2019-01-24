@@ -1,1 +1,1 @@
-autocmd BufRead,BufNewFile *.dbs set filetype=xml
+autocmd BufRead,BufNewFile *.dbs setf xml

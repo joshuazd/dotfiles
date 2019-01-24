@@ -1,1 +1,1 @@
-autocmd BufRead,BufNewFile .editorconfig,editorconfig setlocal filetype=editorconfig syntax=editorconfig
+autocmd BufRead,BufNewFile .editorconfig,editorconfig setf editorconfig

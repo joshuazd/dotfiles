@@ -1,1 +1,1 @@
-autocmd BufRead,BufNewFile *.dmc set filetype=javascript
+autocmd BufRead,BufNewFile *.dmc setf javascript

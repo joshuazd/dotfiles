@@ -1,1 +1,1 @@
-autocmd BufRead,BufNewFile *.zsh-theme set filetype=zsh
+autocmd BufRead,BufNewFile *.zsh-theme setf zsh
