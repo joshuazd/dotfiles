@@ -10,7 +10,6 @@ endif
 
 silent! call plug#begin('$HOME/.vim/bundle/')
 if exists('*plug#begin')
-  filetype off
   Plug 'lifepillar/vim-mucomplete'
   Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
@@ -286,8 +285,8 @@ augroup EditVim
   autocmd InsertEnter        *            setl listchars-=trail:─
   autocmd InsertLeave        *            setl listchars+=trail:─
   autocmd FileType           *            silent! call functions#LC_maps()
-  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == '' && &ft == '' | setf xml  | endif
-  autocmd BufEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' && &ft == '' | setf java | endif
+  autocmd BufReadPost        *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == '' && &ft == '' | setf xml  | endif
+  autocmd BufReadPost        *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' && &ft == '' | setf java | endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
