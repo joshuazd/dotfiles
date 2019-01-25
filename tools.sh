@@ -5,6 +5,9 @@ sudo snap alias ripgrep.rg rg
 wget https://github.com/sharkdp/fd/releases/download/v7.0.0/fd-musl_7.0.0_i386.deb
 sudo dpkg -i fd-musl_7.0.0_i386.deb
 rm fd-musl_7.0.0_i386.deb
+wget https://github.com/sharkdp/bat/releases/download/v0.9.0/bat-musl_0.9.0_amd64.deb
+sudo dpkg -i bat-musl_0.9.0_amd64.deb
+rm bat-musl_0.9.0_amd64.deb
 sudo apt install -y silversearcher-ag
 sudo apt upgrade -y snapd silversearcher-ag zsh ctags vim
 sudo snap refresh ripgrep
