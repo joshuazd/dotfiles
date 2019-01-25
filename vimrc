@@ -294,8 +294,8 @@ augroup EditVim
   autocmd InsertEnter        *            setl listchars-=trail:─
   autocmd InsertLeave        *            setl listchars+=trail:─
   autocmd FileType           *            silent! call functions#LC_maps()
-  autocmd BufReadPost        *            if expand('%:p:h') =~# '^.*/projects/esb/' && expand('%:p') == '' && &ft == '' | setf xml  | endif
-  autocmd BufReadPost        *            if expand('%:p:h') =~# '^.*/projects/weblogic/' && expand('%:p') == '' && &ft == '' | setf java | endif
+  autocmd VimEnter           *            if expand('%:p:h') =~# '^.*/projects/esb' && expand('%:p') == '' && &ft == '' | setf xml  | endif
+  autocmd VimEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic' && expand('%:p') == '' && &ft == '' | setf java | endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
