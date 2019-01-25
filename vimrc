@@ -78,6 +78,7 @@ set tags=./tags,tags
 set modeline
 set shortmess+=cmrw
 set wildmenu
+set wildcharm=<C-z>
 set wildmode=list:longest,list:full
 set wildignorecase
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup
@@ -201,13 +202,14 @@ for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', 
   execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
 endfor
 
+
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find<space>
 nnoremap <Space>s :sfind<space>
 nnoremap <Space>v :vert sfind<space>
-nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-d>
+nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
 nnoremap <Space>t :tjump /
 
 nnoremap <Space>l :set colorcolumn=
@@ -233,11 +235,18 @@ nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
 nnoremap =q :cclose<CR>
 
+" make [d and ]d show declarations
+nnoremap [d :let save=winsaveview()<CR>gD:nohlsearch<CR>^"ay$:call winrestview(save)<Bar>echo @a<CR>
+nnoremap ]d :let save=winsaveview()<CR>gd:nohlsearch<CR>^"ay$:call winrestview(save)<Bar>echo @a<CR>
+
 " smarter pasting
 nnoremap <silent> <Space>p p=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
 nnoremap <expr> <silent> zp putoperator#PutOperator()
 nmap <silent> zpp Vp
+
+" improved searching
+cnoremap <expr> <Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>/<C-r>/" : "<C-z>"
 
 " misc functions
 nnoremap <silent> <F5> :call vim#VimRefresh()<CR>

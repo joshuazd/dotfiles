@@ -1,9 +1,9 @@
 function! whitespace#TrimWhiteSpace() abort
   if !&binary && &filetype !=? 'diff'
-    let l:save = winsaveview()
+    let save = winsaveview()
     " vint: -ProhibitCommandRelyOnUser -ProhibitCommandWithUnintendedSideEffect
     keeppatterns %s/\s\+$//e
     " vint: +ProhibitCommandRelyOnUser +ProhibitCommandWithUnintendedSideEffect
-    call winrestview(l:save)
+    call winrestview(save)
   endif
 endfunction

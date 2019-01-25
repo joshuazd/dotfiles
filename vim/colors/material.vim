@@ -73,7 +73,7 @@ call s:h('ColorColumn',     s:none,       s:mediumgrey,   'none')
 
 call s:h('Directory',       s:blue,       s:background,   'none')
 call s:h('Search',          s:black,      s:yellow,       'none')
-call s:h('IncSearch',       s:black,      s:yellow,       'none')
+call s:h('IncSearch',       s:black,      s:blurple,       'none')
 
 call s:h('WildMenu',        s:boldgreen,  s:mediumgrey,   'none')
 call s:h('Question',        s:boldgreen,  s:background,   'none')
