@@ -1,22 +1,18 @@
 set backspace=indent,eol,start
-set ignorecase smartcase
+set hidden
+set ignorecase 
+set smartcase
+set autoindent 
+set smarttab
 set nowrap
 set clipboard^=unnamedplus
-set laststatus=2
-set scrolloff=10
-set wildmenu
+set wildmenu 
+set wildcharm=<C-z>
 set noswapfile
 set showcmd
 set tags=./tags,tags
-set foldlevelstart=4
+set path=.,**
+set ruler
+set background=dark
 filetype plugin indent on
 syntax enable
-colorscheme material
-set termguicolors
-nnoremap ' `
-nnoremap Y y$
-nnoremap gb :ls<CR>:b<space>
-inoremap jk <esc>
-nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
-nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
-set statusline=\ %f%m%r%h%w%=%{&ff}\ \ %{&ft}\ \ %03p%%\ \ %04l,%04v\ 
