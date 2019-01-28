@@ -100,8 +100,6 @@ if [[ -d ~/pebble-dev/pebble-sdk-4.5-linux64/bin ]]; then
     export PATH=$PATH:~/pebble-dev/pebble-sdk-4.5-linux64/bin
 fi
 
-# fzf setup
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export PATH=$PATH:/snap/bin/
 
 PATH="$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH"
@@ -162,6 +160,8 @@ source "${ZSH_CUSTOM}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
 compdef sshrc=ssh
+# fzf setup
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # history settings
 zle -N history-substring-search-up
 zle -N history-substring-search-down
@@ -201,13 +201,22 @@ local color0D='#945eb8'
 local color0E='#39adb5'
 local color0F='#ffffff'
 
+# export FZF_DEFAULT_OPTS="
+#   --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
+#   --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
+#   --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
+#   --preview '(bat -p --theme=TwoDark --color always {} \
+#     || cat {} \
+#     || ls -F --color=always {} \
+#     || bat -p --theme=TwoDark --color always \$(echo {} | awk \"{ sub(/:.*/,\\\"\\\");gsub(/\[[0-9]+m/,\\\"\\\");print }\")) 2> /dev/null | head -100'
+# "
+
 export FZF_DEFAULT_OPTS="
   --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
   --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
   --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
-  --preview '(bat -p --theme=TwoDark --color always {} || cat {} || ls -F --color=always {}) 2> /dev/null | head -100'
+  --preview='fzf_preview {} 2>/dev/null'
 "
-
 }
 
 

@@ -22,6 +22,15 @@ if exists('g:loaded_sneak_plugin')
 
 endif
 
+if exists('g:loaded_fzf')
+  runtime! autoload/quickfix.vim
+  command! -bang Rg call fzf#run(fzf#wrap('rg',
+        \{'source': 'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>),
+        \ 'options': ['--multi','--ansi','--preview-window', <bang>0 ? 'up:75%' : 'right:50%'],
+        \ 'down': '25%',
+        \ 'sink*': funcref('quickfix#add')}, <bang>0 ) )
+endif
+
 if exists('did_plugin_ultisnips')
   let g:ulti_expand_or_jump_res = 0
   function! UltiSnips_ExpandJump() abort
