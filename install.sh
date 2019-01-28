@@ -3,11 +3,6 @@
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
 
-case $(uname -s) in
-    Linux*) ./tools.sh ;;
-    *) ;;
-esac
-
 read -p 'Backup existing files (Y/n)' backup
 if [ -z $backup ]; then
     backup='y'
@@ -48,6 +43,9 @@ install tmux.conf
 install editorconfig
 install ctags
 install bin
+install config/i3
+install config/polybar
+install config/bat
 
 echo "Creating symlinks for theme"
 if [ -f /usr/local/share/zsh/site-functions/prompt_nier_setup ]; then
@@ -71,3 +69,9 @@ case $(uname -s) in
 esac
 
 vim +PlugInstall +helptags\ ALL +qall
+
+case $(uname -s) in
+    Linux*) ./tools.sh ;;
+    *) ;;
+esac
+
