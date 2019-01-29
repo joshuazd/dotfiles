@@ -7,10 +7,10 @@ _fzf_preview() {
     else
         local lnum=1
     fi
-    (bat -n --theme=TwoDark --color=always "$match" \
+    (bat -n --color=always "$match" \
         || cat "$match" \
         || ls -F --color=always "$match" \
-        || bat -n --theme=MaterialThemeDark --color=always --line-range "$lnum": $(echo "$match" | sed 's/:.*//' )) | head -100
+        || bat -n --color=always --line-range "$lnum": $(echo "$match" | sed 's/:.*//' )) | head -100
     }
 
 _fzf_preview "$@"
