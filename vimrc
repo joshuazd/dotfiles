@@ -102,8 +102,8 @@ if has('patch-8.1.0513')
 endif
 
 if !empty($TEMP)
-  set backupdir=$TEMP//
-  set directory=$TEMP//
+  set backupdir=$TEMP/swap/
+  set directory=$TEMP/backup/
 else
   set directory=$HOME/.tmp/swap//
   set backupdir=$HOME/.tmp/backup//
