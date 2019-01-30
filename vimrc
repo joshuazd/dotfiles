@@ -101,25 +101,19 @@ if has('patch-8.1.0513')
   set diffopt+=algorithm:patience,indent-heuristic
 endif
 
-if has('win32')
-  if !empty($TEMP)
-      set backup
-      set swapfile
-      set backupdir=$TEMP//
-      set directory=$TEMP//
-  else
-      set noswapfile
-  endif
+if !empty($TEMP)
+  set backupdir=$TEMP//
+  set directory=$TEMP//
 else
-  set backup
   set directory=$HOME/.tmp/swap//
   set backupdir=$HOME/.tmp/backup//
-  for dir in [&directory, &backupdir]
-    if empty(glob(dir))
-      call system('mkdir -p ' . dir)
-    endif
-  endfor
 endif
+set swapfile
+for dir in [&directory, &backupdir]
+  if empty(glob(dir))
+    call mkdir(dir, 'p')
+  endif
+endfor
 
 set completeopt+=menuone
 if has('patch-7.4.784')
@@ -202,7 +196,6 @@ for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', 
   execute 'xnoremap a' . char . ' :<C-u>normal! F' . char . 'vf' . char . '<CR>'
   execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
 endfor
-
 
 " file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
