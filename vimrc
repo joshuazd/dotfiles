@@ -52,6 +52,7 @@ set breakindentopt+=shift:2
 set ignorecase
 set smartcase
 set incsearch
+set hlsearch
 set lazyredraw
 set showmatch
 set matchtime=2
@@ -169,6 +170,7 @@ endif
 " map Y behave like D and C
 nnoremap Y y$
 
+
 " buffer navigation
 nnoremap [b :bprevious<CR>
 nnoremap ]b :bnext<CR>
@@ -181,7 +183,6 @@ nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
 nnoremap gk k
 nnoremap ' `
-nnoremap * :set hlsearch<CR>*N
 nnoremap c* :set hlsearch<CR>*Ncgn
 
 " edit embedded scripts
@@ -212,12 +213,13 @@ xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
 nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
+nnoremap <silent> <Esc> :nohlsearch<CR>
 
 " vim-unimpaired inspired settings toggles
-nnoremap =ow :setlocal wrap!           <Bar>setlocal wrap?<CR>
-nnoremap =oz :setlocal list!           <Bar>setlocal list?<CR>
-nnoremap =os :setlocal spell!          <Bar>setlocal spell?<CR>
-nnoremap =oh :setlocal hlsearch!       <Bar>setlocal hlsearch?<CR>
+nnoremap =ow :setlocal wrap!     <Bar>setlocal wrap?<CR>
+nnoremap =oz :setlocal list!     <Bar>setlocal list?<CR>
+nnoremap =os :setlocal spell!    <Bar>setlocal spell?<CR>
+nnoremap =oh :setlocal hlsearch! <Bar>setlocal hlsearch?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><Bar>setlocal signcolumn?<CR>
 nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><Bar>setlocal conceallevel?<CR>
 nnoremap =oy :if exists('g:syntax_on') <Bar> syntax off <Bar> else <Bar> syntax enable <Bar> endif<CR>
