@@ -28,7 +28,7 @@ if exists('*plug#begin')
   if executable('ctags')
     Plug 'ludovicchabant/vim-gutentags'
   endif
-  if has('python_compiled') || has('python3_compiled')
+  if has('pythonx')
     Plug 'SirVer/ultisnips'
   endif
   silent! call plug#end()
