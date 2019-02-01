@@ -8,6 +8,7 @@ if has('win32')
   set runtimepath+=~/.vim/after
 endif
 
+filetype off
 silent! call plug#begin('$HOME/.vim/bundle/')
 if exists('*plug#begin')
   Plug 'lifepillar/vim-mucomplete'
