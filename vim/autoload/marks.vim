@@ -13,4 +13,5 @@ function! marks#marks() abort
   execute 'normal! `' . m
   wincmd p | close
   keepjumps normal! mz999zh`z
+  delmarks z
 endfunction

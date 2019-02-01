@@ -2,7 +2,7 @@
 function! functions#MyFoldText() abort
   let line = getline(v:foldstart)
   let n = v:foldend - v:foldstart + 1
-  let info = ' ' . n . ' lines  + ───'
+  let info = ' ' . n . ' lines  ├───'
   let line .= repeat(' ',999)
   let num_w = getwinvar(0, '&number' ) * getwinvar( 0, '&numberwidth')
   let fold_w = getwinvar(0, '&foldcolumn')
