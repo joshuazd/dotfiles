@@ -202,16 +202,6 @@ local color0D='#945eb8'
 local color0E='#39adb5'
 local color0F='#ffffff'
 
-# export FZF_DEFAULT_OPTS="
-#   --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
-#   --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
-#   --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
-#   --preview '(bat -p --theme=TwoDark --color always {} \
-#     || cat {} \
-#     || ls -F --color=always {} \
-#     || bat -p --theme=TwoDark --color always \$(echo {} | awk \"{ sub(/:.*/,\\\"\\\");gsub(/\[[0-9]+m/,\\\"\\\");print }\")) 2> /dev/null | head -100'
-# "
-
 export FZF_DEFAULT_OPTS="
   --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
   --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
