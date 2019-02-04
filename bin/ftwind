@@ -61,7 +61,7 @@ done
 
 # Run fzf and check result
 # target=$(echo "$windows" | fzf-tmux +m --reverse --ansi)
-target=$(echo "$windows" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS" fzf-tmux +m)
+target=$(echo "$windows" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS --preview= " fzf-tmux +m)
 res=$?
 [ "$res" -eq "130" ] && exit 0
 [ "$res" -eq "0" ] || exit $res
