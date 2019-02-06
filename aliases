@@ -129,6 +129,17 @@ alias gf='git fetch'
 alias gfa='git fetch --all --prune'
 alias gfo='git fetch origin'
 
+alias gg='git gui citool'
+alias gga='git gui citool --amend'
+
+alias ggsup='git branch --set-upstream-to=origin/$(git_current_branch)'
+alias gpsup='git push --set-upstream origin $(git_current_branch)'
+
+alias ghh='git help'
+
+alias gignore='git update-index --assume-unchanged'
+alias gignored='git ls-files -v | grep "^[[:lower:]]"'
+
 alias gl='git pull'
 alias glg='git log --stat'
 alias glgp='git log --stat -p'
