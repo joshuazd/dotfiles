@@ -3,7 +3,7 @@ function! edit#open(...) abort
     call feedkeys(":E \<C-d>")
     return
   endif
-  if len(glob(a:1, 0, 1)) == 1
+  if len(glob(a:1, 0, 1)) <= 1
     execute 'edit ' a:1
   else
     try
