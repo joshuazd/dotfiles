@@ -35,6 +35,7 @@ install() {
 install vim
 install vimrc
 install inputrc
+install shrc
 install bashrc
 install zshrc
 install aliases

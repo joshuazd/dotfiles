@@ -1,6 +1,10 @@
 # If not running interactively, don't do anything
 [[ "$-" != *i* ]] && return
 
+if [ -f "${HOME}/.shrc" ]; then
+      source "${HOME}/.shrc"
+fi
+
 # Don't wait for job termination notification
 # set -o notify
 
@@ -41,27 +45,9 @@ export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 # The '&' is a special pattern which suppresses duplicate entries.
 export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls:l'
 
-export EDITOR=vim\ -u\ ~/dotfiles/nanovimrc\ -N
-export VISUAL=vim\ -u\ ~/dotfiles/nanovimrc\ -N
-
 # Aliases
 if [ -f "${HOME}/.aliases" ]; then
   source "${HOME}/.aliases"
 fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
-export PATH=$PATH:/snap/bin/
-
-PATH="$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH"
-
-if type fd > /dev/null; then
-    export FZF_DEFAULT_COMMAND='fd --type f'
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-    export FZF_ALT_C_COMMAND='fd --type d'
-elif type rg > /dev/null; then
-    export FZF_DEFAULT_COMMAND='rg --files'
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-elif type ag > /dev/null; then
-    export FZF_DEFAULT_COMMAND='ag -l'
-    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-fi
