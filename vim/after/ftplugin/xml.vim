@@ -8,18 +8,21 @@ setlocal tabstop=2
 setlocal shiftwidth=2
 setlocal softtabstop=2
 inoremap <buffer> <expr> / getline('.')[col('.')-2] ==# '<' ? "/\<C-x>\<C-o>\<C-n>\<C-y>" : "/"
-nnoremap <silent> <buffer> [m ?<resource<CR>
-nnoremap <silent> <buffer> ]m /<resource<CR>
-xnoremap <silent> <buffer> [m ?<resource<CR>
-xnoremap <silent> <buffer> ]m /<resource<CR>
-onoremap <silent> <buffer> [m ?<resource<CR>
-onoremap <silent> <buffer> ]m /<resource<CR>
-nnoremap <silent> <buffer> [M ?<\/resource<CR>
-nnoremap <silent> <buffer> ]M /<\/resource<CR>
-xnoremap <silent> <buffer> [M ?<\/resource<CR>
-xnoremap <silent> <buffer> ]M /<\/resource<CR>
-onoremap <silent> <buffer> [M ?<\/resource<CR>
-onoremap <silent> <buffer> ]M /<\/resource<CR>
+
+nnoremap <silent> <buffer> [m :call search('<resource','Wcb')<CR>
+nnoremap <silent> <buffer> ]m :call search('<resource','Wc')<CR>
+xnoremap <silent> <buffer> [m <Esc>m<:call search('<resource','Wcb')<CR>m>gv
+xnoremap <silent> <buffer> ]m <Esc>m<:call search('<resource','Wc')<CR>m>gv
+onoremap <silent> <buffer> [m :call search('<resource','Wcb')<CR>
+onoremap <silent> <buffer> ]m :call search('<resource','Wc')<CR>
+
+nnoremap <silent> <buffer> [M :call search('<\/resource','Wcb')<CR>
+nnoremap <silent> <buffer> ]M :call search('<\/resource','Wc')<CR>
+xnoremap <silent> <buffer> [M <Esc>m<:call search('<\/resource','Wcb')<CR>m>gv
+xnoremap <silent> <buffer> ]M <Esc>m<:call search('<\/resource','Wc')<CR>m>gv
+onoremap <silent> <buffer> [M :call search('<\/resource','Wcb')<CR>
+onoremap <silent> <buffer> ]M :call search('<\/resource','Wc')<CR>
+
 setlocal omnifunc=xml#complete#CompleteTags
 compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
