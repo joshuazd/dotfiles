@@ -12,22 +12,19 @@ function! s:declaration(whitespace, visualmode) abort
   let match = escape(matchstr(getline('.'), '\v^\s*\zs' . get(b:, 'textobj#declaration_char', '\k') . '+'), '!@#$%^&*()[]-+={};:<>,.\|?/`~')
   normal! ^
   " jump back to the first line after a line that doesn't start with the match
-  call searchpos('\v^\s*%(%(^\s*' . match . ')@<!.)+$' . (ws ? '\n%(^\s*$\n|.)\ze' : '') . '\_s*.', 'bWec')
+  call search('\v^\s*%(%(^\s*' . match . ')@<!.)+$' . (ws ? '\n%(^\s*$\n|.)\ze' : '') . '\_s*.', 'bWec')
   execute 'normal! ' . a:visualmode
   " jump forward to the line before the next line that doesn't match
-  call searchpos('\v' . (ws ? '\n^\s*\S' : '\S\s*\n^\_s*') . '%(%(' . match . ')@<!.)*$', 'Wc')
+  call search('\v\S\s*\n^\_s*%(%(' . match . ')@<!.)*$', 'Wc')
+  if ws
+    call search('\v\_s*', 'Wce')
+  endif
 endfunction
 
 xnoremap <silent> <Plug>(textobj#declaration_inner) :<C-u>call <SID>declaration(0,visualmode())<CR>
 onoremap <silent> <Plug>(textobj#declaration_inner) :<C-u>call <SID>declaration(0,'V')<CR>
 xnoremap <silent> <Plug>(textobj#declaration_around) :<C-u>call <SID>declaration(1,visualmode())<CR>
 onoremap <silent> <Plug>(textobj#declaration_around) :<C-u>call <SID>declaration(1,'V')<CR>
-
-function! s:define_map(mode, lhs, rhs) abort
-  if !hasmapto(a:rhs, get({'x':'v'}, a:mode, a:mode)) && maparg(a:lhs, a:mode) ==? ''
-    execute a:mode . 'map <silent> ' . a:lhs . ' ' . a:rhs
-  endif
-endfunction
 
 call textobj#textobj#define_map('x', 'id', '<Plug>(textobj#declaration_inner)')
 call textobj#textobj#define_map('o', 'id', '<Plug>(textobj#declaration_inner)')
