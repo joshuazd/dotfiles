@@ -30,7 +30,7 @@ syn keyword xpathFuncName substring-before substring-after index-of get-property
 syn match xpathFuncName "\<contains\>" contained display
 syn keyword xpathFuncName number abs ceiling floor round string compare concat adjust-dateTime-to-timezone contained
 syn keyword xpathFuncName matches replce boolean not true false dateTime name root remove empty exists reverse contained
-syn keyword xpathFuncName subsequence count avg max min sum id position last translate text format-dateTime contained
+syn keyword xpathFuncName subsequence count avg max min sum id node position last translate text format-dateTime contained
 syn keyword xpathFuncName dayTimeDuration contained
 
 
