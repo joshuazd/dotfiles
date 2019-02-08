@@ -65,7 +65,7 @@ call s:h('CursorLineNR',    s:boldcyan,   s:background,   'none')
 
 call s:h('CursorColumn',    s:none,       s:mediumgrey,   'none')
 call s:h('FoldColumn',      s:none,       s:background,   'none')
-call s:h('SignColumn',      s:none,       s:background,   'none')
+call s:h('SignColumn',      s:none,       s:mediumgrey,   'none')
 call s:h('Folded',          s:lightgrey,  s:darkgrey,     'none')
 
 call s:h('VertSplit',       s:grey,       s:background,   'none')
@@ -126,11 +126,10 @@ call s:h('StorageClass',    s:green,      s:background,   'none')
 call s:h('Structure',       s:boldcyan,   s:background,   'none')
 call s:h('Class',           s:boldblue,   s:background,   'bold')
 
-call s:h('DiffAdd',         s:boldgreen,  s:darkdarkgrey, 'none')
-call s:h('DiffChange',      s:yellow,     s:darkdarkgrey, 'none')
-call s:h('DiffDelete',      s:red,        s:darkdarkgrey, 'none')
+call s:h('DiffAdd',         s:boldgreen,  s:mediumgrey,   'none')
+call s:h('DiffChange',      s:yellow,     s:mediumgrey,   'none')
+call s:h('DiffDelete',      s:red,        s:mediumgrey,   'none')
 call s:h('DiffText',        s:black,      s:lightgrey,    'none')
-call s:h('diffAdded',       s:boldgreen,  s:background,   'none')
 
 call s:h('Pmenu',           s:white,      s:mediumgrey,   'none')
 call s:h('PmenuSel',        s:white,      s:mediumgrey,   'reverse')
