@@ -17,11 +17,13 @@ if exists('*plug#begin')
   Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-commentary'
   Plug 'tpope/vim-apathy'
+  Plug 'tpope/vim-fugitive'
   Plug 'tommcdo/vim-lion'
   Plug 'romainl/vim-qf'
   Plug 'romainl/vim-qlist'
   Plug 'markonm/traces.vim'
   Plug 'sgur/vim-editorconfig'
+  Plug 'mhinz/vim-signify'
   if !has('win32')
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'for': ['java'] }
@@ -110,7 +112,6 @@ else
   set directory=$HOME/.tmp/swap//
   set backupdir=$HOME/.tmp/backup//
 endif
-set swapfile
 for dir in [&directory, &backupdir]
   if empty(glob(dir))
     call mkdir(dir, 'p')

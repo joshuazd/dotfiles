@@ -61,3 +61,19 @@ if executable('python3')
   let g:python_executable = 'python3'
   let g:jedi#force_py_version = 3
 endif
+" signify
+let g:signify_vcs_list        = ['git']
+let g:signify_sign_add        = '│'
+let g:signify_sign_delete     = '─'
+let g:signify_sign_change     = '┇'
+let g:signify_sign_show_count = 0
+" function! s:hl_Signify() abort
+"   hi link SignifySignAdd    StringDelimiter
+"   hi link SignifySignChange Identifier
+"   hi link SignifySignDelete Special
+" endfunction
+" call <SID>hl_Signify()
+" augroup signify
+"   autocmd!
+"   autocmd ColorScheme * call <SID>hl_Signify()
+" augroup END
