@@ -59,7 +59,7 @@ augroup END
 " let b:endwise_pattern = '<\%([^ /!?"''<>][^>]*\)\?[^/>]>\s*$'
 " let b:endwise_syngroups = 'xmlTag,xmlTagPunct'
 
-let b:decselect_char = '\S'
+let b:textobj_declaration_char = '\S'
 
 let g:xmldata_none = {}
 

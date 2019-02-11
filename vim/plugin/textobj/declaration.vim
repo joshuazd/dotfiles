@@ -9,7 +9,7 @@ set cpo&vim
 function! s:declaration(whitespace, visualmode) abort
   let ws = a:whitespace
   " find the first word on the current line
-  let match = escape(matchstr(getline('.'), '\v^\s*\zs' . get(b:, 'textobj#declaration_char', '\k') . '+'), '!@#$%^&*()[]-+={};:<>,.\|?/`~')
+  let match = escape(matchstr(getline('.'), '\v^\s*\zs' . get(b:, 'textobj_declaration_char', '\k') . '+'), '!@#$%^&*()[]-+={};:<>,.\|?/`~')
   normal! ^
   " jump back to the first line after a line that doesn't start with the match
   call search('\v^\s*%(%(^\s*' . match . ')@<!.)+$' . (ws ? '\n%(^\s*$\n|.)\ze' : '') . '\_s*.', 'bWec')
