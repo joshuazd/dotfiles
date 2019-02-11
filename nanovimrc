@@ -1,12 +1,12 @@
 set backspace=indent,eol,start
 set hidden
-set ignorecase 
+set ignorecase
 set smartcase
-set autoindent 
+set autoindent
 set smarttab
 set nowrap
 set clipboard^=unnamedplus
-set wildmenu 
+set wildmenu
 set wildmode=list:longest,longest:full
 set wildignorecase
 set wildcharm=<C-z>

@@ -172,7 +172,6 @@ endif
 " map Y behave like D and C
 nnoremap Y y$
 
-
 " buffer navigation
 nnoremap [b :bprevious<CR>
 nnoremap ]b :bnext<CR>
