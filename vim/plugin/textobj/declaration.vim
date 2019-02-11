@@ -17,7 +17,7 @@ function! s:declaration(whitespace, visualmode) abort
   " jump forward to the line before the next line that doesn't match
   call search('\v\S\s*\n^\_s*%(%(' . match . ')@<!.)*$', 'Wc')
   if ws
-    call search('\v\_s*', 'Wce')
+    call search('\v\_s*\n\ze(\s*\S*)', 'Wce')
   endif
 endfunction
 
