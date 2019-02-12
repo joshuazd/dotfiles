@@ -2,6 +2,7 @@
 
 scriptdir="$(dirname "$0")"
 cd "$scriptdir"
+cd ..
 
 read -p 'Backup existing files (Y/n)' backup
 if [ -z $backup ]; then
@@ -50,13 +51,13 @@ install config/bat
 
 echo "Creating symlinks for theme"
 if [ -f /usr/local/share/zsh/site-functions/prompt_nier_setup ]; then
-    rm /usr/local/share/zsh/site-functions/prompt_nier_setup
+    sudo rm /usr/local/share/zsh/site-functions/prompt_nier_setup
 fi
 if [ -f /usr/local/share/zsh/site-functions/prompt_pure_setup ]; then
-    rm /usr/local/share/zsh/site-functions/prompt_pure_setup
+    sudo rm /usr/local/share/zsh/site-functions/prompt_pure_setup
 fi
 if [ -f /usr/local/share/zsh/site-functions/async ]; then
-    rm /usr/local/share/zsh/site-functions/async
+    sudo rm /usr/local/share/zsh/site-functions/async
 fi
 
 case $(uname -s) in
@@ -68,11 +69,3 @@ case $(uname -s) in
              ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async ;;
     *) ;;
 esac
-
-vim +PlugInstall +helptags\ ALL +qall
-
-case $(uname -s) in
-    Linux*) ./tools.sh ;;
-    *) ;;
-esac
-

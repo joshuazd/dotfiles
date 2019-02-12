@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 sudo apt update
 
@@ -26,4 +26,3 @@ sudo make install
 
 cd -
 
-# rm -fr /tmp/tmux

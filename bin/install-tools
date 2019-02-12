@@ -1,3 +1,4 @@
+#! /usr/bin/env sh
 sudo apt update
 sudo apt install -y zsh ctags vim snapd
 sudo snap install ripgrep --classic
@@ -12,3 +13,4 @@ bat cache --init
 sudo apt install -y silversearcher-ag
 sudo apt upgrade -y snapd silversearcher-ag zsh ctags vim
 sudo snap refresh ripgrep
+
