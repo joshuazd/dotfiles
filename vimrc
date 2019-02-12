@@ -18,6 +18,7 @@ if exists('*plug#begin')
   Plug 'tpope/vim-commentary'
   Plug 'tpope/vim-apathy'
   Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-dispatch'
   Plug 'tommcdo/vim-lion'
   Plug 'romainl/vim-qf'
   Plug 'romainl/vim-qlist'
