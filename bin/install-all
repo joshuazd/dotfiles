@@ -1,9 +1,8 @@
 #! /usr/bin/env sh
 
-scriptdir="$(dirname "$0")"
-cd "$scriptdir"
+cd "$(dirname "$0")"
 
-exec "$PWD/bin/install-symlinks"
-exec "$PWD/bin/install-tmux"
-exec "$PWD/bin/install-vim"
-exec "$PWD/bin/install-tools"
+"$PWD/install-symlinks"
+"$PWD/install-tmux"
+"$PWD/install-vim"
+"$PWD/install-tools"
