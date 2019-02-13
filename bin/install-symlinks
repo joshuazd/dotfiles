@@ -1,7 +1,6 @@
 #!/bin/sh
 
-scriptdir="$(dirname "$0")"
-cd "$scriptdir"
+cd "$(dirname "$0")"
 cd ..
 
 read -p 'Backup existing files (Y/n)' backup
@@ -23,11 +22,11 @@ install() {
     case $(uname -s) in
         Linux*|Darwin*) ln -s "$PWD/$1" "$HOME/.$1" ;;
         CYGWIN*)
-            currentdir=$(cygpath -w "$scriptdir")
+            basedir=$(cygpath -w "$PWD")
             if [ -d "$PWD/$1" ]; then
-                cygstart --action=runas cmd /C "cd %HOME% && mklink /D .$1 $currentdir\\$1"
+                cygstart --action=runas cmd /C "cd %HOME% && mklink /D .$1 $basedir\\$1"
             elif [ -f "$PWD/$1" ]; then
-                cygstart --action=runas cmd /C "cd %HOME% && mklink .$1 $currentdir\\$1"
+                cygstart --action=runas cmd /C "cd %HOME% && mklink .$1 $basedir\\$1"
             fi ;;
         *) ;;
     esac
@@ -45,6 +44,7 @@ install tmux.conf
 install editorconfig
 install ctags
 install bin
+install ripgrep
 install config/i3
 install config/polybar
 install config/bat
