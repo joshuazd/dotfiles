@@ -20,7 +20,6 @@ source $ZSH_CUSTOM/mvncolor.sh
 autoload -Uz promptinit
 promptinit
 prompt pure
-# prompt nier
 
 # typeset -A ZSH_HIGHLIGHT_STYLES
 # ZSH_HIGHLIGHT_STYLES[function]='none'
