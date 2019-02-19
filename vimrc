@@ -8,9 +8,9 @@ if has('win32')
   set runtimepath+=~/.vim/after
 endif
 
-filetype off
 silent! call plug#begin('$HOME/.vim/bundle/')
 if exists('*plug#begin')
+  filetype off
   Plug 'lifepillar/vim-mucomplete'
   Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
@@ -290,6 +290,7 @@ augroup EditVim
   autocmd FileType           *            silent! call functions#LC_maps()
   autocmd VimEnter           *            if expand('%:p:h') =~# '^.*/projects/esb' && expand('%:p') == '' && &ft == '' | setf xml  | endif
   autocmd VimEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic' && expand('%:p') == '' && &ft == '' | setf java | endif
+  autocmd VimEnter           *            if fugitive#head() !=? '' | setlocal signcolumn=yes | endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
