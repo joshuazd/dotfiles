@@ -75,9 +75,9 @@ set autoindent
 set nowrap
 set linebreak
 set laststatus=2
-set scrolloff=10
+set scrolloff=5
 set sidescroll=1
-set sidescrolloff=10
+set sidescrolloff=5
 set sessionoptions-=options
 set sessionoptions-=blank
 set display+=lastline
