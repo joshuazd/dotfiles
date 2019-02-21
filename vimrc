@@ -249,6 +249,7 @@ nmap <silent> zpp Vp
 
 " improved searching
 cnoremap <expr> <Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>/<C-r>/" : "<C-z>"
+cnoremap <expr> <S-Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>?<C-r>/" : "<C-z>"
 
 " misc functions
 nnoremap <silent> <F5> :call vim#VimRefresh()<CR>
@@ -314,12 +315,11 @@ command! -range=% FormatJSON <line1>,<line2>!python2 -c
 " {{{
 if exists('+statusline')
   let in_snippet = 0
-  let stl_snippet = ['', 'snippet ']
+  let stl_snippet = ['', 'snippet']
 
-  set statusline=\ %<%f%m%r
-  set statusline+=\ %w%q%h%=
-  set statusline+=\ %{stl_snippet[in_snippet]}
-  set statusline+=%{&filetype}
-  set statusline+=\ %03l:%02c\ 
+  set statusline=%<%f%m%r%w%q%h%=
+  set statusline+=%-19{stl_snippet[in_snippet]}
+  set statusline+=%-19{&filetype}
+  set statusline+=%-19(%03l,%02c%03V%)
 endif
 " }}}
