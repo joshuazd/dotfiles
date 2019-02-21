@@ -10,7 +10,9 @@ endif
 
 silent! call plug#begin('$HOME/.vim/bundle/')
 if exists('*plug#begin')
+
   filetype off
+
   Plug 'lifepillar/vim-mucomplete'
   Plug 'justinmk/vim-sneak'
   Plug 'tpope/vim-surround'
@@ -24,6 +26,7 @@ if exists('*plug#begin')
   Plug 'markonm/traces.vim'
   Plug 'sgur/vim-editorconfig'
   Plug 'mhinz/vim-signify'
+
   if !has('win32')
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'for': ['java'] }
@@ -35,6 +38,7 @@ if exists('*plug#begin')
     Plug 'SirVer/ultisnips'
   endif
   silent! call plug#end()
+
 endif
 runtime! macros/matchit.vim
 syntax enable
@@ -290,7 +294,7 @@ augroup EditVim
   autocmd FileType           *            silent! call functions#LC_maps()
   autocmd VimEnter           *            if expand('%:p:h') =~# '^.*/projects/esb' && expand('%:p') == '' && &ft == '' | setf xml  | endif
   autocmd VimEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic' && expand('%:p') == '' && &ft == '' | setf java | endif
-  autocmd VimEnter           *            if fugitive#head() !=? '' | setlocal signcolumn=yes | endif
+  autocmd VimEnter           *            silent! if fugitive#head() !=? '' | set signcolumn=yes | endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
