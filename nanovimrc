@@ -18,3 +18,4 @@ set ruler
 set background=dark
 filetype plugin indent on
 syntax enable
+colorscheme material
