@@ -317,8 +317,8 @@ if exists('+statusline')
   let in_snippet = 0
   let stl_snippet = ['', 'snippet']
 
-  set statusline=%<%f%m%r%w%q%h%=
-  set statusline+=%-19{stl_snippet[in_snippet]}
+  set statusline=%f%m%r%w%q%h%=
+  set statusline+=%<%-19{stl_snippet[in_snippet]}
   set statusline+=%-19{&filetype}
   set statusline+=%-19(%03l,%02c%03V%)
 endif
