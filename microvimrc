@@ -38,12 +38,9 @@ set autoread
 set path=.,**
 set tags=./tags,tags
 set background=dark
+set grepprg=grep\ -r\ -n\ -I\ --exclude-dir=.git
 filetype plugin indent on
-
-nnoremap L $
-nnoremap H ^
-xnoremap L $
-xnoremap H ^
+syntax enable
 
 nnoremap Y y$
 
@@ -88,6 +85,12 @@ nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR
 nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR>\|setlocal conceallevel?<CR>
 nnoremap =oy :if exists('g:syntax_on') \| syntax off \| else \| syntax enable \| endif<CR>
 
+nnoremap [q :cprevious<CR>
+nnoremap ]q :cnext<CR>
+nnoremap [Q :cfirst<CR>
+nnoremap ]Q :clast<CR>
+nnoremap =q :cclose<CR>
+
 nnoremap <C-]> g<C-]>
 
 nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
@@ -95,4 +98,4 @@ nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 cnoremap <expr> <Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>/<C-r>/" : "<C-z>"
 
-set statusline=\ %f%m%r%h%w%=%{&ff}\ \ %{&ft}\ \ %03p%%\ \ %04l,%04v\ 
+set statusline=%f\ %m%r%w%q%h%=%<%-20{&filetype}%-14(%03l,%c%V%)%P\ 
