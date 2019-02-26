@@ -98,4 +98,4 @@ nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
 
 cnoremap <expr> <Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>/<C-r>/" : "<C-z>"
 
-set statusline=%f\ %m%r%w%q%h%=%<%-20{&filetype}%-14(%03l,%c%V%)%P\ 
+set statusline=%f\ %m%r%w%q%h%=%<%-20{&filetype}%-15(%l,%c%V%)%P
