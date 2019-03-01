@@ -159,6 +159,7 @@ if has('gui_running')
   else
     set guifont=DejaVu\ Sans\ Mono\ 10
   endif
+  set guicursor+=a:blinkon0
   set guioptions-=T
   set guioptions+=e
   set guioptions-=m
