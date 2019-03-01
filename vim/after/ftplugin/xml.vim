@@ -11,15 +11,15 @@ inoremap <buffer> <expr> / getline('.')[col('.')-2] ==# '<' ? "/\<C-x>\<C-o>\<C-
 
 nnoremap <silent> <buffer> [m :call search('<resource','Wb')<CR>
 nnoremap <silent> <buffer> ]m :call search('<resource','W')<CR>
-xnoremap <silent> <buffer> [m <Esc>m<:call search('<resource','Wb')<CR>m>gv
-xnoremap <silent> <buffer> ]m <Esc>m<:call search('<resource','W')<CR>m>gv
+xnoremap <silent> <buffer> [m :<C-u>execute "normal! gv"\|call search('<resource','Wb')<CR>
+xnoremap <silent> <buffer> ]m :<C-u>execute "normal! gv"\|call search('<resource','W')<CR>
 onoremap <silent> <buffer> [m :call search('<resource','Wb')<CR>
 onoremap <silent> <buffer> ]m :call search('<resource','W')<CR>
 
 nnoremap <silent> <buffer> [M :call search('<\/resource','Wb')<CR>
 nnoremap <silent> <buffer> ]M :call search('<\/resource','W')<CR>
-xnoremap <silent> <buffer> [M <Esc>m<:call search('<\/resource','Wb')<CR>m>gv
-xnoremap <silent> <buffer> ]M <Esc>m<:call search('<\/resource','W')<CR>m>gv
+xnoremap <silent> <buffer> [M :<C-u>execute "normal! gv"\|call search('<\/resource','Wb')<CR>
+xnoremap <silent> <buffer> ]M :<C-u>execute "normal! gv"\|call search('<\/resource','W')<CR>
 onoremap <silent> <buffer> [M :call search('<\/resource','Wb')<CR>
 onoremap <silent> <buffer> ]M :call search('<\/resource','W')<CR>
 
@@ -31,7 +31,7 @@ setlocal syntax=xml
 setlocal path=.,*/src/main/synapse-config,*/src/main/dataservice/,*_DataMapper/,*/dataservice/,*/src/main/synapse-config/*
 set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
-setlocal include=\\%(target\\\|key\\)=\"\\zs\\w\\+\\ze\"
+setlocal include=\\%(target\\\|key\\\|messageStore\\)=\"\\zs\\w\\+\\ze\"
 nnoremap <buffer> ,f zMzr
 nnoremap <buffer> cx :set operatorfunc=xml#escape#escape<CR>g@
 xnoremap <buffer> X :<C-u>call xml#escape#escape()<CR>
