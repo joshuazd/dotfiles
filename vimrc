@@ -64,7 +64,7 @@ set lazyredraw
 set showmatch
 set matchtime=2
 set timeoutlen=500
-set ttimeoutlen=100
+set ttimeoutlen=50
 set splitbelow
 set splitright
 set softtabstop=4
