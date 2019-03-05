@@ -59,3 +59,7 @@ if exists('g:loaded_qlist')
   nnoremap <Space>i :Ilist<space>
   nmap <Space>8 <Plug>QlistIncludefromtop:cdo s//g<Left><Left>
 endif
+
+if exists('g:loaded_fugitive')
+  nnoremap gs :Gstatus<CR>
+endif
