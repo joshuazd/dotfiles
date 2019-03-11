@@ -25,6 +25,9 @@ xnoremap <silent> <buffer> ]M :<C-u>execute "normal! gv"\|call search('<\/resour
 onoremap <silent> <buffer> [M :call search('<\/resource','Wb')<CR>
 onoremap <silent> <buffer> ]M :call search('<\/resource','W')<CR>
 
+nnoremap <silent> <buffer> [[ :normal! vatat<CR>o<Esc>^
+nnoremap <silent> <buffer> ]] :normal! vatat<CR><Esc>^
+
 setlocal omnifunc=xml#complete#CompleteTags
 compiler xmllint
 setlocal makeprg=xmllint\ --noout\ %:S
