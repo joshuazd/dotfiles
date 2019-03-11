@@ -85,7 +85,7 @@ set autoread
 set path=.,**
 set tags=./tags,tags
 set modeline
-set shortmess+=cmrw
+set shortmess+=mrw
 set wildmenu
 set wildcharm=<C-z>
 set wildmode=list:longest,list:full
