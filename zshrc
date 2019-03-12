@@ -13,6 +13,7 @@ export LANG=en_US.UTF-8
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
 export ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 export TMUX_CUSTOM=$HOME/dotfiles/tmux
+export SHELL=/usr/bin/zsh
 
 source $ZSH_CUSTOM/mvncolor.sh
 
