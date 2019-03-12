@@ -18,9 +18,20 @@ export SHELL=/usr/bin/zsh
 source $ZSH_CUSTOM/mvncolor.sh
 
 # setup prompt
-autoload -Uz promptinit
-promptinit
-prompt pure
+# autoload -Uz promptinit
+# promptinit
+# prompt pure
+
+_git_prompt_info() {
+  ref=${$(command git symbolic-ref HEAD 2> /dev/null)#refs/heads/} || \
+      ref=${$(command git rev-parse HEAD 2>/dev/null)[1][1,7]} || \
+      return
+  print -Pn '%F{242} [$ref]%f'
+}
+
+export PROMPT=" %F{111}%~%f\$(_git_prompt_info)
+%F{%(?.222.red)}%(!.#.$)%f "
+setopt promptsubst
 
 # typeset -A ZSH_HIGHLIGHT_STYLES
 # ZSH_HIGHLIGHT_STYLES[function]='none'
@@ -43,6 +54,7 @@ setopt listpacked
 
 # Editing settings
 stty -ixon
+zmodload zsh/zle
 bindkey -v
 export KEYTIMEOUT=1
 autoload zmv
@@ -67,6 +79,19 @@ vim-files() {
 }
 zle -N vim-files
 bindkey '\ev' vim-files
+
+precmd() { RPROMPT="" }
+function zle-line-init zle-keymap-select {
+    case $KEYMAP in
+        vicmd)      RPS1="%F{blue}-- NORMAL --%f" ;;
+        main|viins) RPS1="" ;;
+    esac
+    # RPS1="${${KEYMAP/vicmd/-- NORMAL --}/(main|viins)/-- INSERT --}"
+    RPS2=$RPS1
+    zle reset-prompt
+}
+zle -N zle-line-init
+zle -N zle-keymap-select
 
 __fgitsel() {
   local cmd="git status --short | awk ' { print \$2 }'"
@@ -194,6 +219,7 @@ export FZF_DEFAULT_OPTS="
   --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
   --preview='fzf_preview {} 2>/dev/null'
 "
+export FZF_CTRL_R_OPTS="--preview=''"
 }
 
 
