@@ -121,13 +121,8 @@ if [[ -d ~/pebble-dev/pebble-sdk-4.5-linux64/bin ]]; then
 fi
 
 # Source alias and function files
-if [ -f "${HOME}/.aliases" ]; then
-      source "${HOME}/.aliases"
-fi
-
-if [ -f "${HOME}/.functions" ]; then
-      source "${HOME}/.functions"
-fi
+[ -f "${HOME}/.aliases" ] && source ~/.aliases
+[ -f "${HOME}/.functions" ] && source ~/.functions
 
 _fzf_complete_sshrc() {
   _fzf_complete '+m' "$@" < <(
