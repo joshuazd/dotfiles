@@ -15,6 +15,7 @@ if exists('*plug#begin')
 
   Plug 'lifepillar/vim-mucomplete'
   Plug 'justinmk/vim-sneak'
+  Plug 'tpope/vim-dispatch', { 'on': ['Make','Make!'] }
   Plug 'tpope/vim-surround'
   Plug 'tpope/vim-repeat'
   Plug 'tpope/vim-commentary'
