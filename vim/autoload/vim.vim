@@ -1,7 +1,6 @@
 function! vim#VimRefresh() abort
-  if exists('g:loaded_gutentags') && g:loaded_gutentags == 1
-    GutentagsUpdate!
-  endif
+  silent! GutentagsUpdate!
+  silent! SignifyRefresh
   redraw!
   syntax sync fromstart
   echo 'Vim is refreshed'
