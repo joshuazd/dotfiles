@@ -20,6 +20,7 @@ alias la='ls -lAh'
 
 alias mv='mv -i'
 alias cp='cp -i'
+alias rm='rm -I'
 alias j=jobs
 
 alias python='python3'
