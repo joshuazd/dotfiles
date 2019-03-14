@@ -103,6 +103,7 @@ set conceallevel=2
 set spellfile=~/.vim/spell/en.utf-8.add
 set winminheight=0
 set winminwidth=0
+set formatoptions+=j
 set foldtext=functions#MyFoldText()
 set virtualedit+=block
 set fillchars=vert:│,diff:─
