@@ -9,11 +9,9 @@ set cpo&vim
 " vint: -ProhibitCommandRelyOnUser
 function! s:method(whitespace, visualmode) abort
   normal [mV]M
-  if a:whitespace
-    normal ]m
-    let lnum = line('.')
-    normal [Mj
-    if line('.') >= lnum && getline('.') !~? '^\s*$'
+  if a:whitespace && line('.') < line('$')
+    normal! j
+    if getline('.') !~? '^\s*$'
       normal! k
     endif
   endif
