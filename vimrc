@@ -66,8 +66,6 @@ set showmatch
 set matchtime=2
 set timeoutlen=500
 set ttimeoutlen=0
-set splitbelow
-set splitright
 set softtabstop=4
 set shiftwidth=4
 set expandtab
@@ -216,7 +214,7 @@ nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
 nnoremap <Space>t :tjump /
 
 nnoremap <Space>l :set colorcolumn=
-nnoremap <Space>g :g/\v/#<Left><Left>:
+nnoremap <Space>g :g/\v/#<Left><Left>
 xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
 nnoremap <Space>i :ilist /
 nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
