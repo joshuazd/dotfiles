@@ -27,10 +27,10 @@ if exists('*plug#begin')
   Plug 'markonm/traces.vim'
   Plug 'sgur/vim-editorconfig'
   Plug 'mhinz/vim-signify'
+  Plug 'natebosch/vim-lsc'
 
   if !has('win32')
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-    Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh', 'for': ['java'] }
   endif
   if executable('ctags')
     Plug 'ludovicchabant/vim-gutentags'

@@ -3,6 +3,29 @@ if exists('g:loaded_variables')
 endif
 let g:loaded_variables = 1
 
+" LSC
+let g:lsc_enable_autocomplete = v:false
+let g:lsc_server_commands = {'java': {
+      \ 'command': 'java-language-server',
+      \ 'log_level': 'Warning'
+      \}
+      \}
+let g:lsc_auto_map = {
+    \ 'GoToDefinition': 'gd',
+    \ 'GoToDefinitionSplit': ['<C-W>d', '<C-W><C-d>'],
+    \ 'FindReferences': 'gr',
+    \ 'NextReference': '<C-n>',
+    \ 'PreviousReference': '<C-p>',
+    \ 'FindImplementations': 'gI',
+    \ 'FindCodeActions': 'ga',
+    \ 'Rename': 'gR',
+    \ 'ShowHover': v:true,
+    \ 'DocumentSymbol': 'go',
+    \ 'WorkspaceSymbol': 'gS',
+    \ 'SignatureHelp': '<C-m>',
+    \ 'Completion': 'omnifunc',
+    \}
+
 " ultisnips
 let g:UltiSnipsListSnippets        = '<C-@>'
 let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
@@ -45,10 +68,6 @@ let g:netrw_browse_split = 4
 let g:netrw_winsize = 15
 " markdown
 let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql']
-" LSP
-let g:LanguageClient_serverCommands = {
-      \ 'java': ['/home/vagrant/dotfiles/bin/java-language-server'],
-      \ }
 " echodoc
 let g:echodoc#enable_at_startup = 1
 " gutentags
