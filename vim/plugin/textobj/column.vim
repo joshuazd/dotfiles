@@ -11,11 +11,11 @@ function! s:column(whitespace, visualmode) abort
   let col = col('.')
   let lnum = line('.')
   let up = 0
-  while(lnum-up-1 >= 1 && ((getline(lnum-up-1) =~? '\v^' . match . '\S' && col([lnum-up-1, '$']) >= col) || (a:whitespace && getline(lnum-up-1) =~? '\v^\s*$')))
+  while(lnum-up-1 >= 1 && ((getline(lnum-up-1) =~? '\v^' . match . '\S' && col([lnum-up-1, '$']) > col) || (a:whitespace && getline(lnum-up-1) =~? '\v^\s*$')))
     let up += 1
   endwhile
   let down = 0
-  while(lnum+down+1 <= line('$') && ((getline(lnum+down+1) =~? '\v^' . match . '\S' && col([lnum+down+1, '$']) >= col) || (a:whitespace && getline(lnum+down+1) =~? '\v^\s*$')))
+  while(lnum+down+1 <= line('$') && ((getline(lnum+down+1) =~? '\v^' . match . '\S' && col([lnum+down+1, '$']) > col) || (a:whitespace && getline(lnum+down+1) =~? '\v^\s*$')))
     let down += 1
   endwhile
   execute 'normal! ' . (a:visualmode ? "`<\<C-v>`>" : "\<C-v>" ) . (up ? up . 'k' : '' ) . 'o' . (down ? down . 'j' : '')
