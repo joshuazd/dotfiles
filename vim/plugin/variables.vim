@@ -4,27 +4,33 @@ endif
 let g:loaded_variables = 1
 
 " LSC
+let g:lsc_reference_highlights = v:false
 let g:lsc_enable_autocomplete = v:false
-let g:lsc_server_commands = {'java': {
-      \ 'command': 'java-language-server',
-      \ 'log_level': 'Warning'
-      \}
+let g:lsc_server_commands = {
+      \ 'java': {
+        \ 'command': 'java-language-server',
+        \ 'log_level': 'Warning'
+        \},
+      \ 'bash': {
+        \ 'command': 'bash-language-server start'
+        \},
+      \ 'sh': {
+        \ 'command': 'bash-language-server start'
+        \}
       \}
 let g:lsc_auto_map = {
-    \ 'GoToDefinition': 'gd',
-    \ 'GoToDefinitionSplit': ['<C-W>d', '<C-W><C-d>'],
-    \ 'FindReferences': 'gr',
-    \ 'NextReference': '<C-n>',
-    \ 'PreviousReference': '<C-p>',
-    \ 'FindImplementations': 'gI',
-    \ 'FindCodeActions': 'ga',
-    \ 'Rename': 'gR',
-    \ 'ShowHover': v:true,
-    \ 'DocumentSymbol': 'go',
-    \ 'WorkspaceSymbol': 'gS',
-    \ 'SignatureHelp': '<C-m>',
-    \ 'Completion': 'omnifunc',
-    \}
+      \ 'GoToDefinition': 'gd',
+      \ 'GoToDefinitionSplit': ['<C-W>d', '<C-W><C-d>'],
+      \ 'FindReferences': 'gr',
+      \ 'FindImplementations': 'gI',
+      \ 'FindCodeActions': 'ga',
+      \ 'Rename': 'gR',
+      \ 'ShowHover': v:true,
+      \ 'DocumentSymbol': 'go',
+      \ 'WorkspaceSymbol': 'gS',
+      \ 'SignatureHelp': '<C-m>',
+      \ 'Completion': 'omnifunc',
+      \}
 
 " ultisnips
 let g:UltiSnipsListSnippets        = '<C-@>'
