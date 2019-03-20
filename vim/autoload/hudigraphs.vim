@@ -49,7 +49,12 @@ function! s:filter_digraphs(digraphs, char) abort
   for line in range(len(digraphs))
     let filtered_line = ''
     for digraph_spec in split(digraphs[line], '..\s*.\zs\s*')
-      let [key_code, digraph] = split(digraph_spec, '\s\+')
+      let dgrph = split(digraph_spec, '\s\+')
+      if len(dgrph) != 2
+        continue
+      else
+        let [key_code, digraph] = dgrph
+      endif
       if key_code =~# '\V\^' . a:char
         let filtered_line .= ' ' . key_code[1:] . ' ' . digraph . "\t"
       else
@@ -84,8 +89,6 @@ function! s:digraphs_table() abort
       let digraphs_table += [table_line]
     endif
   endfor
-
-
 
   return digraphs_table
 endfunction
