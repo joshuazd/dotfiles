@@ -116,7 +116,7 @@ else
   set directory=$HOME/.tmp/swap//
   set backupdir=$HOME/.tmp/backup//
 endif
-for dir in [&directory, &backupdir]
+for dir in [&directory,&backupdir]
   if empty(glob(dir))
     call mkdir(dir, 'p')
   endif
