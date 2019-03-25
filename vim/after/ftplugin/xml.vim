@@ -162,7 +162,7 @@ let b:xmldata_mediators = {
       \ ],
       \ 'class': [
       \ ['property'],
-      \ {'name': ['com.panera.b:xml_mediator_names.BABuilder']}
+      \ {'name': ['com.panera.mediators.BABuilder']}
       \ ],
       \ 'header': [
       \ [],
@@ -199,6 +199,14 @@ let b:xmldata_mediators = {
       \ 'script': [
       \ [],
       \ {'language': ['groovy', 'js']}
+      \ ],
+      \ 'switch': [
+      \ ['case'],
+      \ {'source': []}
+      \ ],
+      \ 'case': [
+      \ b:xml_mediator_names,
+      \ {'regex': []}
       \ ],
       \ 'datamapper': [
       \ [],
