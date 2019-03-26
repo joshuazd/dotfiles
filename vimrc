@@ -106,7 +106,7 @@ set foldtext=functions#MyFoldText()
 set virtualedit+=block
 set fillchars=vert:│,diff:─
 if has('patch-8.1.0513')
-  set diffopt+=algorithm:patience,indent-heuristic,iwhiteall
+  set diffopt+=algorithm:patience,indent-heuristic,iwhiteall,vertical
 endif
 
 if !empty($TEMP)
