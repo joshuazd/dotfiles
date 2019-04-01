@@ -69,7 +69,7 @@ function! s:taskSelect(count) abort
       endif
     endfor
   endfor
-  execute len(tasks) . 'new'
+  execute 'rightbelow ' . len(tasks) . 'new'
   setlocal nolist bufhidden=wipe buftype=nofile
   put! =join(tasks,\"\n\")
   normal! Gddgg
