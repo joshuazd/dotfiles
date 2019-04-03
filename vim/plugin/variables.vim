@@ -10,12 +10,6 @@ let g:lsc_server_commands = {
       \ 'java': {
         \ 'command': 'java-language-server',
         \ 'log_level': 'Warning'
-        \},
-      \ 'bash': {
-        \ 'command': 'bash-language-server start'
-        \},
-      \ 'sh': {
-        \ 'command': 'bash-language-server start'
         \}
       \}
 let g:lsc_auto_map = {
