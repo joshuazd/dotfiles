@@ -37,13 +37,19 @@ OPT = [
 
 
 def main():
-    shutil.rmtree(os.path.expanduser('~' + os.sep + '.vim' + os.sep + 'pack' + os.sep + 'bundle'))
-    print('Removed ''pack' + os.sep + 'bundle'' directory')
+    try:
+        shutil.rmtree(
+            os.path.expanduser(
+                os.path.join('~', '.vim', 'pack', 'remote')))
+    except Exception as e:
+        pass
+    print('Removed ''pack' + os.sep + 'remote'' directory')
     p = Pool(20)
     p.map(pack_process, PACKAGES)
-    for root, _, files in os.walk(os.path.expanduser('~' + os.sep + '.vim' + os.sep + 'pack')):
+    for root, _, files in os.walk(
+            os.path.expanduser(os.path.join('~', '.vim', 'pack'))):
         for file in files:
-            if any(file.lower().endswith(ext) for ext in ['gif','png']):
+            if any(file.lower().endswith(ext) for ext in ['gif', 'png']):
                 os.remove(os.path.join(root, file))
     print('Removed image files from plugins')
 
@@ -52,11 +58,8 @@ def pack_process(package):
     name = package.split('/')[-1]
     dir = HOOKS.get(name, {}).get('dir', name)
     load = 'opt' if name in OPT else 'start'
-    # git log -a --graph --oneline
-    # --pretty='%Cred%h%Creset %C(yellow)%s%Creset (%cr)'
-    # ..origin/$(git rev-parse --abbrev-ref HEAD)
-    path = '~' + os.sep + '.vim' + os.sep + 'pack' + os.sep + \
-        'bundle' + os.sep + load + os.sep + name if dir == name else dir
+    path = os.path.join('~', '.vim', 'pack', 'remote', load, name) \
+        if dir == name else dir
     path = os.path.expanduser(path)
     pack_install(package, path, name)
 
