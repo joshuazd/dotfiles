@@ -23,12 +23,7 @@ if exists('g:loaded_sneak_plugin')
 endif
 
 if exists('g:loaded_fzf')
-  runtime! autoload/quickfix.vim
-  command! -bang Rg call fzf#run(fzf#wrap('rg',
-        \{'source': 'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>),
-        \ 'options': ['--multi','--ansi','--preview-window', <bang>0 ? 'up:75%' : 'right:50%'],
-        \ 'down': '25%',
-        \ 'sink*': funcref('quickfix#add')}, <bang>0 ) )
+  nnoremap gb :Buffers<CR>
 endif
 
 if exists('did_plugin_ultisnips')
@@ -51,8 +46,6 @@ if exists('g:loaded_mucomplete')
   else
     inoremap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>"
   endif
-  inoremap <expr> <right> mucomplete#extend_fwd("\<right>")
-  inoremap <expr> <left> mucomplete#extend_bwd("\<left>")
 endif
 
 if exists('g:loaded_qlist')
@@ -61,5 +54,6 @@ if exists('g:loaded_qlist')
 endif
 
 if exists('g:loaded_fugitive')
-  nnoremap gs :Gstatus<CR>
+  nnoremap gs :rightbelow Gstatus<CR>
+  nnoremap gS :rightbelow Gstatus!<CR>
 endif
