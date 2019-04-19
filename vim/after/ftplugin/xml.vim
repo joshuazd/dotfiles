@@ -9,7 +9,7 @@ setlocal shiftwidth=2
 setlocal softtabstop=2
 setlocal statusline+=%{findfunc#FindFunc()}
 
-inoremap <buffer> <expr> / getline('.')[col('.')-2] ==# '<' ? "/\<C-x>\<C-o>\<C-n>\<C-y>" : "/"
+inoremap <buffer> <expr> / getline('.')[col('.')-2] ==# '<' ? "/\<C-x>\<C-o>\<C-n>\<C-y>\<C-f>" : "/"
 
 nnoremap <silent> <buffer> [m :call search('<resource','Wb')<CR>
 nnoremap <silent> <buffer> ]m :call search('<resource','W')<CR>

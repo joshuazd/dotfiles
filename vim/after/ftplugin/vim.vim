@@ -17,7 +17,7 @@ xnoremap <silent><buffer> [M m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*
 nnoremap <silent><buffer> ]M m':call search('^\s*endf*\%[unction]\>', "W")<CR>
 xnoremap <silent><buffer> ]M m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*\%[unction]\>', "W")<CR>
 
-augroup VIM
+augroup vimscript
   autocmd!
   if executable('vint')
     autocmd BufWritePost *.vim,.vimrc,vimrc silent! make|cwindow|redraw!

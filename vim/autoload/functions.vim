@@ -10,20 +10,6 @@ function! functions#MyFoldText() abort
   return line . info
 endfunction
 
-" Sets up maps for language server client
-function! functions#LC_maps() abort
-  if has_key(g:LanguageClient_serverCommands, &filetype)
-    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
-    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
-    nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
-    nnoremap <buffer> <silent> ga :call LanguageClient#textDocument_codeAction()<CR>
-    nnoremap <buffer> <silent> gr :call LanguageClient#textDocument_references()<CR>
-    nnoremap <buffer> <silent> gs :call LanguageClient#textDocument_documentSymbol()<CR>
-    setlocal formatexpr=LanguageClient#textDocument_rangeFormatting_sync()
-    setlocal signcolumn=yes
-  endif
-endfunction
-
 " regexes for function names for findfunc#FindFunc
 function! functions#findFuncDefs() abort
   let g:findfunc = {'vim'   : ['^\s*fun\%[ction]', '^\s*endf\%[unction]',  '^\s*fun\%[ction]!\?\s\+\zs[a-z][[:alnum:]#_]*\ze('],
