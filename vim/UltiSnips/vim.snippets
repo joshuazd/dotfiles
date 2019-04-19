@@ -18,7 +18,13 @@ endif
 endsnippet
 
 snippet func "function" b
-function! ${1:name}($2) abort
+function! `!v substitute(substitute(expand('%:p:r'),'\v^%(\/[^\/]+){-1,}\/?%($|plugin|autoload|ftplugin)\/?','',''),'\v\/|%([^\/]+$\zs)','#','g')`${1:name}($2) abort
+	${0:${VISUAL:" code}}
+endfunction
+endsnippet
+
+snippet funcs "script local function" b
+function! s:${1:name}($2) abort
 	${0:${VISUAL:" code}}
 endfunction
 endsnippet
