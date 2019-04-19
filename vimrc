@@ -2,47 +2,19 @@
 "                 PLUGINS
 "===============================================
 " {{{
+silent! call pathogen#infect()
 " Set up vim to work in windows+cygwin
 if has('win32')
   set runtimepath^=~/.vim
   set runtimepath+=~/.vim/after
 endif
 
-silent! call plug#begin('$HOME/.vim/bundle/')
-if exists('*plug#begin')
-
-  filetype off
-
-  Plug 'lifepillar/vim-mucomplete'
-  Plug 'justinmk/vim-sneak'
-  Plug 'tpope/vim-dispatch', { 'on': ['Make','Make!'] }
-  Plug 'tpope/vim-surround'
-  Plug 'tpope/vim-repeat'
-  Plug 'tpope/vim-commentary'
-  Plug 'tpope/vim-apathy'
-  Plug 'tpope/vim-fugitive'
-  Plug 'tommcdo/vim-lion'
-  Plug 'romainl/vim-qf'
-  Plug 'romainl/vim-qlist'
-  Plug 'markonm/traces.vim'
-  Plug 'sgur/vim-editorconfig'
-  Plug 'mhinz/vim-signify'
-  Plug 'natebosch/vim-lsc'
-
-  if !has('win32')
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-  endif
-  if executable('ctags')
-    Plug 'ludovicchabant/vim-gutentags'
-  endif
-  if has('pythonx')
-    Plug 'SirVer/ultisnips'
-  endif
-  silent! call plug#end()
-
+command! -nargs=1 Packadd if has('packages') | packadd! <args> | else | silent! call pathogen#surround('pack/{}/opt/' . <args>) | endif
+if has('pythonx')
+  silent! Packadd ultisnips
 endif
-runtime! macros/matchit.vim
-syntax enable
+runtime macros/matchit.vim
+syntax on
 filetype plugin indent on
 " }}}
 
@@ -293,10 +265,8 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let in_snippet = 0
   autocmd InsertEnter        *            setl listchars-=trail:─
   autocmd InsertLeave        *            setl listchars+=trail:─
-  autocmd FileType           *            silent! call functions#LC_maps()
-  autocmd VimEnter           *            if expand('%:p:h') =~# '^.*/projects/esb' && expand('%:p') == '' && &ft == '' | setf xml  | endif
-  autocmd VimEnter           *            if expand('%:p:h') =~# '^.*/projects/weblogic' && expand('%:p') == '' && &ft == '' | setf java | endif
   autocmd VimEnter           *            silent! if fugitive#head() !=? '' | set signcolumn=yes | endif
+  autocmd BufNewFile */plugin/*.vim 0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()

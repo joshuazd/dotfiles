@@ -1,0 +1,89 @@
+#! /usr/bin/env python
+from __future__ import print_function
+import os
+import shutil
+from multiprocessing import Pool
+
+PACKAGES = [
+    'lifepillar/vim-mucomplete',
+    'justinmk/vim-sneak',
+    'tpope/vim-dispatch',
+    'tpope/vim-surround',
+    'tpope/vim-repeat',
+    'tpope/vim-commentary',
+    'tpope/vim-apathy',
+    'tpope/vim-fugitive',
+    'tpope/vim-projectionist',
+    'tommcdo/vim-lion',
+    'romainl/vim-qf',
+    'romainl/vim-qlist',
+    'markonm/traces.vim',
+    'sgur/vim-editorconfig',
+    'mhinz/vim-signify',
+    'natebosch/vim-lsc',
+    'junegunn/fzf',
+    'junegunn/fzf.vim',
+    'ludovicchabant/vim-gutentags',
+    'SirVer/ultisnips'
+]
+
+HOOKS = {
+    'fzf': {'do': './install --all'}
+}
+
+OPT = [
+    'ultisnips'
+]
+
+
+def main():
+    shutil.rmtree(os.path.expanduser('~' + os.sep + '.vim' + os.sep + 'pack' + os.sep + 'bundle'))
+    print('Removed ''pack' + os.sep + 'bundle'' directory')
+    p = Pool(20)
+    p.map(pack_process, PACKAGES)
+    for root, _, files in os.walk(os.path.expanduser('~' + os.sep + '.vim' + os.sep + 'pack')):
+        for file in files:
+            if any(file.lower().endswith(ext) for ext in ['gif','png']):
+                os.remove(os.path.join(root, file))
+    print('Removed image files from plugins')
+
+
+def pack_process(package):
+    name = package.split('/')[-1]
+    dir = HOOKS.get(name, {}).get('dir', name)
+    load = 'opt' if name in OPT else 'start'
+    # git log -a --graph --oneline
+    # --pretty='%Cred%h%Creset %C(yellow)%s%Creset (%cr)'
+    # ..origin/$(git rev-parse --abbrev-ref HEAD)
+    path = '~' + os.sep + '.vim' + os.sep + 'pack' + os.sep + \
+        'bundle' + os.sep + load + os.sep + name if dir == name else dir
+    path = os.path.expanduser(path)
+    pack_install(package, path, name)
+
+
+def pack_install(package, path, name):
+    print('Installing %s plugin' % name)
+    os.system('git clone -q --recurse-submodules https://github.com/'
+              + package + ' ' + path)
+    try:
+        shutil.rmtree(path + os.sep + '.git')
+        os.remove(path + os.sep + '.gitignore')
+    except Exception as e:
+        pass
+    install_hooks(path, name)
+
+
+def install_hooks(path, name):
+    if name in HOOKS and 'do' in HOOKS[name]:
+        cwd = os.getcwd()
+        os.chdir(path)
+        print('Running post-install hook for %s' % name)
+        try:
+            os.system(HOOKS[name]['do'])
+        except Exception as e:
+            print('Unable to run post-install hook for %s' % name)
+        os.chdir(cwd)
+
+
+if __name__ == "__main__":
+    main()
