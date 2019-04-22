@@ -10,9 +10,9 @@ if has('win32')
   set runtimepath+=~/.vim/after
 endif
 
-command! -nargs=1 Packadd call pack#add('<args>')
+command! -nargs=1 -bang Packadd call pack#add('<args>', '<bang>')
 if has('pythonx')
-  Packadd ultisnips
+  Packadd! ultisnips
 endif
 runtime macros/matchit.vim
 syntax on
