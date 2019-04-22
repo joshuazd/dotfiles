@@ -10,7 +10,7 @@ if has('win32')
   set runtimepath+=~/.vim/after
 endif
 
-command! -nargs=1 -bang Packadd call pack#add('<args>', '<bang>')
+command! -nargs=1 -bang -bar Packadd call pack#add('<args>', '<bang>')
 if has('pythonx')
   Packadd! ultisnips
 endif
