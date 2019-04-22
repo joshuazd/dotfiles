@@ -2,6 +2,7 @@
 "                 PLUGINS
 "===============================================
 " {{{
+" kept for backwards compatibility on older vim versions
 silent! call pathogen#infect()
 " Set up vim to work in windows+cygwin
 if has('win32')
@@ -9,9 +10,9 @@ if has('win32')
   set runtimepath+=~/.vim/after
 endif
 
-command! -nargs=1 Packadd if has('packages') | packadd! <args> | else | silent! call pathogen#surround('pack/{}/opt/' . <args>) | endif
+command! -nargs=1 Packadd call pack#add('<args>')
 if has('pythonx')
-  silent! Packadd ultisnips
+  Packadd ultisnips
 endif
 runtime macros/matchit.vim
 syntax on

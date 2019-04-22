@@ -32,7 +32,8 @@ HOOKS = {
 }
 
 OPT = [
-    'ultisnips'
+    'ultisnips',
+    'vim-dispatch'
 ]
 
 

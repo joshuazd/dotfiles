@@ -64,12 +64,13 @@ let g:mucomplete#no_mappings            = 1
 let g:mucomplete#no_popup_mappings      = 1
 let g:mucomplete#always_use_completeopt = 1
 let g:mucomplete#chains                 = {
-      \ 'default' : ['file', 'omni', 'ulti', 'dict', 'uspl', 'c-p', 'tags'],
-      \ 'java'    : ['omni', 'ulti', 'c-p',  'tags', 'file'],
-      \ 'vim'     : ['file', 'ulti', 'cmd',  'c-p',  'tags'],
-      \ 'xml'     : ['omni', 'ulti', 'tags', 'c-p'],
-      \ 'sql'     : ['c-p',  'ulti', 'tags'],
-      \ 'markdown': ['c-p',  'ulti', 'tags']
+      \ 'default'   : ['file', 'omni', 'ulti', 'dict', 'uspl', 'c-p', 'tags'],
+      \ 'gitcommit' : ['tags', 'c-n'],
+      \ 'java'      : ['omni', 'ulti', 'c-p',  'tags', 'file'],
+      \ 'vim'       : ['file', 'ulti', 'cmd',  'c-p',  'tags'],
+      \ 'xml'       : ['omni', 'ulti', 'tags', 'c-p'],
+      \ 'sql'       : ['c-p',  'ulti', 'tags'],
+      \ 'markdown'  : ['c-p',  'ulti', 'tags']
       \ }
 let g:mucomplete#can_complete = { }
 if has('lambda')
