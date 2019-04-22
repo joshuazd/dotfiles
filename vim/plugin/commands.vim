@@ -16,7 +16,7 @@ for [cmd, name] in items(cmd_map)
   execute 'command! -nargs=* -complete=file -bang -range ' . cmd
         \. ' delcommand ' . cmd
         \. '| Packadd ' . name
-        \. '|' . cmd
+        \. '|' . cmd . '<bang>' . ' <args>'
 endfor
 
 
