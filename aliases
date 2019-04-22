@@ -47,8 +47,8 @@ alias vi=vim
 alias vimup='vim +helptags\ ALL +PlugUpgrade +PlugUpdate'
 alias cvi='vi -u ~/dotfiles/microvimrc --noplugin -N'
 alias e='vi -Nu ~/dotfiles/microvimrc'
-alias mvi='vi -u ~/dotfiles/minvimrc -N'
-alias nvi='vi -u ~/dotfiles/nanovimrc -N'
+alias mvi='vi --noplugin -Nu ~/dotfiles/minvimrc'
+alias nvi='vi --noplugin -Nu ~/dotfiles/nanovimrc'
 
 ####################################
 #         CYGWIN ALIASES

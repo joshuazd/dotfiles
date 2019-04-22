@@ -4,8 +4,8 @@ export LS_COLORS='di=00;94:ex=00;92:tw=00;94:ow=00;94:ln=00;36:*.mp4=00;35:*.tar
 
 export ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
 
-export EDITOR=vim\ -Nu\ ~/dotfiles/nanovimrc
-export VISUAL=vim\ -Nu\ ~/dotfiles/nanovimrc
+export EDITOR=vim\ --noplugin\ -Nu\ ~/dotfiles/nanovimrc
+export VISUAL=vim\ --noplugin\ -Nu\ ~/dotfiles/nanovimrc
 
 export RIPGREP_CONFIG_PATH=~/.ripgrep
 
