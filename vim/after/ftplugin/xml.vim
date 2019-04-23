@@ -41,6 +41,9 @@ nnoremap <buffer> ,f zMzr
 nnoremap <buffer> cx :set operatorfunc=xml#escape#escape<CR>g@
 xnoremap <buffer> X :<C-u>call xml#escape#escape()<CR>
 
+command! -bar -buffer -nargs=* Maven :Dispatch mvn <args>
+command! -bar -buffer -nargs=* Install :Maven clean install <args>
+
 let b:undo_ftplugin = 'setlocal foldmethod< smarttab< conceallevel< foldnestmax< iskeyword< expandtab< tabstop< shiftwidth< softtabstop< omnifunc< makeprg< formatprg< syntax< path< suffixesadd< isfname< include<'
 
 augroup XML
