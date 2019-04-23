@@ -266,7 +266,7 @@ augroup EditVim
   autocmd User UltiSnipsExitLastSnippet   let in_snippet = 0
   autocmd InsertEnter        *            setl listchars-=trail:─
   autocmd InsertLeave        *            setl listchars+=trail:─
-  autocmd VimEnter           *            silent! if fugitive#head() !=? '' | set signcolumn=yes | endif
+  autocmd VimEnter           *            silent! if fugitive#head() !=? '' | setl signcolumn=auto | endif
   autocmd BufNewFile */plugin/*.vim 0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
 augroup END
 
