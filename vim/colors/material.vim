@@ -22,7 +22,7 @@ let s:boldblue     = {'ansi': '4',    'term' : '67',   'gui' : '#5f87af'}
 let s:cyan         = {'ansi': '6',    'term' : '73',   'gui' : '#5fafaf'}
 let s:boldcyan     = {'ansi': '14',   'term' : '116',  'gui' : '#87d7d7'}
 let s:bluegrey     = {'ansi': '7',    'term' : '248',  'gui' : '#a8a8a8'}
-let s:purple       = {'ansi': '5',    'term' : '140',  'gui' : '#af87d7'}
+let s:purple       = {'ansi': '5',    'term' : '104',  'gui' : '#8787d7'}
 let s:boldpurple   = {'ansi': '13',   'term' : '97',   'gui' : '#875faf'}
 let s:darkpurple   = {'ansi': '13',   'term' : '53',   'gui' : '#5f005f'}
 let s:magenta      = {'ansi': '13',   'term' : '55',   'gui' : '#5f00af'}
@@ -104,7 +104,8 @@ call s:h('Operator',        s:brown,      s:background,   'none')
 call s:h('Comment',         s:grey,       s:background,   'italic')
 call s:h('Builtin',         s:orange,     s:background,   'none')
 call s:h('Language',        s:pink,       s:background,   'none')
-call s:h('Special',         s:red,        s:background,   'none')
+call s:h('Special',         s:pink,       s:background,   'none')
+call s:h('Tag',             s:red,        s:background,   'none')
 call s:h('SpecialChar',     s:cyan,       s:background,   'bold')
 call s:h('Delimiter',       s:bluegrey,   s:background,   'none')
 call s:h('Coding',          s:red,        s:background,   'italic')
