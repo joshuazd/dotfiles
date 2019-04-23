@@ -29,8 +29,7 @@ syn region   xmlPropertyTag
       \ contains=xmlError,Xpath,xmlTagName,xmlPropString,xmlAttrib,xmlAttribPunct,xmlEqual,xmlOperator,xmlProperty
 
 " XML Strings
-syn match   xmlFile '\k\+_\(Logger\|XSLT\|EP\|MP\|FailOverMP\|MS\|FailOverMS\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)' display contained
-syn match   xmlFile '\k\+Logger' display contained
+syn match   xmlFile '\k\+_\?\(Logger\|XSLT\|EP\|MP\|FailOverMP\|MS\|FailOverMS\|DM\|outputSchema\|OutputSchema\|inputSchema\|InputSchema\)\>' display contained
 
 " syn keyword xmlName   expression value regex name action select source    contained
 
@@ -66,7 +65,7 @@ function! XmlAfterHighlight() abort
     highlight xmlExpression ctermfg=203 guifg=#ff5f5f cterm=italic gui=italic
     highlight xmlSelect     ctermfg=222 guifg=#ffd787 cterm=italic gui=italic
     highlight xmlName       ctermfg=152 guifg=#afd7d7
-    highlight xmlLog        ctermfg=245 guifg=#8a8a8a
+    highlight xmlLog        ctermfg=67  guifg=#5f87af
     highlight xmlSqlTag     ctermfg=209 guifg=#ff875f
     highlight xmlLogParam   ctermfg=243 guifg=#767676
   else
@@ -74,7 +73,7 @@ function! XmlAfterHighlight() abort
     highlight xmlExpression ctermfg=red
     highlight xmlSelect     ctermfg=yellow
     highlight xmlName       ctermfg=grey
-    highlight xmlLog        ctermfg=grey
+    highlight xmlLog        ctermfg=darkblue
     highlight xmlSqlTag     ctermfg=darkyellow
     highlight xmlLogParam   ctermfg=darkgrey
   endif
