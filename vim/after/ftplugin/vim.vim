@@ -20,7 +20,7 @@ xnoremap <silent><buffer> ]M m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*
 augroup vimscript
   autocmd!
   if executable('vint')
-    autocmd BufWritePost *.vim,.vimrc,vimrc silent! make|cwindow|redraw!
+    autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
   endif
 augroup END
 

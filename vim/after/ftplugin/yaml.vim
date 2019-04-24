@@ -6,7 +6,7 @@ command! -range=% FormatYAML <line1>,<line2>!python -c
 augroup YAML
     autocmd!
     if executable('yamllint')
-      autocmd BufWritePost *.yaml,*.yml silent! make|cwindow|redraw!
+      autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
     endif
 augroup END
 

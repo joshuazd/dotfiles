@@ -15,7 +15,7 @@ setlocal foldnestmax=4
 augroup PYTHON
     autocmd!
     if executable('flake8')
-      autocmd BufWritePost *.py silent! make|cwindow|redraw!
+      autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
     endif
 augroup END
 let g:jedi#goto_command = ',d'

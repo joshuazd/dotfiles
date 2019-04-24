@@ -49,7 +49,7 @@ let b:undo_ftplugin = 'setlocal foldmethod< smarttab< conceallevel< foldnestmax<
 augroup XML
   autocmd!
   if executable('xmllint')
-    autocmd BufWritePost *.xml,*.dbs silent! make|cwindow|redraw!
+    autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
   endif
   if exists(':UltiSnipsAddFiletypes')
     autocmd BufEnter pom.xml,artifact.xml UltiSnipsAddFiletypes pom.xml
