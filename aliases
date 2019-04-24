@@ -46,7 +46,7 @@ alias build='mvn install; mcar'
 alias vi=vim
 alias vimup='vim +helptags\ ALL +PlugUpgrade +PlugUpdate'
 alias cvi='vi -u ~/dotfiles/microvimrc --noplugin -N'
-alias e='vi -Nu ~/dotfiles/microvimrc'
+alias e='vi --noplugin -Nu ~/dotfiles/microvimrc'
 alias mvi='vi --noplugin -Nu ~/dotfiles/minvimrc'
 alias nvi='vi --noplugin -Nu ~/dotfiles/nanovimrc'
 
