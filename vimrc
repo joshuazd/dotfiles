@@ -3,11 +3,14 @@
 "===============================================
 " {{{
 " kept for backwards compatibility on older vim versions
-silent! call pathogen#infect()
+if !has('packages')
+  silent! call pathogen#infect()
+endif
 " Set up vim to work in windows+cygwin
 if has('win32')
   set runtimepath^=~/.vim
   set runtimepath+=~/.vim/after
+  set packpath^=~/.vim
 endif
 
 command! -nargs=1 -bang -bar Packadd call pack#add('<args>', '<bang>')
