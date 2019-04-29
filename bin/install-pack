@@ -39,9 +39,12 @@ OPT = [
     'vim-dispatch'
 ]
 
+dir = os.path.dirname(os.path.realpath(__file__))
+update_file = os.path.join(dir, '..', '.last-update')
+log_file = os.path.join(dir, '..', '.plugin-update')
 conch = threading.Semaphore()
 try:
-    with open('.last-update') as file:
+    with open(update_file) as file:
         last_update = file.read().strip()
 except IOError as e:
     last_update = None
@@ -56,10 +59,13 @@ def main():
     except Exception as e:
         pass
     print('Removed ''pack' + os.sep + 'remote'' directory')
-    os.remove('.last-update')
+    try:
+        os.remove(log_file)
+    except OSError as e:
+        pass
     p = Pool(20)
     p.map(pack_process, PACKAGES)
-    with open('.last-update', 'w') as file:
+    with open(update_file, 'w') as file:
         file.write(update_time)
     for root, _, files in os.walk(
             os.path.expanduser(os.path.join('~', '.vim', 'pack'))):
@@ -94,18 +100,18 @@ def pack_install(package, path, name):
         os.chdir(cwd)
         conch.acquire()
         if len(log) > 0:
-            with open('.plugin-update', 'a') as file:
+            with open(log_file, 'a') as file:
                 file.write(name + '\n')
                 file.write(log + '\n')
                 file.write('\n')
+            print()
             print(name)
             print(log)
-            print()
         conch.release()
     try:
         shutil.rmtree(path + os.sep + '.git')
         os.remove(path + os.sep + '.gitignore')
-    except Exception as e:
+    except OSError as e:
         pass
     install_hooks(path, name)
 
