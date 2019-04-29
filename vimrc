@@ -271,6 +271,9 @@ augroup EditVim
   autocmd InsertLeave        *            setl listchars+=trail:─
   autocmd VimEnter           *            silent! if fugitive#head() !=? '' | setl signcolumn=auto | endif
   autocmd BufNewFile */plugin/*.vim 0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
+  if exists('##TextYankPost') && executable('base64')
+    autocmd TextYankPost       *            if v:event.operator ==# 'y' | call clip#osc52() | endif
+  endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
