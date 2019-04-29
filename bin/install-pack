@@ -1,8 +1,11 @@
 #! /usr/bin/env python
 from __future__ import print_function
 import os
+import time
 import shutil
+import subprocess
 from multiprocessing import Pool
+import threading
 
 PACKAGES = [
     'lifepillar/vim-mucomplete',
@@ -36,8 +39,16 @@ OPT = [
     'vim-dispatch'
 ]
 
+conch = threading.Semaphore()
+try:
+    with open('.last-update') as file:
+        last_update = file.read().strip()
+except IOError as e:
+    last_update = None
+
 
 def main():
+    update_time = time.strftime('%Y-%m-%dT%H:%M:%S')
     try:
         shutil.rmtree(
             os.path.expanduser(
@@ -45,8 +56,11 @@ def main():
     except Exception as e:
         pass
     print('Removed ''pack' + os.sep + 'remote'' directory')
+    os.remove('.last-update')
     p = Pool(20)
     p.map(pack_process, PACKAGES)
+    with open('.last-update', 'w') as file:
+        file.write(update_time)
     for root, _, files in os.walk(
             os.path.expanduser(os.path.join('~', '.vim', 'pack'))):
         for file in files:
@@ -69,6 +83,25 @@ def pack_install(package, path, name):
     print('Installing %s plugin' % name)
     os.system('git clone -q --recurse-submodules https://github.com/'
               + package + ' ' + path)
+    if last_update is not None:
+        cwd = os.getcwd()
+        os.chdir(path)
+        log = subprocess.Popen('git log --color --graph --oneline --since='
+                               + last_update, stdout=subprocess.PIPE,
+                               shell=True)
+        log, _ = log.communicate()
+        log = log.strip()
+        os.chdir(cwd)
+        conch.acquire()
+        if len(log) > 0:
+            with open('.plugin-update', 'a') as file:
+                file.write(name + '\n')
+                file.write(log + '\n')
+                file.write('\n')
+            print(name)
+            print(log)
+            print()
+        conch.release()
     try:
         shutil.rmtree(path + os.sep + '.git')
         os.remove(path + os.sep + '.gitignore')
