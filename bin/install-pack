@@ -67,12 +67,19 @@ def main():
     p.map(pack_process, PACKAGES)
     with open(update_file, 'w') as file:
         file.write(update_time)
-    for root, _, files in os.walk(
-            os.path.expanduser(os.path.join('~', '.vim', 'pack'))):
-        for file in files:
-            if any(file.lower().endswith(ext) for ext in ['gif', 'png']):
-                os.remove(os.path.join(root, file))
+
+    print('Installed/Updated plugins')
+
+    p.map(walk_tree,
+          os.walk(os.path.expanduser(os.path.join('~', '.vim', 'pack'))))
     print('Removed image files from plugins')
+
+
+def walk_tree(tree):
+    root, _, files = tree
+    for file in files:
+        if any(file.lower().endswith(ext) for ext in ['gif', 'png']):
+            os.remove(os.path.join(root, file))
 
 
 def pack_process(package):
