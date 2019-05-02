@@ -19,11 +19,12 @@ _git_prompt_info() {
   ref=${$(command git symbolic-ref HEAD 2> /dev/null)#refs/heads/} || \
       ref=${$(command git rev-parse HEAD 2>/dev/null)[1][1,7]} || \
       return
-  print -Pn '%F{242} [$ref]%f'
+  echo -n '%F{242} ['
+  echo -n $ref
+  echo -n ']%f'
 }
 
-export PROMPT=" %F{111}%~%f\$(_git_prompt_info)
-%F{%(?.222.red)}%(!.#.$)%f "
+export PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "
 setopt promptsubst
 
 # typeset -A ZSH_HIGHLIGHT_STYLES
