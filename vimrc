@@ -26,7 +26,6 @@ filetype plugin indent on
 "              GENERAL OPTIONS
 "===============================================
 " {{{
-set encoding=utf-8
 set hidden
 set backspace=eol,start,indent
 set whichwrap+=<,>
@@ -103,7 +102,11 @@ if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
 endif
 
-set listchars=tab:│\ ,trail:─,extends:>,nbsp:␣
+if &termencoding ==# 'utf-8' || &encoding ==# 'utf-8'
+  set listchars=tab:│\ ,trail:─,extends:→,nbsp:␣
+else
+  set listchars=tab:\|\ ,trail:-,extends:>,nbsp:.
+endif
 set list
 
 if exists('+clipboard')
@@ -190,6 +193,7 @@ nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
 nnoremap <Space>t :tjump /
 
 nnoremap <Space>l :set colorcolumn=
+nnoremap <Space>q :source $MYVIMRC<CR>:doautocmd VimEnter<CR>
 nnoremap <Space>g :g/\v/#<Left><Left>
 xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
 nnoremap <Space>i :ilist /
