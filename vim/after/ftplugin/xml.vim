@@ -36,8 +36,8 @@ setlocal syntax=xml
 setlocal path=.,*/src/main/synapse-config,*/src/main/dataservice/,*_DataMapper/,*/dataservice/,*/src/main/synapse-config/*
 set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
-setlocal include=\\%(target\\\|key\\\|messageStore\\)="\\zs\\w\\+\\ze"
-setlocal define=\\%(name\\)="\\zs\\w\\+\\ze"
+setlocal include=\\%(target\\\|key\\\|messageStore\\)=
+setlocal define=\\%(name\\)=
 nnoremap <buffer> ,f zMzr
 nnoremap <buffer> cx :set operatorfunc=xml#escape#escape<CR>g@
 xnoremap <buffer> X :<C-u>call xml#escape#escape()<CR>
