@@ -57,9 +57,8 @@ let g:UltiSnipsListSnippets        = '<C-@>'
 let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
 let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
 " mucomplete
-if !has('win32unix') " this is slow on cygwin
-  let g:mucomplete#enable_auto_at_startup = 1
-endif
+" this is slow on cygwin
+let g:mucomplete#enable_auto_at_startup = !has('win32unix')
 let g:mucomplete#no_mappings            = 1
 let g:mucomplete#no_popup_mappings      = 1
 let g:mucomplete#always_use_completeopt = 1
@@ -96,7 +95,7 @@ let g:netrw_liststyle = 0
 let g:netrw_browse_split = 4
 let g:netrw_winsize = 15
 " markdown
-let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'xml', 'sql']
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'sql']
 " echodoc
 let g:echodoc#enable_at_startup = 1
 " gutentags
