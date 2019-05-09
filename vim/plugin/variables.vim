@@ -92,8 +92,9 @@ let g:sneak#use_ic_scs = 1
 " netrw
 let g:netrw_banner = 0
 let g:netrw_liststyle = 0
-let g:netrw_browse_split = 4
+let g:netrw_browse_split = 0
 let g:netrw_winsize = 15
+let g:netrw_cursor = 2
 " markdown
 let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'sql']
 " echodoc

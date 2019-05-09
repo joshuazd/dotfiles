@@ -266,7 +266,7 @@ nnoremap <silent> <C-w>z :pclose<Bar>helpclose<CR>
 "              (AUTO)COMMANDS
 "===============================================
 " {{{
-augroup EditVim
+augroup vimrc
   autocmd!
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
   autocmd User UltiSnipsEnterFirstSnippet let in_snippet = 1
