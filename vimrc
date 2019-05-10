@@ -1,7 +1,4 @@
-"===============================================
-"                 PLUGINS
-"===============================================
-" {{{
+" {{{ Plugins
 " kept for backwards compatibility on older vim versions
 if !has('packages')
   silent! call pathogen#infect()
@@ -22,10 +19,7 @@ syntax on
 filetype plugin indent on
 " }}}
 
-"===============================================
-"              GENERAL OPTIONS
-"===============================================
-" {{{
+" {{{ Options
 set hidden
 set backspace=eol,start,indent
 set whichwrap+=<,>
@@ -72,10 +66,7 @@ set foldlevelstart=4
 set complete-=i
 set omnifunc=syntaxcomplete#Complete
 set concealcursor+=n
-set conceallevel=2
 set spellfile=~/.vim/spell/en.utf-8.add
-set winminheight=0
-set winminwidth=0
 set formatoptions+=j
 set foldtext=functions#MyFoldText()
 set virtualedit+=block
@@ -149,20 +140,14 @@ if has('gui_running')
 endif
 " }}}
 
-"===============================================
-"              KEYBINDINGS
-"===============================================
-" {{{
-" map Y behave like D and C
+" {{{ Keymaps
 nnoremap Y y$
 
-" buffer navigation
 nnoremap [b :bprevious<CR>
 nnoremap ]b :bnext<CR>
 nnoremap <BS> <C-^>
 nnoremap <silent> <Space>x :bn<Bar>bd #<CR>
 
-" line navigation
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
@@ -172,10 +157,8 @@ nnoremap c* :set hlsearch<CR>*Ncgn
 
 " edit embedded scripts
 xnoremap <Space>e :yank<Bar>vnew<Bar>silent! put!<Bar>set bt=nofile bh=wipe ft= <Bar>normal! gg=G<S-Left><S-Left><Left>
-" redraw
 nnoremap <C-w>a :redraw!<CR>
 
-" new text objects
 for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', '`' ]
   execute 'xnoremap i' . char . ' :<C-u>normal! T' . char . 'vt' . char . '<CR>'
   execute 'onoremap i' . char . ' :normal vi' . char . '<CR>'
@@ -183,7 +166,6 @@ for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', 
   execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
 endfor
 
-" file/buffer search and management
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>f :find<space>
@@ -193,7 +175,7 @@ nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
 nnoremap <Space>t :tjump /
 
 nnoremap <Space>l :set colorcolumn=
-nnoremap <Space>q :source $MYVIMRC<CR>:doautocmd VimEnter<CR>
+nnoremap <Space>q m":source $MYVIMRC<CR>:doautocmd VimEnter<CR>
 nnoremap <Space>g :g/\v/#<Left><Left>
 xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
 nnoremap <Space>i :ilist /
@@ -211,7 +193,6 @@ nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR
 nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><Bar>setlocal conceallevel?<CR>
 nnoremap =oy :if exists('g:syntax_on') <Bar> syntax off <Bar> else <Bar> syntax enable <Bar> endif<CR>
 
-" quickfix maps
 nnoremap ]q :cnext<CR>
 nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
@@ -222,7 +203,6 @@ nnoremap =q :cclose<CR>
 nnoremap [d :let save=winsaveview()<CR>gD:nohlsearch<CR>^"ay$:call winrestview(save)<Bar>echo @a<CR>
 nnoremap ]d :let save=winsaveview()<CR>gd:nohlsearch<CR>^"ay$:call winrestview(save)<Bar>echo @a<CR>
 
-" smarter pasting
 nnoremap <silent> <Space>p p=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
 nnoremap <expr> <silent> zp putoperator#PutOperator()
@@ -232,7 +212,6 @@ nmap <silent> zpp Vp
 cnoremap <expr> <Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>/<C-r>/" : "<C-z>"
 cnoremap <expr> <S-Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>?<C-r>/" : "<C-z>"
 
-" misc functions
 nnoremap <silent> <F5> :call vim#VimRefresh()<CR>
 nnoremap <silent> <F11> :call vim#Focus()<CR>
 nnoremap <silent> <Space>m :silent! make<Bar>cwindow<Bar>redraw!<CR>
@@ -249,30 +228,28 @@ nnoremap <expr> <C-w>] winnr('$') > 1
 nnoremap <C-_> :stjump <C-r><C-w><CR>
 nnoremap <C-Bslash> :vertical stjump <C-r><C-w><CR>
 
-" auto expansion
-inoremap {<CR> {<CR>}<C-o>O
-
 " better file jumping
 nnoremap <silent> <expr> <C-w>f winnr('$') > 1
       \? ":let fname=\"\<C-r>\<C-f>\"\|wincmd p\<CR>:find \<C-r>=fname\<CR>\<CR>"
       \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
 
-" make <C-w>z more robust
 nnoremap <silent> <C-w>z :pclose<Bar>helpclose<CR>
 
 " }}}
 
-"===============================================
-"              (AUTO)COMMANDS
-"===============================================
-" {{{
+" {{{ (Auto)commands
 augroup vimrc
   autocmd!
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
   autocmd User UltiSnipsEnterFirstSnippet let in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let in_snippet = 0
-  autocmd InsertEnter        *            setl listchars-=trail:─
-  autocmd InsertLeave        *            setl listchars+=trail:─
+  if &termencoding ==# 'utf-8' || &encoding ==# 'utf-8'
+    autocmd InsertEnter        *            setl listchars-=trail:─
+    autocmd InsertLeave        *            setl listchars+=trail:─
+  else
+    autocmd InsertEnter        *            setl listchars-=trail:-
+    autocmd InsertLeave        *            setl listchars+=trail:-
+  endif
   autocmd VimEnter           *            silent! if fugitive#head() !=? '' | setl signcolumn=auto | endif
   autocmd BufNewFile */plugin/*.vim 0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
   if exists('##TextYankPost') && executable('base64')
@@ -291,10 +268,7 @@ command! -range=% FormatJSON <line1>,<line2>!python2 -c
 
 " }}}
 
-"===============================================
-"              STATUSLINE SETUP
-"===============================================
-" {{{
+" {{{ Statusline
 if exists('+statusline')
   let in_snippet = 0
   let stl_snippet = ['', 'snippet']
