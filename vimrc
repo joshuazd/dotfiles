@@ -200,8 +200,8 @@ nnoremap ]Q :clast<CR>
 nnoremap =q :cclose<CR>
 
 " make [d and ]d show declarations
-nnoremap [d :let save=winsaveview()<CR>gD:nohlsearch<CR>^"ay$:call winrestview(save)<Bar>echo @a<CR>
-nnoremap ]d :let save=winsaveview()<CR>gd:nohlsearch<CR>^"ay$:call winrestview(save)<Bar>echo @a<CR>
+nnoremap [d :let save=winsaveview()<CR>gD:nohlsearch<CR>md:call winrestview(save)<Bar>echo getline("'d")<CR>
+nnoremap ]d :let save=winsaveview()<CR>gd:nohlsearch<CR>md:call winrestview(save)<Bar>echo getline("'d")<CR>
 
 nnoremap <silent> <Space>p p=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>

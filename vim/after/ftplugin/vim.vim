@@ -17,6 +17,21 @@ xnoremap <silent><buffer> [M m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*
 nnoremap <silent><buffer> ]M m':call search('^\s*endf*\%[unction]\>', "W")<CR>
 xnoremap <silent><buffer> ]M m':<C-U>exe "normal! gv"<Bar>call search('^\s*endf*\%[unction]\>', "W")<CR>
 
+nnoremap <buffer> g== :<C-u><C-r>=trim(getline('.'))<CR><CR>
+nnoremap <buffer> g: :<C-u><C-r>=trim(getline('.'))<CR>
+nnoremap <silent> <buffer> g= :set opfunc=<SID>evaluate<CR>g@
+xnoremap <silent> <buffer> g= :call <SID>evaluate(visualmode(), getline('.'))<CR>
+
+function! s:evaluate(type, ...) abort
+  if a:0
+    exe trim(a:1)
+  else
+    for lnum in range(line("'["), line("']"))
+      execute trim(getline(lnum))
+    endfor
+  endif
+endfunction
+
 augroup vimscript
   autocmd!
   if executable('vint')
