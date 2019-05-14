@@ -1,3 +1,4 @@
+setlocal conceallevel=2
 setlocal comments=n:-,n::
 setlocal formatoptions+=or
 setlocal shiftwidth=2

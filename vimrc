@@ -70,7 +70,6 @@ set spellfile=~/.vim/spell/en.utf-8.add
 set formatoptions+=j
 set foldtext=functions#MyFoldText()
 set virtualedit+=block
-set fillchars=vert:│,diff:─
 if has('patch-8.1.0513')
   set diffopt+=algorithm:patience,indent-heuristic,iwhiteall,vertical
 endif
@@ -94,6 +93,7 @@ if has('patch-7.4.784')
 endif
 
 if &termencoding ==# 'utf-8' || &encoding ==# 'utf-8'
+  set fillchars=vert:│,diff:─
   set listchars=tab:│\ ,trail:─,extends:→,nbsp:␣
 else
   set listchars=tab:\|\ ,trail:-,extends:>,nbsp:.
@@ -251,15 +251,15 @@ augroup vimrc
     autocmd InsertLeave        *            setl listchars+=trail:-
   endif
   autocmd VimEnter           *            silent! if fugitive#head() !=? '' | setl signcolumn=auto | endif
-  autocmd BufNewFile */plugin/*.vim 0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
+  autocmd BufNewFile  */plugin/*.vim      0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
   if exists('##TextYankPost') && executable('base64')
     autocmd TextYankPost       *            if v:event.operator ==# 'y' | call clip#osc52() | endif
   endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
-command! -range=% AE <line1>,<line2>yank a|silent! call ansible#AnsibleEdit()
-command! AC call ansible#AnsibleEncrypt()
+command! -range=% AnsibleEdit <line1>,<line2>yank a|silent! call ansible#AnsibleEdit()
+command! AnsibleCrypt call ansible#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
 command! Focus call vim#Focus()
 command! -nargs=1 -complete=color Theme colo <args>|!theme <args>
