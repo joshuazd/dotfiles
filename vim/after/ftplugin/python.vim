@@ -1,9 +1,11 @@
-Packadd jedi-vim
-setlocal foldmethod=indent
+if exists(':Packadd')
+  Packadd jedi-vim
+endif
 if exists(':JediDebugInfo')
   setlocal omnifunc=jedi#completions
-  " nunmap <buffer> K
 endif
+setlocal path-=**
+setlocal foldmethod=indent
 setlocal keywordprg=pydoc3
 setlocal makeprg=flake8\ %:S
 setlocal errorformat=%f:%l:%c:\ %t%n\ %m
