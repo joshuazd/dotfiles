@@ -8,7 +8,7 @@ export WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
 export LANG=en_US.UTF-8
 export ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 export TMUX_CUSTOM=$HOME/dotfiles/tmux
-export SHELL=/usr/bin/zsh
+SHELL=/usr/bin/zsh
 
 # setup prompt
 # autoload -Uz promptinit
@@ -174,7 +174,7 @@ export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
 export HISTSIZE=5000
 export HISTFILE=~/.zsh_history
 export SAVEHIST=5000
-export CDPATH=.:~/projects
+CDPATH=.:~/projects
 setopt append_history
 setopt extended_history
 setopt share_history
