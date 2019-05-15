@@ -38,7 +38,7 @@ HOOKS = {
 OPT = [
     'ultisnips',
     'vim-dispatch',
-    'davidhalter/jedi-vim'
+    'jedi-vim'
 ]
 
 dir = os.path.dirname(os.path.realpath(__file__))
@@ -80,7 +80,7 @@ def main():
 def walk_tree(tree):
     root, _, files = tree
     for file in files:
-        if any(file.lower().endswith(ext) for ext in ['gif', 'png']):
+        if any(file.lower().endswith(ext) for ext in ['gif', 'png', 'svg', '.git', '.gitignore', '.gitmodules']):
             os.remove(os.path.join(root, file))
 
 
@@ -117,11 +117,6 @@ def pack_install(package, path, name):
             print(name)
             print(log)
         conch.release()
-    try:
-        shutil.rmtree(path + os.sep + '.git')
-        os.remove(path + os.sep + '.gitignore')
-    except OSError as e:
-        pass
     install_hooks(path, name)
 
 

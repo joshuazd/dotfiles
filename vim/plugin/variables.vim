@@ -76,11 +76,12 @@ if has('lambda')
   let g:mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
   let g:mucomplete#can_complete.java    = { 'omni' : { t -> t =~# '\m\(\k\|)\|]\)\%\(\.\)$'} }
   let g:mucomplete#can_complete.xml     = { 'omni' : { t -> t =~# '\m\(\k\k\|<\|\k\+:\)$'} }
+  let g:mucomplete#can_complete.python  = { 'omni' : { t -> t =~# '\m\(\k\|)\|]\)\%\(\.\)$'} }
 endif
 " jedi
 let g:jedi#auto_vim_configuration     = 0
 let g:jedi#popup_on_dot               = 0
-let g:jedi#show_call_signatures       = 1
+let g:jedi#show_call_signatures       = 0
 let g:jedi#show_call_signatures_delay = 50
 let g:jedi#auto_close_doc             = 0
 " lion
