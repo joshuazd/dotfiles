@@ -27,7 +27,8 @@ PACKAGES = [
     'junegunn/fzf',
     'junegunn/fzf.vim',
     'ludovicchabant/vim-gutentags',
-    'SirVer/ultisnips'
+    'SirVer/ultisnips',
+    'davidhalter/jedi-vim'
 ]
 
 HOOKS = {
@@ -36,7 +37,8 @@ HOOKS = {
 
 OPT = [
     'ultisnips',
-    'vim-dispatch'
+    'vim-dispatch',
+    'davidhalter/jedi-vim'
 ]
 
 dir = os.path.dirname(os.path.realpath(__file__))
