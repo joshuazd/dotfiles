@@ -35,23 +35,17 @@ _git_prompt_info() {
 
 _build_prompt() {
     ret=$([ $? -eq 0 ] && echo '33' || echo '31')
-    prompt="\e[94m${PWD/"$HOME"/'~'}\e[m\e["
+    prompt="\e[94m$(dirs +0)\e[m\e["
 
     case "$TERM" in
-        *-256color)
-            prompt+='38;5;242'
-            ;;
-        *)
-            prompt+='91'
-            ;;
+        *-256color) prompt+='38;5;242' ;;
+        *)          prompt+='91'       ;;
     esac
     prompt+="m$(_git_prompt_info)\e["$ret"m $\e[m"
 
     echo -ne " "$prompt" "
 }
 
-# PS1=" \[\e[94m\]\w\[\e[m\]\[\e["$gitcolor"m\]\$(_git_prompt_info)\[\e["$promptcolor"m\] $\[\e[m\] "
-# PS1="\$([ \$? -eq 0 ] && echo 33 || echo 31)\$promptcolor \[\e[94m\]\w\[\e[m\]\[\e["$gitcolor"m\]\$(_git_prompt_info)\[\e[\${promptcolor}m\] $\[\e[m\] "
 PS1="\$(_build_prompt)"
 # History Options
 #
