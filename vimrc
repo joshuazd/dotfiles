@@ -10,7 +10,7 @@ if has('win32')
   set packpath^=~/.vim
 endif
 
-execute 'command! ' .(has('packages') ? '-complete=packadd' : '') ." -nargs=1 -bang -bar Packadd call pack#add('<args>', '<bang>')"
+execute 'command! '.(has('packages') ? '-complete=packadd' : '')." -nargs=1 -bang -bar Packadd call pack#add('<args>', '<bang>')"
 if has('pythonx')
   Packadd! ultisnips
 endif
