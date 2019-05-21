@@ -16,7 +16,6 @@ PACKAGES = [
     'tpope/vim-commentary',
     'tpope/vim-apathy',
     'tpope/vim-fugitive',
-    'tpope/vim-projectionist',
     'tommcdo/vim-lion',
     'romainl/vim-qf',
     'romainl/vim-qlist',
@@ -78,7 +77,10 @@ def main():
 
 
 def walk_tree(tree):
-    root, _, files = tree
+    root, dirs, files = tree
+    for dir in dirs:
+        if any(dir.lower().endswith(ext) for ext in ['.git']):
+            shutil.rmtree(os.path.join(root, dir))
     for file in files:
         if any(file.lower().endswith(ext) for ext in ['gif', 'png', 'svg', '.git', '.gitignore', '.gitmodules']):
             os.remove(os.path.join(root, file))
