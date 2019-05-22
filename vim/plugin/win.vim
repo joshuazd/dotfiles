@@ -3,3 +3,4 @@ if !has('win32')
 endif
 set shell=cmd.exe
 set shellcmdflag=/c
+set encoding=utf-8

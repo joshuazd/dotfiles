@@ -1,7 +1,7 @@
-if exists('g:loaded_commands')
+if exists('g:loaded_lazyload')
   finish
 endif
-let g:loaded_commands = 1
+let g:loaded_lazyload = 1
 
 let s:save_cpo = &cpo
 set cpo&vim

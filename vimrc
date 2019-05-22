@@ -253,7 +253,7 @@ augroup vimrc
   autocmd VimEnter           *            silent! if fugitive#head() !=? '' | setl signcolumn=auto | endif
   autocmd BufNewFile  */plugin/*.vim      0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
   if exists('##TextYankPost') && executable('base64')
-    autocmd TextYankPost       *            if v:event.operator ==# 'y' | call clip#osc52() | endif
+    autocmd TextYankPost       *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
   endif
 augroup END
 
@@ -263,8 +263,9 @@ command! AnsibleCrypt call ansible#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
 command! Focus call vim#Focus()
 command! -nargs=1 -complete=color Theme colo <args>|!theme <args>
-command! -range=% FormatJSON <line1>,<line2>!python2 -c
-      \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+" command! -range=% FormatJSON <line1>,<line2>!python2 -c
+"       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+command! -range=% FormatJSON <line1>,<line2>!python3 -m json.tool
 
 " }}}
 
