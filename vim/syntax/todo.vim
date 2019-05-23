@@ -36,13 +36,25 @@ hi def link todoTODOwords Todo
 hi def link todoDONEwords Question
 hi def link todoListMarker Keyword
 hi def link todoHeader Normal
-hi todoHeader cterm=reverse gui=reverse
 hi def link todoSubHeader Constant
 hi def link todoDate PreProc
 hi def link todoBox Statement
+function! s:hilight() abort
+  hi todoHeader cterm=reverse gui=reverse
+  let statement_id = synIDtrans(hlID('Statement'))
+  let t_fg = synIDattr(statement_id, 'fg', 'cterm')
+  let t_bg = synIDattr(statement_id, 'bg', 'cterm')
+  let g_fg = synIDattr(statement_id, 'fg', 'gui')
+  let g_bg = synIDattr(statement_id, 'bg', 'gui')
+  let Syn = {x -> len(x) ? x : 'NONE'}
+  execute 'highlight todoBox ctermfg='.Syn(t_fg).' ctermbg='.Syn(t_bg).
+        \' guifg='.Syn(g_fg).' guibg='.Syn(g_bg).
+        \' cterm=bold gui=bold'
+endfunction
+call s:hilight()
 augroup todo_syntax
   autocmd!
-  autocmd ColorScheme * hi todoHeader cterm=reverse gui=reverse
+  autocmd ColorScheme * call s:hilight()
 augroup END
 
 let b:current_syntax = 'todo'

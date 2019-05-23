@@ -46,18 +46,16 @@ function! s:hi(group, target) abort
   else
     let italic = 0
   endif
-  let t_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'cterm')
-  let t_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'cterm')
-  let t_fmt = synIDattr(synIDtrans(hlID(a:target)), 'reverse', 'cterm') ? 'reverse,' : ''
-  let g_fg = synIDattr(synIDtrans(hlID(a:target)), 'fg', 'gui')
-  let g_bg = synIDattr(synIDtrans(hlID(a:target)), 'bg', 'gui')
-  let g_fmt = synIDattr(synIDtrans(hlID(a:target)), 'reverse', 'gui') ? 'reverse,' : ''
-  let t_fg = t_fg ==? '' ? 'NONE' : t_fg
-  let t_bg = t_bg ==? '' ? 'NONE' : t_bg
-  let g_fg = g_fg ==? '' ? 'NONE' : g_fg
-  let g_bg = g_bg ==? '' ? 'NONE' : g_bg
-  execute 'highlight ' . a:group . ' ctermfg=' . t_fg . ' ctermbg=' . t_bg .
-        \ ' guifg=' . g_fg . ' guibg=' . g_bg .
+  let target_id = synIDtrans(hlID(a:target))
+  let t_fg = synIDattr(target_id, 'fg', 'cterm')
+  let t_bg = synIDattr(target_id, 'bg', 'cterm')
+  let t_fmt = synIDattr(target_id, 'reverse', 'cterm') ? 'reverse,' : ''
+  let g_fg = synIDattr(target_id, 'fg', 'gui')
+  let g_bg = synIDattr(target_id, 'bg', 'gui')
+  let g_fmt = synIDattr(target_id, 'reverse', 'gui') ? 'reverse,' : ''
+  let Syn = {x -> len(x) ? x : 'NONE'}
+  execute 'highlight ' . a:group . ' ctermfg=' . Syn(t_fg) . ' ctermbg=' . Syn(t_bg) .
+        \ ' guifg=' . Syn(g_fg) . ' guibg=' . Syn(g_bg) .
         \ (italic ? ' cterm=' . t_fmt . 'italic gui=' . g_fmt . 'italic' : '')
 endfunction
 
