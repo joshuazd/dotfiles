@@ -1,19 +1,5 @@
-case "$TERM" in
-    xterm*|*rxvt*) TERM=xterm-256color
-esac
 
-[ -f "${HOME}/.shrc" ] && source ~/.shrc
-
-export WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
-export LANG=en_US.UTF-8
-export ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
-export TMUX_CUSTOM=$HOME/dotfiles/tmux
-SHELL=/usr/bin/zsh
-
-# setup prompt
-# autoload -Uz promptinit
-# promptinit
-# prompt pure
+. "$HOME/.shrc"
 
 _git_prompt_info() {
   ref=${$(command git symbolic-ref HEAD 2> /dev/null)#refs/heads/} || \
@@ -24,14 +10,8 @@ _git_prompt_info() {
   echo -n ']%f'
 }
 
-export PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "
+PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "
 setopt promptsubst
-
-# typeset -A ZSH_HIGHLIGHT_STYLES
-# ZSH_HIGHLIGHT_STYLES[function]='none'
-# ZSH_HIGHLIGHT_STYLES[command]='none'
-# ZSH_HIGHLIGHT_STYLES[alias]='none'
-# ZSH_HIGHLIGHT_STYLES[builtin]='none'
 
 # Options
 setopt autocd
@@ -50,7 +30,6 @@ setopt listpacked
 stty -ixon
 zmodload zsh/zle
 bindkey -v
-export KEYTIMEOUT=1
 autoload zmv
 autoload -U edit-command-line
 zle -N edit-command-line
@@ -169,12 +148,6 @@ bindkey '^P' history-substring-search-up
 bindkey '^N' history-substring-search-down
 bindkey -M emacs '^P' history-substring-search-up
 bindkey -M emacs '^N' history-substring-search-down
-export HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=none,fg=magenta,bold'
-export HISTIGNORE="&:ls:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
-export HISTSIZE=5000
-export HISTFILE=~/.zsh_history
-export SAVEHIST=5000
-CDPATH=.:~/projects
 setopt append_history
 setopt extended_history
 setopt share_history
@@ -202,13 +175,13 @@ local color0D='#945eb8'
 local color0E='#39adb5'
 local color0F='#ffffff'
 
-export FZF_DEFAULT_OPTS="
+FZF_DEFAULT_OPTS="
   --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
   --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
   --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
   --preview='fzf_preview {} 2>/dev/null'
 "
-export FZF_CTRL_R_OPTS="--preview=''"
+FZF_CTRL_R_OPTS="--preview=''"
 }
 
 

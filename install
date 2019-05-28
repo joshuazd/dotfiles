@@ -6,15 +6,15 @@ option="$1"
 
 case "$option" in
     symlinks)
-        exec "$PWD/bin/install-symlinks" ;;
+        exec "$PWD/.bin/install-symlinks" ;;
     tools)
-        exec "$PWD/bin/install-tools" ;;
+        exec "$PWD/.bin/install-tools" ;;
     tmux)
-        exec "$PWD/bin/install-tmux" ;;
+        exec "$PWD/.bin/install-tmux" ;;
     vim)
-        exec "$PWD/bin/install-vim" ;;
+        exec "$PWD/.bin/install-vim" ;;
     all)
-        exec "$PWD/bin/install-all" ;;
+        exec "$PWD/.bin/install-all" ;;
     *)
         ;;
 esac

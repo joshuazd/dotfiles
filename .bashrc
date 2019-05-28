@@ -1,19 +1,8 @@
-# If not running interactively, don't do anything
-[[ "$-" != *i* ]] && return
 
-[ -f "${HOME}/.shrc" ] && source "${HOME}/.shrc"
+. "$HOME/.shrc"
 
-# Don't wait for job termination notification
-# set -o notify
-
-# Use case-insensitive filename globbing
 shopt -s nocaseglob
-
-# Make bash append rather than overwrite the history on disk
 shopt -s histappend
-
-# When changing directory small typos can be ignored by bash
-# for example, cd /vr/lgo/apaache would find /var/log/apache
 shopt -s cdspell
 
 # Uncomment to turn on programmable completion enhancements.
@@ -47,15 +36,6 @@ _build_prompt() {
 }
 
 PS1="\$(_build_prompt)"
-# History Options
-#
-# Don't put duplicate lines in the history.
-export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
-#
-# Ignore some controlling instructions
-# HISTIGNORE is a colon-delimited list of patterns which should be excluded.
-# The '&' is a special pattern which suppresses duplicate entries.
-export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls:l'
 
 # Aliases
 [ -f "${HOME}/.aliases" ] && source "${HOME}/.aliases"

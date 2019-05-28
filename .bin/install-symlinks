@@ -20,7 +20,7 @@ install() {
     echo "Installing $1"
 
     case $(uname -s) in
-        Linux*|Darwin*) ln -s "$PWD/$1" "$HOME/.$1" ;;
+        Linux*|Darwin*) ln -s "$PWD/.$1" "$HOME/.$1" ;;
         CYGWIN*)
             basedir=$(cygpath -w "$PWD")
             if [ -d "$PWD/$1" ]; then
