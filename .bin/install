@@ -1,0 +1,22 @@
+#!/bin/sh
+
+cd "$(dirname "$0")"
+
+option="$1"
+
+case "$option" in
+    symlinks)
+        exec "$PWD/install-symlinks" ;;
+    pack)
+        exec "$PWD/install-pack" ;;
+    tools)
+        exec "$PWD/install-tools" ;;
+    tmux)
+        exec "$PWD/install-tmux" ;;
+    vim)
+        exec "$PWD/install-vim" ;;
+    all)
+        exec "$PWD/install-all" ;;
+    *)
+        ;;
+esac
