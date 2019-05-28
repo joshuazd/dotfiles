@@ -138,6 +138,7 @@ source "${ZSH_CUSTOM}/my_scripts.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 source "${ZSH_CUSTOM}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=none,fg=magenta,bold'
 compdef sshrc=ssh
 # fzf setup
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
