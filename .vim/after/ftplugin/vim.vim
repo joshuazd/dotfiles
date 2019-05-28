@@ -4,7 +4,7 @@ setlocal foldmethod=marker
 setlocal makeprg=vint\ %:S
 setlocal keywordprg=:help
 setlocal errorformat=%f:%l:%c:\ %t%n:\ %m,%f:%l:%c:\ %m
-setlocal path=$HOME/dotfiles/vim/,,
+setlocal path=$HOME/dotfiles/.vim/,,
 setlocal suffixesadd+=.vim
 
 " Move around functions.

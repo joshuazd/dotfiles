@@ -21,11 +21,13 @@ filetype plugin indent on
 
 " {{{ Options
 set hidden
+set history=200
 set backspace=eol,start,indent
 set whichwrap+=<,>
 set showcmd
 set breakindent
 set breakindentopt+=shift:2
+set nrformats-=octal
 set ignorecase
 set smartcase
 set incsearch
@@ -244,16 +246,18 @@ augroup vimrc
   autocmd User UltiSnipsEnterFirstSnippet let in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let in_snippet = 0
   if &termencoding ==# 'utf-8' || &encoding ==# 'utf-8'
-    autocmd InsertEnter        *            setl listchars-=trail:─
-    autocmd InsertLeave        *            setl listchars+=trail:─
+    autocmd InsertEnter      *            setl listchars-=trail:─
+    autocmd InsertLeave      *            setl listchars+=trail:─
   else
-    autocmd InsertEnter        *            setl listchars-=trail:-
-    autocmd InsertLeave        *            setl listchars+=trail:-
+    autocmd InsertEnter      *            setl listchars-=trail:-
+    autocmd InsertLeave      *            setl listchars+=trail:-
   endif
-  autocmd VimEnter           *            silent! if fugitive#head() !=? '' | setl signcolumn=auto | endif
+  autocmd User FugitiveBoot               setl signcolumn=auto
+  autocmd User FugitiveBoot               let &l:grepprg='git grep -n --no-color'
+        \| let &l:grepformat='%f:%l:%c:%m,%f:%l:%m,%m %f match%ts,%f'
   autocmd BufNewFile  */plugin/*.vim      0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
   if exists('##TextYankPost') && executable('base64')
-    autocmd TextYankPost       *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
+    autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
   endif
 augroup END
 
@@ -263,9 +267,12 @@ command! AnsibleCrypt call ansible#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
 command! Focus call vim#Focus()
 command! -nargs=1 -complete=color Theme colo <args>|!theme <args>
-" command! -range=% FormatJSON <line1>,<line2>!python2 -c
-"       \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
-command! -range=% FormatJSON <line1>,<line2>!python3 -m json.tool
+if executable('python3')
+  command! -range=% FormatJSON <line1>,<line2>!python3 -m json.tool
+else
+  command! -range=% FormatJSON <line1>,<line2>!python2 -c
+        \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+endif
 
 " }}}
 
