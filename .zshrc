@@ -157,60 +157,34 @@ setopt hist_ignore_all_dups
 setopt hist_ignore_space
 setopt hist_reduce_blanks
 
-_gen_fzf_default_opts() {
+compdef _jzd jzd
 
-local color00='#262626'
-local color01='#ff5f5f'
-local color02='#87d787'
-local color03='#ffd787'
-local color04='#6182b8'
-local color05='#c792ea'
-local color06='#89ddff'
-local color07='#bbbbbb'
-local color08='#3a3a3a'
-local color09='#d75f5f'
-local color0A='#87af87'
-local color0B='#ffaf5f'
-local color0C='#82aaff'
-local color0D='#945eb8'
-local color0E='#39adb5'
-local color0F='#ffffff'
+_jzd() {
+  local cmd=$(basename $words[1])
+  if [[ $CURRENT = 2 ]]; then
+    local tmp
+    tmp=($(grep '^    [a-z0-9-]*[|)]' "$HOME/.bin/$cmd" 2>/dev/null | sed -e 's/).*//' | tr '|' ' '))
+    _describe -t commands "${words[1]} command" tmp --
+  else
+    shift words
+    (( CURRENT-- ))
+    curcontext="${curcontext%:*:*}:$cmd-${words[1]}:"
 
-FZF_DEFAULT_OPTS="
-  --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
-  --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
-  --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
-  --preview='fzf_preview {} 2>/dev/null'
-"
-FZF_CTRL_R_OPTS="--preview=''"
+    local selector=$(egrep "^    ([a-z0-9-]*[|])*${words[1]}([|][a-z0-9-]*)*[)] *# *[_a-z0-9-]*$" "$HOME/.bin/$cmd" | sed -e 's/.*# *//')
+    _call_function ret _$selector && return $ret
+
+    if [[ -n "$selector" ]]; then
+      words[1]=$selector
+    elif [[ -f "$HOME/.bin/$cmd-${words[1]}" ]]; then
+      words[1]=$cmd-${words[1]}
+      _jzd
+    fi
+    _normal
+  fi
 }
 
-
-# _gen_fzf_default_opts() {
-
-# local color00='#45403a'
-# local color01='#bf4243'
-# local color02='#525643'
-# local color03='#5b5143'
-# local color04='#4c5361'
-# local color05='#614c61'
-# local color06='#465953'
-# local color07='#999483'
-# local color08='#777467'
-# local color09='#d75f5f'
-# local color0A='#81895d'
-# local color0B='#957f5f'
-# local color0C='#7382a0'
-# local color0D='#9c739c'
-# local color0E='#5f8c7d'
-# local color0F='#ffffff'
-
-# export FZF_DEFAULT_OPTS="
-#   --color=bg+:$color07,bg:#b4af9a,spinner:$color0C,hl:$color01
-#   --color=fg:$color08,header:$color0D,info:$color0A,pointer:$color04
-#   --color=marker:$color04,fg+:$color00,prompt:$color04,hl+:$color01
-# "
-
-# }
-
-_gen_fzf_default_opts
+_256colors() {
+    nums=({1..256})
+    _describe -t commands "${words[1]} command" nums --
+    return 0
+}

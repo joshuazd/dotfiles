@@ -1,0 +1,28 @@
+#!/bin/sh
+
+. "$HOME/.profile"
+
+basename=$(basename "$0")
+cmd=$(basename "$1")
+shift
+
+if [ ! -d "$HOME/.bin" ]; then
+    echo "$(basename "$0")" setting up bin symlink
+    ln -s $(dirname "$0") "$HOME/.bin"
+fi
+
+case $cmd in
+    install)
+        exec "$HOME/.bin/jzd-install" "$@" ;;
+    256)
+        exec "$HOME/.bin/jzd-256-colors" "$@" ;;
+    color) # 256colors
+        exec "$HOME/.bin/jzd-colortrans" "$@" ;;
+    theme)
+        tmux source "$TMUX_CUSTOM/colors/"$@".tmux"
+        type mtc >/dev/null 2>&1 && mtc set "$@"
+        return 0
+        ;;
+    *)
+        echo "$(basename "$0") $cmd: unknown command" ;;
+esac

@@ -1,2 +1,0 @@
-tmux source ~/dotfiles/tmux/colors/$1.tmux
-mtc set $1
