@@ -1,5 +1,5 @@
 
-. "$HOME/.shrc"
+. "$HOME/.shrc" 2>/dev/null
 
 shopt -s nocaseglob
 shopt -s histappend
