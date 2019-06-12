@@ -12,5 +12,7 @@ for char in ['~', '`', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '-
   execute 'cnoremap <expr> ' . char . ' verymagic#verymagic("' . char . '")'
 endfor
 
+cnoremap <expr> <BS> getcmdline() =~? '\\v$' ? '<BS><BS>' : '<BS>'
+
 let &cpo = s:save_cpo
 unlet s:save_cpo
