@@ -13,14 +13,14 @@ RIPGREP_CONFIG_PATH=~/.ripgrep
 eval $(dircolors "$HOME/.dir_colors")
 
 if type fd > /dev/null; then
-    FZF_DEFAULT_COMMAND='fd --type f'
+    FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
     FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
     FZF_ALT_C_COMMAND='fd --type d'
 elif type rg > /dev/null; then
     FZF_DEFAULT_COMMAND='rg --files'
     FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 elif type ag > /dev/null; then
-    FZF_DEFAULT_COMMAND='ag -l'
+    FZF_DEFAULT_COMMAND='ag -l --hidden --ignore .git'
     FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
 

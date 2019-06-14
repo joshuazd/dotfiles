@@ -187,10 +187,12 @@ nnoremap <Esc>OA <Up>
 nnoremap <silent> <nowait> <Esc> :<C-u>nohlsearch<CR>
 
 " vim-unimpaired inspired settings toggles
-nnoremap =ow :setlocal wrap!     <Bar>setlocal wrap?<CR>
-nnoremap =oz :setlocal list!     <Bar>setlocal list?<CR>
-nnoremap =os :setlocal spell!    <Bar>setlocal spell?<CR>
-nnoremap =oh :setlocal hlsearch! <Bar>setlocal hlsearch?<CR>
+nnoremap =on :setlocal number!         <Bar>setlocal number?<CR>
+nnoremap =or :setlocal relativenumber! <Bar>setlocal relativenumber?<CR>
+nnoremap =ow :setlocal wrap!           <Bar>setlocal wrap?<CR>
+nnoremap =oz :setlocal list!           <Bar>setlocal list?<CR>
+nnoremap =os :setlocal spell!          <Bar>setlocal spell?<CR>
+nnoremap =oh :setlocal hlsearch!       <Bar>setlocal hlsearch?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><Bar>setlocal signcolumn?<CR>
 nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><Bar>setlocal conceallevel?<CR>
 nnoremap =oy :if exists('g:syntax_on') <Bar> syntax off <Bar> else <Bar> syntax enable <Bar> endif<CR>
