@@ -4,11 +4,12 @@
 
 basename=$(basename "$0")
 cmd=$(basename "$1")
+dir=$(cd -P "$(dirname "$0")" >/dev/null 2>&1 && pwd)
 shift
 
-if [ ! -d "$HOME/.bin" ]; then
+if [ ! -d "$HOME/.bin" ] && [ ! -L "$HOME/.bin" ]; then
     echo "$(basename "$0")" setting up bin symlink
-    ln -s $(dirname "$0") "$HOME/.bin"
+    ln -s $dir "$HOME/.bin"
 fi
 
 case $cmd in
