@@ -35,7 +35,7 @@ set hlsearch
 set lazyredraw
 set showmatch
 set matchtime=2
-set timeoutlen=500
+set timeoutlen=3000
 set ttimeoutlen=0
 set softtabstop=4
 set shiftwidth=4
@@ -170,19 +170,19 @@ endfor
 
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
-nnoremap <Space>f :find<space>
-nnoremap <Space>s :sfind<space>
-nnoremap <Space>v :vert sfind<space>
+nnoremap <Space>ff :find<space>
+nnoremap <Space>fs :sfind<space>
+nnoremap <Space>fv :vert sfind<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
 nnoremap <Space>t :tjump /
 
-nnoremap <Space>l :set colorcolumn=
+nnoremap <Space>;l :set colorcolumn=
 nnoremap <Space>q m":source $MYVIMRC<CR>:doautocmd VimEnter<CR>
-nnoremap <Space>g :g/\v/#<Left><Left>
-xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
-nnoremap <Space>i :ilist /
-nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
-xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
+nnoremap <Space>;g :g/\v/#<Left><Left>
+xnoremap <Space>;g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
+nnoremap <Space>;i :ilist /
+nnoremap <Space>;r :%s/<C-r><C-w>//g<Left><Left>
+xnoremap <Space>;r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
 nnoremap <Esc>OA <Up>
 nnoremap <silent> <nowait> <Esc> :<C-u>nohlsearch<CR>
 

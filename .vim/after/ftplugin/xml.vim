@@ -38,13 +38,16 @@ set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
 setlocal include=\\%(target\\\|key\\\|messageStore\\)=
 setlocal define=\\%(name\\)=
-nnoremap <buffer> ,f zMzr
+nnoremap <buffer> <space>F zMzr
 nnoremap <buffer> cx :set operatorfunc=xml#escape#escape<CR>g@
 xnoremap <buffer> X :<C-u>call xml#escape#escape()<CR>
 
 command! -bar -buffer -nargs=* Maven :Dispatch mvn <args>
 command! -bar -buffer -nargs=* Install :Maven clean install <args>
 command! -bar -buffer -nargs=* Version :Maven versions:set -DnewVersion=<args>
+
+nnoremap <buffer> <space>I :<C-u>Install<space>
+nnoremap <buffer> <space>V :<C-u>Version<space>
 
 let b:undo_ftplugin = 'setlocal foldmethod< smarttab< conceallevel< foldnestmax< iskeyword< expandtab< tabstop< shiftwidth< softtabstop< omnifunc< makeprg< formatprg< syntax< path< suffixesadd< isfname< include<'
 

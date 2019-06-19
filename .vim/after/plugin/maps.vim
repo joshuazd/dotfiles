@@ -54,6 +54,8 @@ if exists('g:loaded_qlist')
 endif
 
 if exists('g:loaded_fugitive')
-  nnoremap gs :rightbelow Gstatus<CR>
-  nnoremap gS :rightbelow Gstatus!<CR>
+  nnoremap <space>gs :rightbelow Gstatus<CR>
+  nnoremap <space>gS :rightbelow Gstatus!<CR>
+  nnoremap <space>gl :Gpull<CR>
+  nnoremap <space>gp :Gpush<CR>
 endif
