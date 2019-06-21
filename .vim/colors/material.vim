@@ -37,6 +37,8 @@ let s:black        = {'ansi': '0',    'term' : '16',   'gui' : '#000000'}
 let s:background   = {'ansi': 'NONE', 'term' : 'NONE', 'gui' : '#262626'}
 let s:white        = {'ansi': '15',   'term' : '251',  'gui' : '#c6c6c6'}
 let s:none         = {'ansi': 'NONE', 'term' : 'NONE', 'gui' : 'NONE'}
+let g:terminal_ansi_colors = ['#262626','#ff4f4f','#87d787','#ffd787','#5f87af','#8787d7','#5fafaf','#a8a8a8',
+                            \ '#4a4a4a','#d75f5f','#87af87','#ffaf5f','#87aaff','#5f005f','#87d7d7','#c6c6c6']
 
 if &t_Co >= 256 || $TERM =~? '256'|| has('gui_running')
   function! s:h(hl, fg, bg, fmt) abort
