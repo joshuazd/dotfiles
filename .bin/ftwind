@@ -43,7 +43,7 @@ while read -r line; do
 done <<< "$windows_str"
 
 # Align on columns
-windows=$(column -s $'\t' -t <<< "$windows")
+# windows=$(column -s $'\t' -t <<< "$windows")
 
 # Split by newlines
 IFS=$'\n' read -rd '' -a window_arr <<<"$windows"
@@ -58,6 +58,7 @@ do
    windows=$(printf '%s%s%s%s' "$windows" "$delim" "$out")
    delim=$'\n'
 done
+windows=$(column -t <<< "$windows")
 
 # Run fzf and check result
 # target=$(echo "$windows" | fzf-tmux +m --reverse --ansi)
