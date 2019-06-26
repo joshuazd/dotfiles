@@ -1,6 +1,12 @@
 [credential]
-	helper = store
+    helper = store
 [color "status"]
-	changed = 3
+    changed = yellow
+    untracked = red
 [commit]
-	verbose = true
+    verbose = true
+    status = true
+[push]
+    default = simple
+[grep]
+    lineNumber = true

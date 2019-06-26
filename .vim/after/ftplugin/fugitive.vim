@@ -25,6 +25,6 @@ augroup FugitiveHighlight
   autocmd TextChanged <buffer> call <SID>highlight()
 augroup END
 if expand('%') =~# '\.git\/index'
-  exe "norm \<C-n>"
+  exe "norm gg\<C-n>"
   nmap <buffer> <TAB> =
 endif
