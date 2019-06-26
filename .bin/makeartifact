@@ -3,6 +3,7 @@ from __future__ import print_function
 import sys
 import os
 import re
+import glob
 
 
 def main(argv):
@@ -44,7 +45,7 @@ def main(argv):
     artifact = open(path + '/' + artifact_name + '.xml', 'w+')
     artifact.close()
 
-    project_name = os.path.split(os.getcwd())[-1]
+    project_name = glob.glob('*_ESB')[0][:-4]
 
     path = os.getcwd() + '/' + project_name + \
         '_Deployment/pom.xml'
