@@ -40,27 +40,21 @@ endfunction
 
 " Finds the human readable label for a diagnsotic severity level
 function! s:SeverityLabel(severity) abort
-    if a:severity == 1
-      return 'Error'
-    elseif a:severity == 2
-      return 'Warning'
-    elseif a:severity == 3
-      return 'Info'
-    elseif a:severity == 4
-      return 'Hint'
+    if a:severity == 1 | return 'Error'
+    elseif a:severity == 2 | return 'Warning'
+    elseif a:severity == 3 | return 'Info'
+    elseif a:severity == 4 | return 'Hint'
+    else | return ''
     endif
 endfunction
 
 " Finds the location list type given a diagnostic severity level
 function! s:SeverityType(severity) abort
-    if a:severity == 1
-      return 'E'
-    elseif a:severity == 2
-      return 'W'
-    elseif a:severity == 3
-      return 'I'
-    elseif a:severity == 4
-      return 'H'
+    if a:severity == 1 | return 'E'
+    elseif a:severity == 2 | return 'W'
+    elseif a:severity == 3 | return 'I'
+    elseif a:severity == 4 | return 'H'
+    else | return ''
     endif
 endfunction
 
@@ -113,6 +107,7 @@ function! lsc#diagnostics#setForFile(file_path, diagnostics) abort
   endif
   call lsc#diagnostics#updateLocationList(a:file_path)
   call lsc#highlights#updateDisplayed()
+  call s:UpdateQuickFix()
   if(a:file_path ==# lsc#file#fullPath())
     call lsc#cursor#showDiagnostic()
   endif
@@ -196,19 +191,56 @@ endfunction
 
 " Finds all diagnostics and populates the quickfix list.
 function! lsc#diagnostics#showInQuickFix() abort
-  let all_diagnostics = []
-  for file_path in keys(s:file_diagnostics)
-    let bufnr = lsc#file#bufnr(file_path)
-    if bufnr == -1
-      let file_ref = {'filename': fnamemodify(file_path, ':.')}
-    else
-      let file_ref = {'bufnr': bufnr}
-    endif
-    call extend(all_diagnostics, s:ListItems(file_path, file_ref))
-  endfor
-  call sort(all_diagnostics, 'lsc#util#compareQuickFixItems')
-  call setqflist(all_diagnostics)
+  call setqflist([], ' ', {
+      \ 'items': s:AllDiagnostics(),
+      \ 'title': 'LSC Diagnostics',
+      \ 'context': {'client': 'LSC'}
+      \})
   copen
+endfunction
+
+function! s:UpdateQuickFix() abort
+  let l:current = getqflist({'context': 1, 'idx': 1, 'items': 1})
+  let l:context = get(l:current, 'context', 0)
+  if type(l:context) != type({}) ||
+      \ !has_key(l:context, 'client') ||
+      \ l:context.client != 'LSC'
+    return
+  endif
+  let l:new_list = {'items': s:AllDiagnostics()}
+  if len(l:new_list.items) > 0 &&
+      \ l:current.idx > 0 &&
+      \ len(l:current.items) >= l:current.idx
+    let l:prev_item = l:current.items[l:current.idx - 1]
+    let l:new_list.idx = s:FindNearest(l:prev_item, l:new_list.items)
+  endif
+  call setqflist([], 'r', l:new_list)
+endfunction
+
+function! s:FindNearest(prev, items) abort
+  let l:idx = 1
+  for l:item in a:items
+    if lsc#util#compareQuickFixItems(l:item, a:prev) >= 0
+      return l:idx
+    endif
+    let l:idx += 1
+  endfor
+  return l:idx - 1
+endfunction
+
+function! s:AllDiagnostics() abort
+  let l:all_diagnostics = []
+  for l:file_path in keys(s:file_diagnostics)
+    let l:bufnr = lsc#file#bufnr(l:file_path)
+    if l:bufnr == -1
+      let l:file_ref = {'filename': fnamemodify(l:file_path, ':.')}
+    else
+      let l:file_ref = {'bufnr': l:bufnr}
+    endif
+    call extend(l:all_diagnostics, s:ListItems(l:file_path, l:file_ref))
+  endfor
+  call sort(l:all_diagnostics, 'lsc#util#compareQuickFixItems')
+  return l:all_diagnostics
 endfunction
 
 " Whether the location list has the most up to date diagnostics.
