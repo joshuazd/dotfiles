@@ -1,5 +1,6 @@
 nnoremap <buffer> gp :Gpush<CR>
 setl signcolumn=no
+setl nolist
 
 hi FugitiveDiffLine ctermbg=238 ctermfg=248 guibg=#444444 guifg=#a8a8a8
 hi FugitiveDiffHunk ctermbg=234 guibg=#1c1c1c

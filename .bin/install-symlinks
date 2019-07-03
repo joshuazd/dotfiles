@@ -15,7 +15,7 @@ install() {
             echo "Backing up existing $1 to .$1.old"
             mv "$HOME/.$1" "$HOME/.$1.old"
         else
-	    echo "Removing old $1"
+            echo "Removing old $1"
             rm "$HOME/.$1"
         fi
     fi
@@ -50,6 +50,7 @@ install editorconfig
 install ctags
 install bin
 install ripgrep
+[ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
 install config/i3
 install config/polybar
 install config/bat
