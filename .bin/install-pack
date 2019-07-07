@@ -27,7 +27,9 @@ PACKAGES = [
     'junegunn/fzf.vim',
     'ludovicchabant/vim-gutentags',
     'SirVer/ultisnips',
-    'davidhalter/jedi-vim'
+    'davidhalter/jedi-vim',
+    'mhinz/vim-startify',
+    'ryanoasis/vim-devicons'
 ]
 
 HOOKS = {

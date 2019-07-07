@@ -127,3 +127,26 @@ augroup signify
   autocmd!
   autocmd ColorScheme * call <SID>hl_Signify()
 augroup END
+" startify
+let g:startify_custom_header = [
+      \ '        ________ ++     ________',
+      \ '       /VVVVVVVV\++++  /VVVVVVVV\''',
+      \ '       \VVVVVVVV/++++++\VVVVVVVV/''',
+      \ '        |VVVVVV|++++++++/VVVVV/''',
+      \ '        |VVVVVV|++++++/VVVVV/''',
+      \ '       +|VVVVVV|++++/VVVVV/''+',
+      \ '     +++|VVVVVV|++/VVVVV/''+++++',
+      \ '   +++++|VVVVVV|/VVV___++++++++++',
+      \ '     +++|VVVVVVVVVV/##/ +_+_+_+_',
+      \ '       +|VVVVVVVVV___ +/#_#,#_#,\',
+      \ '        |VVVVVVV//##/+/#/+/#/''/#/',
+      \ '        |VVVVV/''+/#/+/#/+/#/ /#/',
+      \ '        |VVV/''++/#/+/#/ /#/ /#/',
+      \ '        ''V/''  /##//##//##//###/',
+      \ '                 ++']
+function! StartifyEntryFormat()
+  return 'WebDevIconsGetFileTypeSymbol(absolute_path) ." ". entry_path'
+endfunction
+" devicons
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
+let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
