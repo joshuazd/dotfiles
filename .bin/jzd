@@ -20,10 +20,7 @@ case $cmd in
     color) # 256colors
         exec "$HOME/.bin/jzd-colortrans" "$@" ;;
     theme)
-        tmux source "$TMUX_CUSTOM/colors/"$@".tmux"
-        type mtc >/dev/null 2>&1 && mtc set "$@"
-        return 0
-        ;;
+        exec "$HOME/.bin/jzd-theme" "$@" ;;
     *)
         echo "$(basename "$0") $cmd: unknown command" ;;
 esac

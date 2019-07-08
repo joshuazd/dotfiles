@@ -23,7 +23,7 @@ elif type ag > /dev/null; then
     FZF_DEFAULT_COMMAND='ag -l --hidden --ignore .git'
     FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 fi
-export FZF_DEFAULT_COMMAND FZF_CTRL_T_COMMAND FZF_CTRL_R_OPTS
+export FZF_DEFAULT_COMMAND FZF_CTRL_T_COMMAND FZF_ALT_C_COMMAND
 
 # _gen_fzf_default_opts() {
 

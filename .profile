@@ -47,7 +47,7 @@ _gen_fzf_default_opts() {
               --color=bg+:$color07,bg:#b4af9a,spinner:$color0C,hl:$color01
               --color=fg:$color08,header:$color0D,info:$color0A,pointer:$color04
               --color=marker:$color04,fg+:$color00,prompt:$color04,hl+:$color01
-              --preview='fzf_preview {} 2>/dev/null'
+              --preview='cat {} 2>/dev/null'
             "
             ;;
         *)
@@ -80,5 +80,5 @@ _gen_fzf_default_opts() {
     export FZF_DEFAULT_OPTS FZF_CTRL_R_OPTS
 }
 
-_gen_fzf_default_opts
+_gen_fzf_default_opts nier
 

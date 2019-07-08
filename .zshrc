@@ -10,7 +10,19 @@ _git_prompt_info() {
   echo -n ']%f'
 }
 
-PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "
+_theme () {
+    case "$1" in
+        nier)
+            PROMPT=" %F{234}%~%f\$(_git_prompt_info) %F{%(?.234.red)}%(!.#.:)%f "
+            ;;
+        *)
+            PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "
+            ;;
+    esac
+}
+
+# PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "
+_theme nier
 setopt promptsubst
 
 # Options
