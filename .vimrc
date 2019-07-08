@@ -259,7 +259,7 @@ augroup vimrc
         \| let &l:grepformat='%f:%l:%c:%m,%f:%l:%m,%m %f match%ts,%f'
   autocmd BufNewFile  */plugin/*.vim      0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
   if exists('##TextYankPost') && executable('base64')
-    " autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
+    autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
   endif
 augroup END
 
@@ -276,4 +276,16 @@ else
         \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
 endif
 
+" }}}
+
+" {{{ Statusline
+if exists('+statusline')
+  let in_snippet = 0
+  let stl_snippet = ['', 'snippet']
+
+  set statusline=%f\ %m%r%w%q%h%=
+  set statusline+=%<%-20{stl_snippet[in_snippet]}
+  set statusline+=%-20{&filetype}
+  set statusline+=%-15(%l,%c%V%)%P
+endif
 " }}}

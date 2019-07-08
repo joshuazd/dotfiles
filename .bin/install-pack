@@ -29,7 +29,6 @@ PACKAGES = [
     'SirVer/ultisnips',
     'davidhalter/jedi-vim',
     'mhinz/vim-startify',
-    'ryanoasis/vim-devicons'
 ]
 
 HOOKS = {

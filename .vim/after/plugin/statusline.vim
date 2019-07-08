@@ -1,3 +1,4 @@
+let g:loaded_statusline = 1
 if exists('g:loaded_statusline')
   finish
 endif

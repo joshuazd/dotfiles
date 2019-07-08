@@ -24,7 +24,7 @@ endif
 
 if exists('g:loaded_fzf')
   nnoremap gb :Buffers<CR>
-  nnoremap <space>fz :Files<CR>
+  nnoremap <space>p :Files<CR>
 endif
 
 if exists('did_plugin_ultisnips')
@@ -59,8 +59,4 @@ if exists('g:loaded_fugitive')
   nnoremap <space>gS :rightbelow Gstatus!<CR>
   nnoremap <space>gl :Gpull<CR>
   nnoremap <space>gp :Gpush<CR>
-endif
-
-if exists('g:loaded_webdevicons')
-  nnoremap <space>p :DFiles<CR>
 endif

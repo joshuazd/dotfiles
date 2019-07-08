@@ -144,9 +144,3 @@ let g:startify_custom_header = [
       \ '        |VVV/''++/#/+/#/ /#/ /#/',
       \ '        ''V/''  /##//##//##//###/',
       \ '                 ++']
-function! StartifyEntryFormat()
-  return 'WebDevIconsGetFileTypeSymbol(absolute_path) ." ". entry_path'
-endfunction
-" devicons
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols = {}
-let g:WebDevIconsUnicodeDecorateFileNodesExtensionSymbols['xml'] = ''
