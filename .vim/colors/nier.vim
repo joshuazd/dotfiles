@@ -11,8 +11,7 @@ hi Normal         ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a
 hi Comment        ctermfg=8    guifg=#777467 ctermbg=NONE guibg=#b4af9a
 hi StatusLine     ctermfg=7    guifg=#b4af9a ctermbg=0    guibg=#45403a cterm=none              gui=none
 hi StatusLineNC   ctermfg=8    guifg=#777467 ctermbg=8    guibg=#999483 cterm=none              gui=none
-" hi String         ctermfg=NONE guifg=#45403a ctermbg=NONE guibg=#b4af9a cterm=reverse           gui=reverse
-hi String         ctermfg=9    guifg=#bf4243 ctermbg=NONE guibg=#b4af9a
+hi String         ctermfg=NONE guifg=#45403a ctermbg=NONE guibg=#b4af9a cterm=reverse           gui=reverse
 hi Constant       ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a cterm=bold              gui=bold
 hi PreProc        ctermfg=8    guifg=#777467 ctermbg=NONE guibg=#b4af9a cterm=bold              gui=bold
 hi Special        ctermfg=0    guifg=#000000 ctermbg=NONE guibg=#b4af9a
@@ -33,14 +32,16 @@ hi SneakLabel     ctermfg=0    guifg=#45403a ctermbg=6    guibg=#5f8c7d cterm=bo
 hi SneakLabelMask ctermfg=6    guifg=#5f8c7d ctermbg=6    guibg=#5f8c7d
 hi SneakScope     ctermfg=15   guifg=#ffffff ctermbg=0    guibg=#45403a
 hi MoreMsg        ctermfg=2    guifg=#465953 ctermbg=NONE guibg=#b4af9a
-" hi Error          ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=#b4af9a cterm=underline         gui=underline
+hi Error          ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=#b4af9a cterm=underline         gui=underline
 hi ErrorMsg       ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=#b4af9a cterm=underline,reverse gui=underline,reverse
 hi DiffAdd        ctermfg=0    guifg=#45403a ctermbg=10   guibg=#81895d
 hi DiffChange     ctermfg=0    guifg=#45403a ctermbg=11   guibg=#957f5f
 hi DiffDelete     ctermfg=0    guifg=#45403a ctermbg=9    guibg=#bf4243
-" hi SpecialChar    ctermfg=1    guifg=#bf4243 ctermbg=0    guibg=#45403a cterm=bold              gui=bold
+hi SpecialChar    ctermfg=1    guifg=#bf4243 ctermbg=0    guibg=#45403a cterm=bold              gui=bold
 hi Delimiter      ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a
-hi SignColumn                                ctermbg=NONE guibg=#b4af9a
+hi SignColumn                                ctermbg=NONE guibg=NONE
+hi LineNr         ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a cterm=reverse           gui=reverse
+hi SignifySignAdd ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=NONE
 
 hi! link  IncSearch        Search
 hi! link  Identifier       Normal
@@ -59,3 +60,4 @@ hi! link  Quote            String
 hi! link  DiffAdded        DiffAdd
 hi! link  DiffChanged      DiffChange
 hi! link  DiffRemoved      DiffDelete
+hi! link  DiffText         Search

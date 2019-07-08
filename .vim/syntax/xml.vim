@@ -388,7 +388,9 @@ augroup xmlHighlight
   autocmd!
   autocmd ColorScheme material call XmlHighlight()
 augroup END
-call XmlHighlight()
+if g:colors_name ==# 'material'
+  call XmlHighlight()
+endif
 
 let b:current_syntax = 'xml'
 

@@ -268,7 +268,7 @@ command! -range=% AnsibleEdit <line1>,<line2>yank a|silent! call ansible#Ansible
 command! AnsibleCrypt call ansible#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
 command! Focus call vim#Focus()
-command! -nargs=1 -complete=color Theme colo <args>|!theme <args>
+command! -nargs=1 -complete=color Theme colo <args>|!jzd theme <args>
 if executable('python3')
   command! -range=% FormatJSON <line1>,<line2>!python3 -m json.tool
 else

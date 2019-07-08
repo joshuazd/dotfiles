@@ -37,7 +37,7 @@ set completeopt+=menuone,noselect,longest
 set autoread
 set path=.,**
 set tags=./tags,tags
-set background=dark
+set background=light
 set grepprg=grep\ -r\ -n\ -I\ --exclude-dir=.git
 filetype plugin indent on
 syntax enable

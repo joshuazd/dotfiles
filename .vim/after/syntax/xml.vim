@@ -79,11 +79,47 @@ function! XmlAfterHighlight() abort
   endif
 endfunction
 
+function! s:hi(group, target) abort
+  if &t_Co >= 256 || has('gui_running')
+    let italic = 1
+  else
+    let italic = 0
+  endif
+  let target_id = synIDtrans(hlID(a:target))
+  let t_fg = synIDattr(target_id, 'fg', 'cterm')
+  let t_bg = synIDattr(synIDtrans(hlID('String')), 'fg', 'cterm')
+  let t_fmt = ''
+  let t_fmt.= synIDattr(target_id, 'bold', 'cterm') ? 'bold,' : ''
+  let t_fmt.= synIDattr(target_id, 'italic', 'cterm') ? 'italic' : ''
+  let g_fg = synIDattr(target_id, 'fg', 'gui')
+  let g_bg = synIDattr(synIDtrans(hlID('String')), 'fg', 'gui')
+  let g_fmt = ''
+  let g_fmt.= synIDattr(target_id, 'bold', 'gui') ? 'bold,' : ''
+  let g_fmt.= synIDattr(target_id, 'italic', 'gui') ? 'italic' : ''
+  let Syn = { x -> len(x) ? x : 'NONE' }
+  let Trim = { x -> x[-1] ==# ',' ? x[:-2] : x }
+  let Attr = { x -> Trim(Syn(x)) }
+  execute 'highlight ' . a:group . ' ctermfg=' . Syn(t_fg) . ' ctermbg=' . Syn(t_bg) .
+        \ ' guifg=' . Syn(g_fg) . ' guibg=' . Syn(g_bg) .
+        \ ' cterm=' . Attr(t_fmt) . ' gui=' . Attr(g_fmt)
+endfunction
+
+function! XmlNier() abort
+  call <SID>hi('xmlFile', 'PreProc')
+  call <SID>hi('xmlPropName', 'Todo')
+endfunction
+
 augroup xmlAfterHighlight
   autocmd!
   autocmd ColorScheme material call XmlAfterHighlight()
+  autocmd ColorScheme nier call XmlNier()
 augroup END
-call XmlAfterHighlight()
+if g:colors_name ==# 'material'
+  call XmlAfterHighlight()
+endif
+if g:colors_name ==# 'nier'
+  call XmlNier()
+endif
 
 hi def link xmlArgs         Primitive
 hi def link xmlConnection   Storage
