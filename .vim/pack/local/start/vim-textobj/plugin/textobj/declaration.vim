@@ -26,10 +26,12 @@ onoremap <silent> <Plug>(textobj#declaration_inner) :<C-u>call <SID>declaration(
 xnoremap <silent> <Plug>(textobj#declaration_around) :<C-u>call <SID>declaration(1,visualmode())<CR>
 onoremap <silent> <Plug>(textobj#declaration_around) :<C-u>call <SID>declaration(1,'V')<CR>
 
-call textobj#textobj#define_map('x', 'id', '<Plug>(textobj#declaration_inner)')
-call textobj#textobj#define_map('o', 'id', '<Plug>(textobj#declaration_inner)')
-call textobj#textobj#define_map('x', 'ad', '<Plug>(textobj#declaration_around)')
-call textobj#textobj#define_map('o', 'ad', '<Plug>(textobj#declaration_around)')
+if get(g:,'textobj_maps',1)
+  xmap id <Plug>(textobj#declaration_inner)
+  omap id <Plug>(textobj#declaration_inner)
+  xmap ad <Plug>(textobj#declaration_around)
+  omap ad <Plug>(textobj#declaration_around)
+endif
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

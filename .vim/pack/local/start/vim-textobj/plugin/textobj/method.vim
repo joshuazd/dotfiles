@@ -23,10 +23,12 @@ onoremap <silent> <Plug>(textobj#method_inner) :<C-u>call <SID>method(0,'V')<CR>
 xnoremap <silent> <Plug>(textobj#method_around) :<C-u>call <SID>method(1,visualmode())<CR>
 onoremap <silent> <Plug>(textobj#method_around) :<C-u>call <SID>method(1,'V')<CR>
 
-call textobj#textobj#define_map('x', 'im', '<Plug>(textobj#method_inner)')
-call textobj#textobj#define_map('o', 'im', '<Plug>(textobj#method_inner)')
-call textobj#textobj#define_map('x', 'am', '<Plug>(textobj#method_around)')
-call textobj#textobj#define_map('o', 'am', '<Plug>(textobj#method_around)')
+if get(g:,'textobj_maps',1)
+  xmap im <Plug>(textobj#method_inner)
+  omap im <Plug>(textobj#method_inner)
+  xmap am <Plug>(textobj#method_around)
+  omap am <Plug>(textobj#method_around)
+endif
 
 let &cpo = s:save_cpo
 unlet s:save_cpo

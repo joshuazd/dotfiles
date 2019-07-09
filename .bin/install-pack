@@ -39,7 +39,8 @@ HOOKS = {
 OPT = [
     'ultisnips',
     'vim-dispatch',
-    'jedi-vim'
+    'jedi-vim',
+    'vim-lsc'
 ]
 
 dir = os.path.dirname(os.path.realpath(__file__))
