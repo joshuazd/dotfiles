@@ -29,8 +29,7 @@ PACKAGES = [
     'SirVer/ultisnips',
     'davidhalter/jedi-vim',
     'mhinz/vim-startify',
-    'AndrewRadev/splitjoin.vim',
-    'tpope/vim-vinegar'
+    'AndrewRadev/splitjoin.vim'
 ]
 
 HOOKS = {
