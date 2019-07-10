@@ -6,6 +6,8 @@ endif
 set background=light
 
 let g:colors_name  = 'nier'
+let g:terminal_ansi_colors = ['#45403a','#bf4243','#465953','#5b5143','#4c5361','#614c61','#465953','#999483'
+                           \ ,'#777467','#d75f5f','#81895d','#957f5f','#7382a0','#9c739c','#5f8c7d','#ffffff']
 
 hi Normal         ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a
 hi Comment        ctermfg=8    guifg=#777467 ctermbg=NONE guibg=#b4af9a
