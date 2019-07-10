@@ -41,7 +41,7 @@ hi DiffChange     ctermfg=0    guifg=#45403a ctermbg=11   guibg=#957f5f
 hi DiffDelete     ctermfg=0    guifg=#45403a ctermbg=9    guibg=#bf4243
 hi SpecialChar    ctermfg=1    guifg=#bf4243 ctermbg=0    guibg=#45403a cterm=bold              gui=bold
 hi Delimiter      ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a
-hi SignColumn                                ctermbg=NONE guibg=NONE
+hi SignColumn                                ctermbg=NONE guibg=#b4af9a
 hi LineNr         ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a cterm=reverse           gui=reverse
 hi SignifySignAdd ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=NONE
 
