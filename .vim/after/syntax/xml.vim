@@ -107,6 +107,7 @@ endfunction
 function! XmlNier() abort
   call <SID>hi('xmlFile', 'PreProc')
   call <SID>hi('xmlPropName', 'Todo')
+  hi xmlPropName guifg=#d75f5f cterm=bold gui=none
 endfunction
 
 augroup xmlAfterHighlight
@@ -141,4 +142,5 @@ hi def link xmlFilter       Keyword
 hi def link xsltStatement   Statement
 hi def link xmlPropString   xmlString
 hi def link xmlPropName     Identifier
+hi def link Xpath           String
 " hi def link xmlPropName Todo
