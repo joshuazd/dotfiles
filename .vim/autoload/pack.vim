@@ -8,5 +8,5 @@ function! pack#add(name, bang) abort
     silent! call pathogen#infect('pack/{}/opt/'.a:name)
   endif
   execute 'runtime! pack/*/opt/'.a:name.'/ftdetect/**/*.vim'
-  silent! doautocmd BufRead
+  silent! doautocmd filetypedetect
 endfunction

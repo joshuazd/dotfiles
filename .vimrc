@@ -42,6 +42,8 @@ set shiftwidth=4
 set expandtab
 set smarttab
 set autoindent
+set splitright
+set splitbelow
 set nowrap
 set linebreak
 set laststatus=2
