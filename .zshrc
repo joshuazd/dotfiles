@@ -13,7 +13,7 @@ _git_prompt_info() {
 _theme () {
     case "$1" in
         nier)
-            PROMPT=" %F{234}%~%f\$(_git_prompt_info) %F{%(?.234.red)}%(!.#.:)%f "
+            PROMPT=" %F{234}%~%f\$(_git_prompt_info) %F{%(?.234.red)}%(!.#.>)%f "
             ;;
         *)
             PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "

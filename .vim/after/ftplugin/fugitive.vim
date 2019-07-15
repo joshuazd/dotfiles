@@ -2,8 +2,13 @@ nnoremap <buffer> gp :Gpush<CR>
 setl signcolumn=no
 setl nolist
 
-hi FugitiveDiffLine ctermbg=238 ctermfg=248 guibg=#444444 guifg=#a8a8a8
-hi FugitiveDiffHunk ctermbg=234 guibg=#1c1c1c
+if &background ==? 'light'
+  hi FugitiveDiffLine ctermbg=8 ctermfg=0 guibg=#777467 guifg=#45403a cterm=bold gui=bold
+  hi FugitiveDiffHunk ctermbg=7 guibg=#999483
+else
+  hi FugitiveDiffLine ctermbg=238 ctermfg=248 guibg=#444444 guifg=#a8a8a8
+  hi FugitiveDiffHunk ctermbg=234 guibg=#1c1c1c
+endif
 sign define diffline linehl=FugitiveDiffLine
 sign define diffhunk linehl=FugitiveDiffHunk
 
