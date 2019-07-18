@@ -149,7 +149,7 @@ nnoremap Y y$
 
 nnoremap [b :bprevious<CR>
 nnoremap ]b :bnext<CR>
-nnoremap <BS> <C-^>
+nnoremap <BS> <C-^>g`"
 nnoremap <silent> <Space>x :bn<Bar>bd #<CR>
 
 nnoremap <expr> j v:count ? 'j' : 'gj'
@@ -240,6 +240,8 @@ nnoremap <silent> <expr> <C-w>f winnr('$') > 1
       \: ":if findfile('\<C-r>\<C-f>') !=? ''\|vsplit\|find \<C-r>\<C-f>\|else\|execute 'normal! gf'\|endif\<CR>"
 
 nnoremap <silent> <C-w>z :pclose<Bar>helpclose<CR>
+
+nnoremap <space>] :call tag#get('<C-r><C-w>')<CR>
 
 " }}}
 
