@@ -12,7 +12,7 @@ function! tag#get(tag) abort
   let info = split(info, '\n')[1:-2]
   let tag = []
   for i in range(1,len(info)-1)
-    if info[i] =~# '\V  \d\+\(\s\+\w\*\)\*\s\+'.a:tag
+    if info[i] =~? '\V  \d\+\(\s\+\w\*\)\*\s\+'.a:tag
       break
     endif
     let tag += [trim(info[i])]

@@ -53,6 +53,7 @@ set sidescrolloff=5
 set sessionoptions-=options
 set sessionoptions-=blank
 set display+=lastline
+set switchbuf=useopen
 set autoread
 set path=.,**
 set tags=./tags,tags
@@ -241,7 +242,7 @@ nnoremap <silent> <expr> <C-w>f winnr('$') > 1
 
 nnoremap <silent> <C-w>z :pclose<Bar>helpclose<CR>
 
-nnoremap <space>] :call tag#get('<C-r><C-w>')<CR>
+nnoremap <silent> <space>] :call tag#get('<C-r><C-w>')<CR>
 
 " }}}
 

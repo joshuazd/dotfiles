@@ -22,7 +22,7 @@ hi Search         ctermfg=7    guifg=#b4af9a ctermbg=9    guibg=#bf4243
 hi Visual         ctermfg=7    guifg=#b4af9a ctermbg=8    guibg=#8a8570
 hi Todo           ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=#b4af9a cterm=bold              gui=bold
 hi Error          ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=#b4af9a cterm=bold,underline    gui=bold,underline
-hi SpecialKey     ctermfg=8    guifg=#777467 ctermbg=NONE guibg=#b4af9a
+hi SpecialKey     ctermfg=8    guifg=#999483 ctermbg=NONE guibg=#b4af9a
 hi NonText        ctermfg=7    guifg=#b4af9a ctermbg=8    guibg=#999483
 hi MatchParen     ctermfg=9    guifg=#bf4243 ctermbg=7    guibg=#b4af9a cterm=bold              gui=bold
 hi Folded         ctermfg=0    guifg=#45403a ctermbg=8    guibg=#999483 cterm=none              gui=none
