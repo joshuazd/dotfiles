@@ -9,8 +9,10 @@ else
   hi FugitiveDiffLine ctermbg=238 ctermfg=248 guibg=#444444 guifg=#a8a8a8
   hi FugitiveDiffHunk ctermbg=234 guibg=#1c1c1c
 endif
-sign define diffline linehl=FugitiveDiffLine
-sign define diffhunk linehl=FugitiveDiffHunk
+sign define diffline   linehl=FugitiveDiffLine
+sign define diffhunk   linehl=FugitiveDiffHunk
+sign define diffadd    linehl=DiffAdded
+sign define diffremove linehl=DiffRemoved
 
 function! s:highlight() abort
   exe 'sign unplace * buffer='.bufnr('%')
@@ -19,7 +21,13 @@ function! s:highlight() abort
       let in_hunk = 0
     endif
     if in_hunk
-      exe 'sign place '.lnum.' line='.lnum.' name=diffhunk'
+      if getline(lnum) =~# '^+'
+        exe 'sign place '.lnum.' line='.lnum.' name=diffadd'
+      elseif getline(lnum) =~# '^-'
+        exe 'sign place '.lnum.' line='.lnum.' name=diffremove'
+      else
+        exe 'sign place '.lnum.' line='.lnum.' name=diffhunk'
+      endif
     elseif getline(lnum) =~# '^\%(@@ -\)'
       exe 'sign place '.lnum.' line='.lnum.' name=diffline'
       let in_hunk = 1

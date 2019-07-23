@@ -59,4 +59,5 @@ if exists('g:loaded_fugitive')
   nnoremap <space>gS :rightbelow Gstatus!<CR>
   nnoremap <space>gl :Gpull<CR>
   nnoremap <space>gp :Gpush<CR>
+  cnoreabbrev @@ <C-r>=fugitive#head()<CR>
 endif

@@ -28,7 +28,6 @@ PACKAGES = [
     'ludovicchabant/vim-gutentags',
     'SirVer/ultisnips',
     'davidhalter/jedi-vim',
-    'mhinz/vim-startify',
     'AndrewRadev/splitjoin.vim'
 ]
 
