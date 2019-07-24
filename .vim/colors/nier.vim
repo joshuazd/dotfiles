@@ -6,7 +6,7 @@ endif
 set background=light
 
 let g:colors_name  = 'nier'
-let g:terminal_ansi_colors = ['#45403a','#bf4243','#465953','#5b5143','#4c5361','#614c61','#465953','#999483'
+let g:terminal_ansi_colors = ['#45403a','#bf4243','#525643','#5b5143','#4c5361','#614c61','#465953','#999483'
                            \ ,'#777467','#d75f5f','#81895d','#957f5f','#7382a0','#9c739c','#5f8c7d','#ffffff']
 
 hi Normal         ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a
@@ -19,6 +19,7 @@ hi PreProc        ctermfg=8    guifg=#777467 ctermbg=NONE guibg=#b4af9a cterm=bo
 hi Special        ctermfg=0    guifg=#000000 ctermbg=NONE guibg=#b4af9a
 hi Underlined     ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a cterm=underline         gui=underline
 hi Search         ctermfg=7    guifg=#b4af9a ctermbg=9    guibg=#bf4243
+hi IncSearch      ctermfg=0    guifg=#45403a ctermbg=9    guibg=#957f5f cterm=bold              gui=bold
 hi Visual         ctermfg=7    guifg=#b4af9a ctermbg=8    guibg=#8a8570
 hi Todo           ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=#b4af9a cterm=bold              gui=bold
 hi Error          ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=#b4af9a cterm=bold,underline    gui=bold,underline
@@ -47,7 +48,6 @@ hi SignColumn                                ctermbg=NONE guibg=#b4af9a
 hi LineNr         ctermfg=0    guifg=#45403a ctermbg=NONE guibg=#b4af9a cterm=reverse           gui=reverse
 hi SignifySignAdd ctermfg=1    guifg=#bf4243 ctermbg=NONE guibg=NONE
 
-hi! link  IncSearch        Search
 hi! link  Identifier       Normal
 hi! link  Statement        Normal
 hi! link  Type             Normal
