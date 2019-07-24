@@ -6,8 +6,10 @@ if exists('g:autoloaded_fugitive')
 endif
 let g:autoloaded_fugitive = 1
 
-if !exists('g:fugitive_git_executable') || g:fugitive_git_executable =~# '^LANG='
+if !exists('g:fugitive_git_executable')
   let g:fugitive_git_executable = 'git'
+elseif g:fugitive_git_executable =~# '^\w\+='
+  let g:fugitive_git_executable = 'env ' . g:fugitive_git_executable
 endif
 
 " Section: Utility
@@ -485,7 +487,7 @@ function! fugitive#RevParse(rev, ...) abort
   if !exec_error && hash =~# '^\x\{40,\}$'
     return hash
   endif
-  call s:throw('rev-parse '.a:rev.': '.hash)
+  throw 'vim-fugitive: rev-parse '.a:rev.': '.hash
 endfunction
 
 function! s:ConfigTimestamps(dir, dict) abort
@@ -882,12 +884,6 @@ function! fugitive#Find(object, ...) abort
   elseif rev =~# '^:/\@!'
     let f = 'fugitive://' . dir . '//0/' . rev[1:-1]
   else
-    if rev =~# 'HEAD$\|^refs/' && rev !~# ':'
-      let cdir = rev =~# '^refs/' ? fugitive#CommonDir(dir) : dir
-      if filereadable(cdir . '/' . rev)
-        let f = simplify(cdir . '/' . rev)
-      endif
-    endif
     if !exists('f')
       let commit = substitute(matchstr(rev, '^[^:]\+\|^:.*'), '^@\%($\|[~^]\|@{\)\@=', 'HEAD', '')
       let file = substitute(matchstr(rev, '^[^:]\+\zs:.*'), '^:', '/', '')
@@ -947,13 +943,8 @@ function! fugitive#Object(...) abort
   if empty(rev) && empty(tree)
   elseif empty(rev)
     let rev = fugitive#Path(a:0 ? a:1 : @%, './', dir)
-    let cdir = fugitive#CommonDir(dir)
-    if rev =~# '^\./\.git/refs/\%(tags\|heads\|remotes\)/.\|^\./\.git/\w*HEAD$'
-      let rev = rev[7:-1]
-    elseif s:cpath(cdir . '/refs/', rev[0 : len(cdir)])
-      let rev = strpart(rev, len(cdir)+1)
-    elseif rev =~# '^\./.git\%(/\|$\)'
-      return fnamemodify(a:0 ? a:1 : @%, ':p')
+    if rev =~# '^\./.git\%(/\|$\)'
+      return fnamemodify(a:0 ? a:1 : @%, ':p' . (rev =~# '/$' ? '' : ':s?/$??'))
     endif
   endif
   if rev !~# '^\.\%(/\|$\)' || s:cpath(getcwd(), tree)
@@ -1806,7 +1797,7 @@ function! fugitive#BufReadStatus() abort
     nnoremap <buffer> <silent> gr :<C-U>exe <SID>StageJump(v:count, 'Rebasing')<CR>
     nnoremap <buffer> <silent> C :<C-U>Gcommit<CR>:echohl WarningMsg<Bar>echo ':Gstatus C is deprecated in favor of cc'<Bar>echohl NONE<CR>
     nnoremap <buffer> <silent> a :<C-U>execute <SID>Do('Toggle',0)<CR>
-    nnoremap <buffer> <silent> i :<C-U>execute <SID>StageIntend(v:count1)<CR>
+    nnoremap <buffer> <silent> i :<C-U>execute <SID>NextExpandedHunk(v:count1)<CR>
     exe 'nnoremap <buffer> <silent>' nowait "= :<C-U>execute <SID>StageInline('toggle',line('.'),v:count)<CR>"
     exe 'nnoremap <buffer> <silent>' nowait "< :<C-U>execute <SID>StageInline('show',  line('.'),v:count)<CR>"
     exe 'nnoremap <buffer> <silent>' nowait "> :<C-U>execute <SID>StageInline('hide',  line('.'),v:count)<CR>"
@@ -1828,8 +1819,8 @@ function! fugitive#BufReadStatus() abort
     nnoremap <buffer> <silent> R :echohl WarningMsg<Bar>echo 'Reloading is automatic.  Use :e to force'<Bar>echohl NONE<CR>
     nnoremap <buffer> <silent> g<Bar> :<C-U>echoerr 'Changed to X'<CR>
     xnoremap <buffer> <silent> g<Bar> :<C-U>echoerr 'Changed to X'<CR>
-    nnoremap <buffer> <silent> X :<C-U>execute <SID>StageDelete(line('.'),v:count)<CR>
-    xnoremap <buffer> <silent> X :<C-U>execute <SID>StageDelete(line("'<"),line("'>")-line("'<")+1)<CR>
+    nnoremap <buffer> <silent> X :<C-U>execute <SID>StageDelete(line('.'), 0, v:count)<CR>
+    xnoremap <buffer> <silent> X :<C-U>execute <SID>StageDelete(line("'<"), line("'>"), v:count)<CR>
     nnoremap <buffer>          . :<C-U> <C-R>=<SID>StageArgs(0)<CR><Home>
     xnoremap <buffer>          . :<C-U> <C-R>=<SID>StageArgs(1)<CR><Home>
     nnoremap <buffer> <silent> <F1> :help fugitive-mappings<CR>
@@ -2728,19 +2719,10 @@ function! s:StageInline(mode, ...) abort
   return lnum
 endfunction
 
-function! s:StageIntend(count) abort
+function! s:NextExpandedHunk(count) abort
   for i in range(a:count)
-    if getline('.')[0:1] ==# '? '
-      call s:TreeChomp('add', '--intent-to-add', '--', s:Tree() . '/' . getline('.')[2:-1])
-      -
-      exe s:ReloadStatus()
-    elseif getline('.') =~# '^Unstaged\|^Untracked'
-      call s:TreeChomp('add', '--intent-to-add', '--', s:Tree())
-      exe s:ReloadStatus()
-    else
-      call s:StageInline('show', line('.'), 1)
-    endif
-    call s:NextFileHunk(1)
+    call s:StageInline('show', line('.'), 1)
+    call search('^[A-Z?] .\|^diff --\|^@','W')
   endfor
   return '.'
 endfunction
@@ -2833,38 +2815,38 @@ function! s:StageApply(info, reverse, extra) abort
   call s:throw(output)
 endfunction
 
-function! s:StageDelete(lnum, count) abort
-  let info = get(s:Selection(a:lnum, -a:count), 0, {'filename': ''})
+function! s:StageDelete(lnum1, lnum2, count) abort
+  let info = get(s:Selection(a:lnum1, a:lnum2), 0, {'filename': ''})
   if empty(info.filename)
     return ''
   endif
   let hash = s:TreeChomp('hash-object', '-w', '--', info.paths[0])
-  if empty(hash)
-    return ''
-  elseif info.patch
-    try
+  try
+    if empty(hash)
+      return ''
+    elseif info.patch
       call s:StageApply(info, 1, info.section ==# 'Staged' ? ['--index'] : [])
-    catch /^fugitive:/
-      return 'echoerr ' . string(v:exception)
-    endtry
-  elseif a:count == 2
-    call s:TreeChomp('checkout', '--ours', '--', info.paths[0])
-  elseif a:count == 3
-    call s:TreeChomp('checkout', '--theirs', '--', info.paths[0])
-  elseif info.status =~# '[ADU]' &&
-        \ get(b:fugitive_status[info.section ==# 'Staged' ? 'Unstaged' : 'Staged'], info.filename, '') =~# '[AU]'
-    call s:TreeChomp('checkout', info.section ==# 'Staged' ? '--ours' : '--theirs', '--', info.paths[0])
-  elseif info.status ==# 'U'
-    call s:TreeChomp('rm', '--', info.paths[0])
-  elseif info.status ==# 'A'
-    call s:TreeChomp('rm', '-f', '--', info.paths[0])
-  elseif info.status ==# '?'
-    call s:TreeChomp('clean', '-f', '--', info.paths[0])
-  elseif info.section ==# 'Unstaged'
-    call s:TreeChomp('checkout', '--', info.paths[0])
-  else
-    call s:TreeChomp('checkout', 'HEAD^{}', '--', info.paths[0])
-  endif
+    elseif info.status ==# '?'
+      call s:TreeChomp('clean', '-f', '--', info.paths[0])
+    elseif a:count == 2
+      call s:TreeChomp('checkout', '--ours', '--', info.paths[0])
+    elseif a:count == 3
+      call s:TreeChomp('checkout', '--theirs', '--', info.paths[0])
+    elseif info.status =~# '[ADU]' &&
+          \ get(b:fugitive_status[info.section ==# 'Staged' ? 'Unstaged' : 'Staged'], info.filename, '') =~# '[AU]'
+      call s:TreeChomp('checkout', info.section ==# 'Staged' ? '--ours' : '--theirs', '--', info.paths[0])
+    elseif info.status ==# 'U'
+      call s:TreeChomp('rm', '--', info.paths[0])
+    elseif info.status ==# 'A'
+      call s:TreeChomp('rm', '-f', '--', info.paths[0])
+    elseif info.section ==# 'Unstaged'
+      call s:TreeChomp('checkout', '--', info.paths[0])
+    else
+      call s:TreeChomp('checkout', 'HEAD^{}', '--', info.paths[0])
+    endif
+  catch /^fugitive:/
+    return 'echoerr ' . string(v:exception)
+  endtry
   exe s:ReloadStatus()
   call s:StageReveal()
   let @@ = hash
@@ -2977,6 +2959,7 @@ endfunction
 function! s:StagePatch(lnum1,lnum2) abort
   let add = []
   let reset = []
+  let intend = []
 
   for lnum in range(a:lnum1,a:lnum2)
     let info = s:StageInfo(lnum)
@@ -2992,11 +2975,16 @@ function! s:StagePatch(lnum1,lnum2) abort
     execute lnum
     if info.section ==# 'Staged'
       let reset += info.relative
+    elseif info.section ==# 'Untracked'
+      let intend += info.paths
     elseif info.status !~# '^D'
       let add += info.relative
     endif
   endfor
   try
+    if !empty(intend)
+      call s:TreeChomp(['add', '--intent-to-add', '--'] + intend)
+    endif
     if !empty(add)
       execute "Git add --patch -- ".join(map(add,'s:fnameescape(v:val)'))
     endif
@@ -4909,6 +4897,15 @@ function! fugitive#MapJumps(...) abort
     nnoremap <buffer>          cS    :<C-U><Bar>Grebase --autosquash<C-R>=<SID>RebaseArgument()<CR><Home>Gcommit --squash=<C-R>=<SID>SquashArgument()<CR>
     nnoremap <buffer>          cA    :<C-U>Gcommit --edit --squash=<C-R>=<SID>SquashArgument()<CR>
     nnoremap <buffer> <silent> c?    :<C-U>help fugitive_c<CR>
+
+    nnoremap <buffer>      cz<Space> :G stash<Space>
+    nnoremap <buffer>         cz<CR> :G stash<CR>
+    nnoremap <buffer> <silent> cza   :<C-U>exe <SID>EchoExec(['stash', 'apply', '--quiet', 'stash@{' . v:count . '}'])<CR>
+    nnoremap <buffer> <silent> czp   :<C-U>exe <SID>EchoExec(['stash', 'pop', '--quiet', 'stash@{' . v:count . '}'])<CR>
+    nnoremap <buffer> <silent> czv   :<C-U>exe 'Gedit' fugitive#RevParse('stash@{' . v:count . '}')<CR>
+    nnoremap <buffer> <silent> czw   :<C-U>exe <SID>EchoExec(['stash', '--keep-index'] + (v:count > 1 ? ['--all'] : v:count ? ['--include-untracked'] : []))<CR>
+    nnoremap <buffer> <silent> czz   :<C-U>exe <SID>EchoExec(['stash'] + (v:count > 1 ? ['--all'] : v:count ? ['--include-untracked'] : []))<CR>
+    nnoremap <buffer> <silent> cz?   :<C-U>help fugitive_cz<CR>
 
     nnoremap <buffer>          r-    :Grebase -
     nnoremap <buffer>       r<Space> :Grebase<Space>
