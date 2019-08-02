@@ -105,6 +105,10 @@ else
 endif
 set list
 
+if exists('&previewpopup')
+  set previewpopup=height:10,width:60
+endif
+
 if exists('+clipboard')
   set clipboard^=unnamed,unnamedplus
 endif

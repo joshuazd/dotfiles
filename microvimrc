@@ -1,12 +1,18 @@
 set hidden
+set history=200
 set backspace=eol,start,indent
 set whichwrap+=<,>
 set showcmd
 set breakindent
 set breakindentopt+=shift:2
+set nrformats-=octal
 set ignorecase
 set smartcase
+set incsearch
+set hlsearch
 set lazyredraw
+set showmatch
+set matchtime=2
 set splitbelow
 set splitright
 set clipboard^=unnamed,unnamedplus
@@ -19,6 +25,8 @@ set nowrap
 set linebreak
 set laststatus=2
 set foldmethod=marker
+set timeoutlen=3000
+set ttimeoutlen=0
 set wildmenu
 set wildcharm=<C-z>
 set wildmode=list:longest,list:full
@@ -39,6 +47,7 @@ set path=.,**
 set tags=./tags,tags
 set background=light
 set grepprg=grep\ -r\ -n\ -I\ --exclude-dir=.git
+runtime! macros/matchit.vim
 filetype plugin indent on
 syntax enable
 
@@ -54,7 +63,6 @@ nnoremap <expr> k v:count ? 'k' : 'gk'
 nnoremap gj j
 nnoremap gk k
 nnoremap ' `
-nnoremap * :set hlsearch<CR>*
 nnoremap c* :set hlsearch<CR>*Ncgn
 
 " select column
@@ -64,9 +72,9 @@ onoremap <silent> ac :normal vac<CR>
 " buffer/file management
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
-nnoremap <Space>f :find<space>
-nnoremap <Space>s :sfind<space>
-nnoremap <Space>v :vert sfind<space>
+nnoremap <Space>ff :find<space>
+nnoremap <Space>fs :sfind<space>
+nnoremap <Space>fv :vert sfind<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
 nnoremap <Space>t :tjump /
 
