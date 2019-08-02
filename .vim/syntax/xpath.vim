@@ -61,7 +61,7 @@ endfunction
 
 function! s:xpathHighlight() abort
 
-  if g:colors_name ==# 'material'
+  if get(g:, 'colors_name', '') ==# 'material'
     call <SID>hi('xpathFuncError', 'Error')
     call <SID>hi('xpathQuote',     'StringDelimiter')
     call <SID>hi('xpathString',    'String')

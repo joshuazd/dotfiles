@@ -388,7 +388,7 @@ augroup xmlHighlight
   autocmd!
   autocmd ColorScheme material call XmlHighlight()
 augroup END
-if g:colors_name ==# 'material'
+if get(g:, 'colors_name', '') ==# 'material'
   call XmlHighlight()
 endif
 

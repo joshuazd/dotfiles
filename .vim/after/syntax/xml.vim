@@ -115,10 +115,10 @@ augroup xmlAfterHighlight
   autocmd ColorScheme material call XmlAfterHighlight()
   autocmd ColorScheme nier call XmlNier()
 augroup END
-if g:colors_name ==# 'material'
+if get(g:, 'colors_name', '') ==# 'material'
   call XmlAfterHighlight()
 endif
-if g:colors_name ==# 'nier'
+if get(g:, 'colors_name', '') ==# 'nier'
   call XmlNier()
 endif
 
