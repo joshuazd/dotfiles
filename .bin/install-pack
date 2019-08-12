@@ -16,6 +16,7 @@ PACKAGES = [
     'tpope/vim-commentary',
     'tpope/vim-apathy',
     'tpope/vim-fugitive',
+    'tpope/vim-abolish',
     'tommcdo/vim-lion',
     'romainl/vim-qf',
     'romainl/vim-qlist',
@@ -27,8 +28,7 @@ PACKAGES = [
     'junegunn/fzf.vim',
     'ludovicchabant/vim-gutentags',
     'SirVer/ultisnips',
-    'davidhalter/jedi-vim',
-    'AndrewRadev/splitjoin.vim'
+    'davidhalter/jedi-vim'
 ]
 
 HOOKS = {
@@ -37,9 +37,7 @@ HOOKS = {
 
 OPT = [
     'ultisnips',
-    'vim-dispatch',
     'jedi-vim',
-    'vim-lsc'
 ]
 
 dir = os.path.dirname(os.path.realpath(__file__))
