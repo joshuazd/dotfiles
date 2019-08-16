@@ -5,6 +5,9 @@
 - Avoid sending unnecessary `didClose` notifications for buffers of the wrong
   filetype.
 - Fix `getbufinfo` calls for loaded buffers.
+- Fix completions starting at the beginning of the line when the server did not
+  send any items containing a `textEdit` field.
+- Truncate diagnostics at 1 character shorter for when `ruler` is used.
 
 **Minor breaking changes**
 - Server dictionaries no longer expose their full `init_results`, or their call
@@ -27,6 +30,7 @@
   tool.
 - Add support for a `workspace_config` server configuration key which causes a
   `workspace/didChangeConfiguration` notification on server startup.
+- Use the popup window for hover.
 
 # 0.3.2
 

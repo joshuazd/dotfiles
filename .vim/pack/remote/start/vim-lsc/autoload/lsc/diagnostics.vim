@@ -204,7 +204,7 @@ function! s:UpdateQuickFix() abort
   let l:context = get(l:current, 'context', 0)
   if type(l:context) != type({}) ||
       \ !has_key(l:context, 'client') ||
-      \ l:context.client != 'LSC'
+      \ l:context.client !=# 'LSC'
     return
   endif
   let l:new_list = {'items': s:AllDiagnostics()}
@@ -268,12 +268,19 @@ endfunction
 " no diagnostic is directly under the cursor returns the last seen diagnostic
 " on this line.
 function! lsc#diagnostics#underCursor() abort
-  let file_diagnostics = lsc#diagnostics#forFile(lsc#file#fullPath())
-  let line = line('.')
-  if !has_key(file_diagnostics, line)
+  let l:file_diagnostics = lsc#diagnostics#forFile(lsc#file#fullPath())
+  let l:line = line('.')
+  if !has_key(l:file_diagnostics, l:line)
+    if l:line !=line('$') | return {} | endif
+    " Find a diagnostic reported after the end of the file
+    for l:diagnostic_line in keys(l:file_diagnostics)
+      if l:diagnostic_line > l:line
+        return l:file_diagnostics[l:diagnostic_line][0]
+      endif
+    endfor
     return {}
   endif
-  let diagnostics = file_diagnostics[line]
+  let diagnostics = l:file_diagnostics[l:line]
   let col = col('.')
   let closest_diagnostic = {}
   let closest_distance = -1
