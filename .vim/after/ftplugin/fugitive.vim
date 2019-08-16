@@ -21,13 +21,14 @@ function! s:highlight() abort
       let in_hunk = 0
     endif
     if in_hunk
-      if getline(lnum) =~# '^+'
-        exe 'sign place '.lnum.' line='.lnum.' name=diffadd'
-      elseif getline(lnum) =~# '^-'
-        exe 'sign place '.lnum.' line='.lnum.' name=diffremove'
-      else
         exe 'sign place '.lnum.' line='.lnum.' name=diffhunk'
-      endif
+      " if getline(lnum) =~# '^+'
+      "   exe 'sign place '.lnum.' line='.lnum.' name=diffadd'
+      " elseif getline(lnum) =~# '^-'
+      "   exe 'sign place '.lnum.' line='.lnum.' name=diffremove'
+      " else
+      "   exe 'sign place '.lnum.' line='.lnum.' name=diffhunk'
+      " endif
     elseif getline(lnum) =~# '^\%(@@ -\)'
       exe 'sign place '.lnum.' line='.lnum.' name=diffline'
       let in_hunk = 1

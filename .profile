@@ -80,5 +80,5 @@ _gen_fzf_default_opts() {
     export FZF_DEFAULT_OPTS FZF_CTRL_R_OPTS
 }
 
-_gen_fzf_default_opts nier
+_gen_fzf_default_opts material
 

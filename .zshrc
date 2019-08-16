@@ -22,7 +22,7 @@ _theme () {
 }
 
 # PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "
-_theme nier
+_theme material
 setopt promptsubst
 
 # Options

@@ -120,7 +120,7 @@ if has('termguicolors') && &t_Co >= 256
   set termguicolors
 endif
 try
-  colorscheme nier
+  colorscheme material
 catch
 endtry
 

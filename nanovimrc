@@ -17,4 +17,4 @@ set path=.,**
 set ruler
 filetype plugin indent on
 syntax enable
-colorscheme nier
+colorscheme material
