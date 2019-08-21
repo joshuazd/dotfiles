@@ -19,7 +19,7 @@ endfunction
 function! textobj#indent#indentTextObj(inner, block) abort
   let indent = indent('.')
   let blank = a:inner ? '\s*$|' : ''
-  let block = a:block ? '| {' . (indent + 1) . ',}|\t{' . (indent + 1) / &tabstop . ',}' : ''
+  let block = a:block ? '| {' . (indent + 1) . ',}|\t{' . (indent/&tabstop + 1) . ',}' : ''
   let pattern = '\v^%('. blank . '%( {,' . max([indent - 1,0]) . '}|\t{,' . max([indent - 1,0]) / &tabstop . '}' . block . ')\S)'
   let up = max([search(pattern, 'nWb'), 0])
   let down = min([search(pattern, 'nW'), line('$')])
