@@ -298,3 +298,101 @@ if exists('+statusline')
   set statusline+=%-15(%l,%c%V%)%P
 endif
 " }}}
+
+" {{{ Variables
+" LSC
+let g:lsc_reference_highlights = v:false
+let g:lsc_enable_autocomplete = v:false
+let g:lsc_server_commands = {
+      \ 'java': {
+        \ 'command': 'java-language-server',
+        \ 'log_level': 'Warning'
+        \}
+      \}
+let g:lsc_auto_map = {
+      \ 'GoToDefinition': 'gd',
+      \ 'GoToDefinitionSplit': ['<C-W>d', '<C-W><C-d>'],
+      \ 'FindReferences': 'gr',
+      \ 'FindImplementations': 'gI',
+      \ 'FindCodeActions': 'ga',
+      \ 'Rename': 'gR',
+      \ 'ShowHover': v:true,
+      \ 'DocumentSymbol': 'go',
+      \ 'WorkspaceSymbol': 'gS',
+      \ 'SignatureHelp': '<C-m>',
+      \ 'Completion': 'omnifunc',
+      \}
+" ultisnips
+let g:UltiSnipsListSnippets        = '<C-@>'
+let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
+let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
+" mucomplete
+" this is slow on cygwin
+let g:mucomplete#enable_auto_at_startup = !has('win32unix')
+let g:mucomplete#no_mappings            = 1
+let g:mucomplete#no_popup_mappings      = 1
+let g:mucomplete#always_use_completeopt = 1
+let g:mucomplete#chains                 = {
+      \ 'default'   : ['file', 'omni', 'ulti', 'dict', 'uspl', 'c-p', 'tags'],
+      \ 'gitcommit' : ['tags', 'c-n'],
+      \ 'java'      : ['omni', 'ulti', 'c-p',  'tags', 'file'],
+      \ 'vim'       : ['file', 'ulti', 'cmd',  'c-p',  'tags'],
+      \ 'xml'       : ['omni', 'ulti', 'tags', 'c-p'],
+      \ 'sql'       : ['c-p',  'ulti', 'tags'],
+      \ 'markdown'  : ['c-p',  'ulti', 'tags']
+      \ }
+let g:mucomplete#can_complete = { }
+if has('lambda')
+  let g:mucomplete#can_complete.default = { 'omni' : { t -> t =~ '\m\%(\k\k\|\.\)$' } }
+  let g:mucomplete#can_complete.java    = { 'omni' : { t -> t =~# '\m\(\k\|)\|]\)\%\(\.\)$'} }
+  let g:mucomplete#can_complete.xml     = { 'omni' : { t -> t =~# '\m\(\k\k\|<\|\k\+:\)$'} }
+  let g:mucomplete#can_complete.python  = { 'omni' : { t -> t =~# '\m\(\k\|)\|]\)\%\(\.\)$'} }
+endif
+" jedi
+let g:jedi#auto_vim_configuration     = 0
+let g:jedi#popup_on_dot               = 0
+let g:jedi#show_call_signatures       = 0
+let g:jedi#show_call_signatures_delay = 50
+let g:jedi#auto_close_doc             = 0
+" lion
+let g:lion_squeeze_spaces = 1
+" sneak
+let g:sneak#label      = 1
+let g:sneak#s_next     = 1
+let g:sneak#use_ic_scs = 1
+" netrw
+let g:netrw_banner = 0
+let g:netrw_liststyle = 0
+let g:netrw_browse_split = 0
+let g:netrw_winsize = 15
+let g:netrw_cursor = 2
+" markdown
+let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'sql']
+" gutentags
+let g:gutentags_ctags_exclude = split(&wildignore, ',')
+if has('win32')
+  let g:gutentags_ctags_extra_args=['--options=%HOME%\.ctags']
+endif
+let g:todo_words = [['TODO', '|', 'DONE'], ['ASSIGNED', 'DEVELOP', 'TESTING', '|', 'READY', 'COMPLETE']]
+if executable('python3')
+  let g:python_executable = 'python3'
+  let g:jedi#force_py_version = 3
+endif
+" signify
+let g:signify_vcs_list        = ['git']
+let g:signify_sign_add        = '┃'
+let g:signify_sign_delete     = '_'
+let g:signify_sign_change     = '┃'
+let g:signify_sign_delete_first_line = '¯'
+let g:signify_sign_show_count = 0
+function! s:hl_Signify() abort
+  hi link SignifySignAdd    StringDelimiter
+  hi link SignifySignChange Identifier
+  hi link SignifySignDelete Special
+endfunction
+call <SID>hl_Signify()
+augroup signify
+  autocmd!
+  autocmd ColorScheme * call <SID>hl_Signify()
+augroup END
+" }}}
