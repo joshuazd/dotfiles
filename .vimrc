@@ -302,8 +302,8 @@ endif
 
 " {{{ Variables
 " LSC
-let g:lsc_reference_highlights = v:false
-let g:lsc_enable_autocomplete = v:false
+let g:lsc_reference_highlights = 0
+let g:lsc_enable_autocomplete = 0
 let g:lsc_server_commands = {
       \ 'java': {
         \ 'command': 'java-language-server',
@@ -317,11 +317,11 @@ let g:lsc_auto_map = {
       \ 'FindImplementations': 'gI',
       \ 'FindCodeActions': 'ga',
       \ 'Rename': 'gR',
-      \ 'ShowHover': v:true,
+      \ 'ShowHover': 1,
       \ 'DocumentSymbol': 'go',
       \ 'WorkspaceSymbol': 'gS',
       \ 'SignatureHelp': '<C-m>',
-      \ 'Completion': 'omnifunc',
+      \ 'Completion': 'omnifunc'
       \}
 " ultisnips
 let g:UltiSnipsListSnippets        = '<C-@>'
