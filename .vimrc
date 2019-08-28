@@ -107,6 +107,7 @@ set list
 
 if exists('&previewpopup')
   set previewpopup=height:10,width:60
+  set completeopt+=popup
 endif
 
 if exists('+clipboard')
