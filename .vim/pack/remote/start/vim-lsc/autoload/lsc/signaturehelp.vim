@@ -17,6 +17,10 @@ function! s:HighlightCurrentParameter() abort
 endfunction
 
 function! s:ShowHelp(signatureHelp) abort
+  if empty(a:signatureHelp)
+    call lsc#message#show('No signature help available')
+    return
+  endif
   let signatures = []
   if has_key(a:signatureHelp, 'signatures')
     if type(a:signatureHelp.signatures) == type([])
@@ -39,6 +43,11 @@ function! s:ShowHelp(signatureHelp) abort
   let signature = get(signatures, active_signature)
 
   if !has_key(signature, 'label')
+    return
+  endif
+
+  if !has_key(signature, 'parameters')
+    call lsc#util#displayAsPreview([signature.label], function('<SID>HighlightCurrentParameter'))
     return
   endif
 

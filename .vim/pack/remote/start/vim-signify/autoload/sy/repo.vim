@@ -116,6 +116,10 @@ function! s:handle_diff(options, exitval) abort
     let sy.detecting -= 1
   endif
 
+  if (&fenc != &enc) && has('iconv')
+    call map(a:options.stdoutbuf, 'iconv(v:val, &fenc, &enc)')
+  endif
+
   let [found_diff, diff] = s:check_diff_{a:options.vcs}(a:exitval, a:options.stdoutbuf)
   if found_diff
     if index(sy.vcs, a:options.vcs) == -1
@@ -253,7 +257,7 @@ function! sy#repo#diffmode(do_tab) abort
   try
     execute chdir fnameescape(b:sy.info.dir)
     leftabove vnew
-    if has('iconv')
+    if (fenc != &enc) && has('iconv')
       silent put =iconv(system(cmd), fenc, &enc)
     else
       silent put =system(cmd)
@@ -284,7 +288,7 @@ function! s:preview_hunk(_sy, vcs, diff) abort
 
   for line in a:diff
     if in_hunk
-      if line[:2] == '@@ '
+      if line[:2] == '@@ ' || empty(line)
         break
       endif
       call add(hunk, line)
