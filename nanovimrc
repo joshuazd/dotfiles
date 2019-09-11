@@ -5,11 +5,7 @@ set smartcase
 set autoindent
 set smarttab
 set nowrap
-set clipboard^=unnamedplus
 set wildmenu
-set wildmode=list:longest,longest:full
-set wildignorecase
-set wildcharm=<C-z>
 set noswapfile
 set showcmd
 set tags=./tags,tags
