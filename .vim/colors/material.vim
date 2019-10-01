@@ -2,15 +2,15 @@
 
 hi clear
 
-if exists("syntax_on")
+if exists('syntax_on')
   syntax reset
 endif
 
 set background=dark
 
-let colors_name = "material"
+let colors_name = 'material'
 
-if ($TERM =~ '256' || &t_Co >= 256) || has("gui_running")
+if ($TERM =~# '256' || &t_Co >= 256) || has('gui_running')
     hi Normal ctermbg=235 ctermfg=251 cterm=NONE guibg=#262626 guifg=#c6c6c6 gui=NONE
 
     hi LineNr ctermbg=235 ctermfg=240 cterm=NONE guibg=#262626 guifg=#585858 gui=NONE
@@ -33,35 +33,35 @@ if ($TERM =~ '256' || &t_Co >= 256) || has("gui_running")
     hi MatchParen ctermbg=236 ctermfg=116 cterm=NONE guibg=#303030 guifg=#87d7d7 gui=NONE
     hi Visual ctermbg=236 ctermfg=NONE cterm=NONE guibg=#303030 guifg=NONE gui=NONE
     hi NonText ctermbg=235 ctermfg=67 cterm=NONE guibg=#262626 guifg=#5f87af gui=NONE
-    hi Todo ctermbg=235 ctermfg=203 cterm=BOLD guibg=#262626 guifg=#ff5f5f gui=BOLD
+    hi Todo ctermbg=NONE ctermfg=203 cterm=BOLD guibg=NONE guifg=#ff5f5f gui=BOLD
     hi Underlined ctermbg=235 ctermfg=111 cterm=UNDERLINE guibg=#262626 guifg=#87aaff gui=UNDERLINE
     hi Error ctermbg=203 ctermfg=16 cterm=UNDERLINE guibg=#ff5f5f guifg=#000000 gui=UNDERLINE
     hi ErrorMsg ctermbg=203 ctermfg=16 cterm=NONE guibg=#ff5f5f guifg=#000000 gui=NONE
     hi WarningMsg ctermbg=173 ctermfg=16 cterm=NONE guibg=#d7875f guifg=#000000 gui=NONE
     hi Ignore ctermbg=235 ctermfg=NONE cterm=NONE guibg=#262626 guifg=NONE gui=NONE
-    hi SpecialKey ctermbg=235 ctermfg=67 cterm=NONE guibg=#262626 guifg=#5f87af gui=NONE
-    hi Constant ctermbg=235 ctermfg=73 cterm=NONE guibg=#262626 guifg=#5fafaf gui=NONE
-    hi String ctermbg=235 ctermfg=108 cterm=NONE guibg=#262626 guifg=#87af87 gui=NONE
-    hi StringDelimiter ctermbg=235 ctermfg=114 cterm=NONE guibg=#262626 guifg=#87d787 gui=NONE
-    hi Identifier ctermbg=235 ctermfg=222 cterm=NONE guibg=#262626 guifg=#ffd787 gui=NONE
-    hi Function ctermbg=235 ctermfg=111 cterm=NONE guibg=#262626 guifg=#87aaff gui=NONE
-    hi Primitive ctermbg=235 ctermfg=215 cterm=ITALIC guibg=#262626 guifg=#ffaf5f gui=ITALIC
-    hi Statement ctermbg=235 ctermfg=104 cterm=NONE guibg=#262626 guifg=#8787d7 gui=NONE
-    hi Operator ctermbg=235 ctermfg=137 cterm=NONE guibg=#262626 guifg=#ab7967 gui=NONE
-    hi Comment ctermbg=235 ctermfg=240 cterm=ITALIC guibg=#262626 guifg=#585858 gui=ITALIC
-    hi Builtin ctermbg=235 ctermfg=173 cterm=NONE guibg=#262626 guifg=#d7875f gui=NONE
-    hi Language ctermbg=235 ctermfg=203 cterm=NONE guibg=#262626 guifg=#ff5f5f gui=NONE
-    hi Special ctermbg=235 ctermfg=203 cterm=NONE guibg=#262626 guifg=#ff5f5f gui=NONE
-    hi Tag ctermbg=235 ctermfg=203 cterm=NONE guibg=#262626 guifg=#ff5f5f gui=NONE
-    hi SpecialChar ctermbg=235 ctermfg=73 cterm=BOLD guibg=#262626 guifg=#5fafaf gui=BOLD
-    hi Delimiter ctermbg=235 ctermfg=246 cterm=NONE guibg=#262626 guifg=#949494 gui=NONE
-    hi Coding ctermbg=235 ctermfg=203 cterm=ITALIC guibg=#262626 guifg=#ff5f5f gui=ITALIC
-    hi PreProc ctermbg=235 ctermfg=116 cterm=NONE guibg=#262626 guifg=#87d7d7 gui=NONE
-    hi Type ctermbg=235 ctermfg=222 cterm=NONE guibg=#262626 guifg=#ffd787 gui=NONE
-    hi Storage ctermbg=235 ctermfg=97 cterm=NONE guibg=#262626 guifg=#875faf gui=NONE
-    hi StorageClass ctermbg=235 ctermfg=114 cterm=NONE guibg=#262626 guifg=#87d787 gui=NONE
-    hi Structure ctermbg=235 ctermfg=116 cterm=NONE guibg=#262626 guifg=#87d7d7 gui=NONE
-    hi Class ctermbg=235 ctermfg=67 cterm=BOLD guibg=#262626 guifg=#5f87af gui=BOLD
+    hi SpecialKey ctermbg=NONE ctermfg=67 cterm=NONE guibg=NONE guifg=#5f87af gui=NONE
+    hi Constant ctermbg=NONE ctermfg=73 cterm=NONE guibg=NONE guifg=#5fafaf gui=NONE
+    hi String ctermbg=NONE ctermfg=108 cterm=NONE guibg=NONE guifg=#87af87 gui=NONE
+    hi StringDelimiter ctermbg=NONE ctermfg=114 cterm=NONE guibg=NONE guifg=#87d787 gui=NONE
+    hi Identifier ctermbg=NONE ctermfg=222 cterm=NONE guibg=NONE guifg=#ffd787 gui=NONE
+    hi Function ctermbg=NONE ctermfg=111 cterm=NONE guibg=NONE guifg=#87aaff gui=NONE
+    hi Primitive ctermbg=NONE ctermfg=215 cterm=ITALIC guibg=NONE guifg=#ffaf5f gui=ITALIC
+    hi Statement ctermbg=NONE ctermfg=104 cterm=NONE guibg=NONE guifg=#8787d7 gui=NONE
+    hi Operator ctermbg=NONE ctermfg=137 cterm=NONE guibg=NONE guifg=#ab7967 gui=NONE
+    hi Comment ctermbg=NONE ctermfg=240 cterm=ITALIC guibg=NONE guifg=#585858 gui=ITALIC
+    hi Builtin ctermbg=NONE ctermfg=173 cterm=NONE guibg=NONE guifg=#d7875f gui=NONE
+    hi Language ctermbg=NONE ctermfg=203 cterm=NONE guibg=NONE guifg=#ff5f5f gui=NONE
+    hi Special ctermbg=NONE ctermfg=203 cterm=NONE guibg=NONE guifg=#ff5f5f gui=NONE
+    hi Tag ctermbg=NONE ctermfg=203 cterm=NONE guibg=NONE guifg=#ff5f5f gui=NONE
+    hi SpecialChar ctermbg=NONE ctermfg=73 cterm=BOLD guibg=NONE guifg=#5fafaf gui=BOLD
+    hi Delimiter ctermbg=NONE ctermfg=246 cterm=NONE guibg=NONE guifg=#949494 gui=NONE
+    hi Coding ctermbg=NONE ctermfg=203 cterm=ITALIC guibg=NONE guifg=#ff5f5f gui=ITALIC
+    hi PreProc ctermbg=NONE ctermfg=116 cterm=NONE guibg=NONE guifg=#87d7d7 gui=NONE
+    hi Type ctermbg=NONE ctermfg=222 cterm=NONE guibg=NONE guifg=#ffd787 gui=NONE
+    hi Storage ctermbg=NONE ctermfg=97 cterm=NONE guibg=NONE guifg=#875faf gui=NONE
+    hi StorageClass ctermbg=NONE ctermfg=114 cterm=NONE guibg=NONE guifg=#87d787 gui=NONE
+    hi Structure ctermbg=NONE ctermfg=116 cterm=NONE guibg=NONE guifg=#87d7d7 gui=NONE
+    hi Class ctermbg=NONE ctermfg=67 cterm=BOLD guibg=NONE guifg=#5f87af gui=BOLD
     hi DiffAdd ctermbg=236 ctermfg=108 cterm=NONE guibg=#303030 guifg=#87af87 gui=NONE
     hi DiffChange ctermbg=236 ctermfg=222 cterm=NONE guibg=#303030 guifg=#ffd787 gui=NONE
     hi DiffDelete ctermbg=236 ctermfg=203 cterm=NONE guibg=#303030 guifg=#ff5f5f gui=NONE
@@ -107,35 +107,35 @@ elseif &t_Co == 8 || $TERM !~# '^linux' || &t_Co == 16
     hi MatchParen ctermbg=darkgrey ctermfg=darkcyan cterm=NONE
     hi Visual ctermbg=darkgrey ctermfg=NONE cterm=NONE
     hi NonText ctermbg=black ctermfg=darkblue cterm=NONE
-    hi Todo ctermbg=black ctermfg=darkred cterm=BOLD
+    hi Todo ctermbg=NONE ctermfg=darkred cterm=BOLD
     hi Underlined ctermbg=black ctermfg=blue cterm=UNDERLINE
     hi Error ctermbg=darkred ctermfg=black cterm=UNDERLINE
     hi ErrorMsg ctermbg=darkred ctermfg=black cterm=NONE
     hi WarningMsg ctermbg=red ctermfg=black cterm=NONE
     hi Ignore ctermbg=black ctermfg=NONE cterm=NONE
-    hi SpecialKey ctermbg=black ctermfg=darkblue cterm=NONE
-    hi Constant ctermbg=black ctermfg=cyan cterm=NONE
-    hi String ctermbg=black ctermfg=darkgreen cterm=NONE
-    hi StringDelimiter ctermbg=black ctermfg=green cterm=NONE
-    hi Identifier ctermbg=black ctermfg=yellow cterm=NONE
-    hi Function ctermbg=black ctermfg=blue cterm=NONE
-    hi Primitive ctermbg=black ctermfg=darkyellow cterm=ITALIC
-    hi Statement ctermbg=black ctermfg=magenta cterm=NONE
-    hi Operator ctermbg=black ctermfg=darkgrey cterm=NONE
-    hi Comment ctermbg=black ctermfg=grey cterm=ITALIC
-    hi Builtin ctermbg=black ctermfg=red cterm=NONE
-    hi Language ctermbg=black ctermfg=darkred cterm=NONE
-    hi Special ctermbg=black ctermfg=darkred cterm=NONE
-    hi Tag ctermbg=black ctermfg=darkred cterm=NONE
-    hi SpecialChar ctermbg=black ctermfg=cyan cterm=BOLD
-    hi Delimiter ctermbg=black ctermfg=lightgrey cterm=NONE
-    hi Coding ctermbg=black ctermfg=darkred cterm=ITALIC
-    hi PreProc ctermbg=black ctermfg=darkcyan cterm=NONE
-    hi Type ctermbg=black ctermfg=yellow cterm=NONE
-    hi Storage ctermbg=black ctermfg=darkmagenta cterm=NONE
-    hi StorageClass ctermbg=black ctermfg=green cterm=NONE
-    hi Structure ctermbg=black ctermfg=darkcyan cterm=NONE
-    hi Class ctermbg=black ctermfg=darkblue cterm=BOLD
+    hi SpecialKey ctermbg=NONE ctermfg=darkblue cterm=NONE
+    hi Constant ctermbg=NONE ctermfg=cyan cterm=NONE
+    hi String ctermbg=NONE ctermfg=darkgreen cterm=NONE
+    hi StringDelimiter ctermbg=NONE ctermfg=green cterm=NONE
+    hi Identifier ctermbg=NONE ctermfg=yellow cterm=NONE
+    hi Function ctermbg=NONE ctermfg=blue cterm=NONE
+    hi Primitive ctermbg=NONE ctermfg=darkyellow cterm=ITALIC
+    hi Statement ctermbg=NONE ctermfg=magenta cterm=NONE
+    hi Operator ctermbg=NONE ctermfg=lightgrey cterm=NONE
+    hi Comment ctermbg=NONE ctermfg=grey cterm=ITALIC
+    hi Builtin ctermbg=NONE ctermfg=red cterm=NONE
+    hi Language ctermbg=NONE ctermfg=darkred cterm=NONE
+    hi Special ctermbg=NONE ctermfg=darkred cterm=NONE
+    hi Tag ctermbg=NONE ctermfg=darkred cterm=NONE
+    hi SpecialChar ctermbg=NONE ctermfg=cyan cterm=BOLD
+    hi Delimiter ctermbg=NONE ctermfg=lightgrey cterm=NONE
+    hi Coding ctermbg=NONE ctermfg=darkred cterm=ITALIC
+    hi PreProc ctermbg=NONE ctermfg=darkcyan cterm=NONE
+    hi Type ctermbg=NONE ctermfg=yellow cterm=NONE
+    hi Storage ctermbg=NONE ctermfg=darkmagenta cterm=NONE
+    hi StorageClass ctermbg=NONE ctermfg=green cterm=NONE
+    hi Structure ctermbg=NONE ctermfg=darkcyan cterm=NONE
+    hi Class ctermbg=NONE ctermfg=darkblue cterm=BOLD
     hi DiffAdd ctermbg=darkgrey ctermfg=darkgreen cterm=NONE
     hi DiffChange ctermbg=darkgrey ctermfg=yellow cterm=NONE
     hi DiffDelete ctermbg=darkgrey ctermfg=darkred cterm=NONE
