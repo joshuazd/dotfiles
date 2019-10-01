@@ -45,37 +45,37 @@ urxvt*dynamicColors: on
 # define bg #262626
 # define fg #cccccc
 ! black
-# define c_0 #1c1c1c
+# define c_0 #262626
 ! red
 # define c_1 #ff5f5f
 ! green
-# define c_2 #87d787
+# define c_2 #87af87
 ! yellow
-# define c_3 #ffd787
+# define c_3 #ffaf5f
 ! blue
 # define c_4 #6182b8
 ! purple
-# define c_5 #c792ea
+# define c_5 #875faf
 ! cyan
-# define c_6 #89ddff
+# define c_6 #5fafaf
 ! white
-# define c_7 #bbbbbb
+# define c_7 #949494
 ! bright black
-# define c_8 #3e515b
+# define c_8 #585858
 ! bright red
-# define c_9 #d75f5f
+# define c_9 #d7875f
 ! bright green
-# define c_10 #87af87
+# define c_10 #87d787
 ! bright yellow
-# define c_11 #ffaf5f
+# define c_11 #ffd787
 ! bright blue
-# define c_12 #82aaff
+# define c_12 #87aaff
 ! bright purple
-# define c_13 #945eb8
+# define c_13 #8787d7
 ! bright cyan
-# define c_14 #39adb5
+# define c_14 #87d787
 ! bright white
-# define c_15 #ffffff
+# define c_15 #c6c6c6
 
 
 
