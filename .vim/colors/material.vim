@@ -39,7 +39,7 @@ if ($TERM =~# '256' || &t_Co >= 256) || has('gui_running')
     hi ErrorMsg ctermbg=203 ctermfg=16 cterm=NONE guibg=#ff5f5f guifg=#000000 gui=NONE
     hi WarningMsg ctermbg=173 ctermfg=16 cterm=NONE guibg=#d7875f guifg=#000000 gui=NONE
     hi Ignore ctermbg=235 ctermfg=NONE cterm=NONE guibg=#262626 guifg=NONE gui=NONE
-    hi SpecialKey ctermbg=NONE ctermfg=67 cterm=NONE guibg=NONE guifg=#5f87af gui=NONE
+    hi SpecialKey ctermbg=NONE ctermfg=236 cterm=NONE guibg=NONE guifg=#303030 gui=NONE
     hi Constant ctermbg=NONE ctermfg=73 cterm=NONE guibg=NONE guifg=#5fafaf gui=NONE
     hi String ctermbg=NONE ctermfg=108 cterm=NONE guibg=NONE guifg=#87af87 gui=NONE
     hi StringDelimiter ctermbg=NONE ctermfg=114 cterm=NONE guibg=NONE guifg=#87d787 gui=NONE
@@ -113,7 +113,7 @@ elseif &t_Co == 8 || $TERM !~# '^linux' || &t_Co == 16
     hi ErrorMsg ctermbg=darkred ctermfg=black cterm=NONE
     hi WarningMsg ctermbg=red ctermfg=black cterm=NONE
     hi Ignore ctermbg=black ctermfg=NONE cterm=NONE
-    hi SpecialKey ctermbg=NONE ctermfg=darkblue cterm=NONE
+    hi SpecialKey ctermbg=NONE ctermfg=darkgrey cterm=NONE
     hi Constant ctermbg=NONE ctermfg=darkcyan cterm=NONE
     hi String ctermbg=NONE ctermfg=darkgreen cterm=NONE
     hi StringDelimiter ctermbg=NONE ctermfg=green cterm=NONE
