@@ -23,7 +23,7 @@ _git_prompt_info() {
 }
 
 _build_prompt() {
-    ret=$([ $? -eq 0 ] && echo '33' || echo '31')
+    ret=$([ $? -eq 0 ] && echo '93' || echo '31')
     prompt="\e[94m$(dirs +0)\e[m\e["
 
     case "$TERM" in
