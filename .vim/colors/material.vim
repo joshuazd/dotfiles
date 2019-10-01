@@ -89,7 +89,7 @@ elseif &t_Co == 8 || $TERM !~# '^linux' || &t_Co == 16
 
     hi LineNr ctermbg=black ctermfg=grey cterm=NONE
     hi CursorLine ctermbg=darkgrey ctermfg=NONE cterm=NONE
-    hi CursorLineNR ctermbg=black ctermfg=darkcyan cterm=NONE
+    hi CursorLineNR ctermbg=black ctermfg=cyan cterm=NONE
     hi CursorColumn ctermbg=darkgrey ctermfg=NONE cterm=NONE
     hi FoldColumn ctermbg=black ctermfg=NONE cterm=NONE
     hi SignColumn ctermbg=black ctermfg=NONE cterm=NONE
@@ -104,54 +104,54 @@ elseif &t_Co == 8 || $TERM !~# '^linux' || &t_Co == 16
     hi Title ctermbg=black ctermfg=yellow cterm=NONE
     hi ModeMsg ctermbg=black ctermfg=darkblue cterm=NONE
     hi MoreMsg ctermbg=black ctermfg=darkgreen cterm=NONE
-    hi MatchParen ctermbg=darkgrey ctermfg=darkcyan cterm=NONE
+    hi MatchParen ctermbg=darkgrey ctermfg=cyan cterm=NONE
     hi Visual ctermbg=darkgrey ctermfg=NONE cterm=NONE
     hi NonText ctermbg=black ctermfg=darkblue cterm=NONE
-    hi Todo ctermbg=NONE ctermfg=darkred cterm=NONE
-    hi Underlined ctermbg=black ctermfg=blue cterm=NONE
-    hi Error ctermbg=darkred ctermfg=black cterm=NONE
+    hi Todo ctermbg=NONE ctermfg=darkred cterm=BOLD
+    hi Underlined ctermbg=black ctermfg=blue cterm=UNDERLINE
+    hi Error ctermbg=darkred ctermfg=black cterm=UNDERLINE
     hi ErrorMsg ctermbg=darkred ctermfg=black cterm=NONE
     hi WarningMsg ctermbg=red ctermfg=black cterm=NONE
     hi Ignore ctermbg=black ctermfg=NONE cterm=NONE
     hi SpecialKey ctermbg=NONE ctermfg=darkblue cterm=NONE
-    hi Constant ctermbg=NONE ctermfg=cyan cterm=NONE
+    hi Constant ctermbg=NONE ctermfg=darkcyan cterm=NONE
     hi String ctermbg=NONE ctermfg=darkgreen cterm=NONE
     hi StringDelimiter ctermbg=NONE ctermfg=green cterm=NONE
     hi Identifier ctermbg=NONE ctermfg=yellow cterm=NONE
     hi Function ctermbg=NONE ctermfg=blue cterm=NONE
-    hi Primitive ctermbg=NONE ctermfg=darkyellow cterm=NONE
+    hi Primitive ctermbg=NONE ctermfg=darkyellow cterm=ITALIC
     hi Statement ctermbg=NONE ctermfg=magenta cterm=NONE
     hi Operator ctermbg=NONE ctermfg=lightgrey cterm=NONE
-    hi Comment ctermbg=NONE ctermfg=grey cterm=NONE
+    hi Comment ctermbg=NONE ctermfg=grey cterm=ITALIC
     hi Builtin ctermbg=NONE ctermfg=red cterm=NONE
     hi Language ctermbg=NONE ctermfg=darkred cterm=NONE
     hi Special ctermbg=NONE ctermfg=darkred cterm=NONE
     hi Tag ctermbg=NONE ctermfg=darkred cterm=NONE
-    hi SpecialChar ctermbg=NONE ctermfg=cyan cterm=NONE
+    hi SpecialChar ctermbg=NONE ctermfg=darkcyan cterm=BOLD
     hi Delimiter ctermbg=NONE ctermfg=lightgrey cterm=NONE
-    hi Coding ctermbg=NONE ctermfg=darkred cterm=NONE
-    hi PreProc ctermbg=NONE ctermfg=darkcyan cterm=NONE
+    hi Coding ctermbg=NONE ctermfg=darkred cterm=ITALIC
+    hi PreProc ctermbg=NONE ctermfg=cyan cterm=NONE
     hi Type ctermbg=NONE ctermfg=yellow cterm=NONE
     hi Storage ctermbg=NONE ctermfg=darkmagenta cterm=NONE
     hi StorageClass ctermbg=NONE ctermfg=green cterm=NONE
-    hi Structure ctermbg=NONE ctermfg=darkcyan cterm=NONE
-    hi Class ctermbg=NONE ctermfg=darkblue cterm=NONE
+    hi Structure ctermbg=NONE ctermfg=cyan cterm=NONE
+    hi Class ctermbg=NONE ctermfg=darkblue cterm=BOLD
     hi DiffAdd ctermbg=darkgrey ctermfg=darkgreen cterm=NONE
     hi DiffChange ctermbg=darkgrey ctermfg=yellow cterm=NONE
     hi DiffDelete ctermbg=darkgrey ctermfg=darkred cterm=NONE
     hi DiffText ctermbg=lightgrey ctermfg=black cterm=NONE
     hi diffAdded ctermbg=black ctermfg=darkgreen cterm=NONE
     hi Pmenu ctermbg=darkgrey ctermfg=white cterm=NONE
-    hi PmenuSel ctermbg=darkgrey ctermfg=white cterm=NONE
+    hi PmenuSel ctermbg=darkgrey ctermfg=white cterm=REVERSE
     hi SpellBad ctermbg=darkred ctermfg=darkgrey cterm=NONE
     hi SpellCap ctermbg=darkblue ctermfg=darkgrey cterm=NONE
-    hi SpellLocal ctermbg=darkcyan ctermfg=cyan cterm=NONE
+    hi SpellLocal ctermbg=cyan ctermfg=darkcyan cterm=NONE
     hi SpellRare ctermbg=darkmagenta ctermfg=magenta cterm=NONE
     hi StatusLine ctermbg=darkgrey ctermfg=white cterm=NONE
-    hi StatusLineNC ctermbg=black ctermfg=grey cterm=NONE
+    hi StatusLineNC ctermbg=black ctermfg=grey cterm=BOLD
     hi TabLine ctermbg=lightgrey ctermfg=black cterm=NONE
     hi TabLineFill ctermbg=lightgrey ctermfg=black cterm=NONE
-    hi TabLineSel ctermbg=darkgrey ctermfg=white cterm=NONE
+    hi TabLineSel ctermbg=darkgrey ctermfg=white cterm=BOLD
     hi Sneak ctermbg=darkmagenta ctermfg=white cterm=NONE
     hi SneakLabel ctermbg=darkmagenta ctermfg=white cterm=NONE
     hi SneakLabelMask ctermbg=darkmagenta ctermfg=darkmagenta cterm=NONE
@@ -160,19 +160,19 @@ endif
 let g:terminal_ansi_colors = [
         \ '#262626',
         \ '#d7875f',
-        \ '#87af87',
+        \ '#87d787',
         \ '#ffd787',
         \ '#5f87af',
         \ '#8787d7',
-        \ '#87d7d7',
+        \ '#5fafaf',
         \ '#949494',
         \ '#585858',
         \ '#ff5f5f',
-        \ '#87d787',
+        \ '#87af87',
         \ '#ffaf5f',
         \ '#87aaff',
         \ '#875faf',
-        \ '#5fafaf',
+        \ '#87d7d7',
         \ '#c6c6c6',
         \ ]
 
