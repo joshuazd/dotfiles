@@ -24,6 +24,10 @@ augroup signify
 
   if get(g:, 'signify_realtime') && has('patch-7.4.1967')
     autocmd WinEnter * call sy#start()
+    autocmd ShellCmdPost * call sy#start()
+    if exists('##VimResume')
+      autocmd VimResume * call sy#start()
+    endif
     if get(g:, 'signify_update_on_bufenter')
       autocmd BufEnter * nested call s:save()
     else
@@ -66,7 +70,8 @@ command! -nargs=0 -bar       SignifyList            call sy#debug#list_active_bu
 command! -nargs=0 -bar       SignifyDebug           call sy#repo#debug_detection()
 command! -nargs=0 -bar -bang SignifyFold            call sy#fold#dispatch(<bang>1)
 command! -nargs=0 -bar -bang SignifyDiff            call sy#repo#diffmode(<bang>1)
-command! -nargs=0 -bar       SignifyDiffPreview     call sy#repo#preview_hunk()
+command! -nargs=0 -bar       SignifyHunkPreview     call sy#repo#preview_hunk()
+command! -nargs=0 -bar       SignifyHunkUndo        call sy#repo#undo_hunk()
 command! -nargs=0 -bar       SignifyRefresh         call sy#util#refresh_windows()
 command! -nargs=0 -bar       SignifyEnable          call sy#enable()
 command! -nargs=0 -bar       SignifyDisable         call sy#disable()

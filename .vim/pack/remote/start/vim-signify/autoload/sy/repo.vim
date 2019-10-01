@@ -273,6 +273,24 @@ function! sy#repo#diffmode(do_tab) abort
   normal! ]czt
 endfunction
 
+function! s:extract_current_hunk(diff) abort
+  let header = ''
+  let hunk = []
+
+  for line in a:diff
+    if header != ''
+      if line[:2] == '@@ ' || empty(line)
+        break
+      endif
+      call add(hunk, line)
+    elseif line[:2] == '@@ ' && s:is_cur_line_in_hunk(line)
+      let header = line
+    endif
+  endfor
+
+  return [header, hunk]
+endfunction
+
 " Function: #preview_hunk {{{1
 function! sy#repo#preview_hunk() abort
   if exists('b:sy') && !empty(b:sy.updated_by)
@@ -283,21 +301,8 @@ endfunction
 function! s:preview_hunk(_sy, vcs, diff) abort
   call sy#verbose('s:preview_hunk()', a:vcs)
 
-  let in_hunk = 0
-  let hunk = []
-
-  for line in a:diff
-    if in_hunk
-      if line[:2] == '@@ ' || empty(line)
-        break
-      endif
-      call add(hunk, line)
-    elseif line[:2] == '@@ ' && s:is_cur_line_in_hunk(line)
-      let in_hunk = 1
-    endif
-  endfor
-
-  if !in_hunk
+  let [_, hunk] = s:extract_current_hunk(a:diff)
+  if empty(hunk)
     return
   endif
 
@@ -315,6 +320,52 @@ function! s:preview_hunk(_sy, vcs, diff) abort
   " With :noautocmd wincmd p, the first line of the preview window would show
   " the 'cursorline', although it's not focused. Use feedkeys() instead.
   noautocmd call feedkeys("\<c-w>p", 'nt')
+endfunction
+
+" Function: #undo_hunk {{{1
+function! sy#repo#undo_hunk() abort
+  if exists('b:sy') && !empty(b:sy.updated_by)
+    call sy#repo#get_diff(b:sy.updated_by, function('s:undo_hunk'))
+  endif
+endfunction
+
+function! s:undo_hunk(_sy, vcs, diff) abort
+  call sy#verbose('s:undo_hunk()', a:vcs)
+
+  let [header, hunk] = s:extract_current_hunk(a:diff)
+  if empty(hunk)
+    return
+  endif
+
+  let [_old_line, new_line, _old_count, _new_count] = sy#sign#parse_hunk(header)
+
+  for line in hunk
+    echom new_line
+    echom line
+    let op = line[0]
+    let text = line[1:]
+    if op == ' '
+      if text != getline(new_line)
+        echoerr 'Could not apply context hunk for undo. Try saving the buffer first.'
+        return
+      endif
+      let new_line += 1
+    elseif op == '-'
+      call append(new_line-1, text)
+      let new_line += 1
+    elseif op == '+'
+      if text != getline(new_line)
+        echom text
+        echom getline(new_line)
+        echoerr 'Could not apply addition hunk for undo. Try saving the buffer first.'
+        return
+      endif
+      execute new_line 'delete _'
+    else
+      echoer 'Unknown diff operation ' . line
+      return
+    endif
+  endfor
 endfunction
 
 function! s:is_cur_line_in_hunk(hunkline) abort
