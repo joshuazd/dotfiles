@@ -592,39 +592,6 @@ function! s:add_methods(namespace, method_names) abort
   endfor
 endfunction
 
-function! s:Command(command, line1, line2, range, bang, mods, arg, args) abort
-  try
-    if a:command =~# '^\l[[:alnum:]-]\+$'
-      return fugitive#Command(a:line1, a:line2, a:range, a:bang, s:Mods(a:mods), a:command . ' ' . a:arg)
-    endif
-    return s:{a:command}Command(a:line1, a:line2, a:range, a:line2, a:bang, s:Mods(a:mods), '', a:arg, a:args)
-  catch /^fugitive:/
-    return 'echoerr ' . string(v:exception)
-  endtry
-endfunction
-
-let s:commands = []
-function! s:command(definition, ...) abort
-  let def = a:definition
-  if !has('patch-7.4.542')
-    let def = substitute(def, '-addr=\S\+ ', '', '')
-  endif
-  if !has('patch-8.1.560')
-    let def = substitute(def, '-addr=other ', '', '')
-  endif
-  if a:0
-    call add(s:commands, def . ' execute s:Command(' . string(a:1) . ", <line1>, <count>, +'<range>', <bang>0, '<mods>', <q-args>, [<f-args>])")
-  else
-    call add(s:commands, def)
-  endif
-endfunction
-
-function! s:define_commands() abort
-  for command in s:commands
-    exe 'command! -buffer '.command
-  endfor
-endfunction
-
 let s:repo_prototype = {}
 let s:repos = {}
 
@@ -1668,7 +1635,7 @@ function! fugitive#BufReadStatus() abort
       let branch = head
     endif
 
-    let b:fugitive_status = {'Staged': {}, 'Unstaged': {}}
+    let b:fugitive_files = {'Staged': {}, 'Unstaged': {}}
     let [staged, unstaged, untracked] = [[], [], []]
     let i = 0
     while i < len(output)
@@ -1694,10 +1661,10 @@ function! fugitive#BufReadStatus() abort
     endwhile
 
     for dict in staged
-      let b:fugitive_status['Staged'][dict.filename] = dict.status
+      let b:fugitive_files['Staged'][dict.filename] = dict
     endfor
     for dict in unstaged
-      let b:fugitive_status['Unstaged'][dict.filename] = dict.status
+      let b:fugitive_files['Unstaged'][dict.filename] = dict
     endfor
 
     let config = fugitive#Config()
@@ -2215,8 +2182,6 @@ function! fugitive#Cd(path, ...) abort
 endfunction
 
 " Section: :Gstatus
-
-call s:command("-bar -bang -range=-1 -addr=other Gstatus", "Status")
 
 function! s:StatusCommand(line1, line2, range, count, bang, mods, reg, arg, args, ...) abort
   let dir = a:0 ? a:1 : s:Dir()
@@ -3064,6 +3029,9 @@ function! s:StageDelete(lnum1, lnum2, count) abort
       endif
       if info.status ==# 'D'
         let undo = 'Gremove'
+      elseif info.paths[0] =~# '/$'
+        let err .= '|echoerr ' . string('fugitive: will not delete directory ' . string(info.relative[0]))
+        break
       else
         let undo = 'Gread ' . s:TreeChomp('hash-object', '-w', '--', info.paths[0])[0:10]
       endif
@@ -3076,7 +3044,7 @@ function! s:StageDelete(lnum1, lnum2, count) abort
       elseif a:count == 3
         call s:TreeChomp('checkout', '--theirs', '--', info.paths[0])
       elseif info.status =~# '[ADU]' &&
-            \ get(b:fugitive_status[info.section ==# 'Staged' ? 'Unstaged' : 'Staged'], info.filename, '') =~# '[AU]'
+            \ get(b:fugitive_files[info.section ==# 'Staged' ? 'Unstaged' : 'Staged'], info.filename, {'status': ''}).status =~# '[AU]'
         call s:TreeChomp('checkout', info.section ==# 'Staged' ? '--ours' : '--theirs', '--', info.paths[0])
       elseif info.status ==# 'U'
         call s:TreeChomp('rm', '--', info.paths[0])
@@ -3090,14 +3058,18 @@ function! s:StageDelete(lnum1, lnum2, count) abort
       call add(restore, ':Gsplit ' . s:fnameescape(info.relative[0]) . '|' . undo)
     endfor
   catch /^fugitive:/
-    let err = '|echoerr ' . string(v:exception)
+    let err .= '|echoerr ' . string(v:exception)
   endtry
   if empty(restore)
     return err[1:-1]
   endif
   exe s:ReloadStatus()
   call s:StageReveal()
-  return 'checktime|redraw|echomsg ' . string('To restore, ' . join(restore, '|')) . err
+  if len(restore)
+    return 'checktime|redraw|echomsg ' . string('To restore, ' . join(restore, '|')) . err
+  else
+    return 'checktime|redraw' . err
+  endif
 endfunction
 
 function! s:StageIgnore(lnum1, lnum2, count) abort
@@ -3432,9 +3404,6 @@ function! s:FinishCommit() abort
   return ''
 endfunction
 
-call s:command("-nargs=? -range=-1 -complete=customlist,fugitive#CommitComplete Gcommit", "commit")
-call s:command("-nargs=? -range=-1 -complete=customlist,fugitive#RevertComplete Grevert", "revert")
-
 " Section: :Gmerge, :Grebase, :Gpull
 
 function! fugitive#MergeComplete(A, L, P) abort
@@ -3712,10 +3681,6 @@ augroup fugitive_merge
         \ endif
 augroup END
 
-call s:command("-nargs=? -bang -complete=customlist,fugitive#MergeComplete Gmerge", "merge")
-call s:command("-nargs=? -bang -complete=customlist,fugitive#RebaseComplete Grebase", "rebase")
-call s:command("-nargs=? -bang -complete=customlist,fugitive#PullComplete Gpull", "pull")
-
 " Section: :Ggrep, :Glog
 
 if !exists('g:fugitive_summary_format')
@@ -3956,11 +3921,18 @@ function! s:UsableWin(nr) abort
         \ index(['nofile','help','quickfix'], getbufvar(winbufnr(a:nr), '&buftype')) < 0
 endfunction
 
-function! s:OpenParse(args) abort
-  let pre = []
+function! s:OpenParse(args, wants_cmd) abort
+  let opts = []
+  let cmds = []
   let args = copy(a:args)
-  while !empty(args) && args[0] =~# '^+'
-    call add(pre, ' ' . escape(remove(args, 0), ' |"'))
+  while !empty(args)
+    if args[0] =~# '^++'
+      call add(opts, ' ' . escape(remove(args, 0), ' |"'))
+    elseif a:wants_cmd && args[0] =~# '^+'
+      call add(cmds, remove(args, 0)[1:-1])
+    else
+      break
+    endif
   endwhile
   if len(args)
     let file = join(args)
@@ -3971,7 +3943,54 @@ function! s:OpenParse(args) abort
   else
     let file = '>'
   endif
-  return [s:Expand(file), join(pre)]
+  let dir = s:Dir()
+  let efile = s:Expand(file)
+  let url = fugitive#Find(efile, dir)
+
+  if a:wants_cmd && file[0] ==# '>' && efile[0] !=# '>' && get(b:, 'fugitive_type', '') isnot# 'tree' && &filetype !=# 'netrw'
+    let line = line('.')
+    if expand('%:p') !=# url
+      let diffcmd = 'diff'
+      let from = s:DirRev(@%)[1]
+      let to = s:DirRev(url)[1]
+      if empty(from) && empty(to)
+        let diffcmd = 'diff-files'
+        let args = ['--', expand('%:p'), url]
+      elseif empty(to)
+        let args = [from, '--', url]
+      elseif empty(from)
+        let args = [to, '--', expand('%:p')]
+        let reverse = 1
+      else
+        let args = [from, to]
+      endif
+      let [res, exec_error] = s:LinesError([dir, diffcmd, '-U0'] + args)
+      if !exec_error
+        call filter(res, 'v:val =~# "^@@ "')
+        call map(res, 'substitute(v:val, ''[-+]\d\+\zs '', ",1 ", "g")')
+        call map(res, 'matchlist(v:val, ''^@@ -\(\d\+\),\(\d\+\) +\(\d\+\),\(\d\+\) @@'')[1:4]')
+        if exists('reverse')
+          call map(res, 'v:val[2:3] + v:val[0:1]')
+        endif
+        call filter(res, 'v:val[0] < '.line('.'))
+        let hunk = get(res, -1, [0,0,0,0])
+        if hunk[0] + hunk[1] > line('.')
+          let line = hunk[2] + max([1 - hunk[3], 0])
+        else
+          let line = hunk[2] + max([hunk[3], 1]) + line('.') - hunk[0] - max([hunk[1], 1])
+        endif
+      endif
+    endif
+    call insert(cmds, line)
+  endif
+
+  let pre = join(opts, '')
+  if len(cmds) > 1
+    let pre .= ' +' . escape(join(map(cmds, '"exe ".string(v:val)'), '|'), ' |"')
+  elseif len(cmds)
+    let pre .= ' +' . escape(cmds[0], ' |"')
+  endif
+  return [url, pre]
 endfunction
 
 function! s:DiffClose() abort
@@ -4039,8 +4058,7 @@ function! fugitive#Open(cmd, bang, mods, arg, args) abort
 
   let mods = s:Mods(a:mods)
   try
-    let [file, pre] = s:OpenParse(a:args)
-    let file = s:Generate(file)
+    let [file, pre] = s:OpenParse(a:args, 1)
   catch /^fugitive:/
     return 'echoerr ' . string(v:exception)
   endtry
@@ -4073,8 +4091,7 @@ function! fugitive#ReadCommand(line1, count, range, bang, mods, arg, args) abort
     return 'redraw|echo '.string(':!'.s:UserCommand(dir, args))
   endif
   try
-    let [file, pre] = s:OpenParse(a:args)
-    let file = s:Generate(file)
+    let [file, pre] = s:OpenParse(a:args, 0)
   catch /^fugitive:/
     return 'echoerr ' . string(v:exception)
   endtry
@@ -4323,9 +4340,6 @@ endfunction
 function! s:FetchSubcommand(line1, line2, range, bang, mods, args) abort
   return s:Dispatch(a:bang ? '!' : '', 'fetch', a:args)
 endfunction
-
-call s:command("-nargs=? -bang -complete=customlist,fugitive#PushComplete Gpush", "push")
-call s:command("-nargs=? -bang -complete=customlist,fugitive#FetchComplete Gfetch", "fetch")
 
 " Section: :Gdiff
 
@@ -4698,7 +4712,7 @@ function! s:BlameCommitFileLnum(...) abort
   let commit = matchstr(line, '^\^\=\zs\x\+')
   if commit =~# '^0\+$'
     let commit = ''
-  elseif line !~# '^\^' && has_key(state, 'blame_reverse_end')
+  elseif has_key(state, 'blame_reverse_end')
     let commit = get(s:LinesError('rev-list', '--ancestry-path', '--reverse', commit . '..' . state.blame_reverse_end)[0], 0, '')
   endif
   let lnum = +matchstr(line, ' \zs\d\+\ze \%((\| *\d\+)\)')
@@ -5156,8 +5170,6 @@ augroup fugitive_blame
   autocmd ColorScheme,GUIEnter * call s:BlameRehighlight()
   autocmd BufWinLeave * execute getwinvar(+bufwinnr(+expand('<abuf>')), 'fugitive_leave')
 augroup END
-
-call s:command('-buffer -bang -range=-1 -nargs=? -complete=customlist,fugitive#BlameComplete Gblame', 'blame')
 
 " Section: :Gbrowse
 
@@ -5918,7 +5930,6 @@ function! fugitive#Init() abort
       echohl NONE
     endif
   endif
-  call s:define_commands()
   exe s:DoAutocmd('User Fugitive')
 endfunction
 
