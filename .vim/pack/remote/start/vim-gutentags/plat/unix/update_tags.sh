@@ -5,6 +5,7 @@ set -e
 PROG_NAME=$0
 CTAGS_EXE=ctags
 CTAGS_ARGS=
+CTAGS_ARG_QUOTED_LAST=
 TAGS_FILE=tags
 PROJECT_ROOT=
 LOG_FILE=
@@ -23,6 +24,7 @@ ShowUsage() {
     echo "    -t [file=tags]: The path to the ctags file to update"
     echo "    -p [dir=]:      The path to the project root"
     echo "    -l [file=]:     The path to a log file"
+    echo "    -r              Use tag-relative paths"
     echo "    -L [cmd=]:      The file list command to run"
     echo "    -A:             Specifies that the file list command returns "
     echo "                    absolute paths"
@@ -36,7 +38,7 @@ ShowUsage() {
 }
 
 
-while getopts "h?e:x:t:p:l:L:s:o:O:P:cA" opt; do
+while getopts "h?e:x:t:p:l:L:s:o:O:P:rcA" opt; do
     case $opt in
         h|\?)
             ShowUsage
@@ -71,6 +73,9 @@ while getopts "h?e:x:t:p:l:L:s:o:O:P:cA" opt; do
             ;;
         o)
             CTAGS_ARGS="$CTAGS_ARGS --options=$OPTARG"
+            ;;
+        r)
+            CTAGS_ARGS="$CTAGS_ARGS --tag-relative=yes"
             ;;
         O)
             CTAGS_ARGS="$CTAGS_ARGS $OPTARG"
@@ -120,14 +125,15 @@ if [ $INDEX_WHOLE_PROJECT -eq 1 ]; then
                 echo "${PROJECT_ROOT%/}/${l}"
             done > "${TAGS_FILE}.files"
         fi
-        CTAGS_ARGS="${CTAGS_ARGS} -L "${TAGS_FILE}.files""
+        CTAGS_ARGS="${CTAGS_ARGS} -L"
+        CTAGS_ARG_QUOTED_LAST="${TAGS_FILE}.files"
     else
-        CTAGS_ARGS="${CTAGS_ARGS} "${PROJECT_ROOT}""
+        CTAGS_ARG_QUOTED_LAST="${PROJECT_ROOT}"
     fi
 
     echo "Running ctags on whole project"
-    echo "$CTAGS_EXE -f \"$TAGS_FILE.temp\" $CTAGS_ARGS"
-    $CTAGS_EXE -f "$TAGS_FILE.temp" $CTAGS_ARGS
+    echo "$CTAGS_EXE -f \"$TAGS_FILE.temp\" $CTAGS_ARGS \"$CTAGS_ARG_QUOTED_LAST\""
+    $CTAGS_EXE -f "$TAGS_FILE.temp" $CTAGS_ARGS "$CTAGS_ARG_QUOTED_LAST"
 else
     echo "Running ctags on \"$UPDATED_SOURCE\""
     echo "$CTAGS_EXE -f \"$TAGS_FILE.temp\" $CTAGS_ARGS --append \"$UPDATED_SOURCE\""

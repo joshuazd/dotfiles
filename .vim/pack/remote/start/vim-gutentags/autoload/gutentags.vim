@@ -114,7 +114,9 @@ else
             let l:arglen = strlen(cmdarg)
             if (cmdarg[0] == '"' && cmdarg[l:arglen - 1] == '"') || 
                         \(cmdarg[0] == "'" && cmdarg[l:arglen - 1] == "'")
-                call add(l:outcmd, cmdarg[1:-2])
+                " This was quoted, so there are probably things to escape.
+                let l:escapedarg = cmdarg[1:-2] " substitute(cmdarg[1:-2], '\ ', '\\ ', 'g')
+                call add(l:outcmd, l:escapedarg)
             else
                 call add(l:outcmd, cmdarg)
             endif
@@ -578,8 +580,12 @@ function! gutentags#fake(...)
     echom ""
 endfunction
 
-function! gutentags#default_io_cb(chan, msg) abort
-    call gutentags#trace('[job output]: '.string(a:msg))
+function! gutentags#default_stdout_cb(chan, msg) abort
+    call gutentags#trace('[job stdout]: '.string(a:msg))
+endfunction
+
+function! gutentags#default_stderr_cb(chan, msg) abort
+    call gutentags#trace('[job stderr]: '.string(a:msg))
 endfunction
 
 if has('nvim')
@@ -600,10 +606,10 @@ if has('nvim')
                 \    ['gutentags#'.a:module.'#on_job_exit']),
                 \'on_stdout': function(
                 \    '<SID>nvim_job_out_wrapper',
-                \    ['gutentags#default_io_cb']),
+                \    ['gutentags#default_stdout_cb']),
                 \'on_stderr': function(
                 \    '<SID>nvim_job_out_wrapper',
-                \    ['gutentags#default_io_cb'])
+                \    ['gutentags#default_stderr_cb'])
                 \}
        return l:job_opts
     endfunction
@@ -616,8 +622,8 @@ else
     function! gutentags#build_default_job_options(module) abort
         let l:job_opts = {
                  \'exit_cb': 'gutentags#'.a:module.'#on_job_exit',
-                 \'out_cb': 'gutentags#default_io_cb',
-                 \'err_cb': 'gutentags#default_io_cb',
+                 \'out_cb': 'gutentags#default_stdout_cb',
+                 \'err_cb': 'gutentags#default_stderr_cb',
                  \'stoponexit': 'term'
                  \}
         return l:job_opts
