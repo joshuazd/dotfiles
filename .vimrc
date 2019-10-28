@@ -249,6 +249,9 @@ nnoremap <silent> <C-w>z :pclose<Bar>helpclose<CR>
 
 nnoremap <silent> <space>] :call tag#get('<C-r><C-w>')<CR>
 
+nnoremap <silent> <space>gb :GB<CR>
+xnoremap <silent> <space>gb :GB<CR>
+
 " }}}
 
 " {{{ (Auto)commands
@@ -284,6 +287,10 @@ if executable('python3')
 else
   command! -range=% FormatJSON <line1>,<line2>!python2 -c
         \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
+endif
+command! -range GB echo trim(substitute(join(systemlist("git -C " . shellescape(expand('%:p:h')) . " blame -L <line1>,<line2> " . expand('%:t')), "\n"), '^\([a-z0-9]\+\)[^)]\+\zs) .*$', '\=") " . system("git log -1 --pretty=%s " . submatch(1))', ''))
+if has('textprop')
+  command! -range GB call popup_atcursor(trim(substitute(join(systemlist("git -C " . shellescape(expand('%:p:h')) . " blame -L <line1>,<line2> " . expand('%:t')), "\n"), '^\([a-z0-9]\+\)[^)]\+\zs) .*$', '\=") " . system("git log -1 --pretty=%s " . submatch(1))', '')), {'border':[]})
 endif
 
 " }}}
@@ -367,6 +374,7 @@ let g:netrw_liststyle = 0
 let g:netrw_browse_split = 0
 let g:netrw_winsize = 15
 let g:netrw_cursor = 2
+let g:netrw_list_hide = '^\.\+\/*$'
 " markdown
 let g:markdown_fenced_languages = ['python', 'ruby', 'bash=sh', 'sql']
 " gutentags

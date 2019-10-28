@@ -17,5 +17,5 @@ function! tag#get(tag) abort
     endif
     let tag += [trim(info[i])]
   endfor
-  call popup_atcursor(tag, {'moved':'word','padding':[]})
+  call popup_atcursor(tag, {'moved':'word','border':[]})
 endfunction
