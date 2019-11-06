@@ -26,7 +26,7 @@ var placeholder *regexp.Regexp
 var activeTempFiles []string
 
 func init() {
-	placeholder = regexp.MustCompile("\\\\?(?:{[+sf]*[0-9,-.]*}|{q}|{\\+?f?nf?})")
+	placeholder = regexp.MustCompile(`\\?(?:{[+sf]*[0-9,-.]*}|{q}|{\+?f?nf?})`)
 	activeTempFiles = []string{}
 }
 
@@ -76,7 +76,7 @@ type Terminal struct {
 	xoffset    int
 	yanked     []rune
 	input      []rune
-	multi      bool
+	multi      int
 	sort       bool
 	toggleSort bool
 	delimiter  Delimiter
@@ -750,8 +750,12 @@ func (t *Terminal) printInfo() {
 			output += " -S"
 		}
 	}
-	if t.multi && len(t.selected) > 0 {
-		output += fmt.Sprintf(" (%d)", len(t.selected))
+	if len(t.selected) > 0 {
+		if t.multi == maxMulti {
+			output += fmt.Sprintf(" (%d)", len(t.selected))
+		} else {
+			output += fmt.Sprintf(" (%d/%d)", len(t.selected), t.multi)
+		}
 	}
 	if t.progress > 0 && t.progress < 100 {
 		output += fmt.Sprintf(" (%d%%)", t.progress)
@@ -1006,19 +1010,6 @@ func (t *Terminal) printHighlighted(result Result, attr tui.Attr, col1 tui.Color
 		t.window.CPrint(col1, attr, substr)
 	}
 	return displayWidth
-}
-
-func numLinesMax(str string, max int) int {
-	lines := 0
-	for lines < max {
-		idx := strings.Index(str, "\n")
-		if idx < 0 {
-			break
-		}
-		str = str[idx+1:]
-		lines++
-	}
-	return lines
 }
 
 func (t *Terminal) printPreview() {
@@ -1426,9 +1417,18 @@ func (t *Terminal) buildPlusList(template string, forcePlus bool) (bool, []*Item
 	return true, sels
 }
 
-func (t *Terminal) selectItem(item *Item) {
+func (t *Terminal) selectItem(item *Item) bool {
+	if len(t.selected) >= t.multi {
+		return false
+	}
+	if _, found := t.selected[item.Index()]; found {
+		return false
+	}
+
 	t.selected[item.Index()] = selectedItem{time.Now(), item}
 	t.version++
+
+	return true
 }
 
 func (t *Terminal) deselectItem(item *Item) {
@@ -1436,12 +1436,12 @@ func (t *Terminal) deselectItem(item *Item) {
 	t.version++
 }
 
-func (t *Terminal) toggleItem(item *Item) {
+func (t *Terminal) toggleItem(item *Item) bool {
 	if _, found := t.selected[item.Index()]; !found {
-		t.selectItem(item)
-	} else {
-		t.deselectItem(item)
+		return t.selectItem(item)
 	}
+	t.deselectItem(item)
+	return true
 }
 
 func (t *Terminal) killPreview(code int) {
@@ -1687,11 +1687,12 @@ func (t *Terminal) Loop() {
 				}
 			}
 		}
-		toggle := func() {
-			if t.cy < t.merger.Length() {
-				t.toggleItem(t.merger.Get(t.cy).item)
+		toggle := func() bool {
+			if t.cy < t.merger.Length() && t.toggleItem(t.merger.Get(t.cy).item) {
 				req(reqInfo)
+				return true
 			}
+			return false
 		}
 		scrollPreview := func(amount int) {
 			if !t.previewer.more {
@@ -1813,27 +1814,43 @@ func (t *Terminal) Loop() {
 					t.cx--
 				}
 			case actSelectAll:
-				if t.multi {
+				if t.multi > 0 {
 					for i := 0; i < t.merger.Length(); i++ {
-						t.selectItem(t.merger.Get(i).item)
+						if !t.selectItem(t.merger.Get(i).item) {
+							break
+						}
 					}
 					req(reqList, reqInfo)
 				}
 			case actDeselectAll:
-				if t.multi {
-					t.selected = make(map[int32]selectedItem)
-					t.version++
+				if t.multi > 0 {
+					for i := 0; i < t.merger.Length() && len(t.selected) > 0; i++ {
+						t.deselectItem(t.merger.Get(i).item)
+					}
 					req(reqList, reqInfo)
 				}
 			case actToggle:
-				if t.multi && t.merger.Length() > 0 {
-					toggle()
+				if t.multi > 0 && t.merger.Length() > 0 && toggle() {
 					req(reqList)
 				}
 			case actToggleAll:
-				if t.multi {
+				if t.multi > 0 {
+					prevIndexes := make(map[int]struct{})
+					for i := 0; i < t.merger.Length() && len(t.selected) > 0; i++ {
+						item := t.merger.Get(i).item
+						if _, found := t.selected[item.Index()]; found {
+							prevIndexes[i] = struct{}{}
+							t.deselectItem(item)
+						}
+					}
+
 					for i := 0; i < t.merger.Length(); i++ {
-						t.toggleItem(t.merger.Get(i).item)
+						if _, found := prevIndexes[i]; !found {
+							item := t.merger.Get(i).item
+							if !t.selectItem(item) {
+								break
+							}
+						}
 					}
 					req(reqList, reqInfo)
 				}
@@ -1848,14 +1865,12 @@ func (t *Terminal) Loop() {
 				}
 				return doAction(action{t: actToggleUp}, mapkey)
 			case actToggleDown:
-				if t.multi && t.merger.Length() > 0 {
-					toggle()
+				if t.multi > 0 && t.merger.Length() > 0 && toggle() {
 					t.vmove(-1, true)
 					req(reqList)
 				}
 			case actToggleUp:
-				if t.multi && t.merger.Length() > 0 {
-					toggle()
+				if t.multi > 0 && t.merger.Length() > 0 && toggle() {
 					t.vmove(1, true)
 					req(reqList)
 				}
@@ -1959,7 +1974,7 @@ func (t *Terminal) Loop() {
 				if me.S != 0 {
 					// Scroll
 					if t.window.Enclose(my, mx) && t.merger.Length() > 0 {
-						if t.multi && me.Mod {
+						if t.multi > 0 && me.Mod {
 							toggle()
 						}
 						t.vmove(me.S, true)
@@ -1999,7 +2014,7 @@ func (t *Terminal) Loop() {
 							t.cx = mx + t.xoffset
 						} else if my >= min {
 							// List
-							if t.vset(t.offset+my-min) && t.multi && me.Mod {
+							if t.vset(t.offset+my-min) && t.multi > 0 && me.Mod {
 								toggle()
 							}
 							req(reqList)
