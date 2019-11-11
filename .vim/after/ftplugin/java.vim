@@ -1,5 +1,5 @@
 compiler ant
-setlocal makeprg=mvn\ install\ -e\ -ff
+setlocal makeprg=mvn\ package\ -e\ -ff
 setlocal path=.,src/main/java/com/panera/,src/main/java/
 setlocal foldmarker={,}
 setlocal define=\\s*\\%(\\%(public\\\|private\\\|protected\\\|static\\\|abstract\\\|final\\)\\s*\\)\\+\\%(void\\\|int\\\|short\\\|long\\\|byte\\\|float\\\|double\\\|char\\\|boolean\\\|[A-Z][a-zA-Z0-9_\\.]*\\%(<.*>\\)\\=\\)\\s*
@@ -8,4 +8,36 @@ setlocal complete-=i
 if executable('java-language-server') && exists(':Packadd')
   Packadd vim-lsc
 endif
+let b:wlsenv='/mnt/c/Users/jzinkduda/apps/wls12120/wlserver/server/bin/setWLSEnv.sh'
+function! s:deploy(bang) abort
+  let b:war_name = get(b:, 'war_name', 'target/'.fnamemodify(getcwd(),':t'))
+  execute 'Start'.a:bang.' -wait=error source '.b:wlsenv.' && java weblogic.Deployer -deploy -source $PWD/'.b:war_name.' -adminurl t3://localhost:7001 -username '.get(b:, 'weblogic_username', 'weblogic').' -password '.get(b:, 'weblogic_password', 'webl0gic')
+endfunction
+function! s:build_and_deploy(bang) abort
+  let b:dispatch = 'mvn compile war:manifest war:exploded -T 1C -e -ff'
+  Dispatch
+  unlet b:dispatch
+  let g:build_bang = a:bang
+  augroup finish_build
+    autocmd!
+      autocmd VimResized * call s:deploy(g:build_bang)
+            \ | execute 'autocmd! finish_build'
+            \ | augroup! finish_build
+            \ | unlet g:build_bang
+    augroup END
+endfunction
+function! s:diagnostic_popup() abort
+  let diagnostic = lsc#diagnostics#underCursor()
+  if !has_key(diagnostic, 'message')
+    return
+  endif
+  let popup = popup_atcursor(diagnostic['message'], {'border':[],'maxwidth':50,'col':diagnostic['range']['start']['character']})
+  call setwinvar(popup, '&linebreak', 1)
+endfunction
+autocmd! LSC CursorMoved *
+augroup JavaLSC
+  autocmd!
+  autocmd CursorMoved * call s:diagnostic_popup()
+augroup END
+command! -bang Build call s:build_and_deploy('<bang>')
 let b:undo_ftplugin = 'setlocal makeprg< path< foldmarker< define< include< complete<'
