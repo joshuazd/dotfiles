@@ -311,10 +311,26 @@ endif
 " LSC
 let g:lsc_reference_highlights = 0
 let g:lsc_enable_autocomplete = 0
+function! s:fixEdits(actions) abort
+  return map(a:actions, function('<SID>fixEdit'))
+endfunction
+function! s:fixEdit(idx, maybeEdit) abort
+  if !has_key(a:maybeEdit, 'command') ||
+        \ !has_key(a:maybeEdit.command, 'command') ||
+        \ a:maybeEdit.command.command !=# 'java.apply.workspaceEdit'
+    return a:maybeEdit
+  endif
+  return {
+        \ 'edit': a:maybeEdit.command.arguments[0],
+        \ 'title': a:maybeEdit.command.title}
+endfunction
 let g:lsc_server_commands = {
       \ 'java': {
         \ 'command': 'java-language-server',
-        \ 'log_level': 'Warning'
+        \ 'log_level': 'Warning',
+        \ 'response_hooks': {
+        \   'textDocument/codeAction': function('<SID>fixEdits'),
+        \ }
         \}
       \}
 let g:lsc_auto_map = {
@@ -328,7 +344,8 @@ let g:lsc_auto_map = {
       \ 'DocumentSymbol': 'go',
       \ 'WorkspaceSymbol': 'gS',
       \ 'SignatureHelp': '<C-m>',
-      \ 'Completion': 'omnifunc'
+      \ 'Completion': 'omnifunc',
+      \ 'defaults': 1
       \}
 " ultisnips
 let g:UltiSnipsListSnippets        = '<C-@>'
@@ -394,14 +411,15 @@ let g:signify_sign_delete     = '_'
 let g:signify_sign_change     = '┃'
 let g:signify_sign_delete_first_line = '¯'
 let g:signify_sign_show_count = 0
-function! s:hl_Signify() abort
+function! s:hl() abort
   hi link SignifySignAdd    StringDelimiter
   hi link SignifySignChange Identifier
   hi link SignifySignDelete Special
+  hi link lscDiagnosticWarning WarningMsg
 endfunction
-call <SID>hl_Signify()
+call <SID>hl()
 augroup signify
   autocmd!
-  autocmd ColorScheme * call <SID>hl_Signify()
+  autocmd ColorScheme * call <SID>hl()
 augroup END
 " }}}
