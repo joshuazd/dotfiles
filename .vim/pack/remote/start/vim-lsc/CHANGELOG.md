@@ -13,6 +13,8 @@
 - Server dictionaries no longer expose their full `init_results`, or their call
   logs.
 - Default keybinding for `LSClientSignatureHelp` changed to `gm`.
+- Notifications which are not handled by the client are ignored instead of
+  reported.
 
 **Enhancements**
 - More tolerant towards buggy language servers that omit the `result` field on
@@ -33,6 +35,9 @@
 - Use the popup window for hover.
 - Add autocmd `User LSCDiagnosticsChange` to trigger when diagnostics are
   received.
+- Add support for a custom action menu with `g:LSC_action_menu`.
+- Sort completion suggestions that match by prefix higher than those that match
+  by substring.
 
 # 0.3.2
 
