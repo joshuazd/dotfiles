@@ -22,11 +22,6 @@ if exists('g:loaded_sneak_plugin')
 
 endif
 
-if exists('g:loaded_fzf')
-  nnoremap gb :Buffers<CR>
-  nnoremap <space>p :Files<CR>
-endif
-
 if exists('did_plugin_ultisnips')
   let g:ulti_expand_or_jump_res = 0
   function! UltiSnips_ExpandJump() abort
