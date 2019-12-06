@@ -1,6 +1,6 @@
 compiler ant
 setlocal makeprg=mvn\ package\ -e\ -ff
-setlocal path=.,src/main/java/com/panera/,src/main/java/
+setlocal path=.,src/main/java/com/panera/,src/main/java/,src/main/resources,src/main/webapp/WEB-INF
 setlocal foldmarker={,}
 setlocal define=\\s*\\%(\\%(public\\\|private\\\|protected\\\|static\\\|abstract\\\|final\\)\\s*\\)\\+\\%(void\\\|int\\\|short\\\|long\\\|byte\\\|float\\\|double\\\|char\\\|boolean\\\|[A-Z][a-zA-Z0-9_\\.]*\\%(<.*>\\)\\=\\)\\s*
 setlocal include=^\\s*import\\s*\\%(static\\)\\=\\s*
@@ -28,16 +28,18 @@ function! s:build_and_deploy(bang) abort
 endfunction
 function! s:diagnostic_popup() abort
   let diagnostic = lsc#diagnostics#underCursor()
+  silent! call popup_close(b:popup)
   if !has_key(diagnostic, 'message')
     return
   endif
-  let popup = popup_atcursor(diagnostic['message'], {'border':[],'maxwidth':50,'col':diagnostic['range']['start']['character']})
-  call setwinvar(popup, '&linebreak', 1)
+  let b:popup = popup_atcursor(diagnostic['message'], {'border':[],'maxwidth':50,'col':diagnostic['range']['start']['character']})
+  call setwinvar(b:popup, '&linebreak', 1)
 endfunction
 autocmd! LSC CursorMoved *
 augroup JavaLSC
   autocmd!
   autocmd CursorMoved * call s:diagnostic_popup()
+  autocmd BufWritePost * call s:diagnostic_popup()
 augroup END
 command! -bang Build call s:build_and_deploy('<bang>')
 let b:undo_ftplugin = 'setlocal makeprg< path< foldmarker< define< include< complete<'
