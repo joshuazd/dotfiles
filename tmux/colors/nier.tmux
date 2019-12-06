@@ -29,7 +29,7 @@ set -g status-justify left
 set -g status-bg '#45403a'
 set -g status-fg '#b4af9a'
 set -g status-left ' #S § '
-set -g status-right '#{battery_percentage}#{battery_remain}#[nobold] %I:%M:%S %P #{username} #{hostname} '
+set -g status-right '#{battery_percentage}#{battery_remain}#[nobold] %H:%M:%S %P #{username} #{hostname} '
 
 setw -g window-status-current-fg '#45403a'
 setw -g window-status-current-bg '#b4af9a'

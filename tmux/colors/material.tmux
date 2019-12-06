@@ -27,7 +27,7 @@ set -g status-justify left
 set -g status-bg colour236
 set -g status-fg colour245
 set -g status-left ' #[fg=colour248]#S § '
-set -g status-right '#{battery_status_fg}#{battery_percentage}#[fg=default]#{battery_remain}#[fg=colour68,nobold] %I:%M:%S %P#[bg=default,fg=colour179] #{username} #[fg=default]#{hostname} '
+set -g status-right '#{battery_status_fg}#{battery_percentage}#[fg=default]#{battery_remain}#[fg=colour68,nobold] %H:%M:%S#[bg=default,fg=colour179] #{username} #[fg=default]#{hostname} '
 
 setw -g window-status-current-fg colour234
 setw -g window-status-current-bg colour167
