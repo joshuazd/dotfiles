@@ -1,9 +1,3 @@
-if exists(':Packadd')
-  Packadd jedi-vim
-endif
-if exists(':JediDebugInfo')
-  setlocal omnifunc=jedi#completions
-endif
 setlocal path-=**
 setlocal foldmethod=indent
 setlocal keywordprg=pydoc3
@@ -19,8 +13,6 @@ augroup PYTHON
       autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
     endif
 augroup END
-let g:jedi#goto_command = ',d'
-let g:jedi#rename_command = ',r'
 
 " ipython setup {{{
 
