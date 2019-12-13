@@ -404,21 +404,12 @@ if executable('python3')
   let g:python_executable = 'python3'
   let g:jedi#force_py_version = 3
 endif
-" signify
-let g:signify_vcs_list        = ['git']
-let g:signify_sign_add        = '┃'
-let g:signify_sign_delete     = '_'
-let g:signify_sign_change     = '┃'
-let g:signify_sign_delete_first_line = '¯'
-let g:signify_sign_show_count = 0
+
 function! s:hl() abort
-  hi link SignifySignAdd    StringDelimiter
-  hi link SignifySignChange Identifier
-  hi link SignifySignDelete Special
   hi link lscDiagnosticWarning WarningMsg
 endfunction
 call <SID>hl()
-augroup signify
+augroup custom_hi
   autocmd!
   autocmd ColorScheme * call <SID>hl()
 augroup END
