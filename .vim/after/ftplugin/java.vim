@@ -35,11 +35,15 @@ function! s:diagnostic_popup() abort
   let b:popup = popup_atcursor(diagnostic['message'], {'border':[],'maxwidth':50,'col':diagnostic['range']['start']['character']})
   call setwinvar(b:popup, '&linebreak', 1)
 endfunction
-autocmd! LSC CursorMoved *
+silent! autocmd! LSC CursorMoved *
 augroup JavaLSC
   autocmd!
-  autocmd CursorMoved * call s:diagnostic_popup()
-  autocmd BufWritePost * call s:diagnostic_popup()
+  if exists('*lsc#diagnostics#underCursor')
+    autocmd CursorMoved * call s:diagnostic_popup()
+    autocmd BufWritePost * call s:diagnostic_popup()
+  endif
 augroup END
 command! -bang Build call s:build_and_deploy('<bang>')
+let b:surround_{char2nr('{')} = "\1block: \1 {\n".(&l:expandtab ? repeat(' ',&l:shiftwidth) : "\t")."\r\n}"
+let b:surround_indent = 1
 let b:undo_ftplugin = 'setlocal makeprg< path< foldmarker< define< include< complete<'
