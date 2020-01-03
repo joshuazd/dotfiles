@@ -138,9 +138,15 @@ function! s:showHover(result) abort
     let contents = [contents]
   endif
   let lines = []
+  let filetype = 'markdown'
   for item in contents
     if type(item) == type({})
       let l:lines += split(item.value, "\n")
+      if has_key(item, 'language')
+        let l:filetype = item.language
+      elseif has_key(item, 'kind')
+        let l:filetype = item.kind ==# 'markdown' ? 'markdown' : 'text'
+      endif
     else
       let l:lines += split(item, "\n")
     endif
@@ -148,13 +154,13 @@ function! s:showHover(result) abort
   if get(g:, 'lsc_hover_popup', v:true) 
         \ && (exists('*popup_atcursor') || exists('*nvim_open_win'))
     call s:closeHoverPopup()
-    call s:openHoverPopup(l:lines)
+    call s:openHoverPopup(l:lines, l:filetype)
   else
     call lsc#util#displayAsPreview(lines, function('lsc#util#noop'))
   endif
 endfunction
 
-function! s:openHoverPopup(lines) abort
+function! s:openHoverPopup(lines, filetype) abort
   " Sanity check, if there is no hover text then don't waste resources creating an
   " empty popup.
   if len(a:lines) == 0
@@ -162,19 +168,26 @@ function! s:openHoverPopup(lines) abort
   endif
   if has('nvim')
     let buf = nvim_create_buf(v:false, v:true)
+    call nvim_buf_set_option(buf, 'synmaxcol', 0)
+    if g:lsc_enable_popup_syntax
+      call nvim_buf_set_option(buf, 'filetype', a:filetype)
+    endif
     " Note, the +2s below will be used for padding around the hover text.
     let height = len(a:lines) + 2
     let width = 1
+    " The maximum width of the floating window should not exceed 95% of the
+    " screen width.
+    let max_width = float2nr(&columns * 0.95)
+
     " Need to figure out the longest line and base the popup width on that.
     " Also increase the floating window 'height' if any lines are going to wrap.
     for val in a:lines
       let val_width = strdisplaywidth(val) + 2
-      if val_width > width
-        let width = val_width
+      if val_width > max_width
+        let height = height + (val_width / max_width)
+        let val_width = max_width
       endif
-      if val_width > &columns
-        let height = height + (val_width / &columns)
-      endif
+      let width = val_width > width ? val_width : width
     endfor
 
     " Prefer an upward floating window, but if there is no space fallback to
@@ -190,6 +203,12 @@ function! s:openHoverPopup(lines) abort
       " No space above, so we will float downward instead.
       let vertical_alignment = 'N'
       let row = 1
+      " Truncate the float height so that the popup always floats below and
+      " never overflows into and above the cursor line.
+      let lines_above_cursor = current_position[1] - top_line_number
+      if height > winheight(0) + 2 - lines_above_cursor
+        let height = winheight(0) - lines_above_cursor
+      endif
     endif
 
     let opts = {
@@ -200,24 +219,29 @@ function! s:openHoverPopup(lines) abort
           \ 'width': width,
           \ 'height': height,
           \ 'style': 'minimal',
-          \ 'focusable': v:false,
           \ }
     let s:popup_id = nvim_open_win(buf, v:false, opts)
     call nvim_win_set_option(s:popup_id, 'colorcolumn', '')
     " Add padding to the left and right of each text line.
     call map(a:lines, {_, val -> ' ' . val . ' '})
     call nvim_buf_set_lines(winbufnr(s:popup_id), 1, -1, v:false, a:lines)
+    call nvim_buf_set_option(buf, 'modifiable', v:false)
     " Close the floating window upon a cursor move.
     " vint: -ProhibitAutocmdWithNoGroup
     " https://github.com/Kuniwak/vint/issues/285
     autocmd CursorMoved <buffer> ++once call s:closeHoverPopup()
     " vint: +ProhibitAutocmdWithNoGroup
+    " Also close the floating window when focussed into with the escape key.
+    call nvim_buf_set_keymap(buf, 'n', '<Esc>', ':close<CR>', {})
   else
     let s:popup_id = popup_atcursor(a:lines, {
           \ 'padding': [1, 1, 1, 1],
           \ 'border': [0, 0, 0, 0],
           \ 'moved': 'any',
           \ })
+    if g:lsc_enable_popup_syntax
+      call setbufvar(winbufnr(s:popup_id), '&filetype', a:filetype)
+    endif
   end
 endfunction
 

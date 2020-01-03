@@ -19,6 +19,7 @@ PACKAGES = [
     'tommcdo/vim-lion',
     'romainl/vim-qf',
     'romainl/vim-qlist',
+    'romainl/vim-cool',
     'markonm/traces.vim',
     'sgur/vim-editorconfig',
     'natebosch/vim-lsc',

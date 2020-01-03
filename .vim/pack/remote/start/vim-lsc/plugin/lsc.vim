@@ -16,6 +16,9 @@ endif
 if !exists('g:lsc_enable_snippet_support')
   let g:lsc_enable_snippet_support = v:false
 endif
+if !exists('g:lsc_enable_popup_syntax')
+  let g:lsc_enable_popup_syntax = v:true
+endif
 
 command! LSClientGoToDefinitionSplit
     \ call lsc#reference#goToDefinition(<q-mods>, 1)
@@ -160,7 +163,7 @@ function! s:OnClose() abort
   let l:filetype = getbufvar(str2nr(expand('<abuf>')), '&filetype')
   if !has_key(g:lsc_servers_by_filetype, l:filetype) | return | endif
   if !lsc#server#filetypeActive(l:filetype) | return | endif
-  let l:full_path = expand('<afile>:p')
+  let l:full_path = lsc#file#normalize(expand('<afile>:p'))
   call lsc#file#onClose(l:full_path, l:filetype)
 endfunction
 
