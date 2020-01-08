@@ -22,7 +22,7 @@
 " TODO:     implement pre-like tags, see xml_indent_open / xml_indent_close
 
 " Only load this indent file when no other was loaded.
-if exists("b:did_indent")
+if exists('b:did_indent')
     finish
 endif
 let b:did_indent = 1
@@ -66,10 +66,10 @@ endfun
 
 " [-- check if it's xml --]
 fun! <SID>XmlIndentSynCheck(lnum)
-    if &syntax != ''
+    if &syntax !=# ''
         let syn1 = synIDattr(synID(a:lnum, 1, 1), 'name')
         let syn2 = synIDattr(synID(a:lnum, strlen(getline(a:lnum)) - 1, 1), 'name')
-        if syn1 != '' && syn1 !~ 'xml' && syn2 != '' && syn2 !~ 'xml'
+        if syn1 !=# '' && syn1 !~# 'xml' && syn2 !=# '' && syn2 !~# 'xml'
             " don't indent pure non-xml code
             return 0
         endif
@@ -128,7 +128,7 @@ fun! XmlIndentGet(lnum, use_syntax_check)
         let syn_name_start = synIDattr(synID(a:lnum, match(curline, '\S') + 1, 1), 'name')
     endif
 
-    if syn_name_end =~ 'Comment' && syn_name_start =~ 'Comment'
+    if syn_name_end =~? 'Comment' && syn_name_start =~? 'Comment'
         return <SID>XmlIndentComment(a:lnum)
     " elseif empty(syn_name_start) && empty(syn_name_end)
         " non-xml tag content: use indent from 'autoindent'
@@ -149,12 +149,12 @@ endfun
 
 func! <SID>IsXMLContinuation(line)
     " Checks, whether or not the line matches a start-of-tag
-    return a:line !~ '^\s*<'
+    return a:line !~# '^\s*<'
 endfunc
 
 func! <SID>HasNoTagEnd(line)
     " Checks whether or not the line matches '>' (so finishes a tag)
-    return a:line !~ '>\s*$'
+    return a:line !~# '>\s*$'
 endfunc
 
 " return indent for a commented line,
@@ -162,7 +162,7 @@ endfunc
 func! <SID>XmlIndentComment(lnum)
     let ptagopen = search(b:xml_indent_open, 'bnW')
     let ptagclose = search(b:xml_indent_close, 'bnW')
-    if getline(a:lnum) =~ '<!--'
+    if getline(a:lnum) =~# '<!--'
         " if previous tag was a closing tag, do not add
         " one additional level of indent
         if ptagclose > ptagopen && a:lnum > ptagclose
@@ -171,7 +171,7 @@ func! <SID>XmlIndentComment(lnum)
             " start of comment, add one indentation level
             return indent(ptagopen) + shiftwidth()
         endif
-    elseif getline(a:lnum) =~ '-->'
+    elseif getline(a:lnum) =~# '-->'
         " end of comment, same as start of comment
         return indent(search('<!--', 'bnW'))
     else
