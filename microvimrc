@@ -51,6 +51,11 @@ runtime! macros/matchit.vim
 filetype plugin indent on
 syntax enable
 colorscheme material
+if has('packages')
+  packadd vim-tmuxnavigate
+  packadd vim-ccr
+  packadd vim-textobj
+endif
 
 nnoremap Y y$
 
@@ -79,11 +84,13 @@ nnoremap <Space>fv :vert sfind<space>
 nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
 nnoremap <Space>t :tjump /
 
-nnoremap <Space>g :g/\v/#<Left><Left>
-xnoremap <Space>g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
-nnoremap <Space>i :ilist /
-nnoremap <Space>r :%s/<C-r><C-w>//g<Left><Left>
-xnoremap <Space>r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
+nnoremap <Space>;g :g/\v/#<Left><Left>
+xnoremap <Space>;g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
+nnoremap <Space>;i :ilist /
+nnoremap <Space>;r :%s/<C-r><C-w>//g<Left><Left>
+xnoremap <Space>;r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
+nnoremap <Esc>OA <Up>
+nnoremap <silent> <nowait> <Esc> :<C-u>nohlsearch<CR>
 
 " vim-unimpaired settings toggles
 nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
