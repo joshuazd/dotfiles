@@ -4,7 +4,7 @@
 " Filenames:    *.markdown
 " Last Change:  2013 May 30
 
-if exists("b:current_syntax")
+if exists('b:current_syntax')
   finish
 endif
 
@@ -23,7 +23,7 @@ for s:type in map(copy(g:markdown_fenced_languages),'matchstr(v:val,"[^=]*$")')
   if has_key(s:done_include, matchstr(s:type,'[^.]*'))
     continue
   endif
-  if s:type =~ '\.'
+  if s:type =~# '\.'
     let b:{matchstr(s:type,'[^.]*')}_subtype = matchstr(s:type,'\.\zs.*')
   endif
   exe 'syn include @markdownHighlight'.substitute(s:type,'\.','','g').' syntax/'.matchstr(s:type,'[^.]*').'.vim'
@@ -61,7 +61,8 @@ syn region markdownH6 matchgroup=markdownH6Delimiter start="#######\@!" end="#*\
 
 syn match markdownBlockquote ">.*$" contained contains=@markdownBlock
 
-syn region markdownCodeBlock start="    \|\t" end="$" contained
+syn region markdownCodeBlock start="    " end="$" contained
+syn region markdownCodeBlock start="\t" end="$" contained
 
 " TODO: real nesting
 syn match markdownListMarker "\%(\s*\)[-*+]\%(\s\+\S\)\@=" contained
@@ -161,7 +162,7 @@ hi def link markdownCodeDelimiter         Delimiter
 hi def link markdownEscape                Special
 hi def link markdownError                 Error
 
-let b:current_syntax = "markdown"
+let b:current_syntax = 'markdown'
 if main_syntax ==# 'markdown'
   unlet main_syntax
 endif

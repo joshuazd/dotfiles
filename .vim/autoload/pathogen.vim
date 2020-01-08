@@ -10,7 +10,7 @@
 "
 " The API is documented inline below.
 
-if exists("g:loaded_pathogen") || &cp
+if exists('g:loaded_pathogen') || &cp
   finish
 endif
 let g:loaded_pathogen = 1
@@ -65,7 +65,7 @@ function! pathogen#join(...) abort
     let i = 0
     let space = ''
   endif
-  let path = ""
+  let path = ''
   while i < a:0
     if type(a:000[i]) == type([])
       let list = a:000[i]
@@ -76,7 +76,7 @@ function! pathogen#join(...) abort
         let j += 1
       endwhile
     else
-      let path .= "," . a:000[i]
+      let path .= ',' . a:000[i]
     endif
     let i += 1
   endwhile
@@ -130,7 +130,7 @@ function! pathogen#interpose(name) abort
   let sep = pathogen#slash()
   let name = a:name
   if has_key(s:done_bundles, name)
-    return ""
+    return ''
   endif
   let s:done_bundles[name] = 1
   let list = []
@@ -203,7 +203,7 @@ endfunction
 
 " \ on Windows unless shellslash is set, / everywhere else.
 function! pathogen#slash() abort
-  return !exists("+shellslash") || &shellslash ? '/' : '\'
+  return !exists('+shellslash') || &shellslash ? '/' : '\'
 endfunction
 
 function! pathogen#separator() abort

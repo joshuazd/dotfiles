@@ -1,4 +1,4 @@
-function! xml#complete#CompleteTags(findstart, base)
+function! xml#complete#CompleteTags(findstart, base) abort
   if a:findstart
     " locate the start of the word
     let curline = line('.')
