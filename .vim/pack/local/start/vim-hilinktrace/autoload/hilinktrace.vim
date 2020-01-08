@@ -1,4 +1,4 @@
-function! hilinktrace#HiLinkTrace(always)
+function! hilinktrace#HiLinkTrace(always) abort
 
   " save register a
   let keep_rega= @a

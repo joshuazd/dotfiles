@@ -1,4 +1,4 @@
-function! s:VimNavigate(direction)
+function! s:VimNavigate(direction) abort
   try
     execute 'wincmd ' . a:direction
   catch
@@ -7,7 +7,7 @@ function! s:VimNavigate(direction)
 endfunction
 
 " Like `wincmd` but also change tmux panes instead of vim windows when needed.
-function! tmuxnavigate#TmuxWinCmd(direction)
+function! tmuxnavigate#TmuxWinCmd(direction) abort
   if $TMUX !=? ''
     call s:TmuxAwareNavigate(a:direction)
   else
@@ -15,7 +15,7 @@ function! tmuxnavigate#TmuxWinCmd(direction)
   endif
 endfunction
 
-function! s:TmuxAwareNavigate(direction)
+function! s:TmuxAwareNavigate(direction) abort
   let nr = winnr()
   let tmux_last_pane = (a:direction ==? 'p' && s:tmux_is_last_pane)
   if !tmux_last_pane

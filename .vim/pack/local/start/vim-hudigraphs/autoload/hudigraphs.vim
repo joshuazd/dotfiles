@@ -1,5 +1,5 @@
 " This elaboration intercepts the timeouts on regular getchar()...
-function! s:active_getchar ()
+function! s:active_getchar () abort
     let char = 0
     while !char
         let char = getchar()
@@ -8,14 +8,14 @@ function! s:active_getchar ()
 endfunction
 
 " Retrieve the digraph list (should be called in a :silent)...
-function! s:get_digraphs()
+function! s:get_digraphs() abort
     redir => digraphs
     digraphs
     redir END
     return substitute(digraphs,'\%d173', '-?','')   " Translate invisible soft-hyphen
 endfunction
 
-function! s:show_digraphs (digraphs, cursor_char, context)
+function! s:show_digraphs (digraphs, cursor_char, context) abort
     " Pad digraph table to fill screen
     let digraphs = copy(a:digraphs) + repeat(['~'], winheight(0))
 
@@ -94,7 +94,7 @@ function! s:digraphs_table() abort
 endfunction
 
 " Emulate a more helpful ^K...
-function! hudigraphs#HUDG_GetDigraph()
+function! hudigraphs#HUDG_GetDigraph() abort
   let more = &more
   set nomore
     " Locate cursor...
