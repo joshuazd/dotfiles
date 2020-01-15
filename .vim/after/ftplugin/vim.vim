@@ -6,6 +6,7 @@ setlocal keywordprg=:help
 setlocal errorformat=%f:%l:%c:\ %t%n:\ %m,%f:%l:%c:\ %m
 setlocal path=$HOME/dotfiles/.vim/,,
 setlocal suffixesadd+=.vim
+setlocal tags+=$VIMRUNTIME/tags
 
 " Move around functions.
 nnoremap <silent><buffer> [m m':call search('^\s*fu\%[nction]\>', "bW")<CR>
