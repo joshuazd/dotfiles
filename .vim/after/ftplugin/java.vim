@@ -6,6 +6,8 @@ setlocal define=\\s*\\%(\\%(public\\\|private\\\|protected\\\|static\\\|abstract
 setlocal include=^\\s*import\\s*\\%(static\\)\\=\\s*
 setlocal complete-=i
 if executable('java-language-server') && exists(':Packadd')
+  silent! nunmap K
+  silent! xunmap K
   Packadd vim-lsc
 endif
 let b:wlsenv='/mnt/c/Users/jzinkduda/apps/wls12120/wlserver/server/bin/setWLSEnv.sh'
@@ -32,7 +34,7 @@ function! s:diagnostic_popup() abort
   if !has_key(diagnostic, 'message')
     return
   endif
-  let b:popup = popup_atcursor(diagnostic['message'], {'border':[],'maxwidth':50,'col':diagnostic['range']['start']['character']})
+  let b:popup = popup_atcursor(diagnostic['message'], {'padding':[],'maxwidth':50,'col':diagnostic['range']['start']['character']})
   call setwinvar(b:popup, '&linebreak', 1)
 endfunction
 silent! autocmd! LSC CursorMoved *
