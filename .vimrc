@@ -67,7 +67,7 @@ set wildignore+=*.o,*~,*.pyc,*.versionsBackup
 set wildignore+=*target/*,*bin/*,*build/*
 set wildignore+=tags,Session.vim
 set foldmethod=marker
-set foldlevelstart=4
+set foldlevelstart=99
 set complete-=i
 set omnifunc=syntaxcomplete#Complete
 set concealcursor+=n
@@ -282,6 +282,8 @@ command! AnsibleCrypt call ansible#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
 command! Focus call vim#Focus()
 command! -nargs=1 -complete=color Theme colo <args>|!jzd theme <args>
+command! -nargs=* -complete=file Args call args#tabsplit(<f-args>)
+
 if executable('python3')
   command! -range=% FormatJSON <line1>,<line2>!python3 -m json.tool
 else
