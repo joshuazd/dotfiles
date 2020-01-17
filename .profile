@@ -21,7 +21,8 @@ WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
 ZSH_CUSTOM=$HOME/dotfiles/zsh_custom
 TMUX_CUSTOM=$HOME/dotfiles/tmux
 SHELL=/usr/bin/zsh
-export WORDCHARS ZSH_CUSTOM TMUX_CUSTOM SHELL
+TZ='America/Chicago'
+export WORDCHARS ZSH_CUSTOM TMUX_CUSTOM SHELL TZ
 
 _gen_fzf_default_opts() {
 
