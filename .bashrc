@@ -9,6 +9,10 @@ shopt -s cdspell
 # Any completions you add in ~/.bash_completion are sourced last.
  [[ -f /etc/bash_completion ]] && . /etc/bash_completion
 
+set -o vi
+bind -m vi-insert '"\C-p": previous-history'
+bind -m vi-insert '"\C-n": next-history'
+
 _git_prompt_info() {
     sym=$(command git symbolic-ref HEAD 2> /dev/null)
     rev=$(command git rev-parse HEAD 2> /dev/null)
@@ -22,20 +26,48 @@ _git_prompt_info() {
       fi
 }
 
-_build_prompt() {
-    ret=$([ $? -eq 0 ] && echo '93' || echo '31')
-    prompt="\e[94m$(dirs +0)\e[m\e["
+# _build_prompt() {
+#     # ret=$([ $? -eq 0 ] && echo '93' || echo '31')
+#     # prompt="\e[94m$(dirs +0)\e[m\e["
+#     prompt="$(dirs +0)"
+#     # case "$TERM" in
+#     #     *-256color) prompt+='38;5;242' ;;
+#     #     *)          prompt+='91'       ;;
+#     # esac
+#     # prompt+="m$(_git_prompt_info)\e["$ret"m $\e[m"
+#     prompt+=" $"
+#     echo -ne " "$prompt" "
+# }
 
-    case "$TERM" in
-        *-256color) prompt+='38;5;242' ;;
-        *)          prompt+='91'       ;;
-    esac
-    prompt+="m$(_git_prompt_info)\e["$ret"m $\e[m"
-
-    echo -ne " "$prompt" "
+# get current branch in git repo
+function parse_git_branch() {
+	BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+	if [ ! "${BRANCH}" == "" ]
+	then
+		echo "[${BRANCH}] "
+	else
+		echo ""
+	fi
 }
 
-PS1="\$(_build_prompt)"
+function _prompt_symbol() {
+    RETVAL=$?
+    if [ $RETVAL -ne 0 ]; then
+        PROMPT_SYMBOL="\[\e[31m"
+        # echo -ne "\e[31m"
+    else
+        PROMPT_SYMBOL="\[\e[93m"
+        # echo -ne "\e[93m"
+    fi
+}
+
+function _build_prompt() {
+    _prompt_symbol $?
+    PS1=" \[\e[94m\]\w\[\e[m\] \[\e[38;5;242m\]\`parse_git_branch\`\[\e[m\]\[${PROMPT_SYMBOL}\]\\$\[\e[m\] "
+}
+
+PROMPT_COMMAND=_build_prompt
+# PS1="\$(_build_prompt)"
 
 # Aliases
 [ -f "${HOME}/.aliases" ] && source "${HOME}/.aliases"
