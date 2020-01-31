@@ -10,6 +10,8 @@ ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
 
 RIPGREP_CONFIG_PATH=~/.ripgrep
 
+KEYTIMEOUT=1
+
 eval $(dircolors "$HOME/.dir_colors")
 
 if type fd > /dev/null; then

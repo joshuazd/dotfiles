@@ -1,2 +1,3 @@
 --theme=MaterialThemeDark
 --map-syntax vimrc:vim
+--map-syntax dmc:js
