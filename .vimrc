@@ -283,16 +283,13 @@ command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<ar
 command! Focus call vim#Focus()
 command! -nargs=1 -complete=color Theme colo <args>|!jzd theme <args>
 command! -nargs=* -complete=file Args call args#tabsplit(<f-args>)
+command! -range GB call git#blame("<line1>,<line2>")
 
 if executable('python3')
   command! -range=% FormatJSON <line1>,<line2>!python3 -m json.tool
 else
   command! -range=% FormatJSON <line1>,<line2>!python2 -c
         \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
-endif
-command! -range GB echo trim(substitute(join(systemlist("git -C " . shellescape(expand('%:p:h')) . " blame -L <line1>,<line2> " . expand('%:t')), "\n"), '^\([a-z0-9]\+\)[^)]\+\zs) .*$', '\=") " . system("git log -1 --pretty=%s " . submatch(1))', ''))
-if has('textprop')
-  command! -range GB call popup_atcursor(trim(substitute(join(systemlist("git -C " . shellescape(expand('%:p:h')) . " blame -L <line1>,<line2> " . expand('%:t')), "\n"), '^\([a-z0-9]\+\)[^)]\+\zs) .*$', '\=") " . system("git log -1 --pretty=%s " . submatch(1))', '')), {'border':[]})
 endif
 
 " }}}
@@ -406,6 +403,9 @@ if executable('python3')
   let g:python_executable = 'python3'
   let g:jedi#force_py_version = 3
 endif
+" FZF
+let g:fzf_files_options = ['--preview', 'fzf_preview {} 2>/dev/null']
+let g:fzf_buffers_options = ['--preview', 'fzf_preview {2} 2>/dev/null']
 
 function! s:hl() abort
   hi link lscDiagnosticWarning WarningMsg
@@ -416,3 +416,62 @@ augroup custom_hi
   autocmd ColorScheme * call <SID>hl()
 augroup END
 " }}}
+
+fu s:snr() abort
+    return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
+endfu
+let s:snr = get(s:, 'snr', s:snr())
+let g:fzf_layout = {'window': 'call '.s:snr.'fzf_window(0.9, 0.6, "Comment")'}
+
+inoremap <expr> <c-j> complete#fzf_tags()
+
+fu s:fzf_window(width, height, border_highlight) abort
+    let width = float2nr(&columns * a:width)
+    let height = float2nr(&lines * a:height)
+    let row = float2nr((&lines - height) / 2)
+    let col = float2nr((&columns - width) / 2)
+    let top = '┌' . repeat('─', width - 2) . '┐'
+    let mid = '│' . repeat(' ', width - 2) . '│'
+    let bot = '└' . repeat('─', width - 2) . '┘'
+    let border = [top] + repeat([mid], height - 2) + [bot]
+    let frame = s:create_popup_window(a:border_highlight, {
+        \ 'line': row,
+        \ 'col': col,
+        \ 'width': width,
+        \ 'height': height,
+        \ 'is_frame': 1,
+        \ })
+    call setbufline(frame, 1, border)
+    call s:create_popup_window('Normal', {
+        \ 'line': row + 1,
+        \ 'col': col + 2,
+        \ 'width': width - 4,
+        \ 'height': height - 2,
+        \ })
+endfu
+
+fu s:create_popup_window(hl, opts) abort
+    if has_key(a:opts, 'is_frame')
+        let id = popup_create('', {
+            \ 'line': a:opts.line,
+            \ 'col': a:opts.col,
+            \ 'minwidth': a:opts.width,
+            \ 'minheight': a:opts.height,
+            \ 'zindex': 50,
+            \ })
+        call setwinvar(id, '&wincolor', a:hl)
+        exe 'au BufWipeout * ++once call popup_close('.id.')'
+        return winbufnr(id)
+    else
+        let buf = term_start(&shell, {'hidden': 1})
+        call popup_create(buf, {
+            \ 'line': a:opts.line,
+            \ 'col': a:opts.col,
+            \ 'minwidth': a:opts.width,
+            \ 'minheight': a:opts.height,
+            \ 'zindex': 51,
+            \ })
+        exe 'au BufWipeout * ++once bw! '.buf
+    endif
+endfu
+

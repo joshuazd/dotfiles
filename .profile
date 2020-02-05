@@ -72,13 +72,14 @@ _gen_fzf_default_opts() {
               --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
               --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
               --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
-              --preview='fzf_preview {} 2>/dev/null'
             "
             ;;
     esac
 
     FZF_CTRL_R_OPTS="--preview=''"
-    export FZF_DEFAULT_OPTS FZF_CTRL_R_OPTS
+    FZF_CTRL_T_OPTS="--preview='fzf_preview {} 2>/dev/null'"
+    FZF_ALT_C_OPTS="--preview='fzf_preview {} 2>/dev/null'"
+    export FZF_DEFAULT_OPTS FZF_CTRL_R_OPTS FZF_CTRL_T_OPTS FZF_ALT_C_OPTS
 }
 
 _gen_fzf_default_opts material

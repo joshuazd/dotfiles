@@ -56,3 +56,12 @@ if exists('g:loaded_fugitive')
   nnoremap <space>gp :Gpush<CR>
   cnoreabbrev @@ <C-r>=fugitive#head()<CR>
 endif
+
+if exists(':History')
+  nnoremap <space>H :History<CR>
+  nnoremap <space>F :Files<CR>
+  nnoremap <space>G :GFiles<CR>
+  nnoremap <space>T :Tags<CR>
+  nnoremap <space>L :Lines<CR>
+  nnoremap <space>B :Buffers<CR>
+endif
