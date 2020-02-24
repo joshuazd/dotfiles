@@ -2,6 +2,7 @@ setlocal foldmethod=indent
 setlocal smarttab
 setlocal conceallevel=0
 setlocal foldnestmax=2
+setlocal foldlevel=1
 setlocal iskeyword+=-
 setlocal expandtab
 setlocal tabstop=2
@@ -40,7 +41,6 @@ set suffixesadd+=.xml,.dbs
 setlocal isfname-=/
 setlocal include=\\%(target\\\|key\\\|messageStore\\)=
 setlocal define=\\%(name\\)=
-nnoremap <buffer> <space>F zMzr
 nnoremap <buffer> cx :set operatorfunc=xml#escape#escape<CR>g@
 xnoremap <buffer> X :<C-u>call xml#escape#escape()<CR>
 

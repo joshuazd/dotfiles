@@ -257,7 +257,7 @@ xnoremap <silent> <space>gb :GB<CR>
 " {{{ (Auto)commands
 augroup vimrc
   autocmd!
-  autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif
+  autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif | norm! zv
   autocmd User UltiSnipsEnterFirstSnippet let in_snippet = 1
   autocmd User UltiSnipsExitLastSnippet   let in_snippet = 0
   if &termencoding ==# 'utf-8' || &encoding ==# 'utf-8'

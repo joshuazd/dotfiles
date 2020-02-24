@@ -1,6 +1,6 @@
 compiler ant
 setlocal makeprg=mvn\ package\ -e\ -ff
-setlocal path=.,src/main/java/com/panera/,src/main/java/,src/main/resources,src/main/webapp/WEB-INF
+setlocal path=.,,src/main/java/com/panera/,src/main/java/,src/main/resources,src/main/webapp/WEB-INF
 setlocal foldmarker={,}
 setlocal define=\\s*\\%(\\%(public\\\|private\\\|protected\\\|static\\\|abstract\\\|final\\)\\s*\\)\\+\\%(void\\\|int\\\|short\\\|long\\\|byte\\\|float\\\|double\\\|char\\\|boolean\\\|[A-Z][a-zA-Z0-9_\\.]*\\%(<.*>\\)\\=\\)\\s*
 setlocal include=^\\s*import\\s*\\%(static\\)\\=\\s*
