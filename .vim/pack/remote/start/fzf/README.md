@@ -47,6 +47,7 @@ Table of Contents
       * [Environment variables / Aliases](#environment-variables--aliases)
       * [Settings](#settings)
       * [Supported commands](#supported-commands)
+      * [Custom fuzzy completion](#custom-fuzzy-completion)
    * [Vim plugin](#vim-plugin)
    * [Advanced topics](#advanced-topics)
       * [Performance](#performance)
@@ -112,6 +113,7 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 | FreeBSD      | `pkg install fzf`          |
 | NixOS        | `nix-env -iA nixpkgs.fzf`  |
 | openSUSE     | `sudo zypper install fzf`  |
+| OpenBSD      | `pkg_add fzf`              |
 
 Shell extensions (key bindings and fuzzy auto-completion) and Vim/Neovim
 plugin may or may not be enabled by default depending on the package manager.
@@ -137,39 +139,18 @@ page][windows-wiki].
 
 ### As Vim plugin
 
-Once you have fzf installed, you can enable it inside Vim simply by adding the
-directory to `&runtimepath` in your Vim configuration file. The path may
-differ depending on the package manager.
+If you use
+[vim-plug](https://github.com/junegunn/vim-plug), add this line to your Vim
+configuration file:
 
 ```vim
-" If installed using Homebrew
-set rtp+=/usr/local/opt/fzf
-
-" If installed using git
-set rtp+=~/.fzf
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 ```
 
-If you use [vim-plug](https://github.com/junegunn/vim-plug), the same can be
-written as:
+`fzf#install()` makes sure that you have the latest binary, but it's optional,
+so you can omit it if you use a plugin manager that doesn't support hooks.
 
-```vim
-" If installed using Homebrew
-Plug '/usr/local/opt/fzf'
-
-" If installed using git
-Plug '~/.fzf'
-```
-
-But instead of separately installing fzf on your system (using Homebrew or
-"git clone") and enabling it on Vim (adding it to `&runtimepath`), you can use
-vim-plug to do both.
-
-```vim
-" PlugInstall and PlugUpdate will clone fzf in ~/.fzf and run the install script
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-  " Both options are optional. You don't have to install fzf in ~/.fzf
-  " and you don't have to run the install script if you use fzf only in Vim.
-```
+For more installation options, see [README-VIM.md](README-VIM.md).
 
 Upgrading fzf
 -------------
@@ -180,6 +161,7 @@ method used.
 
 - git: `cd ~/.fzf && git pull && ./install`
 - brew: `brew update; brew reinstall fzf`
+- macports: `sudo port upgrade fzf`
 - chocolatey: `choco upgrade fzf`
 - vim-plug: `:PlugUpdate fzf`
 
@@ -423,6 +405,21 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" . "$1"
 }
+
+# (EXPERIMENTAL) Advanced customization of fzf options via _fzf_comprun function
+# - The first argument to the function is the name of the command.
+# - You should make sure to pass the rest of the arguments to fzf.
+_fzf_comprun() {
+  local command=$1
+  shift
+
+  case "$command" in
+    cd)           fzf "$@" --preview 'tree -C {} | head -200' ;;
+    export|unset) fzf "$@" --preview "eval 'echo \$'{}" ;;
+    ssh)          fzf "$@" --preview 'dig {}' ;;
+    *)            fzf "$@" ;;
+  esac
+}
 ```
 
 #### Supported commands
@@ -435,6 +432,56 @@ commands as well by using `_fzf_setup_completion` helper function.
 # usage: _fzf_setup_completion path|dir|var|alias|host COMMANDS...
 _fzf_setup_completion path ag git kubectl
 _fzf_setup_completion dir tree
+```
+
+#### Custom fuzzy completion
+
+_**(Custom completion API is experimental and subject to change)**_
+
+For a command named _"COMMAND"_, define `_fzf_complete_COMMAND` function using
+`_fzf_complete` helper.
+
+```sh
+# Custom fuzzy completion for "doge" command
+#   e.g. doge **<TAB>
+_fzf_complete_doge() {
+  _fzf_complete --multi --reverse --prompt="doge> " -- "$@" < <(
+    echo very
+    echo wow
+    echo such
+    echo doge
+  )
+}
+```
+
+- The arguments before `--` are the options to fzf.
+- After `--`, simply pass the original completion arguments unchanged (`"$@"`).
+- Then write a set of commands that generates the completion candidates and
+  feed its output to the function using process substitution (`< <(...)`).
+
+zsh will automatically pick up the function using the naming convention but in
+bash you have to manually associate the function with the command using
+`complete` command.
+
+```sh
+[ -n "$BASH" ] && complete -F _fzf_complete_doge -o default -o bashdefault doge
+```
+
+If you need to post-process the output from fzf, define
+`_fzf_complete_COMMAND_post` as follows.
+
+```sh
+_fzf_complete_foo() {
+  _fzf_complete --multi --reverse --header-lines=3 -- "$@" < <(
+    ls -al
+  )
+}
+
+_fzf_complete_foo_post() {
+  awk '{print $NF}'
+}
+
+[ -n "$BASH" ] && complete -F _fzf_complete_foo -o default -o bashdefault foo
 ```
 
 Vim plugin

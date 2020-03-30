@@ -39,6 +39,8 @@
 - Add support for a custom action menu with `g:LSC_action_menu`.
 - Sort completion suggestions that match by prefix higher than those that match
   by substring.
+- Include Completion item `detail` field in the preview window.
+- Strikethrough deprecated completion options in the menu.
 
 # 0.3.2
 

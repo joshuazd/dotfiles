@@ -210,11 +210,11 @@ function! s:FilterAndSort(base, items) abort
   for l:item in a:items
     let l:word = type(l:item) == type({}) ? l:item.word : l:item
     if l:word =~# l:prefix_base
-      call add(l:prefix_case_matches, l:word)
+      call add(l:prefix_case_matches, l:item)
     elseif l:word =~? l:prefix_base
-      call add(l:prefix_matches, l:word)
+      call add(l:prefix_matches, l:item)
     elseif l:word =~? a:base
-      call add(l:substring_matches, l:word)
+      call add(l:substring_matches, l:item)
     endif
   endfor
   return l:prefix_case_matches + l:prefix_matches + l:substring_matches
@@ -272,6 +272,11 @@ function! s:CompletionItem(completion_item) abort
           \ 'snippet': item.word,
           \ 'snippet_trigger': item.word
           \ })
+    let l:item.word = a:completion_item.label
+  endif
+  if get(a:completion_item, 'deprecated', v:false) ||
+      \ index(get(a:completion_item, 'tags', []), 1) >=0
+    let l:item.abbr = substitute(l:item.word, '.', "\\0\<char-0x0336>", 'g')
   endif
   if has_key(a:completion_item, 'kind')
     let item.kind = s:CompletionItemKind(a:completion_item.kind)
@@ -280,14 +285,20 @@ function! s:CompletionItem(completion_item) abort
     let detail_lines = split(a:completion_item.detail, "\n")
     if len(detail_lines) > 0
       let item.menu = detail_lines[0]
+      let l:item.info = a:completion_item.detail
     endif
   endif
   if has_key(a:completion_item, 'documentation')
     let documentation = a:completion_item.documentation
+    if has_key(l:item, 'info')
+      let l:item.info .= "\n\n"
+    else
+      let l:item.info = ''
+    endif
     if type(documentation) == type('')
-      let item.info = documentation
+      let l:item.info .= documentation
     elseif type(documentation) == type({}) && has_key(documentation, 'value')
-      let item.info = documentation.value
+      let l:item.info .= documentation.value
     endif
   endif
   return item

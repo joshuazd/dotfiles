@@ -34,9 +34,16 @@ fi
 # To redraw line after fzf closes (printf '\e[5n')
 bind '"\e[0n": redraw-current-line'
 
-__fzfcmd_complete() {
-  [ -n "$TMUX_PANE" ] && [ "${FZF_TMUX:-0}" != 0 ] && [ ${LINES:-40} -gt 15 ] &&
-    echo "fzf-tmux -d${FZF_TMUX_HEIGHT:-40%}" || echo "fzf"
+__fzf_comprun() {
+  if [ "$(type -t _fzf_comprun 2>&1)" = function ]; then
+    _fzf_comprun "$@"
+  elif [ -n "$TMUX_PANE" ] && [ "${FZF_TMUX:-0}" != 0 ] && [ ${LINES:-40} -gt 15 ]; then
+    shift
+    fzf-tmux -d "${FZF_TMUX_HEIGHT:-40%}" "$@"
+  else
+    shift
+    fzf "$@"
+  fi
 }
 
 __fzf_orig_completion_filter() {
@@ -72,6 +79,8 @@ _fzf_opts_completion() {
     --margin
     --inline-info
     --prompt
+    --pointer
+    --marker
     --header
     --header-lines
     --ansi
@@ -140,8 +149,7 @@ _fzf_handle_dynamic_completion() {
 }
 
 __fzf_generic_path_completion() {
-  local cur base dir leftover matches trigger cmd fzf
-  fzf="$(__fzfcmd_complete)"
+  local cur base dir leftover matches trigger cmd
   cmd="${COMP_WORDS[0]//[^A-Za-z0-9_=]/_}"
   COMPREPLY=()
   trigger=${FZF_COMPLETION_TRIGGER-'**'}
@@ -157,7 +165,7 @@ __fzf_generic_path_completion() {
         leftover=${leftover/#\/}
         [ -z "$dir" ] && dir='.'
         [ "$dir" != "/" ] && dir="${dir/%\//}"
-        matches=$(eval "$1 $(printf %q "$dir")" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_COMPLETION_OPTS" $fzf $2 -q "$leftover" | while read -r item; do
+        matches=$(eval "$1 $(printf %q "$dir")" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_COMPLETION_OPTS $2" __fzf_comprun "$4" -q "$leftover" | while read -r item; do
           printf "%q$3 " "$item"
         done)
         matches=${matches% }
@@ -182,10 +190,30 @@ __fzf_generic_path_completion() {
 }
 
 _fzf_complete() {
-  local cur selected trigger cmd fzf post
+  # Split arguments around --
+  local args rest str_arg i sep
+  args=("$@")
+  sep=
+  for i in "${!args[@]}"; do
+    if [[ "${args[$i]}" = -- ]]; then
+      sep=$i
+      break
+    fi
+  done
+  if [[ -n "$sep" ]]; then
+    str_arg=
+    rest=("${args[@]:$((sep + 1)):${#args[@]}}")
+    args=("${args[@]:0:$sep}")
+  else
+    str_arg=$1
+    args=()
+    shift
+    rest=("$@")
+  fi
+
+  local cur selected trigger cmd post
   post="$(caller 0 | awk '{print $2}')_post"
   type -t "$post" > /dev/null 2>&1 || post=cat
-  fzf="$(__fzfcmd_complete)"
 
   cmd="${COMP_WORDS[0]//[^A-Za-z0-9_=]/_}"
   trigger=${FZF_COMPLETION_TRIGGER-'**'}
@@ -193,7 +221,7 @@ _fzf_complete() {
   if [[ "$cur" == *"$trigger" ]]; then
     cur=${cur:0:${#cur}-${#trigger}}
 
-    selected=$(cat | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_COMPLETION_OPTS" $fzf $1 -q "$cur" | $post | tr '\n' ' ')
+    selected=$(FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_COMPLETION_OPTS $str_arg" __fzf_comprun "${rest[0]}" "${args[@]}" -q "$cur" | $post | tr '\n' ' ')
     selected=${selected% } # Strip trailing space not to repeat "-o nospace"
     if [ -n "$selected" ]; then
       COMPREPLY=("$selected")
@@ -203,8 +231,7 @@ _fzf_complete() {
     printf '\e[5n'
     return 0
   else
-    shift
-    _fzf_handle_dynamic_completion "$cmd" "$@"
+    _fzf_handle_dynamic_completion "$cmd" "${rest[@]}"
   fi
 }
 
@@ -224,9 +251,9 @@ _fzf_dir_completion() {
 _fzf_complete_kill() {
   [ -n "${COMP_WORDS[COMP_CWORD]}" ] && return 1
 
-  local selected fzf
-  fzf="$(__fzfcmd_complete)"
-  selected=$(command ps -ef | sed 1d | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-50%} --min-height 15 --reverse $FZF_DEFAULT_OPTS --preview 'echo {}' --preview-window down:3:wrap $FZF_COMPLETION_OPTS" $fzf -m | awk '{print $2}' | tr '\n' ' ')
+  local selected
+  selected=$(command ps -ef | sed 1d | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-50%} --min-height 15 --reverse $FZF_DEFAULT_OPTS $FZF_COMPLETION_OPTS --preview 'echo {}' --preview-window down:3:wrap" __fzf_comprun "kill" -m | awk '{print $2}' | tr '\n' ' ')
+  selected=${selected% }
   printf '\e[5n'
 
   if [ -n "$selected" ]; then
@@ -236,7 +263,7 @@ _fzf_complete_kill() {
 }
 
 _fzf_host_completion() {
-  _fzf_complete '+m' "$@" < <(
+  _fzf_complete +m -- "$@" < <(
     cat <(cat ~/.ssh/config ~/.ssh/config.d/* /etc/ssh/ssh_config 2> /dev/null | command grep -i '^\s*host\(name\)\? ' | awk '{for (i = 2; i <= NF; i++) print $1 " " $i}' | command grep -v '[*?]') \
         <(command grep -oE '^[[a-z0-9.,:-]+' ~/.ssh/known_hosts | tr ',' '\n' | tr -d '[' | awk '{ print $1 " " $1 }') \
         <(command grep -v '^\s*\(#\|$\)' /etc/hosts | command grep -Fv '0.0.0.0') |
@@ -245,13 +272,13 @@ _fzf_host_completion() {
 }
 
 _fzf_var_completion() {
-  _fzf_complete '-m' "$@" < <(
+  _fzf_complete -m -- "$@" < <(
     declare -xp | sed 's/=.*//' | sed 's/.* //'
   )
 }
 
 _fzf_alias_completion() {
-  _fzf_complete '-m' "$@" < <(
+  _fzf_complete -m -- "$@" < <(
     alias | sed 's/=.*//' | sed 's/.* //'
   )
 }
@@ -319,8 +346,8 @@ _fzf_setup_completion() {
     return 1
   fi
   shift
+  eval "$(complete -p "$@" 2> /dev/null | grep -v "$fn" | __fzf_orig_completion_filter)"
   for cmd in "$@"; do
-    eval "$(complete -p "$cmd" 2> /dev/null | grep -v "$fn" | __fzf_orig_completion_filter)"
     case "$kind" in
       dir)   __fzf_defc "$cmd" "$fn" "-o nospace -o dirnames" ;;
       var)   __fzf_defc "$cmd" "$fn" "-o default -o nospace -v" ;;
