@@ -104,16 +104,17 @@ git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
 
 ### Using Linux package managers
 
-| Distro       | Command                    |
-| ---          | ---                        |
-| Alpine Linux | `sudo apk add fzf`         |
-| Arch Linux   | `sudo pacman -S fzf`       |
-| Debian       | `sudo apt-get install fzf` |
-| Fedora       | `sudo dnf install fzf`     |
-| FreeBSD      | `pkg install fzf`          |
-| NixOS        | `nix-env -iA nixpkgs.fzf`  |
-| openSUSE     | `sudo zypper install fzf`  |
-| OpenBSD      | `pkg_add fzf`              |
+| Package Manager | Linux Distribution      | Command                            |
+| ---             | ---                     | ---                                |
+| APK             | Alpine Linux            | `sudo apk add fzf`                 |
+| APT             | Debian 9+/Ubuntu 19.10+ | `sudo apt-get install fzf`         |
+| Conda           |                         | `conda install -c conda-forge fzf` |
+| DNF             | Fedora                  | `sudo dnf install fzf`             |
+| Nix             | NixOS                   | `nix-env -iA nixpkgs.fzf`          |
+| Pacman          | Arch Linux              | `sudo pacman -S fzf`               |
+| pkg             | FreeBSD                 | `pkg install fzf`                  |
+| pkg_add         | OpenBSD                 | `pkg_add fzf`                      |
+| Zypper          | openSUSE                | `sudo zypper install fzf`          |
 
 Shell extensions (key bindings and fuzzy auto-completion) and Vim/Neovim
 plugin may or may not be enabled by default depending on the package manager.
@@ -281,8 +282,10 @@ own as well.
 [fzf-tmux](bin/fzf-tmux) is a bash script that opens fzf in a tmux pane.
 
 ```sh
-# usage: fzf-tmux [-u|-d [HEIGHT[%]]] [-l|-r [WIDTH[%]]] [--] [FZF OPTIONS]
-#        (-[udlr]: up/down/left/right)
+# usage: fzf-tmux [LAYOUT OPTIONS] [--] [FZF OPTIONS]
+
+# See available options
+fzf-tmux --help
 
 # select git branches in horizontal split below (15 lines)
 git branch | fzf-tmux -d 15
@@ -291,7 +294,7 @@ git branch | fzf-tmux -d 15
 cat /usr/share/dict/words | fzf-tmux -l 20% --multi --reverse
 ```
 
-It will still work even when you're not on tmux, silently ignoring `-[udlr]`
+It will still work even when you're not on tmux, silently ignoring `-[pudlr]`
 options, so you can invariably use `fzf-tmux` in your scripts.
 
 Alternatively, you can use `--height HEIGHT[%]` option not to start fzf in
@@ -318,9 +321,9 @@ fish.
     - Set `FZF_ALT_C_COMMAND` to override the default command
     - Set `FZF_ALT_C_OPTS` to pass additional options
 
-If you're on a tmux session, you can start fzf in a split pane by setting
-`FZF_TMUX` to 1, and change the height of the pane with `FZF_TMUX_HEIGHT`
-(e.g. `20`, `50%`).
+If you're on a tmux session, you can start fzf in a tmux split pane or in
+a tmux popup window by setting `FZF_TMUX_OPTS` (e.g. `-d 40%`).
+See `fzf-tmux --help` for available options.
 
 More tips can be found on [the wiki page](https://github.com/junegunn/fzf/wiki/Configuring-shell-key-bindings).
 
