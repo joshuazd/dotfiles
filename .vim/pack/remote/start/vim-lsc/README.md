@@ -7,9 +7,6 @@ following the [language server protocol][]. For more information see
 [language server protocol]: https://github.com/Microsoft/language-server-protocol
 [langserver.org]: http://langserver.org/
 
-This client has not been tested against a wide range of servers so there may be
-protocol bugs.
-
 ## Installation
 
 Install with your plugin management method of choice. If you don't have a
@@ -195,3 +192,6 @@ a function call. The currently active parameter is highlighted with the group
 
 - [vista.vim](https://github.com/liuchengxu/vista.vim)
 - [deoplete-vim-lsc](https://github.com/hrsh7th/deoplete-vim-lsc)
+- [vim-vsnip](https://github.com/hrsh7th/vim-vsnip)
+- [vim-vsnip-integ](https://github.com/hrsh7th/vim-vsnip-integ)
+

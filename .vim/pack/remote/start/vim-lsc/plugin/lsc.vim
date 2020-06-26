@@ -2,6 +2,7 @@ if exists('g:loaded_lsc')
   finish
 endif
 let g:loaded_lsc = 1
+let g:_lsc_is_exiting = v:false
 
 if !exists('g:lsc_servers_by_filetype')
   " filetype -> server name
@@ -49,6 +50,7 @@ endif
 " Returns the status of the language server for the current filetype or empty
 " string if it is not configured.
 function! LSCServerStatus() abort
+  if !has_key(g:lsc_servers_by_filetype, &filetype) | return '' | endif
   return lsc#server#status(&filetype)
 endfunction
 
@@ -106,6 +108,9 @@ augroup LSC
   autocmd InsertCharPre * call <SID>IfEnabled('lsc#complete#insertCharPre')
 
   autocmd VimLeave * call lsc#server#exit()
+  if exists('##ExitPre')
+    autocmd ExitPre * let g:_lsc_is_exiting = v:true
+  endif
 augroup END
 
 " Set window local state only if this is a brand new window which has not
@@ -160,9 +165,9 @@ function! s:OnOpen() abort
 endfunction
 
 function! s:OnClose() abort
+  if g:_lsc_is_exiting | return | endif
   let l:filetype = getbufvar(str2nr(expand('<abuf>')), '&filetype')
   if !has_key(g:lsc_servers_by_filetype, l:filetype) | return | endif
-  if !lsc#server#filetypeActive(l:filetype) | return | endif
   let l:full_path = lsc#file#normalize(expand('<afile>:p'))
   call lsc#file#onClose(l:full_path, l:filetype)
 endfunction

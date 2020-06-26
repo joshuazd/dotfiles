@@ -100,7 +100,7 @@ def pack_install(package, path, name):
     if last_update is not None:
         cwd = os.getcwd()
         os.chdir(path)
-        log = subprocess.Popen('git log --color --graph --oneline --since='
+        log = subprocess.Popen('git log --graph --oneline --since='
                                + last_update, stdout=subprocess.PIPE,
                                shell=True)
         log, _ = log.communicate()
@@ -109,8 +109,8 @@ def pack_install(package, path, name):
         conch.acquire()
         if len(log) > 0:
             with open(log_file, 'a') as file:
-                file.write(name + '\n')
-                file.write(log + '\n')
+                file.write(str(name) + '\n')
+                file.write(str(log) + '\n')
                 file.write('\n')
             print()
             print(name)

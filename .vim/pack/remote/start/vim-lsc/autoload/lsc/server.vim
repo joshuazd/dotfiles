@@ -29,7 +29,6 @@ function! lsc#server#start(filetype) abort
 endfunction
 
 function! lsc#server#status(filetype) abort
-  if !has_key(g:lsc_servers_by_filetype, a:filetype) | return '' | endif
   return s:servers[g:lsc_servers_by_filetype[a:filetype]].status
 endfunction
 
@@ -55,19 +54,24 @@ endfunction
 " Wait for all running servers to shut down with a 5 second timeout.
 function! lsc#server#exit() abort
   let l:exit_start = reltime()
-  let l:pending = 0
-  function! OnExit() closure abort
-    let l:pending -= 1
+  let l:pending = []
+  function! OnExit(server_name) closure abort
+    call remove(l:pending, index(l:pending, a:server_name))
   endfunction
   for l:server in values(s:servers)
-    if s:Kill(l:server, 'exiting', funcref('OnExit'))
-      let l:pending += 1
+    if s:Kill(l:server, 'exiting', funcref('OnExit', [ l:server.config.name ]))
+      call add(l:pending, l:server.config.name)
     endif
   endfor
-  while l:pending > 0 && reltimefloat(reltime(l:exit_start)) <= 5.0
+  let l:reported = []
+  while len(l:pending) > 0 && reltimefloat(reltime(l:exit_start)) <= 5.0
+     if reltimefloat(reltime(l:exit_start)) >= 1.0 && l:pending != l:reported
+      echo 'Waiting for language server exit: '.join(l:pending, ', ')
+      let l:reported = copy(l:pending)
+     endif
     sleep 100m
   endwhile
-  return l:pending <= 0
+  return len(l:pending) == 0
 endfunction
 
 " Request a 'shutdown' then 'exit'.
@@ -118,6 +122,7 @@ function! s:Start(server) abort
     return
   endif
   let l:command = a:server.config.command
+  let a:server.status = 'starting'
   let a:server._channel = lsc#protocol#open(l:command,
       \ function('<SID>Dispatch', [a:server]),
       \ a:server.on_err, a:server.on_exit)
@@ -174,6 +179,10 @@ function! s:ClientCapabilities() abort
     \   'completion': {
     \     'completionItem': {
     \       'snippetSupport': g:lsc_enable_snippet_support,
+    \       'deprecatedSupport': v:true,
+    \       'tagSupport': {
+    \         'valueSet': [1],
+    \       },
     \      },
     \   },
     \   'definition': {'dynamicRegistration': v:false},
@@ -182,6 +191,7 @@ function! s:ClientCapabilities() abort
     \       'codeActionKind': {'valueSet': ['quickfix', 'refactor', 'source']}
     \     }
     \   },
+    \   'hover': {'contentFormat': ['plaintext', 'markdown']},
     \   'signatureHelp': {'dynamicRegistration': v:false},
     \ }
     \}
@@ -224,7 +234,7 @@ function! lsc#server#register(filetype, config) abort
       throw 'Server configuration must have a "command" key'
     endif
     if !has_key(config, 'name')
-      let config.name = config.command
+      let config.name = string(config.command)
     endif
   endif
   let g:lsc_servers_by_filetype[a:filetype] = config.name
@@ -266,11 +276,8 @@ function! lsc#server#register(filetype, config) abort
     call self._channel.request('initialize', l:params, a:callback)
   endfunction
   function! server.on_err(message) abort
-    if self.status ==# 'starting'
-        \ || !has_key(self.config, 'suppress_stderr')
-        \ || !self.config.suppress_stderr
-      call lsc#message#error('StdErr from '.self.config.name.': '.a:message)
-    endif
+    if get(self.config, 'suppress_stderr', v:false) | return | endif
+    call lsc#message#error('StdErr from '.self.config.name.': '.a:message)
   endfunction
   function! server.on_exit() abort
     unlet self._channel

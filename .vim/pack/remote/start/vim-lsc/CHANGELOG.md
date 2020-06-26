@@ -9,6 +9,8 @@
   send any items containing a `textEdit` field.
 - Truncate diagnostics at 1 character shorter for when `ruler` is used.
 - Normalize windows file path separators to create valid URIs.
+- Don't send `textDocument/didSave` notifications if the server does not
+  advertise it as a capability.
 
 **Minor breaking changes**
 - Server dictionaries no longer expose their full `init_results`, or their call
@@ -39,6 +41,12 @@
 - Add support for a custom action menu with `g:LSC_action_menu`.
 - Sort completion suggestions that match by prefix higher than those that match
   by substring.
+- Include Completion item `detail` field in the preview window.
+- Strikethrough deprecated completion options in the menu.
+- Improve performance of finding incremental changes for file syncing in very
+  large files when lua support is available.
+- Send `hover.contentFormat` to prefer plaintext content which should be more
+  readable for most users.
 
 # 0.3.2
 
