@@ -21,35 +21,22 @@ function! lsc#complete#textChanged() abort
 endfunction
 
 function! s:typedCharacter() abort
-  if s:isTrigger(s:next_char)
-      \ || (s:isCompletable() && !has_key(s:completion_waiting, &filetype))
+  if s:isTrigger(s:next_char) || s:isCompletable()
     call s:startCompletion(v:true)
-  else
-    let s:completion_canceled = v:true
   endif
 endfunction
 
 if !exists('s:initialized')
   let s:next_char = ''
-  " filetype -> ?, used as a Set
-  let s:completion_waiting = {}
-  let s:completion_canceled = v:false
   let s:initialized = v:true
 endif
 
 " Clean state associated with a server.
 function! lsc#complete#clean(filetype) abort
-  call s:MarkNotCompleting(a:filetype)
-endfunction
-
-function! s:MarkCompleting(filetype) abort
-  let s:completion_waiting[a:filetype] = v:true
-endfunction
-
-function! s:MarkNotCompleting(filetype) abort
-  if has_key(s:completion_waiting, a:filetype)
-    unlet s:completion_waiting[a:filetype]
-  endif
+  for l:buffer in getbufinfo({'bufloaded': v:true})
+    if getbufvar(l:buffer.bufnr, '&filetype') != a:filetype | continue | endif
+    call setbufvar(l:buffer.bufnr, 'lsc_is_completing', v:false)
+  endfor
 endfunction
 
 function! s:isTrigger(char) abort
@@ -81,28 +68,23 @@ function! s:isCompletable() abort
       \ g:lsc_autocomplete_length : 3
   if l:min_length == v:false | return v:false | endif
   if l:cur_col < (l:min_length + 1) | return v:false | endif
-  let word = getline('.')[l:cur_col - (l:min_length + 1):l:cur_col - 2]
-  return word =~# '^\w*$'
+  let l:word = getline('.')[l:cur_col - (l:min_length + 1):l:cur_col - 2]
+  return l:word =~# '^\w*$'
 endfunction
 
 function! s:startCompletion(isAuto) abort
   let b:lsc_is_completing = v:true
-  let s:completion_canceled = v:false
-  call s:MarkCompleting(&filetype)
   call lsc#file#flushChanges()
   let l:params = lsc#params#documentPosition()
   " TODO handle multiple servers
   let l:server = lsc#server#forFileType(&filetype)[0]
   call l:server.request('textDocument/completion', l:params,
       \ lsc#util#gateResult('Complete',
-      \     function('<SID>OnResult', [a:isAuto]), function('<SID>OnSkip')))
+      \     function('<SID>OnResult', [a:isAuto]),
+      \     function('<SID>OnSkip', [bufnr('%')])))
 endfunction
 
 function! s:OnResult(isAuto, completion) abort
-  call s:MarkNotCompleting(&filetype)
-  if s:completion_canceled
-    let b:lsc_is_completing = v:false
-  endif
   let l:items = []
   if type(a:completion) == type([])
     let l:items = a:completion
@@ -116,10 +98,8 @@ function! s:OnResult(isAuto, completion) abort
   endif
 endfunction
 
-" TODO this could be the wrong buffer?
-function! s:OnSkip(completion) abort
-  call s:MarkNotCompleting(&filetype)
-  let b:lsc_is_completing = v:false
+function! s:OnSkip(bufnr, completion) abort
+  call setbufvar(a:bufnr, 'lsc_is_completing', v:false)
 endfunction
 
 function! s:SuggestCompletions(items) abort
@@ -129,14 +109,14 @@ function! s:SuggestCompletions(items) abort
   endif
   let l:start = s:FindStart(a:items)
   let l:base = l:start != col('.')
-      \ ? getline('.')[start - 1:col('.') - 2]
+      \ ? getline('.')[l:start - 1:col('.') - 2]
       \ : ''
   let l:completion_items = s:CompletionItems(l:base, a:items)
   call s:SetCompleteOpt()
   if exists('#User#LSCAutocomplete')
     doautocmd <nomodeline> User LSCAutocomplete
   endif
-  call complete(start, l:completion_items)
+  call complete(l:start, l:completion_items)
 endfunction
 
 function! s:SetCompleteOpt() abort
@@ -154,25 +134,23 @@ function! s:SetCompleteOpt() abort
 endfunction
 
 function! lsc#complete#complete(findstart, base) abort
-  if !exists('b:lsc_completion')
-    let l:searchStart = reltime()
-    call s:startCompletion(v:false)
-    let l:timeout = get(g:, 'lsc_complete_timeout', 5)
-    while !exists('b:lsc_completion')
-        \ && reltimefloat(reltime(l:searchStart)) <= l:timeout
-      sleep 100m
-    endwhile
-    if !exists('b:lsc_completion')
-      return -1
-    endif
-  endif
   if a:findstart
-    if len(b:lsc_completion) == 0
-      unlet b:lsc_completion
-      return -3
+    if !exists('b:lsc_completion')
+      let l:searchStart = reltime()
+      call s:startCompletion(v:false)
+      let l:timeout = get(g:, 'lsc_complete_timeout', 5)
+      while !exists('b:lsc_completion')
+            \ && reltimefloat(reltime(l:searchStart)) <= l:timeout
+        sleep 100m
+      endwhile
+      if !exists('b:lsc_completion') || len(b:lsc_completion) == 0
+        return -3
+      endif
+      return  s:FindStart(b:lsc_completion) - 1
     endif
-    return  s:FindStart(b:lsc_completion) - 1
   else
+    " We'll get an error if b:lsc_completion doesn't exist, which is good,
+    " we want to be vocal about such failures.
     return s:CompletionItems(a:base, b:lsc_completion)
   endif
 endfunction
@@ -191,14 +169,14 @@ endfunction
 " Finds the 1-based index of the character after the last non word character
 " behind the cursor.
 function! s:GuessCompletionStart() abort
-  let search = col('.') - 2
-  let line = getline('.')
-  while search > 0
-    let char = line[search]
-    if char !~# '\w'
-      return search + 2
+  let l:search = col('.') - 2
+  let l:line = getline('.')
+  while l:search > 0
+    let l:char = l:line[l:search]
+    if l:char !~# '\w'
+      return l:search + 2
     endif
-    let search -= 1
+    let l:search -= 1
   endwhile
   return 1
 endfunction
@@ -277,50 +255,80 @@ function! s:FinishItem(lsp_item, vim_item) abort
     let a:vim_item.kind = s:CompletionItemKind(a:lsp_item.kind)
   endif
   if has_key(a:lsp_item, 'detail') && a:lsp_item.detail != v:null
-    let detail_lines = split(a:lsp_item.detail, "\n")
-    if len(detail_lines) > 0
-      let a:vim_item.menu = detail_lines[0]
+    let l:detail_lines = split(a:lsp_item.detail, "\n")
+    if len(l:detail_lines) > 0
+      let a:vim_item.menu = l:detail_lines[0]
       let a:vim_item.info = a:lsp_item.detail
     endif
   endif
   if has_key(a:lsp_item, 'documentation')
-    let documentation = a:lsp_item.documentation
+    let l:documentation = a:lsp_item.documentation
     if has_key(a:vim_item, 'info')
       let a:vim_item.info .= "\n\n"
     else
       let a:vim_item.info = ''
     endif
-    if type(documentation) == type('')
-      let a:vim_item.info .= documentation
-    elseif type(documentation) == type({}) && has_key(documentation, 'value')
-      let a:vim_item.info .= documentation.value
+    if type(l:documentation) == type('')
+      let a:vim_item.info .= l:documentation
+    elseif type(l:documentation) == type({})
+        \ && has_key(l:documentation, 'value')
+      let a:vim_item.info .= l:documentation.value
     endif
   endif
 endfunction
 
-function! s:CompletionItemKind(completion_kind) abort
-  if a:completion_kind ==  2
-      \ || a:completion_kind == 3
-      \ || a:completion_kind == 4
-    " Method, Function, Constructor
-    return 'f'
-  elseif a:completion_kind == 5 " Field
-    return 'm'
-  elseif a:completion_kind == 6 " Variable
-    return 'v'
-  elseif a:completion_kind == 7
-      \ || a:completion_kind == 8
-      \ || a:completion_kind == 13
-    " Class, Interface, Enum
-    return 't'
-  elseif a:completion_kind == 14
-      \ || a:completion_kind == 11
-      \ || a:completion_kind == 12
-      \ || a:completion_kind == 1
-      \ || a:completion_kind == 16
-    " Keyword, Unit, Value, Text, Color
-    return 'd'
+function! s:CompletionItemKind(lsp_kind) abort
+  if a:lsp_kind == 1
+    return 'Text'
+  elseif a:lsp_kind == 2
+    return 'Method'
+  elseif a:lsp_kind == 3
+    return 'Function'
+  elseif a:lsp_kind == 4
+    return 'Constructor'
+  elseif a:lsp_kind == 5
+    return 'Field'
+  elseif a:lsp_kind == 6
+    return 'Variable'
+  elseif a:lsp_kind == 7
+    return 'Class'
+  elseif a:lsp_kind == 8
+    return 'Interface'
+  elseif a:lsp_kind == 9
+    return 'Module'
+  elseif a:lsp_kind == 10
+    return 'Property'
+  elseif a:lsp_kind == 11
+    return 'Unit'
+  elseif a:lsp_kind == 12
+    return 'Value'
+  elseif a:lsp_kind == 13
+    return 'Enum'
+  elseif a:lsp_kind == 14
+    return 'Keyword'
+  elseif a:lsp_kind == 15
+    return 'Snippet'
+  elseif a:lsp_kind == 16
+    return 'Color'
+  elseif a:lsp_kind == 17
+    return 'File'
+  elseif a:lsp_kind == 18
+    return 'Reference'
+  elseif a:lsp_kind == 19
+    return 'Folder'
+  elseif a:lsp_kind == 20
+    return 'EnumMember'
+  elseif a:lsp_kind == 21
+    return 'Constant'
+  elseif a:lsp_kind == 22
+    return 'Struct'
+  elseif a:lsp_kind == 23
+    return 'Event'
+  elseif a:lsp_kind == 24
+    return 'Operator'
+  elseif a:lsp_kind == 25
+    return 'TypeParameter'
+  else
+    return ''
   endif
-  " Many kinds are unmapped
-  return ''
 endfunction

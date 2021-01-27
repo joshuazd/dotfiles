@@ -28,7 +28,8 @@ void main() {
     final messages = await vim.messages(2);
     expect(messages, [
       '[lsc:Error] StdErr from some server: messagestderr',
-      '[lsc:Error] Failed to initialize server: some server'
+      '[lsc:Error] Failed to initialize server "some server". '
+          'Failing command is: [\'sh\', \'-c\', \'echo messagestderr >&2\']'
     ]);
   });
 
@@ -44,8 +45,9 @@ void main() {
     }
     final messages = await vim.messages(2);
     expect(messages, [
-      '"foo.txt" [New file] --No lines in buffer--',
-      '[lsc:Error] Failed to initialize server: some server'
+      matches('"foo.txt" .*--No lines in buffer--'),
+      '[lsc:Error] Failed to initialize server "some server". '
+          'Failing command is: [\'sh\', \'-c\', \'echo messagestderr >&2\']'
     ]);
   });
 }

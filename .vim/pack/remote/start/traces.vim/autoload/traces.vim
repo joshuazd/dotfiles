@@ -3,13 +3,14 @@ set cpo&vim
 
 let s:timeout = get(g:, 'traces_timeout', 1000)
 let s:timeout = s:timeout > 200 ? s:timeout : 200
-let s:s_timeout = get(g:, 'traces_search_timeout', 500)
-let s:s_timeout = s:s_timeout > s:timeout - 100 ? s:timeout - 100 : s:s_timeout
+let s:search_timeout = get(g:, 'traces_search_timeout', 500)
+let s:search_timeout = s:search_timeout > s:timeout - 100 ? s:timeout - 100 : s:search_timeout
 
 let s:has_matchdelete_win = has('patch-8.1.1741')
 let s:cmd_pattern = '\v\C^%('
                 \ . 'g%[lobal][[:alnum:]]@!\!=|'
                 \ . 's%[ubstitute][[:alnum:]]@!|'
+                \ . '(Subvert|S)[[:alnum:]]@!|'
                 \ . 'sm%[agic][[:alnum:]]@!|'
                 \ . 'sno%[magic][[:alnum:]]@!|'
                 \ . 'sor%[t][[:alnum:]]@!\!=|'
@@ -133,14 +134,20 @@ endfunction
 
 function! s:search(...) abort
   let cache = s:buf[s:nr].search_cache
-  let key = string(a:000) . string(getcurpos())
+  let key = string(a:000[0:2]) . string(getcurpos())
   if has_key(cache, key)
     if a:0 is 1 || a:0 >= 2 && a:2 !~# 'n'
       call setpos('.', cache[key].curpos)
     endif
     return cache[key].lnum
   endif
+  if s:search_timeout_remaining <= 0
+    return 0
+  endif
+  let start = reltime()
   silent! let lnum = call('search', a:000)
+  let time = reltimefloat(reltime(start)) * 1000
+  let s:search_timeout_remaining -= float2nr(ceil(time))
   let cache[key] = {'lnum': lnum, 'curpos': getcurpos()}
   return lnum
 endfunction
@@ -204,7 +211,7 @@ function! s:address_to_num(address, last_pos) abort
       endif
     endif
     let s:buf[s:nr].show_range = 1
-    let query = s:search(pattern, 'nc', 0, s:s_timeout)
+    let query = s:search(pattern, 'nc', 0, s:search_timeout_remaining)
     if !query | let result.valid = 0 | endif
     if !closed | let result.regex = pattern | endif
     call add(result.range, query)
@@ -222,7 +229,7 @@ function! s:address_to_num(address, last_pos) abort
     endif
     call cursor(a:last_pos, 1)
     let s:buf[s:nr].show_range = 1
-    let query = s:search(pattern, 'nb', 0, s:s_timeout)
+    let query = s:search(pattern, 'nb', 0, s:search_timeout_remaining)
     if !query | let result.valid = 0 | endif
     if !closed | let result.regex = pattern | endif
     call add(result.range, query)
@@ -236,14 +243,14 @@ function! s:address_to_num(address, last_pos) abort
         let result.valid = 0
       endif
     endif
-    let query = s:search(s:last_pattern, 'nc', 0, s:s_timeout)
+    let query = s:search(s:last_pattern, 'nc', 0, s:search_timeout_remaining)
     if !query | let result.valid = 0 | endif
     call add(result.range, query)
     let s:buf[s:nr].show_range = 1
 
   elseif a:address.str ==# '\?'
     call cursor(a:last_pos, 1)
-    let query = s:search(s:last_pattern, 'nb', 0, s:s_timeout)
+    let query = s:search(s:last_pattern, 'nb', 0, s:search_timeout_remaining)
     if !query | let result.valid = 0 | endif
     call add(result.range, query)
     let s:buf[s:nr].show_range = 1
@@ -464,6 +471,38 @@ function! s:parse_substitute(cmdl) abort
   return args
 endfunction
 
+function! s:parse_subvert(cmdl) abort
+  if !exists("g:loaded_abolish") || !g:traces_abolish_integration
+    return {}
+  endif
+  if !exists('s:abolishID')
+    " https://stackoverflow.com/a/39216373
+    " 'dirty trick' to access script-local functions
+    let s:abolishID = '<SNR>' . matchstr(matchstr(split(execute('scriptnames'), "\n"), 'abolish.vim'), '^\s*\zs\d\+') . '_'
+  endif
+  if !exists('*' . s:abolishID . 'substitute_command')
+    return {}
+  endif
+  call s:trim(a:cmdl.string)
+  let a:cmdl.cmd.name = 'substitute'
+  let pattern = '\v^([[:graph:]]&[^[:alnum:]\\"|])(%(\\.|\1@!&.)*)%((\1)%((%(\\.|\1@!&.)*)%((\1)([aviw&cegiInp#lr]+)=)=)=)=$'
+  let args = {}
+  let r = matchlist(a:cmdl.string[0], pattern)
+  if len(r) && !empty(r[2])
+    " String is always '\=Abolished()', unlet to update preview window
+    if exists('s:buf[s:nr].preview_window.args')
+      unlet s:buf[s:nr].preview_window.args
+    endif
+    let args.delimiter        = r[1]
+    let args.pattern_org      = substitute({s:abolishID}substitute_command('', r[2], r[4], r[6])[1:], '\/\\=Abolished.*', '', '')
+    let args.pattern          = args.pattern_org
+    let args.string           = !empty(r[4]) ? '\=Abolished()' : ''
+    let args.last_delimiter   = r[5]
+    let args.flags            = substitute(r[6], '\C[avIiw]', '', 'g')
+  endif
+  return args
+endfunction
+
 function! s:parse_sort(cmdl) abort
   call s:trim(a:cmdl.string)
   let pattern = '\v^.{-}([[:graph:]]&[^[:alnum:]\\"|])(%(\\.|.){-})%((\1)|$)'
@@ -484,6 +523,8 @@ function! s:parse_command(cmdl) abort
     let a:cmdl.cmd.args = s:parse_substitute(a:cmdl)
   elseif a:cmdl.cmd.name =~# '\v^%(sor%[t]\!=)$'
     let a:cmdl.cmd.args = s:parse_sort(a:cmdl)
+  elseif a:cmdl.cmd.name =~# '\v^(Subvert|S)$'
+    let a:cmdl.cmd.args = s:parse_subvert(a:cmdl)
   endif
 endfunction
 
@@ -509,9 +550,9 @@ function! s:pos_pattern(pattern, range, delimiter, type) abort
     endif
   endif
   if a:delimiter ==# '?'
-    let position = s:search(a:pattern, 'cb', stopline, s:s_timeout)
+    let position = s:search(a:pattern, 'cb', stopline, s:search_timeout_remaining)
   else
-    let position = s:search(a:pattern, 'c', stopline, s:s_timeout)
+    let position = s:search(a:pattern, 'c', stopline, s:search_timeout_remaining)
   endif
   if position !=# 0
     let s:moved = 1
@@ -533,7 +574,7 @@ function! s:pos_range(end, pattern) abort
   endif
   call cursor([a:end, 1])
   if !empty(a:pattern)
-    call s:search(a:pattern, 'c', a:end, s:s_timeout)
+    call s:search(a:pattern, 'c', a:end, s:search_timeout_remaining)
   endif
   let s:moved = 1
 endfunction
@@ -667,6 +708,11 @@ function! s:preview_window(range, pattern, type, preview_cmd) abort
   if !empty(getcmdwintype())
     return
   endif
+  " skip when arguments are unchanged
+  if exists('s:buf[s:nr].preview_window.args')
+        \ && s:buf[s:nr].preview_window.args ==# string(a:)
+    return
+  endif
 
   let winopen_pattern = '\v^\s*((('
                     \ . 'vert%[ical]|'
@@ -697,6 +743,7 @@ function! s:preview_window(range, pattern, type, preview_cmd) abort
   if empty(range) || empty(a:pattern)
                 \ || range[0] >= line('w0') && range[1] <= line('w$')
     if exists('s:buf[s:nr].preview_window')
+      let s:buf[s:nr].preview_window.args = string(a:)
       noautocmd call win_gotoid(s:buf[s:nr].preview_window.winid)
       noautocmd %delete
       noautocmd call win_gotoid(s:buf[s:nr].cur_win)
@@ -718,6 +765,7 @@ function! s:preview_window(range, pattern, type, preview_cmd) abort
     noautocmd setlocal nocursorline nocursorcolumn nonumber norelativenumber
     noautocmd call win_gotoid(s:buf[s:nr].cur_win)
   endif
+  let s:buf[s:nr].preview_window.args = string(a:)
 
   " gather lines for preview window
   let view = winsaveview()
@@ -727,14 +775,12 @@ function! s:preview_window(range, pattern, type, preview_cmd) abort
   let currentline = max([range[0], 1])
   let stopline = range[1]
   let max = getwininfo(s:buf[s:nr].preview_window.winid)[0].height
-  let start = reltime()
   while currentline <= stopline && len(filtered) < max
-        \ && reltimefloat(reltime(start)) * 1000 < s:s_timeout
     call cursor(currentline, 1)
-    let matchstart = s:search(a:pattern, 'cn', stopline, s:s_timeout)
+    let matchstart = s:search(a:pattern, 'cn', stopline, s:search_timeout_remaining)
     if matchstart
       call cursor(matchstart, 1)
-      let matchend = s:search(a:pattern, 'cen', stopline, s:s_timeout)
+      let matchend = s:search(a:pattern, 'cen', stopline, s:search_timeout_remaining)
       let currentline = matchend + 1
       if matchstart < wintop || matchstart > winbot
         call extend(filtered, getbufline('%', matchstart, matchend))
@@ -1079,6 +1125,7 @@ function! traces#init(cmdl, view) abort
   let s:last_pattern = @/
   let s:specifier_delimiter = 0
   let s:wundo_time = 0
+  let s:search_timeout_remaining = s:search_timeout
 
   if s:buf[s:nr].duration < s:timeout
     let start_time = reltime()
@@ -1101,6 +1148,7 @@ function! traces#init(cmdl, view) abort
           \ && !get(s:, 'entire_file')
       call s:highlight('Visual', cmdl.range.pattern, 100)
       if empty(cmdl.cmd.name)
+        call s:preview_window_close()
         call s:highlight('TracesSearch', cmdl.range.specifier, 101)
       endif
       call s:pos_range(cmdl.range.end, cmdl.range.specifier)
@@ -1133,7 +1181,7 @@ function! traces#init(cmdl, view) abort
   endif
 
   " redraw screen if necessary
-  if s:redraw_later
+  if s:redraw_later && !wildmenumode()
     call s:adjust_cmdheight()
     if has('nvim')
       redraw

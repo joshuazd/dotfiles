@@ -1,116 +1,85 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:_test/stub_lsp.dart';
+import 'package:_test/test_bed.dart';
 import 'package:_test/vim_remote.dart';
 import 'package:json_rpc_2/json_rpc_2.dart';
-import 'package:lsp/lsp.dart' show lspChannel, CompletionItem;
+import 'package:lsp/lsp.dart' show CompletionItem;
 import 'package:test/test.dart';
 
 void main() {
-  Stream<Peer> clients;
-  ServerSocket serverSocket;
-  Vim vim;
+  TestBed testBed;
   Peer client;
 
   setUpAll(() async {
-    serverSocket = await ServerSocket.bind('localhost', 0);
-
-    clients = serverSocket.map((socket) {
-      return Peer(lspChannel(socket, socket), onUnhandledError: (error, stack) {
-        fail('Unhandled server error: $error');
-      });
-    }).asBroadcastStream();
-    vim = await Vim.start();
-    await vim.expr('RegisterLanguageServer("text", {'
-        '"command":"localhost:${serverSocket.port}",'
-        '"enabled":v:false,'
-        '})');
+    testBed = await TestBed.setup();
   });
 
   setUp(() async {
-    final nextClient = clients.first;
-    await vim.edit('foo.txt');
-    await vim.sendKeys(':LSClientEnable<cr>');
+    final nextClient = testBed.clients.first;
+    await testBed.vim.edit('foo.txt');
+    await testBed.vim.sendKeys(':LSClientEnable<cr>');
     client = await nextClient;
   });
 
   tearDown(() async {
-    await vim.sendKeys(':LSClientDisable<cr>');
-    await vim.sendKeys(':%bwipeout!<cr>');
-    final file = File('foo.txt');
-    if (await file.exists()) await file.delete();
+    await testBed.vim.sendKeys(':LSClientDisable<cr>');
+    await testBed.vim.sendKeys(':%bwipeout!<cr>');
     await client.done;
     client = null;
   });
 
-  tearDownAll(() async {
-    await vim.quit();
-    final log = File(vim.name);
-    print(await log.readAsString());
-    await log.delete();
-    await serverSocket.close();
-  });
-
   test('autocomplete on trigger', () async {
-    client
-      ..registerLifecycleMethods({
-        'completionProvider': {
-          'triggerCharacters': ['.']
-        },
-      })
-      ..registerMethod('textDocument/didOpen', (_) {})
-      ..registerMethod('textDocument/didChange', (_) {})
-      ..registerMethod('textDocument/completion', (Parameters params) {
-        return [
-          CompletionItem((b) => b..label = 'abcd'),
-          CompletionItem((b) => b..label = 'foo')
-        ];
-      })
-      ..listen();
-    await vim.sendKeys('ifoo.');
-    await vim.waitForPopUpMenu();
-    await vim.sendKeys('a<c-n><esc><esc>');
-    expect(await vim.expr('getline(1)'), 'foo.abcd');
+    final server = StubServer(client, capabilities: {
+      'completionProvider': {
+        'triggerCharacters': ['.']
+      },
+    });
+    server.peer.registerMethod('textDocument/completion', (Parameters params) {
+      return [
+        CompletionItem((b) => b..label = 'abcd'),
+        CompletionItem((b) => b..label = 'foo')
+      ];
+    });
+    await server.initialized;
+    await testBed.vim.sendKeys('ifoo.');
+    await testBed.vim.waitForPopUpMenu();
+    await testBed.vim.sendKeys('a<c-n><esc><esc>');
+    expect(await testBed.vim.expr('getline(1)'), 'foo.abcd');
   });
 
   test('autocomplete on 3 word characters', () async {
-    client
-      ..registerLifecycleMethods({
-        'completionProvider': {'triggerCharacters': []},
-      })
-      ..registerMethod('textDocument/didOpen', (_) {})
-      ..registerMethod('textDocument/didChange', (_) {})
-      ..registerMethod('textDocument/completion', (Parameters params) {
-        return [
-          CompletionItem((b) => b..label = 'foobar'),
-          CompletionItem((b) => b..label = 'fooother')
-        ];
-      })
-      ..listen();
-    await vim.sendKeys('ifoo');
-    await vim.waitForPopUpMenu();
-    await vim.sendKeys('b<c-n><esc><esc>');
-    expect(await vim.expr('getline(1)'), 'foobar');
+    final server = StubServer(client, capabilities: {
+      'completionProvider': {'triggerCharacters': []},
+    });
+    server.peer.registerMethod('textDocument/completion', (Parameters params) {
+      return [
+        CompletionItem((b) => b..label = 'foobar'),
+        CompletionItem((b) => b..label = 'fooother')
+      ];
+    });
+    await server.initialized;
+    await testBed.vim.sendKeys('ifoo');
+    await testBed.vim.waitForPopUpMenu();
+    await testBed.vim.sendKeys('b<c-n><esc><esc>');
+    expect(await testBed.vim.expr('getline(1)'), 'foobar');
   });
 
   test('manual completion', () async {
-    client
-      ..registerLifecycleMethods({
-        'completionProvider': {'triggerCharacters': []},
-      })
-      ..registerMethod('textDocument/didOpen', (_) {})
-      ..registerMethod('textDocument/didChange', (_) {})
-      ..registerMethod('textDocument/completion', (Parameters params) {
-        return [
-          CompletionItem((b) => b..label = 'foobar'),
-          CompletionItem((b) => b..label = 'fooother')
-        ];
-      })
-      ..listen();
-    await vim.sendKeys('if<c-x><c-u>');
-    await vim.waitForPopUpMenu();
-    await vim.sendKeys('<c-n><esc><esc>');
-    expect(await vim.expr('getline(1)'), 'foobar');
+    final server = StubServer(client, capabilities: {
+      'completionProvider': {'triggerCharacters': []},
+    });
+    server.peer.registerMethod('textDocument/completion', (Parameters params) {
+      return [
+        CompletionItem((b) => b..label = 'foobar'),
+        CompletionItem((b) => b..label = 'fooother')
+      ];
+    });
+    await server.initialized;
+    await testBed.vim.sendKeys('if<c-x><c-u>');
+    await testBed.vim.waitForPopUpMenu();
+    await testBed.vim.sendKeys('<c-n><esc><esc>');
+    expect(await testBed.vim.expr('getline(1)'), 'foobar');
   });
 }
 
@@ -123,18 +92,5 @@ extension PopUp on Vim {
         throw StateError('Pop up menu is not visible');
       }
     }
-  }
-}
-
-extension LSP on Peer {
-  void registerLifecycleMethods(Map<String, dynamic> capabilities) {
-    registerMethod('initialize', (_) {
-      return {'capabilities': capabilities};
-    });
-    registerMethod('initialized', (_) {});
-    registerMethod('shutdown', (_) {});
-    registerMethod('exit', (_) {
-      close();
-    });
   }
 }

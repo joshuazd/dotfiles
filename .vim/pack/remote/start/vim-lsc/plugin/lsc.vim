@@ -36,6 +36,7 @@ command! -nargs=? LSClientWorkspaceSymbol
 command! -nargs=? LSClientFindCodeActions
     \ call lsc#edit#findCodeActions(lsc#edit#filterActions(<args>))
 command! LSClientAllDiagnostics call lsc#diagnostics#showInQuickFix()
+command! LSClientWindowDiagnostics call lsc#diagnostics#showLocationList()
 command! LSClientLineDiagnostics call lsc#diagnostics#echoForLine()
 command! LSClientSignatureHelp call lsc#signaturehelp#getSignatureHelp()
 command! LSClientRestartServer call <SID>IfEnabled('lsc#server#restart')
@@ -61,15 +62,29 @@ endfunction
 " subsequent appearances of this file type. If the server exits it will be
 " restarted the next time a window or tab is entered with this file type.
 function! RegisterLanguageServer(filetype, config) abort
-  call lsc#server#register(a:filetype, a:config)
-  for buffer in getbufinfo({'bufloaded': v:true})
-    if getbufvar(buffer.bufnr, '&filetype') == a:filetype &&
-        \ getbufvar(buffer.bufnr, '&modifiable') &&
-        \ buffer.name !~# '\v^fugitive:///'
-      call lsc#server#start(a:filetype)
-      return
+  let l:server = lsc#server#register(a:filetype, a:config)
+  if !get(l:server.config, 'enabled', v:true) | return | endif
+  let l:buffers = s:BuffersOfType(a:filetype)
+  if empty(l:buffers) | return | endif
+  if l:server.status ==# 'running'
+    for l:buffer in l:buffers
+      call lsc#file#track(l:server, l:buffer, a:filetype)
+    endfor
+  else
+    call lsc#server#start(l:server)
+  endif
+endfunction
+
+function! s:BuffersOfType(filetype) abort
+  let l:buffers = []
+  for l:buffer in getbufinfo({'bufloaded': v:true})
+    if getbufvar(l:buffer.bufnr, '&filetype') == a:filetype &&
+        \ getbufvar(l:buffer.bufnr, '&modifiable') &&
+        \ l:buffer.name !~# '\v^fugitive:///'
+      call add(l:buffers, l:buffer)
     endif
   endfor
+  return l:buffers
 endfunction
 
 augroup LSC
@@ -98,9 +113,8 @@ augroup LSC
   autocmd BufWritePost * call <SID>OnWrite()
 
   autocmd CursorMoved * call <SID>IfEnabled('lsc#cursor#onMove')
-  autocmd WinLeave * call <SID>IfEnabled('lsc#cursor#onWinLeave')
   autocmd WinEnter * call <SID>IfEnabled('lsc#cursor#onWinEnter')
-  autocmd InsertEnter * call <SID>IfEnabled('lsc#cursor#insertEnter')
+  autocmd WinLeave,InsertEnter * call <SID>IfEnabled('lsc#cursor#clean')
   autocmd User LSCOnChangesFlushed
       \ call <SID>IfEnabled('lsc#cursor#onChangesFlushed')
 
@@ -134,7 +148,7 @@ function! LSCEnsureCurrentWindowState() abort
     if exists('w:lsc_diagnostic_matches')
       call lsc#highlights#clear()
     endif
-    if exists('w:lsc_diagnostics_version')
+    if exists('w:lsc_diagnostics')
       call lsc#diagnostics#clear()
     endif
     if exists('w:lsc_reference_matches')
@@ -142,7 +156,7 @@ function! LSCEnsureCurrentWindowState() abort
     endif
     return
   endif
-  call lsc#diagnostics#updateLocationList(lsc#file#fullPath())
+  call lsc#diagnostics#updateCurrentWindow()
   call lsc#highlights#update()
   call lsc#cursor#onWinEnter()
 endfunction
@@ -153,13 +167,16 @@ endfunction
 " the current buffer where '&filetype' can be trusted.
 function! s:IfEnabled(function, ...) abort
   if !has_key(g:lsc_servers_by_filetype, &filetype) | return | endif
+  if !&modifiable | return | endif
   if !lsc#server#filetypeActive(&filetype) | return | endif
   call call(a:function, a:000)
 endfunction
 
 function! s:OnOpen() abort
   if !has_key(g:lsc_servers_by_filetype, &filetype) | return | endif
+  if expand('%') =~# '\vfugitive:///' | return | endif
   call lsc#config#mapKeys()
+  if !&modifiable | return | endif
   if !lsc#server#filetypeActive(&filetype) | return | endif
   call lsc#file#onOpen()
 endfunction

@@ -180,6 +180,19 @@ g:UltiSnipsEditSplit        Defines how the edit window is opened. Possible
                             |context|        Splits the window vertically or
                                            horizontally depending on context.
 
+                                                        *g:UltiSnipsSnippetStorageDirectoryForUltiSnipsEdit*
+g:UltiSnipsSnippetStorageDirectoryForUltiSnipsEdit
+                            A single absolute path to a directory which will
+                            be used as the storage for location for
+                            `UltiSnipsEdit`. This means that UltiSnipsEdit no
+                            longer searches all paths in
+                            `g:UltiSnipsSnippetDirectories` for snippets to
+                            edit, but only this one. Note that this does not
+                            imply that the snippet expansion engine also
+                            searches this directory. Please read
+                            |UltiSnips-how-snippets-are-loaded| for details.
+
+
                                                         *g:UltiSnipsSnippetDirectories*
 g:UltiSnipsSnippetDirectories
                             An array of relative directory names OR an array
@@ -330,7 +343,7 @@ For even more advanced usage, you can directly write python functions using
 UltiSnip's python modules. This is an internal and therefore unstable API and
 not recommended though.
 
-Here is a small example funtion that expands a snippet: >
+Here is a small example function that expands a snippet: >
 
    function! s:Ulti_ExpandSnip()
    Python << EOF
@@ -518,6 +531,13 @@ An example configuration could be: >
 You can also redefine the search path on a buffer by buffer basis by setting
 the variable b:UltiSnipsSnippetDirectories. This variable takes precedence
 over the global variable.
+
+There is an additional variable which does not control the search path for
+snippets at expansion time, but controls where `:UltiSnipsEdit` is looking for
+snippets. If this variable is set to a single absolute path it will only
+affect where the edit command is looking for and writing snippets too. This is
+useful if you want to use third party snippets, but have all your self created
+snippets in a single place without being asked where to put the file on edit.
 
 Using a strategy similar to how Vim detects |ftplugins|, UltiSnips iterates
 over the snippet definition directories looking for files with names of the
@@ -1153,6 +1173,22 @@ a<tab>http://www.google.com<c-j><BS><c-j>Google ->
 <a href="http://www.google.com">
     Google
 </a>
+
+Another special type of tabstop is choice tabstop. It let's you to choose
+from a predefined list of items. The syntax of a choice tabstop is
+'${1|item1,item2,item3,...|}'. Here is an example to illustrate this
+feature.
+
+------------------- SNIP -------------------
+snippet q
+Your age: ${1|<18,18~60,>60|}
+Your height: ${2|<120cm,120cm~180cm,>180cm|}
+endsnippet
+------------------- SNAP -------------------
+
+q<tab>2<c-j>2
+Your age: 18~60
+Your height: 120cm~180cm
 
 The default text of tabstops can also contain mirrors, transformations or
 interpolation.

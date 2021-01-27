@@ -1,5 +1,3 @@
-@Skip('https://github.com/dart-lang/json_rpc_2/issues/55')
-
 import 'dart:io';
 
 import 'package:_test/vim_remote.dart';
@@ -11,7 +9,7 @@ void main() {
     Vim vim;
     setUpAll(() async {
       vim = await Vim.start();
-      final serverPath = p.absolute('bin', 'mock_server.dart');
+      final serverPath = p.absolute('bin', 'stub_server.dart');
       await vim.expr('RegisterLanguageServer("text","dart $serverPath")');
     });
 

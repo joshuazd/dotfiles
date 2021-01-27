@@ -1,79 +1,46 @@
 import 'dart:async';
-import 'dart:io';
 
-import 'package:_test/vim_remote.dart';
+import 'package:_test/stub_lsp.dart';
+import 'package:_test/test_bed.dart';
 import 'package:json_rpc_2/json_rpc_2.dart';
-import 'package:lsp/lsp.dart' show lspChannel;
 import 'package:test/test.dart';
 
 void main() {
-  Stream<Peer> clients;
-  ServerSocket serverSocket;
-  Vim vim;
+  TestBed testBed;
   Peer client;
 
   setUpAll(() async {
-    serverSocket = await ServerSocket.bind('localhost', 0);
-
-    clients = serverSocket.map((socket) {
-      return Peer(lspChannel(socket, socket), onUnhandledError: (error, stack) {
-        fail('Unhandled server error: $error');
-      });
-    }).asBroadcastStream();
-    vim = await Vim.start();
-    await vim.expr('RegisterLanguageServer("text", {'
-        '"command":"localhost:${serverSocket.port}",'
-        '"enabled":v:false,'
-        '})');
+    testBed = await TestBed.setup();
   });
 
   setUp(() async {
-    final nextClient = clients.first;
-    await vim.edit('foo.txt');
-    await vim.sendKeys(':LSClientEnable<cr>');
+    final nextClient = testBed.clients.first;
+    await testBed.vim.edit('foo.txt');
+    await testBed.vim.sendKeys(':LSClientEnable<cr>');
     client = await nextClient;
   });
 
   tearDown(() async {
-    await vim.sendKeys(':LSClientDisable<cr>');
-    await vim.sendKeys(':%bwipeout!<cr>');
-    final file = File('foo.txt');
-    if (await file.exists()) await file.delete();
+    await testBed.vim.sendKeys(':LSClientDisable<cr>');
+    await testBed.vim.sendKeys(':%bwipeout!<cr>');
     await client.done;
     client = null;
   });
 
-  tearDownAll(() async {
-    await vim.quit();
-    final log = File(vim.name);
-    print(await log.readAsString());
-    await log.delete();
-    await serverSocket.close();
-  });
-
   Future<void> testNoDidSave(Map<String, dynamic> capabilities) async {
-    final didOpen = Completer<Parameters>();
-    final didSave = Completer<Parameters>()
-      ..future.then((_) {
+    final server = StubServer(client, capabilities: capabilities)
+      ..didSave.listen((_) {
         fail('Unexpected didSave');
       });
-    final didChange = Completer<Parameters>();
-    client
-      ..registerLifecycleMethods(capabilities)
-      ..registerMethod(
-          'textDocument/didOpen', (params) => didOpen.complete(params))
-      ..registerMethod(
-          'textDocument/didSave', (params) => didSave.complete(params))
-      ..registerMethod(
-          'textDocument/didChange', (params) => didChange.complete(params))
-      ..listen();
 
-    await didOpen.future;
+    await server.initialized;
 
-    await vim.sendKeys(':w<cr>');
+    await server.didOpen.first;
 
-    await vim.sendKeys('iHello<esc>');
-    await didChange.future;
+    await testBed.vim.sendKeys(':w<cr>');
+
+    await testBed.vim.sendKeys('iHello<esc>');
+    await await server.didChange.first;
   }
 
   test('TextDocumentSyncKind instead of TextDocumentSyncOptions', () async {
@@ -87,35 +54,16 @@ void main() {
   });
 
   test('include sync key', () async {
-    final didOpen = Completer<Parameters>();
-    final didSave = Completer<Parameters>();
-    client
-      ..registerLifecycleMethods({
-        'textDocumentSync': {'openClose': true, 'save': {}}
-      })
-      ..registerMethod(
-          'textDocument/didOpen', (params) => didOpen.complete(params))
-      ..registerMethod(
-          'textDocument/didSave', (params) => didSave.complete(params))
-      ..listen();
+    final server = StubServer(client, capabilities: {
+      'textDocumentSync': {'openClose': true, 'save': {}}
+    });
 
-    await didOpen.future;
+    await server.initialized;
 
-    await vim.sendKeys(':w<cr>');
+    await server.didOpen.first;
 
-    await didSave.future;
+    await testBed.vim.sendKeys(':w<cr>');
+
+    await server.didSave.first;
   });
-}
-
-extension LSP on Peer {
-  void registerLifecycleMethods(Map<String, dynamic> capabilities) {
-    registerMethod('initialize', (params) {
-      return {'capabilities': capabilities};
-    });
-    registerMethod('initialized', (_) {});
-    registerMethod('shutdown', (_) {});
-    registerMethod('exit', (_) {
-      close();
-    });
-  }
 }
