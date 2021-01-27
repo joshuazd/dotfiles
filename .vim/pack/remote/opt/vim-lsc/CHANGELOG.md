@@ -9,6 +9,9 @@
   send any items containing a `textEdit` field.
 - Truncate diagnostics at 1 character shorter for when `ruler` is used.
 - Normalize windows file path separators to create valid URIs.
+- Don't send `textDocument/didSave` notifications if the server does not
+  advertise it as a capability.
+- Fix edits when there are folds in the buffer.
 
 **Minor breaking changes**
 - Server dictionaries no longer expose their full `init_results`, or their call
@@ -41,6 +44,15 @@
   by substring.
 - Include Completion item `detail` field in the preview window.
 - Strikethrough deprecated completion options in the menu.
+- Improve performance of finding incremental changes for file syncing in very
+  large files when lua support is available.
+- Send `hover.contentFormat` to prefer plaintext content which should be more
+  readable for most users.
+- Use full words for completion item kinds instead of single letters.
+- Avoid overwriting location list if it is in use for something other than LSC
+  diagnostics.
+- Asynchronously loop over server messages to avoid long synchronous pauses
+  between handling user input.
 
 # 0.3.2
 

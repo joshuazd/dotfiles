@@ -1,8 +1,7 @@
-@Timeout(Duration(seconds: 30))
-
 import 'dart:io';
 
 import 'package:_test/vim_remote.dart';
+import 'package:path/path.dart' as p;
 import 'package:test/test.dart';
 
 void main() {
@@ -10,11 +9,15 @@ void main() {
     Vim vim;
     setUpAll(() async {
       vim = await Vim.start();
+      final serverPath = p.absolute('bin', 'stub_server.dart');
+      await vim.expr('RegisterLanguageServer("text","dart $serverPath")');
     });
 
     tearDownAll(() async {
       await vim.quit();
-      print(File(vim.name).readAsStringSync());
+      final log = File(vim.name);
+      print(await log.readAsString());
+      await log.delete();
     });
 
     test('evaluates expressions', () async {

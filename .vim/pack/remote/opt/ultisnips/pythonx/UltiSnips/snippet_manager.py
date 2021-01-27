@@ -88,7 +88,9 @@ def _select_and_create_file_to_edit(potentials: Set[str]) -> str:
     return file_to_edit
 
 
-def _get_potential_snippet_filenames_to_edit(snippet_dir, filetypes):
+def _get_potential_snippet_filenames_to_edit(
+    snippet_dir: str, filetypes: str
+) -> Set[str]:
     potentials = set()
     for ft in filetypes:
         ft_snippets_files = find_snippet_files(ft, snippet_dir)
@@ -481,12 +483,13 @@ class SnippetManager:
             vim_helper.command("augroup UltiSnips")
             vim_helper.command("autocmd!")
             vim_helper.command("augroup END")
-            self._inner_state_up = False
         except vim_helper.error:
             # This happens when a preview window was opened. This issues
             # CursorMoved, but not BufLeave. We have no way to unmap, until we
             # are back in our buffer
             pass
+        finally:
+            self._inner_state_up = False
 
     @err_to_scratch_buffer.wrap
     def _save_last_visual_selection(self):
@@ -830,6 +833,20 @@ class SnippetManager:
         potentials = set()
 
         all_snippet_directories = find_all_snippet_directories()
+        has_storage_dir = (
+            vim_helper.eval(
+                "exists('g:UltiSnipsSnippetStorageDirectoryForUltiSnipsEdit')"
+            )
+            == "1"
+        )
+        if has_storage_dir:
+            snippet_storage_dir = vim_helper.eval(
+                "g:UltiSnipsSnippetStorageDirectoryForUltiSnipsEdit"
+            )
+            full_path = os.path.expanduser(snippet_storage_dir)
+            potentials.update(
+                _get_potential_snippet_filenames_to_edit(full_path, filetypes)
+            )
         if len(all_snippet_directories) == 1:
             # Most likely the user has set g:UltiSnipsSnippetDirectories to a
             # single absolute path.
@@ -838,14 +855,16 @@ class SnippetManager:
                     all_snippet_directories[0], filetypes
                 )
             )
-        else:
+
+        if (len(all_snippet_directories) != 1 and not has_storage_dir) or (
+            has_storage_dir and bang
+        ):
             # Likely the array contains things like ["UltiSnips",
             # "mycoolsnippets"] There is no more obvious way to edit than in
             # the users vim config directory.
-            dot_vim_dir = Path(vim_helper.get_dot_vim())
+            dot_vim_dir = vim_helper.get_dot_vim()
             for snippet_dir in all_snippet_directories:
-                snippet_dir = Path(snippet_dir)
-                if dot_vim_dir != snippet_dir.parent:
+                if Path(dot_vim_dir) != Path(snippet_dir).parent:
                     continue
                 potentials.update(
                     _get_potential_snippet_filenames_to_edit(snippet_dir, filetypes)
@@ -890,8 +909,8 @@ class SnippetManager:
 
                 if (
                     before
+                    and self._last_change[0] != ""
                     and before[-1] == self._last_change[0]
-                    or self._last_change[1] != vim_helper.buf.cursor
                 ):
                     self._try_expand(autotrigger_only=True)
         finally:
