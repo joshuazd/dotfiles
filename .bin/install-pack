@@ -110,11 +110,11 @@ def pack_install(package, path, name):
         if len(log) > 0:
             with open(log_file, 'a') as file:
                 file.write(str(name) + '\n')
-                file.write(str(log) + '\n')
+                file.write(str(log.decode()) + '\n')
                 file.write('\n')
             print()
             print(name)
-            print(log)
+            print(log.decode())
         conch.release()
     install_hooks(path, name)
 
