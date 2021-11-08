@@ -1,0 +1,78 @@
+#!/bin/sh
+
+cd "$(dirname "$0")"
+cd ..
+dir="$(cd -P "$(dirname "$0")" >/dev/null 2>&1 && cd .. && pwd)"
+
+read -p 'Backup existing files (Y/n)' backup
+if [ -z $backup ]; then
+    backup='y'
+fi
+
+install() {
+    if [ -f "$HOME/.$1" ] || [ -d "$HOME/.$1" ] || [ -L "$HOME/.$1" ]; then
+        if [ "$backup" = 'y' ] || [ "$backup" = 'Y' ]; then
+            echo "Backing up existing $1 to .$1.old"
+            mv "$HOME/.$1" "$HOME/.$1.old"
+        else
+            echo "Removing old $1"
+            rm "$HOME/.$1"
+        fi
+    fi
+    echo "Installing $1"
+
+    case $(uname -s) in
+        Linux*|Darwin*) ln -s "$dir/.$1" "$HOME/.$1" ;;
+        CYGWIN*)
+            basedir=$(cygpath -w "$dir")
+            if [ -d "$dir/$1" ]; then
+                cygstart --action=runas cmd /C "cd %HOME% && mklink /D .$1 $basedir\\$1"
+            elif [ -f "$dir/$1" ]; then
+                cygstart --action=runas cmd /C "cd %HOME% && mklink .$1 $basedir\\$1"
+            fi ;;
+        *) ;;
+    esac
+}
+
+install vim
+install vimrc
+install inputrc
+install shrc
+install bashrc
+install zshrc
+install profile
+install zprofile
+install bash_profile
+install aliases
+install functions
+install tmux.conf
+install editorconfig
+install ctags
+install bin
+install ripgrep
+install tigrc
+[ -d "$HOME/.config" ] || mkdir -p "$HOME/.config"
+install config/i3
+install config/polybar
+install config/bat
+
+echo "Creating symlinks for theme"
+if [ -f /usr/local/share/zsh/site-functions/prompt_nier_setup ]; then
+    sudo rm /usr/local/share/zsh/site-functions/prompt_nier_setup
+fi
+if [ -f /usr/local/share/zsh/site-functions/prompt_pure_setup ]; then
+    sudo rm /usr/local/share/zsh/site-functions/prompt_pure_setup
+fi
+if [ -f /usr/local/share/zsh/site-functions/async ]; then
+    sudo rm /usr/local/share/zsh/site-functions/async
+fi
+
+case $(uname -s) in
+    Linux*|Darwin*) sudo ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup
+                    sudo ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup
+                    sudo ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async ;;
+    CYGWIN*) ln -s "$PWD/zsh_custom/themes/pure.zsh-theme" /usr/local/share/zsh/site-functions/prompt_pure_setup
+             ln -s "$PWD/zsh_custom/themes/nier.zsh-theme" /usr/local/share/zsh/site-functions/prompt_nier_setup
+             ln -s "$PWD/zsh_custom/async.zsh" /usr/local/share/zsh/site-functions/async ;;
+    *) ;;
+esac

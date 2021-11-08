@@ -1,0 +1,16 @@
+set backspace=indent,eol,start
+set hidden
+set ignorecase
+set smartcase
+set autoindent
+set smarttab
+set nowrap
+set wildmenu
+set noswapfile
+set showcmd
+set tags=./tags,tags
+set path=.,**
+set ruler
+filetype plugin indent on
+syntax enable
+colorscheme nord

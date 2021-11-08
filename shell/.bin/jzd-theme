@@ -1,0 +1,5 @@
+#! /usr/bin/zsh
+mtc set "$1"
+eval $(dircolors "$HOME/.dir_colors")
+tmux source "$TMUX_CUSTOM/colors/"$@".tmux" 2>/dev/null
+return 0

@@ -1,0 +1,16 @@
+[credential]
+    helper = store
+[color "status"]
+    changed = yellow
+    untracked = red
+[commit]
+    verbose = true
+    status = true
+[push]
+    default = simple
+[grep]
+    lineNumber = true
+[core]
+	excludesfile = /home/watcher/.cvsignore
+[alias]
+	conflicts = diff --name-only --diff-filter=U

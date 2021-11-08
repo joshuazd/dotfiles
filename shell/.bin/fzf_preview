@@ -1,0 +1,16 @@
+#! /usr/bin/env sh
+_fzf_preview() {
+    local match="$1"
+    local lnum=$(echo "$match" | sed 's/[^:]*:\([0-9]\+\):.*/\1/')
+    if [ "$lnum" -gt 5 ]; then
+        local lnum=$(($lnum-5))
+    else
+        local lnum=1
+    fi
+    (bat -n --color=always "$match" \
+        || cat "$match" \
+        || ls -F --color=always "$match" \
+        || bat -n --color=always --line-range "$lnum": $(echo "$match" | sed 's/:.*//' )) | head -100
+    }
+
+_fzf_preview "$@"

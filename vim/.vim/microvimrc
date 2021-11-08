@@ -1,0 +1,125 @@
+set hidden
+set history=200
+set backspace=eol,start,indent
+set whichwrap+=<,>
+set showcmd
+set breakindent
+set breakindentopt+=shift:2
+set nrformats-=octal
+set ignorecase
+set smartcase
+set incsearch
+set hlsearch
+set lazyredraw
+set showmatch
+set matchtime=2
+set splitbelow
+set splitright
+set clipboard^=unnamed,unnamedplus
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+set smarttab
+set autoindent
+set nowrap
+set linebreak
+set laststatus=2
+set foldmethod=marker
+set timeoutlen=3000
+set ttimeoutlen=0
+set wildmenu
+set wildcharm=<C-z>
+set wildmode=list:longest,list:full
+set wildignore+=*.o,*~,*.pyc,*.versionsBackup
+set wildignore+=*target/*,*bin/*,*build/*
+set wildignore+=tags,Session.vim
+set wildignorecase
+set sessionoptions-=options
+set sessionoptions-=blank
+set noswapfile
+set foldlevelstart=10
+set listchars=tab:->,trail:~,extends:>,eol:$
+set display+=lastline
+set omnifunc=syntaxcomplete#Complete
+set completeopt+=menuone,noselect,longest
+set autoread
+set path=.,**
+set tags=./tags,tags
+set background=light
+set grepprg=grep\ -r\ -n\ -I\ --exclude-dir=.git
+runtime! macros/matchit.vim
+filetype plugin indent on
+syntax enable
+colorscheme nord
+if has('packages')
+  packadd vim-tmuxnavigate
+  packadd vim-ccr
+  packadd vim-textobj
+endif
+
+nnoremap Y y$
+
+nnoremap [b :bprevious<CR>
+nnoremap ]b :bnext<CR>
+nnoremap <BS> <C-^>
+nnoremap <silent> <Space>x :bn<bar>bd #<CR>
+
+nnoremap <expr> j v:count ? 'j' : 'gj'
+nnoremap <expr> k v:count ? 'k' : 'gk'
+nnoremap gj j
+nnoremap gk k
+nnoremap ' `
+nnoremap c* :set hlsearch<CR>*Ncgn
+
+" select column
+xnoremap <silent> ac :<C-u>execute "normal! vip\<lt>C-v>" . col("'>") . "\|O" . col("'<") . "\|"<CR>
+onoremap <silent> ac :normal vac<CR>
+
+" buffer/file management
+nnoremap gb :ls<CR>:b<space>
+nnoremap <Space>a :argadd **/*
+nnoremap <Space>ff :find<space>
+nnoremap <Space>fs :sfind<space>
+nnoremap <Space>fv :vert sfind<space>
+nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
+nnoremap <Space>t :tjump /
+
+nnoremap <Space>;g :g/\v/#<Left><Left>
+xnoremap <Space>;g "ay:g/\V<C-r>=escape(@a,'\/')<CR>/#<CR>:
+nnoremap <Space>;i :ilist /
+nnoremap <Space>;r :%s/<C-r><C-w>//g<Left><Left>
+xnoremap <Space>;r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
+nnoremap <Esc>OA <Up>
+nnoremap <silent> <nowait> <Esc> :<C-u>nohlsearch<CR>
+
+" vim-unimpaired settings toggles
+nnoremap =ow :setlocal wrap!           \|setlocal wrap?<CR>
+nnoremap =oz :setlocal list!           \|setlocal list?<CR>
+nnoremap =os :setlocal spell!          \|setlocal spell?<CR>
+nnoremap =oh :setlocal hlsearch!       \|setlocal hlsearch?<CR>
+nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR>\|setlocal signcolumn?<CR>
+nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR>\|setlocal conceallevel?<CR>
+nnoremap =oy :if exists('g:syntax_on') \| syntax off \| else \| syntax enable \| endif<CR>
+
+nnoremap [q :cprevious<CR>
+nnoremap ]q :cnext<CR>
+nnoremap [Q :cfirst<CR>
+nnoremap ]Q :clast<CR>
+nnoremap =q :cclose<CR>
+
+nnoremap <C-]> g<C-]>
+
+nnoremap [I [I:ij!  /\<<C-r><C-w>\><S-Left><Left>
+nnoremap ]I ]I:.+1,$ij!  /\<<C-r><C-w>\><S-Left><Left>
+
+cnoremap <expr> <Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>/<C-r>/" : "<C-z>"
+
+augroup vimrc
+  autocmd!
+  autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif | norm! zv
+  if exists('##TextYankPost') && executable('base64')
+    autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
+  endif
+augroup END
+
+set statusline=%f\ %m%r%w%q%h%=%<%-20{&filetype}%-15(%l,%c%V%)%P

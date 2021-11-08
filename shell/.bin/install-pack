@@ -1,0 +1,136 @@
+#! /usr/bin/env python
+from __future__ import print_function
+import os
+import time
+import shutil
+import subprocess
+from multiprocessing import Pool
+import threading
+
+PACKAGES = [
+    'lifepillar/vim-mucomplete',
+    'justinmk/vim-sneak',
+    'tpope/vim-dispatch',
+    'tpope/vim-surround',
+    'tpope/vim-repeat',
+    'tpope/vim-commentary',
+    'tpope/vim-apathy',
+    'tpope/vim-fugitive',
+    'tommcdo/vim-lion',
+    'romainl/vim-qf',
+    'romainl/vim-qlist',
+    'romainl/vim-cool',
+    'markonm/traces.vim',
+    'sgur/vim-editorconfig',
+    'natebosch/vim-lsc',
+    'junegunn/fzf',
+    'junegunn/fzf.vim',
+    'ludovicchabant/vim-gutentags',
+    'SirVer/ultisnips',
+]
+
+HOOKS = {
+    'fzf': {'do': './install --all'}
+}
+
+OPT = [
+    'ultisnips',
+    'vim-lsc'
+]
+
+dir = os.path.dirname(os.path.realpath(__file__))
+update_file = os.path.join(dir, '..', '.last-update')
+log_file = os.path.join(dir, '..', '.plugin-update')
+conch = threading.Semaphore()
+try:
+    with open(update_file) as file:
+        last_update = file.read().strip()
+except IOError as e:
+    last_update = None
+
+
+def main():
+    update_time = time.strftime('%Y-%m-%dT%H:%M:%S')
+    try:
+        shutil.rmtree(
+            os.path.expanduser(
+                os.path.join('~', '.vim', 'pack', 'remote')))
+    except Exception as e:
+        pass
+    print('Removed ''pack' + os.sep + 'remote'' directory')
+    try:
+        os.remove(log_file)
+    except OSError as e:
+        pass
+    p = Pool(20)
+    p.map(pack_process, PACKAGES)
+    with open(update_file, 'w') as file:
+        file.write(update_time)
+
+    print('Installed/Updated plugins')
+
+    p.map(walk_tree,
+          os.walk(os.path.expanduser(os.path.join('~', '.vim', 'pack'))))
+    print('Removed image files from plugins')
+
+
+def walk_tree(tree):
+    root, dirs, files = tree
+    for dir in dirs:
+        if any(dir.lower().endswith(ext) for ext in ['.git']):
+            shutil.rmtree(os.path.join(root, dir))
+    for file in files:
+        if any(file.lower().endswith(ext) for ext in ['gif', 'png', 'svg', '.git', '.gitignore', '.gitmodules']):
+            os.remove(os.path.join(root, file))
+
+
+def pack_process(package):
+    name = package.split('/')[-1]
+    dir = HOOKS.get(name, {}).get('dir', name)
+    load = 'opt' if name in OPT else 'start'
+    path = os.path.join('~', '.vim', 'pack', 'remote', load, name) \
+        if dir == name else dir
+    path = os.path.expanduser(path)
+    pack_install(package, path, name)
+
+
+def pack_install(package, path, name):
+    print('Installing %s plugin' % name)
+    os.system('git clone -q --recurse-submodules https://github.com/'
+              + package + ' ' + path)
+    if last_update is not None:
+        cwd = os.getcwd()
+        os.chdir(path)
+        log = subprocess.Popen('git log --graph --oneline --since='
+                               + last_update, stdout=subprocess.PIPE,
+                               shell=True)
+        log, _ = log.communicate()
+        log = log.strip()
+        os.chdir(cwd)
+        conch.acquire()
+        if len(log) > 0:
+            with open(log_file, 'a') as file:
+                file.write(str(name) + '\n')
+                file.write(str(log.decode()) + '\n')
+                file.write('\n')
+            print()
+            print(name)
+            print(log.decode())
+        conch.release()
+    install_hooks(path, name)
+
+
+def install_hooks(path, name):
+    if name in HOOKS and 'do' in HOOKS[name]:
+        cwd = os.getcwd()
+        os.chdir(path)
+        print('Running post-install hook for %s' % name)
+        try:
+            os.system(HOOKS[name]['do'])
+        except Exception as e:
+            print('Unable to run post-install hook for %s' % name)
+        os.chdir(cwd)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,12 @@
+setlocal formatoptions+=r
+setlocal formatoptions+=o
+setlocal formatoptions-=c
+setlocal comments=b:[\ ]
+setlocal comments+=b:-\ [\ ]
+setlocal comments+=b:*\ [\ ]
+setlocal comments+=b:*,b:+,b:-
+setlocal comments+=b:>
+setlocal foldexpr=MarkdownFold()
+setlocal foldmethod=expr
+setlocal statusline+=\ %{wordcount()['words']}\ words
+let b:undo_ftplugin = 'setlocal formatoptions< comments< foldexpr< foldmethod< statusline<'

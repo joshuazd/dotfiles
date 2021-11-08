@@ -1,0 +1,18 @@
+#! /usr/bin/env sh
+sudo apt update
+sudo apt install -y zsh ctags vim snapd
+sudo snap install ripgrep --classic
+sudo snap alias ripgrep.rg rg
+wget https://github.com/sharkdp/fd/releases/download/v7.0.0/fd-musl_7.2.0_i386.deb
+wget https://github.com/sharkdp/fd/releases/download/v7.3.0/fd-musl_7.3.0_amd64.deb
+sudo dpkg -i fd-musl_7.3.0_amd64.deb
+rm fd-musl_7.3.0_i386.deb
+wget https://github.com/sharkdp/bat/releases/download/v0.10.0/bat-musl_0.10.0_amd64.deb
+sudo dpkg -i bat-musl_0.10.0_amd64.deb
+rm bat-musl_0.10.0_amd64.deb
+mkdir -p ~/.cache/bat
+bat cache --build
+sudo apt install -y silversearcher-ag
+sudo apt upgrade -y snapd silversearcher-ag zsh ctags vim
+sudo snap refresh ripgrep
+

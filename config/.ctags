@@ -1,0 +1,25 @@
+--langdef=XML
+--langmap=XML:.xml.dbs
+--regex-XML=/endpoint .*name="(conf\/)?([a-zA-Z0-9_]+)(\.xml)?"/\2/e,endpoint/
+--regex-XML=/(<api|<template|<sequence|<messageStore|<messageProcessor|<data|<task|<proxy) .*name="([a-zA-Z0-9_]+)"/\2/d,definition/
+--regex-XML=/<localEntry .*key="([a-zA-Z0-9_]+)"/\1/d,definition/
+--regex-XML=/<token>@([a-zA-Z0-9_]+)/\1/t,token/
+--regex-XML=/<resource.*url-mapping="\/([a-zA-Z0-9_\/{}?=-\*&;]+)"/\1/u,url/
+--regex-XML=/<resource.*uri-template="\/([a-zA-Z0-9_\/{}?=-\*&;]+)"/\1/u,url/
+--regex-XML=/<query.*id="([a-zA-Z0-9_]+)"/\1/q,query/
+--regex-XML=/<operation.*name="([a-zA-Z0-9_]+)"/\1/o,operation/
+--exclude=artifact.xml
+--exclude=*/Documentation/*
+--langdef=ansible
+--langmap=ansible:.yml.yaml
+--regex-ansible=/^[ \t]*-[ \t]*name:[ \t]*(.+)/\1/k,tasks/
+--regex-ansible=/^([a-zA-Z0-9_]+):.+/\1/d,definition/
+--langdef=Rust
+--langmap=Rust:.rs
+--regex-Rust=/fn +([a-zA-Z0-9_]+) *[(<{]/\1/f,functions,function definitions/
+--regex-Rust=/(type|enum|struct|trait)[ \t]+([a-zA-Z0-9_]+) *[<{(;]/\2/T,types,type definitions/
+--regex-Rust=/mod[ \t]+([a-zA-Z0-9_]+) *[<{(;]/\1/M,modules,module definitions/
+--regex-Rust=/(static|const) +([a-zA-Z0-9_]+) *[:=]/\2/c,consts,static constants/
+--regex-Rust=/macro_rules! +([a-zA-Z0-9_]+) *[{]/\1/d,macros,macro definitions/
+--regex-Rust=/impl([ \t\n]*<[^>]*>)?[ \t]+(([a-zA-Z0-9_:]+)[ \t]*(<[^>]*>)?[ \t]+(for)[ \t]+)?([a-zA-Z0-9_]+)/\6/i,impls,trait implementations/
+--langmap=Vim:+(vimrc)

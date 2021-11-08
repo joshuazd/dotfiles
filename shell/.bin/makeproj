@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+scriptdir=${PWD}
+projname=${PWD##*/}
+touch pom.xml
+# projname=$1
+mkdir $projname'_ESB'
+mkdir $projname'_Deployment'
+touch $projname'_ESB/artifact.xml'
+touch $projname'_ESB/pom.xml'
+touch $projname'_Deployment/pom.xml'
+mkdir -p $projname'_ESB/src/main/synapse-config'
+cd $projname'_ESB/src/main/synapse-config'
+mkdir api
+mkdir local-entries
+mkdir templates
+mkdir endpoints
+cd $scriptdir

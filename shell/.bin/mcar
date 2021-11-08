@@ -1,0 +1,2 @@
+#! /usr/bin/env sh
+cp -i "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /mnt/h/car-files/

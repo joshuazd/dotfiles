@@ -1,0 +1,24 @@
+#!/bin/sh
+
+cd "$(dirname "$0")"
+
+option="$1"
+
+case "$option" in
+    symlinks)
+        exec "$HOME/.bin/install-symlinks" ;;
+    pack)
+        "$HOME/.bin/install-pack"
+        vim +helptags\ ALL +qall
+        ;;
+    tools)
+        exec "$HOME/.bin/install-tools" ;;
+    tmux)
+        exec "$HOME/.bin/install-tmux" ;;
+    vim)
+        exec "$HOME/.bin/install-vim" ;;
+    all)
+        exec "$HOME/.bin/install-all" ;;
+    *)
+        ;;
+esac

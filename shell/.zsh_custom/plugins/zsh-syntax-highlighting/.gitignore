@@ -1,0 +1,4 @@
+*.zwc*
+zsh_custom/plugins/zsh-syntax-highlighting/.pc/
+zsh_custom/plugins/zsh-syntax-highlighting/docs/all.md
+

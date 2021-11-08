@@ -1,0 +1,120 @@
+#!/usr/bin/env python
+from __future__ import print_function
+import sys
+import os
+import re
+import glob
+
+
+def main(argv):
+
+    types = {
+             'api':               {'dir': 'api',                'dep': 'api',                'art': 'synapse/api',                'type': 'xml', 'ext': 'xml'},
+             'endpoint':          {'dir': 'endpoints',          'dep': 'endpoint',           'art': 'synapse/endpoint',           'type': 'xml', 'ext': 'xml'},
+             'local-entry':       {'dir': 'local-entries',      'dep': 'local-entry',        'art': 'synapse/local-entry',        'type': 'xml', 'ext': 'xml'},
+             'message-processor': {'dir': 'message-processors', 'dep': 'message-processors', 'art': 'synapse/message-processors', 'type': 'xml', 'ext': 'xml'},
+             'message-store':     {'dir': 'message-stores',     'dep': 'message-store',      'art': 'synapse/message-store',      'type': 'xml', 'ext': 'xml'},
+             'proxy-service':     {'dir': 'proxy-services',     'dep': 'proxy-service',      'art': 'synapse/proxy-service',      'type': 'xml', 'ext': 'xml'},
+             'sequence':          {'dir': 'sequences',          'dep': 'sequence',           'art': 'synapse/sequence',           'type': 'xml', 'ext': 'xml'},
+             'task':              {'dir': 'tasks',              'dep': 'task',               'art': 'synapse/task',               'type': 'xml', 'ext': 'xml'},
+             'template':          {'dir': 'templates',          'dep': 'template',           'art': 'synapse/sequenceTemplate',   'type': 'xml', 'ext': 'xml'},
+             'inputschema':       {'dir': '',                   'dep': 'resource',           'art': 'registry/resource',          'type': 'zip', 'ext': 'json', 'dm': True },
+             'outputschema':      {'dir': '',                   'dep': 'resource',           'art': 'registry/resource',          'type': 'zip', 'ext': 'json', 'dm': True },
+             'datamap':           {'dir': '',                   'dep': 'resource',           'art': 'registry/resource',          'type': 'zip', 'ext': 'dmc',  'dm': True }}
+
+
+    if len(argv) >= 2 and (argv[1] == '-p' or argv[1] == '-h' or argv[1] == '--help'):
+        print('MakeArtifact: create an artifact in a WSO2 ESB Project',
+              'Usage: makeartifact <type> <name>',
+              '',
+              '<name> should NOT end in .xml',
+              '',
+              'Types:',
+              '\n'.join(types.keys()),
+              sep='\n')
+        return
+
+    if len(argv) != 3:
+        raise Exception('Usage: makeartifact <type> <name>')
+
+    artifact_type = argv[1]
+    artifact_name = argv[2]
+
+    if artifact_type not in types:
+        raise ValueError('Incorrect artifact type\nUsage: makeartifact <type> <name>')
+
+    if types[artifact_type].get('dm'):
+        subfolder = '_DataMapper'
+    else:
+        subfolder = '_ESB'
+
+    path = os.path.join(os.getcwd(), os.path.split(os.getcwd())[-1] + subfolder)
+    if not(types[artifact_type].get('dm')):
+        path = os.path.join(path, 'src', 'main', 'synapse-config', types[artifact_type]['dir'])
+
+    if not(os.path.exists(path)):
+        os.makedirs(path)
+    artifact = open(os.path.join(path, artifact_name + '.' + types[artifact_type]['ext']), 'w+')
+    artifact.close()
+
+    project_name = glob.glob('*_ESB')[0][:-4]
+
+    path = os.path.join(os.getcwd(), project_name + '_Deployment', 'pom.xml')
+
+    version = '1.0.0'
+    with open('pom.xml', 'r') as pom:
+        version_tag = re.compile('\s*<version>.*</version')
+        for line in pom.readlines():
+            if version_tag.match(line) is not None:
+                version = re.findall('\d+\.\d+\.\d+', line)[0]
+                break
+
+    with open(path, 'r') as dep_pom:
+        lines = dep_pom.readlines()
+
+    with open(path, 'w') as dep_pom:
+        props = re.compile('\s*</properties>')
+        deps = re.compile('\s*</dependencies>')
+        info = (project_name, subfolder, types[artifact_type]['dep'], artifact_name)
+        for line in lines:
+            if props.match(line) is not None:
+                dep_pom.write('    <com....%s%s.%s_._%s>' % tuple(info))
+                dep_pom.write('capp/EnterpriseServiceBus')
+                dep_pom.write('</com....%s%s.%s_._%s>\n' % tuple(info))
+            elif deps.match(line) is not None:
+                dep_pom.write('    <dependency>\n')
+                dep_pom.write('      <groupId>com....%s%s.%s</groupId>\n'
+                              % tuple(info[:-1]))
+                dep_pom.write('      <artifactId>%s</artifactId>\n' % (info[-1]))
+                dep_pom.write('      <version>${project.version}</version>\n')
+                dep_pom.write('      <type>%s</type>\n' % (types[artifact_type]['type']))
+                dep_pom.write('    </dependency>\n')
+
+            dep_pom.write(line)
+
+    path = os.path.join(os.getcwd(), project_name + subfolder, 'artifact.xml')
+    with open(path, 'r') as art_pom:
+        lines = art_pom.readlines()
+
+    with open(path, 'w') as art_pom:
+        arts = re.compile('\s*</artifacts>')
+        for line in lines:
+            if arts.match(line) is not None:
+                art_pom.write('  <artifact name="%s" groupId="com....%s.%s" version="%s" type="%s" serverRole="EnterpriseServiceBus">\n'
+                              % (artifact_name, project_name + subfolder, types[artifact_type]['dep'], version, types[artifact_type]['art']))
+                if types[artifact_type].get('dm'):
+                    art_pom.write('    <item>\n')
+                    art_pom.write('      <file>%s.%s</file>\n' % (artifact_name, types[artifact_type]['ext']))
+                    art_pom.write('      <path>/_system/governance</path>\n')
+                    art_pom.write('      <mediaType>text/plain</mediaType>\n')
+                    art_pom.write('    </item>\n')
+                else:
+                    art_pom.write('    <file>src/main/synapse-config/%s/%s.xml</file>\n'
+                                  % (types[artifact_type]['dir'], artifact_name))
+                art_pom.write('  </artifact>\n')
+
+            art_pom.write(line)
+
+
+if __name__ == "__main__":
+    main(sys.argv)

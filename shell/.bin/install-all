@@ -1,0 +1,8 @@
+#! /usr/bin/env sh
+
+cd "$(dirname "$0")"
+
+"$PWD/install-symlinks"
+"$PWD/install-tmux"
+"$PWD/install-vim"
+"$PWD/install-tools"
