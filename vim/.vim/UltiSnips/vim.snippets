@@ -1,0 +1,76 @@
+snippet if "if endif" b
+if ${1:condition}
+	${0:${VISUAL}}
+endif
+endsnippet
+
+snippet elseif "elseif" b
+elseif ${1:condition}
+	${0}
+endsnippet
+
+snippet ifelse "if else endif" b
+if ${1:condition}
+	${2}
+else
+	$0
+endif
+endsnippet
+
+snippet func "function" b
+function! `!v substitute(substitute(expand('%:p:r'),'\v^%(\/[^\/]+){-1,}\/?%($|plugin|autoload|ftplugin)\/?','',''),'\v\/|%([^\/]+$\zs)','#','g')`${1:name}($2) abort
+	${0:${VISUAL:" code}}
+endfunction
+endsnippet
+
+snippet funcs "script local function" b
+function! s:${1:name}($2) abort
+	${0:${VISUAL:" code}}
+endfunction
+endsnippet
+
+snippet for "for in endfor" b
+for ${1:var} in ${2:list}
+	${0:${VISUAL}}
+endfor
+endsnippet
+
+snippet while "while endwhile" b
+while ${1:condition}
+	${0:${VISUAL}}
+endwhile
+endsnippet
+
+snippet command "command call function" b
+command! ${1:name} call ${2:func_name}
+endsnippet
+
+snippet augroup "augroup with autocmds" b
+augroup ${1:name}
+	autocmd!
+	autocmd ${0:event}
+augroup END
+endsnippet
+
+snippet try "try catch endtry" b
+try
+	${0:" code}
+catch
+endtry
+endsnippet
+
+snippet map "map" b
+${1:n}${2:nore}map ${3:trigger} ${0:result}
+endsnippet
+
+snippet let "let variable" b
+let ${1:variable} = ${0:value}
+endsnippet
+
+snippet hdl "hi def link" b
+hi def link ${1:group} ${0:link}
+endsnippet
+
+snippet hl "highlight" b
+highlight ${1:group} ctermfg=${2:ctermfg} guifg=${3:guifg} ctermbg=${4:ctermbg} guibg=${5:guibg} cterm=${0:format} gui=${0:format}
+endsnippet

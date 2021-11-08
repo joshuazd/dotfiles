@@ -1,0 +1,66 @@
+#!/bin/zsh
+
+function git_update() {
+    if ! git diff-index --quiet HEAD --; then
+        return true
+    else
+        return false
+    fi
+}
+
+function check_repos() {
+    for d in ./*/
+    do
+        cd "$d"
+        echo "$d"
+        git update-index -q --refresh
+        if [[ -n `git status --porcelain` || -n $(git rev-list --left-right HEAD...@'{u}' 2>/dev/null) ]]; then
+            git status -u
+        fi
+        cd ..
+    done
+}
+
+function custom_vim() {
+    local jobsresult=$(jobs)
+    local jobsdir=$(jobs -d)
+    local vimresult=$(echo $jobsdir | grep -n vim)
+    if [[ $@ == '' &&  -f $PWD/.git/Session.vim ]]; then
+        flags=' -S .git/Session.vim'
+    else
+        flags=''
+    fi
+    if [[ -n $vimresult ]]; then
+        if [[ $(jobs -d | grep -B $vimresult[1,1] -oPm1 '(?<=\(pwd : ).*(?=\))') = $PWD ]]; then
+            local jobnum=$(echo $jobsresult | grep -n vim)
+            eval "fg %$jobnum[1,1]"
+        else
+            eval "vim $flags $@"
+        fi
+    else
+        eval "vim $flags $@"
+    fi
+    return true
+}
+
+function getssl() {
+    openssl s_client -showcerts -connect $1 </dev/null 2>/dev/null|openssl x509 -outform PEM >$2
+}
+
+function buildp() {
+    mvn install -P$1; mcar
+}
+
+# fbr - checkout git branch (including remote branches)
+fbr() {
+  local branches branch
+  branches=$(git branch --all | grep -v HEAD) &&
+  branch=$(echo "$branches" |
+           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+function installcar() {
+    rm /mnt/c/Users/jzinkduda/apps/wso2esb-5.0.0/repository/deployment/server/carbonapps/${PWD##*/}*.car
+    cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /mnt/c/Users/jzinkduda/apps/wso2esb-5.0.0/repository/deployment/server/carbonapps/
+}

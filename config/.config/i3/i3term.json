@@ -1,0 +1,23 @@
+{
+    "border": "pixel",
+    "current_border_width": 0,
+    "floating": "auto_off",
+    "geometry": {
+       "height": 680,
+       "width": 676,
+       "x": 0,
+       "y": 0
+    },
+    "name": "URxvt",
+    "percent": 1,
+    "swallows": [
+       {
+         "class": "^URxvt$",
+         "instance": "^urxvt$",
+         "title": "^",
+         "transient_for": "^$"
+       }
+    ],
+    "type": "con"
+}
+

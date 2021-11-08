@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+wget http://download.eclipse.org/jdtls/snapshots/jdt-language-server-latest.tar.gz
+mkdir -p ~/jdt-language-server/
+tar xzf jdt-language-server-latest.tar.gz -C ~/jdt-language-server/
+rm jdt-language-server-latest.tar.gz

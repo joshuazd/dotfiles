@@ -1,0 +1,446 @@
+extends xpath
+
+snippet xml "XML declaration" b
+<?xml version="1.0"?>
+
+endsnippet
+
+snippet < "tag" b
+<${1:tag}>
+	${2:${VISUAL}}
+</${1/([\w:._-]+).*/$1/}>
+endsnippet
+
+snippet > "short tag" b
+<${1:tag}/>
+endsnippet
+
+snippet api "api" b
+<api xmlns="http://ws.apache.org/ns/synapse" name="${1:api_name}" context="/${2:context}">
+	${0:${VISUAL}}
+</api>
+endsnippet
+
+snippet cdata "cdata" b
+<![CDATA[$0]]>
+endsnippet
+
+snippet ct "call-template" b
+<call-template target="${1:LoggerName}">
+	<with-param name="message" value="${2:LogMessage}"/>
+</call-template>
+endsnippet
+
+snippet dbl "dblookup" b
+<dblookup>
+	<connection>
+		<pool>
+			<dsName>jdbc/${1:db name}</dsName>
+		</pool>
+	</connection>
+	<statement>
+		<sql>${2:SQL Statement}</sql>
+		<parameter expression="${3:param expression}" type="${4:STRING}"/>$0
+		<result name="${5:result}" column="${6:column}"/>
+	</statement>
+</dblookup>
+endsnippet
+
+snippet dbr "dbreport" b
+<dbreport>
+	<connection>
+		<pool>
+			<dsName>jdbc/${1:db name}</dsName>
+		</pool>
+	</connection>
+	<statement>
+		<sql>${2:SQL Statement}</sql>
+		<parameter expression="${3:param_expression}" type="${4:STRING}"/>$0
+	</statement>
+</dbreport>
+endsnippet
+
+snippet ep "endpoint" b
+<endpoint xmlns="http://ws.apache.org/ns/synapse" name="conf/${1}">
+	<http method="${2:get}" uri-template="${3}"/>
+</endpoint>
+endsnippet
+
+snippet epa "anonymous endpoint" b
+<endpoint>
+	<http method="${1:get}" uri-template="${2}"/>
+</endpoint>
+endsnippet
+
+snippet epkc "endpoint with conf key" b
+<endpoint key="conf:/${1}.xml"/>
+endsnippet
+
+snippet epk "endpoint with key" b
+<endpoint key="${1}"/>
+endsnippet
+
+snippet epd "address endpoint" b
+<endpoint>
+	<address uri="${1:URI}" format="soap11"/>
+</endpoint>
+endsnippet
+
+snippet enr "enrich" b
+<enrich>
+	<source type="${1:source type}" ${3}/>
+	<target type="${2:target type}" ${4}/>
+</enrich>
+endsnippet
+
+snippet enrb "enrich from body" b
+<enrich>
+	<source clone="true" type="body"/>
+	<target property="PAYLOAD" type="property"/>
+</enrich>
+endsnippet
+
+snippet enrp "enrich from property" b
+<enrich>
+	<source type="property" property="PAYLOAD" clone="true"/>
+	<target type="body"/>
+</enrich>
+endsnippet
+
+snippet fault "makefault" b
+<makefault version="pox">
+	<reason value="${1:reason}" />
+	<detail ${2:expression="${3:detail}"} />
+</makefault>
+endsnippet
+
+snippet fils "filter source" b
+<filter source="${1:get-property('axis2','HTTP_SC')}" regex="${2:20[0-9]}">
+	<then>
+		${3:${VISUAL}}
+	</then>$0
+</filter>
+endsnippet
+
+snippet fil "filter" b
+<filter ${1:xpath="${2:xpath expression}"}>
+	<then>
+		${3:${VISUAL}}
+	</then>$0
+</filter>
+endsnippet
+
+snippet else "filter else" b
+<else>
+	${0:${VISUAL}}
+</else>
+endsnippet
+
+snippet header "header" b
+<header name="${1:name}" scope="transport" value="${2:value}" />
+endsnippet
+
+snippet iter "iterate" b
+<iterate continueParent="true" expression="${1:xpath}" sequential="${2:false}">
+	<target>
+		<sequence>$0
+		</sequence>
+	</target>
+</iterate>
+endsnippet
+
+snippet log "log" b
+<log level="custom">$1
+</log>
+endsnippet
+
+snippet logf "log full" b
+<log level="full"/>
+endsnippet
+
+snippet logg "logging template" b
+<template xmlns="http://ws.apache.org/ns/synapse" name="${1:Logger Name}">
+	<parameter name="message"/>
+	<sequence>
+		<filter xpath="boolean(\$ctx:messageId)">
+			<then/>
+			<else>
+				<filter xpath="\$trp:messageId">
+					<then>
+						<property name="messageId" expression="get-property('transport', 'messageId')" scope="default" type="STRING"/>
+					</then>
+					<else>
+						<property name="messageId" expression="get-property('MessageID')" scope="default" type="STRING"/>
+						<header name="messageId" scope="transport" expression="get-property('messageId')"/>
+					</else>
+				</filter>
+			</else>
+		</filter>
+		<filter xpath="boolean(\$ctx:to)">
+			<then/>
+			<else>
+				<property name="to" expression="get-property('To')" scope="default"/>
+			</else>
+		</filter>
+		<log level="custom">
+			<property name="message" expression="\$func:message"/>
+			<property name="serviceName" value="${2:Service Name}"/>
+			<property name="to" expression="get-property('to')"/>
+			<property name="messageId" expression="get-property('messageId')"/>
+		</log>
+	</sequence>
+</template>
+endsnippet
+
+snippet le "localEntry" b
+<localEntry xmlns="http://ws.apache.org/ns/synapse" key="$1">$0
+</localEntry>
+endsnippet
+
+snippet nilel "nilElement" b
+<xsl:template name="nilElement">
+	<xsl:param name="value" />
+	<xsl:choose>
+		<xsl:when test="string(\$value)">
+			<xsl:value-of select="\$value" />
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:attribute name="xsi:nil" namespace="http://www.w3.org/2001/XMLSchema-instance">true</xsl:attribute>
+		</xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+endsnippet
+
+snippet pay "payloadFactory" b
+<payloadFactory media-type="${1:xml}">
+	<format>
+		${2:<Success xmlns="">Thank you. Your file has been submitted.</Success>}
+	</format>
+	<args/>
+</payloadFactory>${0}
+endsnippet
+
+snippet prop "property" b
+<property name="${1:name}" ${2:value="${3:value}"} scope="${5:default}"/>
+endsnippet
+
+snippet prope "property expression" b
+<property name="${1:name}" expression="${3:expression}" scope="${5:default}"/>
+endsnippet
+
+snippet propv "property value" b
+<property name="${1:name}" value="${3:value}" scope="${5:default}"/>
+endsnippet
+
+snippet valof "value-of" b
+<xsl:value-of select="${1}"/>
+endsnippet
+
+snippet tvo "tag value-of" b
+<${1:tag}>
+	<xsl:value-of select="${2}"/>
+</${1/([\w:._-]+).*/$1/}>
+endsnippet
+
+snippet tct "tag call-template" b
+<${1:tag}>
+	<xsl:call-template name="nilElement">
+		<xsl:with-param name="value" select="${2}"/>
+	</xsl:call-template>
+</${1/([\w:._-]+).*/$1/}>
+endsnippet
+
+snippet xct "xsl call-template" b
+<xsl:call-template name="nilElement">
+	<xsl:with-param name="value" select="${1}"/>
+</xsl:call-template>
+endsnippet
+
+snippet xsltp "xslt with property" b
+<xslt key="${1:XSLT Name}">
+	${2:<property name="BATCH_ID" expression="get-property('MessageID')"/>}
+</xslt>
+endsnippet
+
+snippet xslt "xslt" b
+<xslt key="${1:XSLT}"/>
+endsnippet
+
+snippet xsl "xslt file" b
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:ns0="http://ws.wso2.org/dataservice" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0" exclude-result-prefixes="xsi xsl xsd ns0">
+	${1:<xsl:param name="BATCH_ID" />}
+	<xsl:template match="/">
+		$0
+	</xsl:template>
+</xsl:stylesheet>
+endsnippet
+
+snippet dm "datamapper" b
+<datamapper config="gov:/${1}.dmc" inputSchema="gov:/${2}.json" inputType="${3:JSON}" outputSchema="gov:/${4}.json" outputType="${5:JSON}"/>
+endsnippet
+
+snippet res "resource (blank)" b
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" uri-template="${3}">
+	<inSequence>$0
+	</inSequence>
+	<outSequence>
+	</outSequence>
+</resource>
+endsnippet
+
+snippet resource "resource (proxy)" b
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" uri-template="${3}">
+	<inSequence>
+		<call-template target="${4:Project}${5:Resource}_Logger">
+			<with-param name="message" value="$4 $5 Service Invoked"/>
+		</call-template>
+		<call-template target="$4$5_Logger">
+			<with-param name="message" value="Sending to ${6:Destination}"/>
+		</call-template>
+		<send>
+			<endpoint key="$4$5_EP"/>
+		</send>
+	</inSequence>
+	<outSequence>
+		<call-template target="$4$5_Logger">
+			<with-param name="message" value="Sent to $6"/>
+		</call-template>
+		<filter source="get-property('axis2','HTTP_SC')" regex="20[0-9]">
+			<then>
+				<call-template target="$4$5_Logger">
+					<with-param name="message" value="$4 $5 Service Complete"/>
+				</call-template>
+			</then>
+			<else>
+				<call-template target="$4$5_Logger">
+					<with-param name="message" value="$4 $5 Service Complete - Error"/>
+				</call-template>
+			</else>
+		</filter>
+		<send/>
+	</outSequence>
+</resource>
+endsnippet
+
+snippet resource "resource (proxy with BA)" b
+<resource methods="${1}" faultSequence="${2:CustomErrorResponseSequence}" uri-template="${3}">
+	<inSequence>
+		<call-template target="${4:Project}${5:Resource}_Logger">
+			<with-param name="message" value="$4 $5 Service Invoked"/>
+		</call-template>
+		<class name="com..mediators.BABuilder">
+			<property name="lookupKey" value="${6:lookup}"/>
+		</class>
+		<call-template target="$4$5_Logger">
+			<with-param name="message" value="Sending to ${7:Destination}"/>
+		</call-template>
+		<send>
+			<endpoint key="$4$5_EP"/>
+		</send>
+	</inSequence>
+	<outSequence>
+		<call-template target="$4$5_Logger">
+			<with-param name="message" value="Sent to $7"/>
+		</call-template>
+		<filter source="get-property('axis2','HTTP_SC')" regex="20[0-9]">
+			<then>
+				<call-template target="$4$5_Logger">
+					<with-param name="message" value="$4 $5 Service Complete"/>
+				</call-template>
+			</then>
+			<else>
+				<call-template target="$4$5_Logger">
+					<with-param name="message" value="$4 $5 Service Complete - Error"/>
+				</call-template>
+			</else>
+		</filter>
+		<send/>
+	</outSequence>
+</resource>
+endsnippet
+
+snippet seq "sequence" b
+<sequence key="${1}"/>
+endsnippet
+
+snippet	ept "endpoint timeouts" b
+<timeout>
+	<duration>${1:30000}</duration>
+	<responseAction>fault</responseAction>
+</timeout>
+<suspendOnFailure>
+	<errorCodes>-1</errorCodes>
+	<initialDuration>0</initialDuration>
+	<progressionFactor>1.0</progressionFactor>
+	<maximumDuration>0</maximumDuration>
+</suspendOnFailure>
+<markForSuspension>
+	<errorCodes>-1</errorCodes>
+</markForSuspension>
+endsnippet
+
+snippet s "send" b
+<send>
+	${0:${VISUAL}}
+</send>
+endsnippet
+
+snippet se "send endpoint" b
+<send>
+	<endpoint key="${1:endpoint}"/>
+</send>
+endsnippet
+
+snippet c "call" b
+<call>
+	${0:${VISUAL}}
+</call>
+endsnippet
+
+snippet ce "call endpoint" b
+<call>
+	<endpoint key="${1:endpoint}"/>
+</call>
+endsnippet
+
+snippet script "script" b
+<script language="groovy">
+	import groovy.json.*;
+	def content = mc.getProperty("PAYLOAD");
+	def object = new JsonSlurper().parseText(content.toString());$0
+	def builder = new JsonBuilder(object);
+	mc.setPayloadJSON(JsonOutput.prettyPrint(builder.toString()));
+</script>
+endsnippet
+
+snippet task "Scheduled Task" b
+<task xmlns="http://ws.apache.org/ns/synapse" name="${1:SchedulerName}" class="org.apache.synapse.startup.tasks.MessageInjector" group="synapse.simple.quartz" pinnedServers="esbapp03">
+	<trigger ${2:cron}="${3:0 0 6 ? * *}"/>
+	<property xmlns:task="http://www.wso2.org/products/wso2commons/tasks" name="message">
+		<xml xmlns="">unused</xml>
+	</property>
+	<property xmlns:task="http://www.wso2.org/products/wso2commons/tasks" name="injectTo" value="${4:proxy}"/>
+	<property xmlns:task="http://www.wso2.org/products/wso2commons/tasks" name="$4Name" value="${5:ProxyName}"/>
+	<property xmlns:task="http://www.wso2.org/products/wso2commons/tasks" name="format" value="soap11"/>
+</task>
+endsnippet
+
+snippet proxy "Proxy Service" b
+<proxy xmlns="http://ws.apache.org/ns/synapse" name="${1:ProxyName}" transports="local" startOnLoad="true" trace="disable">
+	<target>
+		<inSequence>$2
+		</inSequence>
+		<outSequence>
+		</outSequence>
+	</target>
+</proxy>
+endsnippet
+
+snippet xfor "xsl for-each" b
+<xsl:for-each select="${1:xpath}">$0
+</xsl:for-each>
+endsnippet
+
+snippet xmlns "namespace" b
+xmlns="http://ws.apache.org/ns/synapse"
+endsnippet

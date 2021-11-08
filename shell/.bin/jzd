@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. "$HOME/.profile"
+
+basename=$(basename "$0")
+cmd=$(basename "$1")
+dir=$(cd -P "$(dirname "$0")" >/dev/null 2>&1 && pwd)
+shift
+
+if [ ! -d "$HOME/.bin" ] && [ ! -L "$HOME/.bin" ]; then
+    echo "$(basename "$0")" setting up bin symlink
+    ln -s $dir "$HOME/.bin"
+fi
+
+case $cmd in
+    install)
+        exec "$HOME/.bin/jzd-install" "$@" ;;
+    256)
+        exec "$HOME/.bin/jzd-256-colors" "$@" ;;
+    color) # 256colors
+        exec "$HOME/.bin/jzd-colortrans" "$@" ;;
+    theme)
+        exec "$HOME/.bin/jzd-theme" "$@" ;;
+    *)
+        echo "$(basename "$0") $cmd: unknown command" ;;
+esac

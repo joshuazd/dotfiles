@@ -1,0 +1,35 @@
+#!/bin/sh
+version=$1
+echo "Running mvn command"
+mvn versions:set -DnewVersion=$version
+echo "Finding artifact.xml file"
+artifact_xml_file=`find . -wholename '*_ESB/artifact.xml'`
+ds_artifact_xml_file=`find . -wholename '*_DataServices/artifact.xml'`
+dm_artifact_xml_file=`find . -wholename '*_DataMapper/artifact.xml'`
+
+if [ -z "$artifact_xml_file" ]; then
+  echo "Didn't find the ESB artifact.xml file"
+  exit 1
+fi
+
+echo "Updating $artifact_xml_file with version $version"
+cat $artifact_xml_file | sed -E 's/version="[0-9]+\.[0-9]+\.[0-9]+"/version="'$version'"/g' > temp_artifact.xml
+mv temp_artifact.xml $artifact_xml_file
+
+if [ -z "$ds_artifact_xml_file" ]; then
+  echo "Didn't find the dataservices artifact.xml file"
+else
+  echo "Updating $ds_artifact_xml_file with version $version"
+  cat $ds_artifact_xml_file | sed -E 's/version="[0-9]+\.[0-9]+\.[0-9]+"/version="'$version'"/g' > temp_artifact.xml
+  mv temp_artifact.xml $ds_artifact_xml_file
+fi
+
+if [ -z "$dm_artifact_xml_file" ]; then
+  echo "Didn't find the datamapper artifact.xml file"
+else
+  echo "Updating $dm_artifact_xml_file with version $version"
+  cat $dm_artifact_xml_file | sed -E 's/version="[0-9]+\.[0-9]+\.[0-9]+"/version="'$version'"/g' > temp_artifact.xml
+  mv temp_artifact.xml $dm_artifact_xml_file
+fi
+
+

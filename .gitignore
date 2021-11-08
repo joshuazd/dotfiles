@@ -1,0 +1,14 @@
+.netrwhist
+vim/sessions/*
+vim/bundle/*
+tags
+__pycache__/
+en.utf-8.add.spl
+*.gif
+*.png
+*.svg
+*.py[cod]
+.plugin-update
+.pytest-cache
+build
+.coverage*
