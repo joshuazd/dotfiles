@@ -18,8 +18,10 @@ PACKAGES = [
     'tpope/vim-fugitive',
     'tpope/vim-endwise',
     'tpope/vim-rails',
-    'tpope/vim-bundler',
     'tpope/vim-dadbod',
+    'tpope/vim-projectionist',
+    'tpope/vim-vinegar',
+    'tpope/vim-bundler',
     'tommcdo/vim-lion',
     'romainl/vim-qf',
     'romainl/vim-qlist',
@@ -31,6 +33,11 @@ PACKAGES = [
     'junegunn/fzf.vim',
     'ludovicchabant/vim-gutentags',
     'SirVer/ultisnips',
+    'joukevandermaas/vim-ember-hbs',
+    'sunaku/vim-ruby-minitest',
+    'mhinz/vim-signify',
+    'dense-analysis/ale',
+    'vim-test/vim-test',
 ]
 
 HOOKS = {
