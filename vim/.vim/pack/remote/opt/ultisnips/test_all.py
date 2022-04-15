@@ -118,11 +118,11 @@ if __name__ == "__main__":
             "multiplexer and race conditions in writing to the file system.",
         )
         p.add_option(
-            "-x",
-            "--exitfirst",
-            dest="exitfirst",
+            "-f",
+            "--failfast",
+            dest="failfast",
             action="store_true",
-            help="exit instantly on first error or failed test.",
+            help="Stop the test run on the first error or failure.",
         )
         p.add_option(
             "--vim",
@@ -160,27 +160,27 @@ if __name__ == "__main__":
             "--remote-pdb",
             dest="pdb_enable",
             action="store_true",
-            help="If set, The remote pdb server will be run"
+            help="If set, The remote pdb server will be run",
         )
         p.add_option(
             "--remote-pdb-host",
             dest="pdb_host",
             type=str,
             default="localhost",
-            help="Remote pdb server host"
+            help="Remote pdb server host",
         )
         p.add_option(
             "--remote-pdb-port",
             dest="pdb_port",
             type=int,
             default=8080,
-            help="Remote pdb server port"
+            help="Remote pdb server port",
         )
         p.add_option(
             "--remote-pdb-non-blocking",
             dest="pdb_block",
             action="store_false",
-            help="If set, the server will not freeze vim on error"
+            help="If set, the server will not freeze vim on error",
         )
 
         o, args = p.parse_args()
@@ -249,7 +249,7 @@ if __name__ == "__main__":
 
         v = 2 if options.verbose else 1
         successfull = (
-            unittest.TextTestRunner(verbosity=v, failfast=options.exitfirst)
+            unittest.TextTestRunner(verbosity=v, failfast=options.failfast)
             .run(suite)
             .wasSuccessful()
         )

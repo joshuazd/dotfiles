@@ -1,4 +1,4 @@
-*UltiSnips.txt*    For Vim version 7.4 or later.
+*UltiSnips.txt*    For Vim version 8.0 or later.
 
         The Ultimate Plugin for Snippets in Vim~
 
@@ -93,7 +93,7 @@ http://vimcasts.org/episodes/ultisnips-visual-placeholder/
 1.1 Requirements                                     *UltiSnips-requirements*
 ----------------
 
-This plugin works with Vim version 7.4 or later with Python 3 support enabled.
+This plugin works with Vim version 8.0 or later with Python 3 support enabled.
 It only works if the 'compatible' setting is not set.
 
 The Python 3.x interface must be available. In other words, Vim
@@ -684,7 +684,7 @@ The options currently supported are: >
        preceded and followed by non-word characters. Word characters are
        defined by the 'iskeyword' setting. Use this option, for example, to
        permit expansion where the tab trigger follows punctuation without
-       expanding suffixes of larger words.
+       expanding suffixes of larger words. This option overrides 'i'.
 
    r   Regular expression - With this option, the tab trigger is expected to
        be a python regular expression. The snippet is expanded if the recently
@@ -692,7 +692,10 @@ The options currently supported are: >
        expression MUST be quoted (or surrounded with another character) like a
        multi-word tab trigger (see above) whether it has spaces or not. A
        resulting match is passed to any python code blocks in the snippet
-       definition as the local variable "match".
+       definition as the local variable "match". Regular expression snippets
+       can be triggered in-word by default. To avoid this you can start your
+       regex pattern with '\b', although this will not respect your
+       'iskeyword' setting.
 
    t   Do not expand tabs - If a snippet definition includes leading tab
        characters, by default UltiSnips expands the tab characters honoring
@@ -1058,9 +1061,9 @@ wow<tab>Hello World ->
 Hello World                                                     HELLO WORLD
 
 Python global functions can be stored in a python module and then imported.
-This makes global functions easily accessible to all snippet files. Since Vim
-7.4 you can just drop python files into ~/.vim/pythonx and import them
-directly inside your snippets. For example to use
+This makes global functions easily accessible to all snippet files. You can
+just drop python files into ~/.vim/pythonx and import them directly inside
+your snippets. For example to use
 ~/.vim/pythonx/my_snippets_helpers.py  >
 
    global !p
@@ -1432,7 +1435,7 @@ In that case snippet should be defined using this syntax: >
 
     snippet trigger_word "description" "expression" options
 
-The context can be defined using a special header: >
+The context can also be defined using a special header: >
 
     context "python_expression"
     snippet trigger_word "description" options
@@ -1463,8 +1466,15 @@ Global variable `snip` will be available with following properties:
         - 'current_text' - text in the placeholder on the moment of selection;
         - 'start' - placeholder start on the moment of selection;
         - 'end' - placeholder end on the moment of selection;
+    'snip.before' - contains the text in the current line up to and including
+        the matched snippet. Since 'snip.column' counts bytes, not characters,
+        this is **not** equivalent to 'snip.buffer[snip.line][:snip.column+1]'.
+        This property is only available in the scope of contexts but not in
+        that of actions.
 
 
+For regular expression triggered snippets the variable `match` will contain
+the return value of the match of the regular expression. See http://docs.python.org/library/re.html#match-objects.
 
 ------------------- SNIP -------------------
 snippet r "return" "re.match('^\s+if err ', snip.buffer[snip.line-1])" be
@@ -1561,7 +1571,7 @@ There are three types of actions:
 
 Specified code will be evaluated at stages defined above and same global
 variables and modules will be available that are stated in
-the |UltiSnips-custom-context-snippets| section.
+the |UltiSnips-custom-context-snippets| section (except 'snip.before').
 
                                                 *UltiSnips-buffer-proxy*
 
@@ -1722,8 +1732,6 @@ endsnippet
 4.11 Autotrigger                                       *UltiSnips-autotrigger*
 ----------------
 
-Note: vim must be newer than 7.4.214 to support this feature.
-
 Many language constructs can occur only at specific places, so it's
 possible to use snippets without manually triggering them.
 
@@ -1781,6 +1789,10 @@ offers out of the box completion dialogue support for it too.
 
 deoplete - The successor of neocomplete is also supported. The completion 
 source is called 'ultisnips'.
+
+vim-easycomplete - Vim-EasyComplete needs ultisnips and vim-snippets for 
+snippets support. This two plugin is compatible with EasyComplete out of
+the box. More information: <https://github.com/jayli/vim-easycomplete>
 
 unite - UltiSnips has a source for unite. As an example of how you can use
 it add the following function and mappings to your vimrc: >

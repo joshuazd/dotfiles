@@ -1,6 +1,32 @@
 CHANGELOG
 =========
 
+0.30.0
+------
+- Added `--ellipsis` option. You can take advantage of it to make fzf
+  effectively search non-visible parts of the item.
+  ```sh
+  # Search against hidden line numbers on the far right
+  nl /usr/share/dict/words                  |
+    awk '{printf "%s%1000s\n", $2, $1}'     |
+    fzf --nth=-1 --no-hscroll --ellipsis='' |
+    awk '{print $2}'
+  ```
+- Bug fixes and improvements
+
+0.29.0
+------
+- Added `change-preview(...)` action to change the `--preview` command
+    - cf. `preview(...)` is a one-off action that doesn't change the default
+      preview command
+- Added `change-preview-window(...)` action
+    - You can rotate through the different options separated by `|`
+      ```sh
+      fzf --preview 'cat {}' --preview-window right:40% \
+          --bind 'ctrl-/:change-preview-window(right,70%|down,40%,border-top|hidden|)'
+      ```
+- Fixed rendering of the prompt line when overflow occurs with `--info=inline`
+
 0.28.0
 ------
 - Added `--header-first` option to print header before the prompt line
