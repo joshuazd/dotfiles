@@ -2159,7 +2159,16 @@ endfunction
 " }}}1
 " Navigation {{{1
 
-function! s:BufNavCommands()
+function! s:BufNavCommands() abort
+  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   R   exe   s:Related('<mods> E<bang>',<line1>,<line2>,<count>,<f-args>)
+  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   RE  exe   s:Related('<mods> E<bang>',<line1>,<line2>,<count>,<f-args>)
+  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   RS  exe   s:Related('<mods> S<bang>',<line1>,<line2>,<count>,<f-args>)
+  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   RV  exe   s:Related('<mods> V<bang>',<line1>,<line2>,<count>,<f-args>)
+  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   RT  exe   s:Related('<mods> T<bang>',<line1>,<line2>,<count>,<f-args>)
+  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_edit      RD  exe   s:Related('<mods> D<bang>',<line1>,<line2>,<count>,<f-args>)
+  if get(g:, 'rails_no_alternate_commands', 0)
+    return
+  endif
   command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_alternate A   exe s:Alternate('<mods> E<bang>',<line1>,<line2>,<count>,<f-args>)
   command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_alternate AE  exe s:Alternate('<mods> E<bang>',<line1>,<line2>,<count>,<f-args>)
   command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_alternate AS  exe s:Alternate('<mods> S<bang>',<line1>,<line2>,<count>,<f-args>)
@@ -2167,12 +2176,6 @@ function! s:BufNavCommands()
   command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_alternate AT  exe s:Alternate('<mods> T<bang>',<line1>,<line2>,<count>,<f-args>)
   command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_edit      AD  exe s:Alternate('<mods> D<bang>',<line1>,<line2>,<count>,<f-args>)
   command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_edit      AR  exe s:Alternate('<mods> D<bang>',<line1>,<line2>,<count>,<f-args>)
-  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   R   exe   s:Related('<mods> E<bang>',<line1>,<line2>,<count>,<f-args>)
-  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   RE  exe   s:Related('<mods> E<bang>',<line1>,<line2>,<count>,<f-args>)
-  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   RS  exe   s:Related('<mods> S<bang>',<line1>,<line2>,<count>,<f-args>)
-  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   RV  exe   s:Related('<mods> V<bang>',<line1>,<line2>,<count>,<f-args>)
-  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_related   RT  exe   s:Related('<mods> T<bang>',<line1>,<line2>,<count>,<f-args>)
-  command! -buffer -bar -nargs=* -range=0 -complete=customlist,s:Complete_edit      RD  exe   s:Related('<mods> D<bang>',<line1>,<line2>,<count>,<f-args>)
 endfunction
 
 function! s:jumpargs(file, jump) abort
@@ -2292,9 +2295,13 @@ function! s:match_partial(func) abort
   elseif res =~# '^\w\+\%(\.\w\+\)\=$'
     let res = rails#singularize(s:sub(res, '^\w*\.', ''))
     return s:findview(rails#pluralize(res).'/_'.res)
-  else
-    return s:findview(s:sub(s:sub(res, '^:=[''"@]=', ''), '[^/]*$', '_&'))
+  elseif res =~# '^@\w\+$'
+    let view = s:findview('_' . rails#singularize(res[1:-1]), '')
+    if !empty(view)
+      return view
+    endif
   endif
+  return s:findview(s:sub(s:sub(res, '^:=[''"@]=', ''), '[^/]*$', '_&'))
 endfunction
 
 function! s:suffixes(type) abort
@@ -3059,7 +3066,12 @@ function! s:fixturesEdit(cmd,...)
   if file =~ '\.\w\+$' && rails#app().find_file(c.e, dirs, []) ==# ''
     return s:edit(a:cmd,file)
   else
-    return s:open(a:cmd, rails#app().find_file(c.e, dirs, ['.yml', '.csv', '.rb'], file))
+    let exts = ['.yml','.csv','.rb']
+    call extend(exts,
+          \ filter(map(keys(filter(copy(rails#app().projections()), 'get(v:val, "type") is# "fixtures"')),
+          \ 'matchstr(v:val, "^\\C\\%(test\\|spec\\)/factories/\\*\\zs.\\+$")'), 'len(v:val)'))
+    call s:uniq(exts)
+    return s:open(a:cmd, rails#app().find_file(c.e, dirs, exts, file))
   endif
 endfunction
 
@@ -3192,9 +3204,9 @@ endfunction
 
 call s:add_methods('readable', ['resolve_view', 'resolve_layout'])
 
-function! s:findview(name) abort
+function! s:findview(name, ...) abort
   let view = s:active() ? rails#buffer().resolve_view(a:name, line('.')) : ''
-  return empty(view) ? (a:name =~# '\.' ? a:name : a:name . '.' . s:format()) : view
+  return len(view) ? view : a:0 ? a:1 : (a:name =~# '\.' ? a:name : a:name . '.' . s:format())
 endfunction
 
 function! s:findlayout(name)
@@ -4592,7 +4604,6 @@ let s:has_projections = {
       \  }
       \}
 
-let s:projections_for_gems = {}
 function! s:app_projections() dict abort
   let dict = s:combine_projections({}, s:default_projections)
   for [k, v] in items(s:has_projections)
@@ -4604,25 +4615,26 @@ function! s:app_projections() dict abort
   call s:combine_projections(dict, get(g:, 'rails_projections', ''))
   for gem in keys(get(g:, 'rails_gem_projections', {}))
     if self.has_gem(gem)
-      call s:combine_projections(dict, g:rails_gem_projections[gem])
+      try
+        if type(g:rails_gem_projections[gem]) ==# v:t_string
+          let file = g:rails_gem_projections[gem]
+          if file !~# '^\a\+:\|^/'
+            if !has_key(self.gems(), gem)
+              continue
+            endif
+            let file = self.gems()[gem] . '/' . file
+          endif
+          if file =~# '/$'
+            let file .= 'projections.json'
+          endif
+          call s:combine_projections(dict, rails#json_parse(s:readfile(file)))
+        else
+          call s:combine_projections(dict, g:rails_gem_projections[gem])
+        endif
+      catch
+      endtry
     endif
   endfor
-  let gem_path = escape(join(values(self.gems()),','), ' ')
-  if !empty(gem_path)
-    if !has_key(s:projections_for_gems, gem_path)
-      let gem_projections = {}
-      for path in ['lib/', 'lib/rails/']
-        for file in findfile(path.'projections.json', gem_path, -1)
-          try
-            call s:combine_projections(gem_projections, rails#json_parse(s:readfile(self.path(file))))
-          catch
-          endtry
-        endfor
-      endfor
-      let s:projections_for_gems[gem_path] = gem_projections
-    endif
-    call s:combine_projections(dict, s:projections_for_gems[gem_path])
-  endif
   if self.cache.needs('projections')
     call self.cache.set('projections', {})
 
@@ -4635,7 +4647,7 @@ function! s:app_projections() dict abort
             call self.cache.set('projections', projections)
             break
           endif
-        catch /^invalid JSON:/
+        catch /^Vim(\a\+):E474:/
         endtry
       endif
     endfor
