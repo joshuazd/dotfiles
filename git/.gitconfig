@@ -11,6 +11,6 @@
 [grep]
     lineNumber = true
 [core]
-	excludesfile = /home/watcher/.cvsignore
+	excludesfile = ~/.cvsignore
 [alias]
 	conflicts = diff --name-only --diff-filter=U

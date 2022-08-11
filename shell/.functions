@@ -54,9 +54,9 @@ function buildp() {
 # fbr - checkout git branch (including remote branches)
 fbr() {
   local branches branch
-  branches=$(git branch --all | grep -v HEAD) &&
+  branches=$(git branch --color=never | grep -v '*') &&
   branch=$(echo "$branches" |
-           fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+           fzf --height=10 -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
   git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
 }
 

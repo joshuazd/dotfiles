@@ -107,6 +107,10 @@ fi
 [ -f "${HOME}/.aliases" ] && source ~/.aliases
 [ -f "${HOME}/.functions" ] && source ~/.functions
 
+export NVM_DIR="$HOME/.nvm"
+[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
+[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+
 _fzf_complete_sshrc() {
   _fzf_complete '+m' "$@" < <(
     command cat <(cat ~/.ssh/config /etc/ssh/ssh_config 2> /dev/null | command grep -i '^host ' | command grep -v '[*?]' | awk '{for (i = 2; i <= NF; i++) print $1 " " $i}') \

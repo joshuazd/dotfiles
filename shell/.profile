@@ -1,5 +1,5 @@
 
-PATH=$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH:/snap/bin
+PATH=/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/grep/libexec/gnubin:$HOME/.rbenv/versions/2.7.6/bin:/usr/local/opt/postgresql@11/bin:$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH:/snap/bin
 LANG=en_US.UTF-8
 export PATH LANG
 
@@ -21,7 +21,7 @@ export JAVA_HOME
 WORDCHARS='*?_-[]~=&;!#$%^(){}<>'
 ZSH_CUSTOM=$HOME/.zsh_custom
 TMUX_CUSTOM=$HOME/.tmux_custom
-SHELL=/usr/bin/zsh
+SHELL=/bin/zsh
 TZ='America/Chicago'
 export WORDCHARS ZSH_CUSTOM TMUX_CUSTOM SHELL TZ
 
@@ -50,6 +50,7 @@ _gen_fzf_default_opts() {
               --color=fg:$color08,header:$color0D,info:$color0A,pointer:$color04
               --color=marker:$color04,fg+:$color00,prompt:$color04,hl+:$color01
               --preview='cat {} 2>/dev/null'
+              --layout=reverse
             "
             ;;
         nord)
@@ -73,6 +74,7 @@ _gen_fzf_default_opts() {
               --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
               --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
               --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
+              --layout=reverse
             "
             ;;
         *)
@@ -96,6 +98,7 @@ _gen_fzf_default_opts() {
               --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
               --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
               --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
+              --layout=reverse
             "
             ;;
     esac
