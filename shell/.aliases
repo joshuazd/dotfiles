@@ -34,6 +34,12 @@ alias md='mkdir -p'
 alias viesb='vi *_ESB/src/**/*.xml'
 
 ####################################
+#          RAILS ALIASES
+####################################
+alias be='bundle exec'
+alias ber='bundle exec rails'
+
+####################################
 #          BUILD ALIASES
 ####################################
 
@@ -111,7 +117,7 @@ alias gcl='git clone --recursive'
 alias gclean='git clean -fd'
 alias gpristine='git reset --hard && git clean -dfx'
 alias gcm='git checkout master'
-alias gcd='git checkout develop'
+alias gcd='git checkout development'
 alias gcmsg='git commit -m'
 alias gco='git checkout'
 

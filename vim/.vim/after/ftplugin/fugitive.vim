@@ -1,4 +1,4 @@
-nnoremap <buffer> gp :Gpush<CR>
+nnoremap <buffer> gp :Git push<CR>
 setl signcolumn=no
 setl nolist
 
@@ -6,8 +6,8 @@ if &background ==? 'light'
   hi FugitiveDiffLine ctermbg=8 ctermfg=0 guibg=#777467 guifg=#45403a cterm=bold gui=bold
   hi FugitiveDiffHunk ctermbg=7 guibg=#999483
 else
-  hi FugitiveDiffLine ctermbg=238 ctermfg=248 guibg=#444444 guifg=#a8a8a8
-  hi FugitiveDiffHunk ctermbg=234 guibg=#1c1c1c
+  hi FugitiveDiffLine ctermbg=8 ctermfg=15 guibg=#616E88 guifg=#eceff4
+  hi FugitiveDiffHunk ctermbg=0 guibg=#3b4252
 endif
 sign define diffline   linehl=FugitiveDiffLine
 sign define diffhunk   linehl=FugitiveDiffHunk
@@ -39,7 +39,7 @@ augroup FugitiveHighlight
   autocmd!
   autocmd TextChanged <buffer> call <SID>highlight()
 augroup END
-if expand('%') =~# '\.git\/index'
-  exe "norm gg\<C-n>"
+if expand('%') =~# '\.git/'
+  exe "norm gg)"
   nmap <buffer> <TAB> =
 endif

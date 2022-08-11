@@ -1,0 +1,55 @@
+#!/bin/sh
+
+[ "$#" -lt 2 ] && echo "At least 2 arguments required" && exit 1
+
+case "$1" in
+    "p")
+        env="production"
+        ;;
+    "a")
+        env="alpha"
+        ;;
+    "b")
+        env="beta"
+        ;;
+    "g")
+        env="gamma"
+        ;;
+    "d")
+        env="delta"
+        ;;
+    "sb")
+        env="sandbox"
+        ;;
+    "st")
+        env="staging"
+        ;;
+    *)
+        echo "Unknown environment: $1"; exit 1
+        ;;
+esac
+env="aurorasolar-$env"
+
+shift
+c="$*"
+postfix=""
+case "$1" in
+    "r")
+        c="run rails c"
+        ;;
+    "c")
+        c="config"
+        ;;
+    "cs"|"config:set")
+        c="config:set"
+        shift; postfix="$*"
+        ;;
+    "l")
+        c="logs --tail"
+        ;;
+    "ro")
+        c="releases:output"
+        ;;
+esac
+
+heroku $c -a $env $postfix

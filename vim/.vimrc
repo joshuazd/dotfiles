@@ -85,6 +85,8 @@ set spellfile=~/.vim/spell/en.utf-8.add
 set formatoptions+=j
 set foldtext=functions#MyFoldText()
 set virtualedit+=block
+set updatetime=100
+set nowrapscan
 if has('patch-8.1.0513')
   set diffopt+=algorithm:patience,indent-heuristic,iwhiteall,vertical
 endif
@@ -175,6 +177,9 @@ nnoremap gj j
 nnoremap gk k
 nnoremap ' `
 nnoremap c* :set hlsearch<CR>*Ncgn
+xnoremap * y/\V<C-R>"<CR>
+xnoremap # y?\V<C-R>"<CR>
+nnoremap & :&&<CR>
 
 " edit embedded scripts
 xnoremap <Space>e :yank<Bar>vnew<Bar>silent! put!<Bar>set bt=nofile bh=wipe ft= <Bar>normal! gg=G<S-Left><S-Left><Left>
@@ -213,6 +218,7 @@ nnoremap =ow :setlocal wrap!           <Bar>setlocal wrap?<CR>
 nnoremap =oz :setlocal list!           <Bar>setlocal list?<CR>
 nnoremap =os :setlocal spell!          <Bar>setlocal spell?<CR>
 nnoremap =oh :setlocal hlsearch!       <Bar>setlocal hlsearch?<CR>
+nnoremap =o= :setlocal cursorline!     <Bar>setlocal cursorline?<CR>
 nnoremap =og :setlocal signcolumn=<C-R>=(&signcolumn ==? 'no' ? 'yes' : 'no')<CR><Bar>setlocal signcolumn?<CR>
 nnoremap =ol :setlocal conceallevel=<C-R>=(&conceallevel == 0 ? '2' : '0')<CR><Bar>setlocal conceallevel?<CR>
 nnoremap =oy :if exists('g:syntax_on') <Bar> syntax off <Bar> else <Bar> syntax enable <Bar> endif<CR>
@@ -270,6 +276,8 @@ endfunction
 nnoremap <silent> gs :set opfunc=Sort<CR>g@
 
 cnoremap <C-n> <C-f>a<C-n>
+cnoreabbrev @f <C-r>=buffer_name()<CR>
+cnoreabbrev :: <C-r>=buffer_name().':'.line('.')<CR>
 
 " }}}
 
@@ -286,8 +294,8 @@ augroup vimrc
     autocmd InsertEnter      *            setl listchars-=trail:-
     autocmd InsertLeave      *            setl listchars+=trail:-
   endif
-  autocmd User FugitiveBoot               setl signcolumn=auto
-  autocmd User FugitiveBoot               let &l:grepprg='git grep -n --no-color'
+  autocmd User FugitiveObject             setl signcolumn=auto
+  autocmd User FugitiveObject             let &l:grepprg='git grep -n --no-color'
         \| let &l:grepformat='%f:%l:%c:%m,%f:%l:%m,%m %f match%ts,%f'
   autocmd BufNewFile  */plugin/*.vim      0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
   if exists('##TextYankPost') && executable('base64')
@@ -352,7 +360,11 @@ let g:lsc_server_commands = {
         \   'textDocument/codeAction': function('<SID>fixEdits'),
         \ }
         \},
-      \ 'javascript': 'typescript-language-server --stdio'
+      \ 'javascript': 'typescript-language-server --stdio',
+      \ 'ruby': {
+        \ 'command': 'solargraph stdio',
+        \ 'suppress_stderr': v:true
+        \}
       \}
 let g:lsc_auto_map = {
       \ 'GoToDefinition': 'gd',
@@ -379,9 +391,13 @@ let g:mucomplete#no_mappings            = 1
 let g:mucomplete#no_popup_mappings      = 1
 let g:mucomplete#always_use_completeopt = 1
 let g:mucomplete#chains                 = {
-      \ 'default'   : ['file', 'omni', 'ulti', 'dict', 'uspl', 'c-p', 'tags'],
+      \ 'default'   : ['file', 'omni', 'ulti', 'dict', 'uspl', 'c-p'],
+      \ 'html'      : ['file', 'omni', 'ulti', 'keyp'],
+      \ 'handlebars': ['file', 'omni', 'ulti', 'keyp'],
+      \ 'html.handlebars': ['file', 'omni', 'ulti', 'keyp'],
       \ 'gitcommit' : ['tags', 'c-n'],
       \ 'java'      : ['omni', 'ulti', 'c-p',  'tags', 'file'],
+      \ 'ruby'      : ['file', 'ulti', 'tags', 'c-p'],
       \ 'vim'       : ['file', 'ulti', 'cmd',  'c-p',  'tags'],
       \ 'xml'       : ['omni', 'ulti', 'tags', 'c-p'],
       \ 'sql'       : ['c-p',  'ulti', 'tags'],
@@ -408,7 +424,7 @@ let g:sneak#s_next     = 1
 let g:sneak#use_ic_scs = 1
 " netrw
 let g:netrw_banner = 0
-let g:netrw_liststyle = 0
+let g:netrw_liststyle = 3
 let g:netrw_browse_split = 0
 let g:netrw_winsize = 15
 let g:netrw_cursor = 2
@@ -425,9 +441,18 @@ if executable('python3')
   let g:python_executable = 'python3'
   let g:jedi#force_py_version = 3
 endif
+" ALE
+let g:ale_fix_on_save = 1
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_cursor_detail = 1
+let g:ale_detail_to_floating_preview = 1
+let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰']
 " FZF
 let g:fzf_files_options = ['--preview', 'fzf_preview {} 2>/dev/null']
 let g:fzf_buffers_options = ['--preview', 'fzf_preview {2} 2>/dev/null']
+" vim-test
+let test#strategy = 'dispatch'
+let g:test#ruby#minitest#executable = 'm'
 
 function! s:hl() abort
   hi link lscDiagnosticWarning WarningMsg
@@ -498,4 +523,3 @@ fu s:create_popup_window(hl, opts) abort
     endif
 endfu
 
-nnoremap c<CR> "cy$h"yp:s/204413/c/gGolj0

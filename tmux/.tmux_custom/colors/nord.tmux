@@ -41,4 +41,4 @@ setw -g window-status-bell-fg colour255
 setw -g window-status-bell-bg colour1
 
 # }}}
-run-shell "~/dotfiles/tmux/custom_tmux.sh"
+run-shell "$TMUX_CUSTOM/custom_tmux.sh"

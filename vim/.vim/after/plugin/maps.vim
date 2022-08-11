@@ -50,11 +50,11 @@ if exists('g:loaded_qlist')
 endif
 
 if exists('g:loaded_fugitive')
-  nnoremap <space>gs :rightbelow Gstatus<CR>
-  nnoremap <space>gS :rightbelow Gstatus!<CR>
+  nnoremap <space>gs :rightbelow Git<CR>
+  nnoremap <space>gS :rightbelow Git!<CR>
   nnoremap <space>gl :Gpull<CR>
   nnoremap <space>gp :Gpush<CR>
-  cnoreabbrev @@ <C-r>=fugitive#head()<CR>
+  cnoreabbrev @@ <C-r>=FugitiveHead()<CR>
 endif
 
 if exists(':History')
@@ -64,4 +64,11 @@ if exists(':History')
   nnoremap <space>T :Tags<CR>
   nnoremap <space>L :Lines<CR>
   nnoremap <space>B :Buffers<CR>
+endif
+
+if exists('g:loaded_ale_dont_use_this_in_other_plugins_please')
+  nmap ]e <Plug>(ale_next)
+  nmap [e <Plug>(ale_previous)
+  nmap ]E <Plug>(ale_last)
+  nmap [E <Plug>(ale_first)
 endif
