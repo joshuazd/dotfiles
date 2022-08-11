@@ -78,6 +78,11 @@ let s:default_registry = {
 \       'suggested_filetypes': ['dhall'],
 \       'description': 'Standard code formatter for the Dhall language and removing dead code',
 \   },
+\   'dune': {
+\       'function': 'ale#fixers#dune#Fix',
+\       'suggested_filetypes': ['dune'],
+\       'description': 'Fix dune files with dune format',
+\   },
 \   'fecs': {
 \       'function': 'ale#fixers#fecs#Fix',
 \       'suggested_filetypes': ['javascript', 'css', 'html'],
@@ -135,6 +140,11 @@ let s:default_registry = {
 \       'suggested_filetypes': ['javascript'],
 \       'description': 'Apply prettier-eslint to a file.',
 \       'aliases': ['prettier-eslint'],
+\   },
+\   'pyflyby': {
+\       'function': 'ale#fixers#pyflyby#Fix',
+\       'suggested_filetypes': ['python'],
+\       'description': 'Tidy Python imports with pyflyby.',
 \   },
 \   'importjs': {
 \       'function': 'ale#fixers#importjs#Fix',
@@ -225,6 +235,11 @@ let s:default_registry = {
 \       'function': 'ale#fixers#php_cs_fixer#Fix',
 \       'suggested_filetypes': ['php'],
 \       'description': 'Fix PHP files with php-cs-fixer.',
+\   },
+\   'pint': {
+\       'function': 'ale#fixers#pint#Fix',
+\       'suggested_filetypes': ['php'],
+\       'description': 'Fix PHP files with Laravel Pint.',
 \   },
 \   'astyle': {
 \       'function': 'ale#fixers#astyle#Fix',
@@ -436,6 +451,11 @@ let s:default_registry = {
 \       'suggested_filetypes': ['hcl', 'terraform'],
 \       'description': 'Fix tf and hcl files with terraform fmt.',
 \   },
+\   'packer': {
+\       'function': 'ale#fixers#packer#Fix',
+\       'suggested_filetypes': ['hcl', 'packer'],
+\       'description': 'Fix Packer HCL files with packer fmt.',
+\   },
 \   'crystal': {
 \       'function': 'ale#fixers#crystal#Fix',
 \       'suggested_filetypes': ['cr'],
@@ -526,10 +546,20 @@ let s:default_registry = {
 \       'suggested_filetypes': ['pascal'],
 \       'description': 'Fix Pascal files with ptop.',
 \   },
+\   'opafmt': {
+\       'function': 'ale#fixers#opafmt#Fix',
+\       'suggested_filetypes': ['rego'],
+\       'description': 'Fix rego files with opa fmt.',
+\   },
 \   'vfmt': {
 \       'function': 'ale#fixers#vfmt#Fix',
 \       'suggested_filetypes': ['v'],
 \       'description': 'A formatter for V source code.',
+\   },
+\   'zigfmt': {
+\       'function': 'ale#fixers#zigfmt#Fix',
+\       'suggested_filetypes': ['zig'],
+\       'description': 'Official formatter for Zig',
 \   }
 \}
 

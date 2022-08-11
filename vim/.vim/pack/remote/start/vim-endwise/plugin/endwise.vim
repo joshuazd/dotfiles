@@ -51,7 +51,7 @@ augroup endwise " {{{1
         \ let b:endwise_addition = '#endif' |
         \ let b:endwise_words = 'if,ifdef,ifndef' |
         \ let b:endwise_pattern = '^\s*#\%(if\|ifdef\|ifndef\)\>' |
-        \ let b:endwise_syngroups = 'cPreCondit,cPreConditMatch,cCppInWrapper,xdefaultsPreProc'
+        \ let b:endwise_syngroups = 'cPreCondit,cPreConditMatch,cCppInWrapper,cCppOutWrapper,xdefaultsPreProc'
   autocmd FileType objc
         \ let b:endwise_addition = '@end' |
         \ let b:endwise_words = 'interface,implementation' |
@@ -69,8 +69,8 @@ augroup endwise " {{{1
         \ let b:endwise_syngroups = 'verilogConditional,verilogLabel,verilogStatement'
   autocmd FileType matlab
         \ let b:endwise_addition = 'end' |
-        \ let b:endwise_words = 'function,if,for' |
-        \ let b:endwise_syngroups = 'matlabStatement,matlabFunction,matlabConditional,matlabRepeat'
+        \ let b:endwise_words = 'function,if,for,switch,while,try' |
+        \ let b:endwise_syngroups = 'matlabStatement,matlabFunction,matlabConditional,matlabRepeat,matlabLabel,matlabExceptions'
   autocmd FileType htmldjango
         \ let b:endwise_addition = '{% end& %}' |
         \ let b:endwise_words = 'autoescape,block,blocktrans,cache,comment,filter,for,if,ifchanged,ifequal,ifnotequal,language,spaceless,verbatim,with' |
@@ -89,7 +89,7 @@ augroup endwise " {{{1
 augroup END " }}}1
 
 function! s:abbrev() abort
-  if get(g:, 'endwise_abbreviations', 0) && &buftype =~# '^\%(nowrite\|acwrite\)\=$'
+  if get(g:, 'endwise_abbreviations', 0) && &buftype =~# '^\%(nowrite\)\=$'
     for word in split(get(b:, 'endwise_words', ''), ',')
       execute 'iabbrev <buffer><script>' word word.'<CR><SID>(endwise-append)<Space><C-U><BS>'
     endfor
@@ -101,7 +101,7 @@ endfunction
 function! EndwiseAppend(...) abort
   if !a:0 || type(a:1) != type('')
     return "\<C-R>=EndwiseDiscretionary()\r"
-  elseif a:1 =~# "\r"
+  elseif a:1 =~# "\r" && &buftype =~# '^\%(nowrite\)\=$'
     return a:1 . "\<C-R>=EndwiseDiscretionary()\r"
   else
     return a:1
@@ -138,7 +138,7 @@ function! s:DefineMap() abort
   elseif rhs =~? '<cr>' || rhs =~# '<[Pp]lug>\w\+CR'
     exe "imap <silent> <CR>" rhs."<SID>(endwise-append)"
   else
-    imap <script> <CR> <CR><SID>(endwise-append)
+    imap <silent><script><expr> <CR> EndwiseAppend("\r")
   endif
 endfunction
 call s:DefineMap()
@@ -156,7 +156,7 @@ endfunction
 
 function! s:crend(always) abort
   let n = ""
-  if &buftype !~# '^\%(nowrite\|acwrite\)\=$' || !exists("b:endwise_addition") || !exists("b:endwise_words") || !exists("b:endwise_syngroups")
+  if &buftype !~# '^\%(nowrite\)\=$' || !exists("b:endwise_addition") || !exists("b:endwise_words") || !exists("b:endwise_syngroups")
     return n
   endif
   let synids = join(map(split(b:endwise_syngroups, ','), 'hlID(v:val)'), ',')
