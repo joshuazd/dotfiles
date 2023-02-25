@@ -72,3 +72,10 @@ if exists('g:loaded_ale_dont_use_this_in_other_plugins_please')
   nmap ]E <Plug>(ale_last)
   nmap [E <Plug>(ale_first)
 endif
+
+if exists('g:loaded_signify')
+  omap ih <plug>(signify-motion-inner-pending)
+  xmap ih <plug>(signify-motion-inner-visual)
+  omap ah <plug>(signify-motion-outer-pending)
+  xmap ah <plug>(signify-motion-outer-visual)
+endif
