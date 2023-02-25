@@ -24,8 +24,11 @@ case "$1" in
     "st")
         env="staging"
         ;;
+    "dev")
+        env="development"
+        ;;
     *)
-        echo "Unknown environment: $1"; exit 1
+        env="$1"
         ;;
 esac
 env="aurorasolar-$env"

@@ -72,4 +72,6 @@ PROMPT_COMMAND=_build_prompt
 # Aliases
 [ -f "${HOME}/.aliases" ] && source "${HOME}/.aliases"
 
+[ -x "$(command -v rbenv)" ] && eval "$(rbenv init - zsh)"
+
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash

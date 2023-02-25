@@ -71,7 +71,8 @@ set modeline
 set shortmess+=mrw
 set wildmenu
 set wildcharm=<C-z>
-set wildmode=list:longest,list:full
+set wildmode=longest:full,list
+set wildoptions=fuzzy,pum
 set wildignorecase
 set wildignore+=*.o,*~,*.pyc,*.versionsBackup
 set wildignore+=*target/*,*bin/*,*build/*
@@ -79,7 +80,8 @@ set wildignore+=tags,Session.vim,node_modules/*
 set foldmethod=marker
 set foldlevelstart=99
 set complete-=i
-set omnifunc=syntaxcomplete#Complete
+set mouse=nvi
+set ttymouse=sgr
 set concealcursor+=n
 set spellfile=~/.vim/spell/en.utf-8.add
 set formatoptions+=j
@@ -108,6 +110,7 @@ set completeopt+=menuone
 if has('patch-7.4.784')
   set completeopt+=noselect,noinsert
 endif
+set completepopup+=border:off,align:menu
 
 if &termencoding ==# 'utf-8' || &encoding ==# 'utf-8'
   set fillchars=vert:│,diff:─
@@ -126,7 +129,7 @@ if exists('+clipboard')
   set clipboard^=unnamed,unnamedplus
 endif
 if exists('+signcolumn')
-  set signcolumn=no
+  set signcolumn=auto
 endif
 
 if has('termguicolors') && &t_Co >= 256
@@ -208,8 +211,9 @@ nnoremap <Space>;i :ilist /
 nnoremap <Space>;r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>;r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
 nnoremap <Space>;s :call setqflist([])<bar>bufdo vimgrepadd  %<Left><Left>
+nnoremap <Space>gr :silent! grep!  <Bar> redraw! <Bar> cwindow<C-Left><C-Left><C-Left><C-Left><Left>
 nnoremap <Esc>OA <Up>
-nnoremap <silent> <nowait> <Esc> :<C-u>nohlsearch<CR>
+nnoremap <silent> <nowait> <Esc> :<C-u>nohlsearch<Bar>call popup_clear()<CR>
 
 " vim-unimpaired inspired settings toggles
 nnoremap =on :setlocal number!         <Bar>setlocal number?<CR>
@@ -275,7 +279,6 @@ function! Sort(type, ...)
 endfunction
 nnoremap <silent> gs :set opfunc=Sort<CR>g@
 
-cnoremap <C-n> <C-f>a<C-n>
 cnoreabbrev @f <C-r>=buffer_name()<CR>
 cnoreabbrev :: <C-r>=buffer_name().':'.line('.')<CR>
 
@@ -336,7 +339,7 @@ endif
 
 " {{{ Variables
 " LSC
-let g:lsc_reference_highlights = 0
+let g:lsc_reference_highlights = 1
 let g:lsc_enable_autocomplete = 0
 let g:lsc_trace_level = 'messages'
 function! s:fixEdits(actions) abort
@@ -352,6 +355,10 @@ function! s:fixEdit(idx, maybeEdit) abort
         \ 'edit': a:maybeEdit.command.arguments[0],
         \ 'title': a:maybeEdit.command.title}
 endfunction
+function! s:lscStart(name, params) abort
+  echom 'Server started!'
+  return a:params
+endfunction
 let g:lsc_server_commands = {
       \ 'java': {
         \ 'command': 'java-language-server',
@@ -363,7 +370,10 @@ let g:lsc_server_commands = {
       \ 'javascript': 'typescript-language-server --stdio',
       \ 'ruby': {
         \ 'command': 'solargraph stdio',
-        \ 'suppress_stderr': v:true
+        \ 'suppress_stderr': v:true,
+        \ 'message_hooks': {
+        \   'initialized': function('<SID>lscStart'),
+        \ }
         \}
       \}
 let g:lsc_auto_map = {
@@ -397,7 +407,7 @@ let g:mucomplete#chains                 = {
       \ 'html.handlebars': ['file', 'omni', 'ulti', 'keyp'],
       \ 'gitcommit' : ['tags', 'c-n'],
       \ 'java'      : ['omni', 'ulti', 'c-p',  'tags', 'file'],
-      \ 'ruby'      : ['file', 'ulti', 'tags', 'c-p'],
+      \ 'ruby'      : ['ulti', 'omni', 'file', 'tags', 'c-p'],
       \ 'vim'       : ['file', 'ulti', 'cmd',  'c-p',  'tags'],
       \ 'xml'       : ['omni', 'ulti', 'tags', 'c-p'],
       \ 'sql'       : ['c-p',  'ulti', 'tags'],
@@ -443,13 +453,14 @@ if executable('python3')
 endif
 " ALE
 let g:ale_fix_on_save = 1
-let g:ale_lint_on_text_changed = 'never'
-let g:ale_cursor_detail = 1
-let g:ale_detail_to_floating_preview = 1
-let g:ale_floating_window_border = ['│', '─', '╭', '╮', '╯', '╰']
+let g:ale_lint_on_text_changed = 'normal'
+let g:ale_hover_to_floating_preview = 1
+let g:ale_floating_window_border = ['', '', '', '', '', '', '', '']
+let g:ale_floating_preview_popup_opts = {'borderchars': [' '], 'close': 'none'}
 " FZF
 let g:fzf_files_options = ['--preview', 'fzf_preview {} 2>/dev/null']
 let g:fzf_buffers_options = ['--preview', 'fzf_preview {2} 2>/dev/null']
+let g:fzf_preview_window = ['right,50%,<90(down,50%)', 'ctrl-/']
 " vim-test
 let test#strategy = 'dispatch'
 let g:test#ruby#minitest#executable = 'm'
@@ -468,8 +479,7 @@ fu s:snr() abort
     return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
 endfu
 let s:snr = get(s:, 'snr', s:snr())
-" let g:fzf_layout = {'window': 'call '.s:snr.'fzf_window(0.9, 0.6, "Comment")'}
-let g:fzf_layout = {'window': {'width': 0.7, 'height': 0.7, 'border': 'rounded'}}
+let g:fzf_layout = {'window': {'width': 0.85, 'height': 0.85, 'border': 'rounded'}}
 
 inoremap <expr> <c-j> complete#fzf_tags()
 
@@ -522,4 +532,3 @@ fu s:create_popup_window(hl, opts) abort
         exe 'au BufWipeout * ++once bw! '.buf
     endif
 endfu
-

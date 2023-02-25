@@ -1,5 +1,5 @@
 
-PATH=/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/grep/libexec/gnubin:$HOME/.rbenv/versions/2.7.6/bin:/usr/local/opt/postgresql@11/bin:$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH:/snap/bin
+PATH=/usr/local/opt/coreutils/libexec/gnubin:/usr/local/opt/grep/libexec/gnubin:/usr/local/opt/postgresql@11/bin:$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH:/snap/bin
 LANG=en_US.UTF-8
 export PATH LANG
 

@@ -93,7 +93,7 @@ bindkey '^g' git-files
 bindkey '\e.' insert-last-word
 
 fgitbranch() {
-    fbr
+    fbr; zle reset-prompt;
 }
 zle -N fgitbranch
 bindkey '^b' fgitbranch
@@ -107,6 +107,9 @@ fi
 [ -f "${HOME}/.aliases" ] && source ~/.aliases
 [ -f "${HOME}/.functions" ] && source ~/.functions
 
+zle -N fco_preview
+bindkey '^o' fco_preview
+
 export NVM_DIR="$HOME/.nvm"
 [ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
 [ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
@@ -119,6 +122,8 @@ _fzf_complete_sshrc() {
         awk '{if (length($2) > 0) {print $2}}' | sort -u
   )
 }
+
+[ -x "$(command -v rbenv)" ] && eval "$(rbenv init - zsh)"
 
 # completion settings
 zstyle ':completion:*' auto-description 'specify: %d'
