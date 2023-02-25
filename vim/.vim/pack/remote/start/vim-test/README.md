@@ -33,16 +33,17 @@ runners are supported:
 |     **Groovy** | Maven, Gradle                                                                                                      | `maventest`, `gradletest`                                                                                                                    |
 |    **Haskell** | stack                                                                                                              | `stacktest`                                                                                                                                  |
 |       **Java** | Maven, Gradle (Groovy and Kotlin DSL)                                                                              | `maventest`, `gradletest`                                                                                                                    |
-| **JavaScript** | Ava, Cucumber.js, Cypress, Deno, Intern, Jasmine, Jest, Karma, Lab, Mocha, ng test, NX, Playwright, ReactScripts, TAP, WebdriverIO | `ava`, `cucumberjs`, `cypress`, `deno`, `intern`, `jasmine`, `jest`, `karma`, `lab`, `mocha`, `ngtest` , `nx`, `playwright`, `reactscripts`, `tap`, `webdriverio`, `vue-test-utils`|
+| **JavaScript** | Ava, Cucumber.js, Cypress, Deno, Intern, Jasmine, Jest, Karma, Lab, Mocha, ng test, NX, Playwright, ReactScripts, TAP, Teenytest, WebdriverIO | `ava`, `cucumberjs`, `cypress`, `deno`, `intern`, `jasmine`, `jest`, `karma`, `lab`, `mocha`, `ngtest` , `nx`, `playwright`, `reactscripts`, `tap`, `teenytest`, `webdriverio`, `vue-test-utils`, `vitest`|
 |     **Kotlin** | Gradle (Groovy and Kotlin DSL)                                                                                     | `gradletest`                                                                                                                                 |
 |        **Lua** | Busted                                                                                                             | `busted`                                                                                                                                     |
 |       **Mint** | Mint                                                                                                               | `minttest`                                                                                                                                   |
+|        **Nim** | Nim                                                                                                                | `unittest`                                                                                                                                   |
 |        **PHP** | Behat, Codeception, Kahlan, Peridot, Pest, PHPUnit, Sail, PHPSpec, Dusk                                            | `behat`, `codeception`, `dusk`, `kahlan`, `peridot`, `phpunit`, `sail`, `phpspec`, `pest`                                                    |
 |       **Perl** | Prove                                                                                                              | `prove`                                                                                                                                      |
 |     **Python** | Behave, Django, Mamba, Nose, Nose2, PyTest, PyUnit                                                                 | `behave`, `djangotest`, `djangonose`, `mamba`, `nose`, `nose2`, `pytest`, `pyunit`                                                           |
 |     **Racket** | RackUnit                                                                                                           | `rackunit`                                                                                                                                   |
 |       **Ruby** | Cucumber, [M], [Minitest][minitest], Rails, RSpec, TestBench                                                       | `cucumber`, `m`, `minitest`, `rails`, `rspec`, `testbench`                                                                                   |
-|       **Rust** | Cargo                                                                                                              | `cargotest`                                                                                                                                  |
+|       **Rust** | Cargo, cargo-nextest                                                                                               | `cargotest`, `cargonextest`                                                                                                                  |
 |      **Scala** | SBT, Bloop                                                                                                         | `sbttest`, `blooptest`                                                                                                                       |
 |      **Shell** | Bats, ShellSpec                                                                                                    | `bats`, `shellspec`                                                                                                                          |
 |      **Swift** | Swift Package Manager                                                                                              | `swiftpm`                                                                                                                                    |
@@ -69,6 +70,7 @@ nmap <silent> <leader>g :TestVisit<CR>
 | Command          | Description                                                                                                                                                                                                                                                                            |
 | :--------------  | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
 | `:TestNearest`   | In a test file runs the test nearest to the cursor, otherwise runs the last nearest test. In test frameworks that don't support line numbers it will **polyfill** this functionality with [regexes](#commands).                                                                        |
+| `:TestClass`     | In a test file runs the first test class found on the same line as or above the cursor. (Currently only supported by Pytest)                                                                                                                                                           |
 | `:TestFile`      | In a test file runs all tests in the current file, otherwise runs the last file tests.                                                                                                                                                                                                 |
 | `:TestSuite`     | Runs the whole test suite (if the current file is a test file, runs that framework's test suite, otherwise determines the test framework from the last run test).                                                                                                                      |
 | `:TestLast`      | Runs the last test.                                                                                                                                                                                                                                                                    |
@@ -95,6 +97,7 @@ let test#strategy = "dispatch"
 | **[Tslime]**                    | `tslime`                                                    | Runs test commands in a tmux pane you specify.                                                                                                                    |
 | **[Slimux]**                    | `slimux`                                                    | Runs test commands in a tmux pane you specify.                                                                                                                    |
 | **[Neoterm]**                   | `neoterm`                                                   | Runs test commands with `:T`, see neoterm docs for display customization.                                                                                         |
+| **[Toggleterm]**                | `toggleterm`                                                | Runs test commands with `TermExec`                                                                                                          |
 | **[Floaterm]**                  | `floaterm`                                                  | Runs test commands within floating/popup terminal, see [floaterm docs](https://github.com/voldikss/vim-floaterm/blob/master/README.md) for display customization.                                                                                         |
 | **[Neomake]**                   | `neomake`                                                   | Runs test commands asynchronously with `:NeomakeProject`.                                                                                                         |
 | **[MakeGreen]**                 | `makegreen`                                                 | Runs test commands with `:MakeGreen`.                                                                                                                             |
@@ -102,12 +105,12 @@ let test#strategy = "dispatch"
 | **[Vim&nbsp;Tmux&nbsp;Runner]** | `vtr`                                                       | Runs test commands in a small tmux pane.                                                                                                                          |
 | **[Tmuxify]**                   | `tmuxify`                                                   | Runs test commands in a small tmux pane at the bottom of your terminal.                                                                                                                    |
 | **[VimProc]**                   | `vimproc`                                                   | Runs test commands asynchronously.                                                                                                                                |
-| **[AsyncRun]**                  | `asyncrun` `asyncrun_background` `asyncrun_background_term` | Runs test commands asynchronosuly using new APIs in Vim 8 and NeoVim (`:AsyncRun`, `:AsyncRun -mode=async -silent`, or `:AsyncRun -mode=term -pos=tab -focus=0`). |
+| **[AsyncRun]**                  | `asyncrun` `asyncrun_background` `asyncrun_background_term` | Runs test commands asynchronosuly using new APIs in Vim 8 and NeoVim (`:AsyncRun`, `:AsyncRun -mode=async -silent`, or `:AsyncRun -mode=term -pos=tab -focus=0 -listed=0`). |
 | **Terminal.app**                | `terminal`                                                  | Sends test commands to Terminal (useful in MacVim GUI).                                                                                                           |
 | **iTerm2.app**                  | `iterm`                                                     | Sends test commands to iTerm2 >= 2.9 (useful in MacVim GUI).                                                                                                      |
 | **[Kitty]**                     | `kitty`                                                     | Sends test commands to Kitty terminal.                                                                                                                            |
 | **[Shtuff]**                    | `shtuff`                                                    | Sends test commands to remote terminal via [shtuff][Shtuff].                                                                                                      |
-| **[Harpoon]**                    | `harpoon`                                                    | Sends test commands to neovim terminal using a terminal managed by [harpoon][Harpoon]. By default commands are sent to terminal number 1, you can choose your terminal by setting `g:test#harpoon_term` with the terminal you want                                                                                                     |
+| **[Harpoon]**                    | `harpoon`                                                  | Sends test commands to neovim terminal using a terminal managed by [harpoon][Harpoon]. By default commands are sent to terminal number 1, you can choose your terminal by setting `g:test#harpoon_term` with the terminal you want                                                                                                     |
 
 You can also set up strategies per granularity:
 
@@ -304,6 +307,16 @@ You can execute test.vim commands directly, and pass them CLI options:
 
 If you want some options to stick around, see [Configuring](#configuring).
 
+### Environment variables
+
+Environment variables are automatically detected from the arguments based on
+`<VARIABLE>=value` format, and prepended to the test command:
+
+```vim
+TestFile COVERAGE=1
+" COVERAGE=1 bundle exec rspec something_spec.rb
+```
+
 ### Runner commands
 
 Aside from the main commands, you get a corresponding Vim command for each
@@ -429,12 +442,14 @@ let test#python#runner = 'pytest'
 " Runners available are 'pytest', 'nose', 'nose2', 'djangotest', 'djangonose', 'mamba', and Python's built-in unittest as 'pyunit'
 ```
 
-The pytest runner optionally supports [pipenv](https://github.com/pypa/pipenv).
+The `pytest` and `djangotest` runner optionally supports [pipenv](https://github.com/pypa/pipenv).
 If you have a `Pipfile`, it will use `pipenv run pytest` instead of just
-`python -m pytest`. It also supports [poetry](https://github.com/sdispater/poetry)
-and will use `poetry run pytest` if it detects a `poetry.lock`. The pyunit
+`python -m pytest`. They also support [poetry](https://github.com/sdispater/poetry)
+and will use `poetry run pytest` if it detects a `poetry.lock`. The pyunit and nose 
 runner supports [pipenv](https://github.com/pypa/pipenv) as well and will
-use `pipenv run python -m unittest` if there is a `Pipfile`.
+respectively use `pipenv run python -m unittest` or `pipenv run python -m nosetests` 
+if there is a `Pipfile`. It also supports [pdm](https://pdm.fming.dev/) as well and 
+will use `poetry run pytest` if there is a `pdm.lock` file.
 
 #### Java
 
@@ -579,7 +594,13 @@ let g:test#cpp#catch2#bin_dir = "../path/to/your/binaries/dir"
 ```
 Suite: We assume that you are using Cmake as your build system, and are registering each test file to it. If not, override the following command.
 ```vim
-let g:test#cpp#catch2#suite_command = "ctest --ouput-on-failure" 
+let g:test#cpp#catch2#suite_command = "ctest --output-on-failure"
+```
+
+#### Rust
+If the `nextest` cargo subcommand is available, cargo-nextest is used. `cargo test` is used otherwise. To force a specific runner:
+```vim
+let g:test#rust#runner = 'cargotest'
 ```
 
 ## Autocommands
@@ -608,6 +629,19 @@ command on the "alternate" test file.
 You can disable this integration by doing
 ```vim
 let g:test#no_alternate = 1
+```
+
+### Custom alternate file
+
+If you are using a different library for jumping between implementation and test file
+you can define a custom function that returns the test filename.
+
+```vim
+function! CustomAlternateFile(cmd)
+  return "test_file_spec.rb"
+endfunction
+
+let g:test#custom_alternate_file = function('echo')
 ```
 
 ## Extending

@@ -6,7 +6,7 @@ function! test#strategy#basic(cmd) abort
   if has('nvim')
     -tabnew
     call termopen(a:cmd)
-    if !get(g:, 'test:basic:start_normal', 0)
+    if !get(g:, 'test#basic#start_normal', 0)
       startinsert
     endif
   else
@@ -57,7 +57,7 @@ endfunction
 function! test#strategy#asyncrun_background_term(cmd) abort
   let g:test#strategy#cmd = a:cmd
   call test#strategy#asyncrun_setup_unlet_global_autocmd()
-  execute 'AsyncRun -mode=term -pos=tab -focus=0 -post=echo\ eval("g:asyncrun_code\ ?\"Failure\":\"Success\"").":"'
+  execute 'AsyncRun -mode=term -pos=tab -focus=0 -listed=0 -post=echo\ eval("g:asyncrun_code\ ?\"Failure\":\"Success\"").":"'
           \ .'\ substitute(g:test\#strategy\#cmd,\ "\\",\ "",\ "") '.a:cmd
 endfunction
 
@@ -95,6 +95,10 @@ endfunction
 
 function! test#strategy#neoterm(cmd) abort
   call neoterm#do({ 'cmd': a:cmd})
+endfunction
+
+function! test#strategy#toggleterm(cmd) abort
+  execute 'TermExec cmd="'.a:cmd.'"'
 endfunction
 
 function! test#strategy#floaterm(cmd) abort
@@ -175,7 +179,7 @@ function! test#strategy#harpoon(cmd) abort
   lua require("harpoon.term").sendCommand(vim.api.nvim_eval("l:harpoon_term"), vim.g.cmd)
   let goToTerminal = exists("g:test#harpoon#gototerminal") ? g:test#harpoon#gototerminal : 1
   if goToTerminal
-    lua require("harpoon.term").gotoTerminal(vim.api.nvim_eval("l:term"))
+    lua require("harpoon.term").gotoTerminal(vim.api.nvim_eval("l:harpoon_term"))
   endif
 endfunction
 

@@ -31,12 +31,22 @@ describe "GoTest"
     view +17 normal_test.go
     TestNearest
 
+    Expect g:test#last_command == 'go test -run ''TestNumbers/this_is/nested$'' ./.'
+
+    view +23 normal_test.go
+    TestNearest
+
     Expect g:test#last_command == 'go test -run ''Testテスト$'' ./.'
 
-    view +21 normal_test.go
+    view +27 normal_test.go
     TestNearest
 
     Expect g:test#last_command == 'go test -run ''ExampleSomething$'' ./.'
+
+    view +36 normal_test.go
+    TestNearest
+
+    Expect g:test#last_command == 'go test -run ''TestSomethingInASuite$'' ./.'
   end
 
   it "runs nearest tests in subdirectory"
@@ -54,6 +64,11 @@ describe "GoTest"
     TestNearest
 
     Expect g:test#last_command == 'go test -run ''ExampleSomething$'' ./mypackage'
+
+   view +22 mypackage/normal_test.go
+    TestNearest
+
+    Expect g:test#last_command == 'go test -run ''TestSomething$'' ./mypackage'
   end
 
   it "runs file test if nearest test couldn't be found"

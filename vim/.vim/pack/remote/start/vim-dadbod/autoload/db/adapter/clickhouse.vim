@@ -36,16 +36,11 @@ function! db#adapter#clickhouse#auth_pattern() abort
   return '^Code: 516\. DB::Exception'
 endfunction
 
-function! db#adapter#clickhouse#can_echo(in, out) abort
-  let out = readfile(a:out, 2)
-  return len(out) == 1 && out[0] =~# '^Code: \d\+'
-endfunction
-
-function db#adapter#clickhouse#complete_database(url) abort
+function! db#adapter#clickhouse#complete_database(url) abort
   let cmd = db#adapter#clickhouse#interactive(substitute(a:url, '/[^/]*$', '/system', ''))
-  return db#systemlist(cmd, 'SHOW DATABASES FORMAT TSV')
+  return db#systemlist(cmd + ['--query', 'SHOW DATABASES FORMAT TSV'])
 endfunction
 
 function! db#adapter#clickhouse#tables(url) abort
-  return db#systemlist(db#adapter#clickhouse#interactive(a:url), 'SHOW TABLES FORMAT TSV')
+  return db#systemlist(db#adapter#clickhouse#interactive(a:url) + ['--query', 'SHOW TABLES FORMAT TSV'])
 endfunction

@@ -17,6 +17,9 @@ COMMANDS                                        *bundler-commands*
                                                 *bundler-:Bundle*
 :Bundle[!] [args]       Invoke `bundle` via |:make|.
 
+:Bundle open {gem}      Effectively does a `bundle open` inside of the current
+                        Vim. instance  Defaults to a new tab.  Use mods like
+                        |:rightbelow| to use a split instead.
 
                                                 *bundler-:Bopen*
 :Bopen[!] [gem]         With no argument, edits the Gemfile.  Otherwise,
@@ -63,9 +66,6 @@ between gem names and their locked versions, paths() returns a dictionary
 mapping between gem names and their installation path (omitting gems which
 aren't installed), and has(gem) returns true if the given gem name is in the
 bundle (regardless of whether or not it is installed).
-
-The original data structures are returned for performance reasons.  Do not
-mutate.
 
 ABOUT                                           *bundler-about*
 

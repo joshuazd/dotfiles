@@ -18,16 +18,17 @@ let g:test#default_runners = {
   \ 'Groovy':     ['MavenTest', 'GradleTest'],
   \ 'Haskell':    ['StackTest'],
   \ 'Java':       ['MavenTest', 'GradleTest'],
-  \ 'JavaScript': ['Ava', 'CucumberJS', 'DenoTest', 'Intern', 'TAP', 'Karma', 'Lab', 'Mocha',  'NgTest', 'Nx', 'Jasmine', 'Jest', 'ReactScripts', 'WebdriverIO', 'Cypress', 'VueTestUtils', 'Playwright'],
+  \ 'JavaScript': ['Ava', 'CucumberJS', 'DenoTest', 'Intern', 'TAP', 'Teenytest', 'Karma', 'Lab', 'Mocha',  'NgTest', 'Nx', 'Jasmine', 'Jest', 'ReactScripts', 'WebdriverIO', 'Cypress', 'VueTestUtils', 'Playwright', 'Vitest'],
   \ 'Kotlin':     ['GradleTest'],
   \ 'Lua':        ['Busted'],
   \ 'Mint':       ['MintTest'],
+  \ 'Nim':        ['UnitTest'],
   \ 'PHP':        ['Codeception', 'Dusk', 'Pest', 'PHPUnit', 'Behat', 'PHPSpec', 'Kahlan', 'Peridot'],
   \ 'Perl':       ['Prove'],
   \ 'Python':     ['Behave', 'DjangoTest', 'PyTest', 'PyUnit', 'Nose', 'Nose2', 'Mamba'],
   \ 'Racket':     ['RackUnit'],
   \ 'Ruby':       ['Rails', 'M', 'Minitest', 'RSpec', 'Cucumber', 'TestBench'],
-  \ 'Rust':       ['CargoTest'],
+  \ 'Rust':       ['CargoNextest', 'CargoTest'],
   \ 'Scala':      ['SbtTest', 'BloopTest'],
   \ 'Shell':      ['Bats', 'ShellSpec'],
   \ 'Swift':      ['SwiftPM'],
@@ -41,6 +42,7 @@ let g:test#runner_commands = get(g:, 'test#runner_commands', [])
 command! -nargs=* -bar TestNearest call test#run('nearest', split(<q-args>))
 command! -nargs=* -bar -complete=file
       \                TestFile    call test#run('file', split(<q-args>))
+command! -nargs=* -bar TestClass   call test#run('class', split(<q-args>))
 command! -nargs=* -bar TestSuite   call test#run('suite', split(<q-args>))
 command! -nargs=* -bar TestLast    call test#run_last(split(<q-args>))
 command!          -bar TestVisit   call test#visit()
