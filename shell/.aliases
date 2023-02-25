@@ -23,8 +23,6 @@ alias cp='cp -i'
 alias rm='rm -I'
 alias j=jobs
 
-alias python='python3'
-alias pip='pip3'
 alias search='find . -type f -name'
 
 alias grep='grep --color=auto --exclude-dir=.git'
@@ -56,6 +54,8 @@ alias cvi='vi -u ~/.vim/microvimrc --noplugin -N'
 alias e='vi --noplugin -Nu ~/.vim/microvimrc'
 alias mvi='vi --noplugin -Nu ~/.vim/minvimrc'
 alias nvi='vi --noplugin -Nu ~/.vim/nanovimrc'
+alias viq='vim -q <(fc -e -)'
+alias vigc='vi `git conflicts`'
 
 ####################################
 #         CYGWIN ALIASES

@@ -22,6 +22,7 @@ PACKAGES = [
     'tpope/vim-projectionist',
     'tpope/vim-vinegar',
     'tpope/vim-bundler',
+    'vim-ruby/vim-ruby',
     'tommcdo/vim-lion',
     'romainl/vim-qf',
     'romainl/vim-qlist',
@@ -38,6 +39,8 @@ PACKAGES = [
     'mhinz/vim-signify',
     'dense-analysis/ale',
     'vim-test/vim-test',
+    'kana/vim-textobj-user',
+    'tek/vim-textobj-ruby',
 ]
 
 HOOKS = {
@@ -56,7 +59,7 @@ conch = threading.Semaphore()
 try:
     with open(update_file) as file:
         last_update = file.read().strip()
-except IOError as e:
+except IOError:
     last_update = None
 
 
@@ -66,12 +69,12 @@ def main():
         shutil.rmtree(
             os.path.expanduser(
                 os.path.join('~', '.vim', 'pack', 'remote')))
-    except Exception as e:
+    except Exception:
         pass
     print('Removed ''pack' + os.sep + 'remote'' directory')
     try:
         os.remove(log_file)
-    except OSError as e:
+    except OSError:
         pass
     p = Pool(20)
     p.map(pack_process, PACKAGES)
@@ -91,7 +94,9 @@ def walk_tree(tree):
         if any(dir.lower().endswith(ext) for ext in ['.git']):
             shutil.rmtree(os.path.join(root, dir))
     for file in files:
-        if any(file.lower().endswith(ext) for ext in ['gif', 'png', 'svg', '.git', '.gitignore', '.gitmodules']):
+        if any(file.lower().endswith(ext)
+               for ext in ['gif', 'png', 'svg', '.git',
+                           '.gitignore', '.gitmodules']):
             os.remove(os.path.join(root, file))
 
 
@@ -138,7 +143,7 @@ def install_hooks(path, name):
         print('Running post-install hook for %s' % name)
         try:
             os.system(HOOKS[name]['do'])
-        except Exception as e:
+        except Exception:
             print('Unable to run post-install hook for %s' % name)
         os.chdir(cwd)
 

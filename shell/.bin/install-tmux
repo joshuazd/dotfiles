@@ -1,14 +1,16 @@
 #!/usr/bin/env sh
 
-sudo apt update
+if [ "$(uname)" = "Linux" ] && [ -x "$(command -v apt)" ]; then
+    sudo apt update
 
-sudo apt install -y git
+    sudo apt install -y git
 
-sudo apt install -y automake
-sudo apt install -y build-essential
-sudo apt install -y pkg-config
-sudo apt install -y libevent-dev
-sudo apt install -y libncurses5-dev
+    sudo apt install -y automake
+    sudo apt install -y build-essential
+    sudo apt install -y pkg-config
+    sudo apt install -y libevent-dev
+    sudo apt install -y libncurses5-dev
+fi
 
 rm -fr /tmp/tmux
 
