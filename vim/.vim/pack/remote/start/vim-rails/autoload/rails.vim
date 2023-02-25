@@ -1450,7 +1450,7 @@ function! s:readable_default_rake_task(...) dict abort
     return 'routes'
   elseif self.type_name('fixtures-yaml') && lnum
     return "db:fixtures:identify LABEL=".self.last_method(lnum)
-  elseif self.type_name('fixtures') && lnum == 0
+  elseif self.type_name('fixtures') && !self.type_name('fixtures-replacement') && lnum == 0
     return "db:fixtures:load FIXTURES=".s:sub(fnamemodify(self.name(),':r'),'^.{-}/fixtures/','')
   elseif self.type_name('task')
     let mnum = self.last_method_line(lnum)
@@ -1727,31 +1727,37 @@ function! s:app_server_binding() dict abort
   endif
   for app in s:split(glob("~/.pow/*"))
     if resolve(app) ==# resolve(self.path())
-      return fnamemodify(app, ':t').'.dev'
+      return 'http://' . fnamemodify(app, ':t') . '.dev'
     endif
   endfor
   return ''
 endfunction
 
-call s:add_methods('app', ['server_pid', 'server_binding'])
+function! s:app_server_root() dict abort
+  return substitute(substitute(self.server_binding(),
+        \ '://\zs\%(0\.0\.0\.0\|127\.0\.0\.1\)\>', 'localhost', ''),
+        \ '://\zs\[::\]', '[::1]', '')
+endfunction
+
+call s:add_methods('app', ['server_pid', 'server_binding', 'server_root'])
 
 function! s:Preview(bang, lnum, uri) abort
-  let binding = rails#app().server_binding()
-  if empty(binding)
-    let binding = '0.0.0.0:3000'
+  let root = rails#app().server_root()
+  if empty(root)
+    let root = 'http://localhost:3000'
   endif
-  let binding = s:sub(binding, '^0\.0\.0\.0>|^127\.0\.0\.1>', 'localhost')
-  let binding = s:sub(binding, '^\[::\]', '[::1]')
   let uri = empty(a:uri) ? get(rails#buffer().preview_urls(a:lnum),0,'') : a:uri
   if uri =~ '://'
     "
   elseif uri =~# '^[[:alnum:]-]\+\.'
-    let uri = 'http://'.s:sub(uri, '^[^/]*\zs', matchstr(root, ':\d\+$'))
+    let uri = matchstr(root, '^.\{-\}://') . substitute(uri, '^[^/]*\zs', matchstr(root, ':\d\+$'), '')
   elseif uri =~# '^[[:alnum:]-]\+\%(/\|$\)'
-    let domain = s:sub(binding, '^localhost>', 'lvh.me')
-    let uri = 'http://'.s:sub(uri, '^[^/]*\zs', '.'.domain)
+    let domain = substitute(
+          \ substitute(matchstr(root, '://\zs.*'), '\C^localhost\>', 'lvh.me', ''),
+          \ '^\d\+\.\d\+\.\d\+\.\d\+\ze\%(:\|$\)', '&.nip.io', '')
+    let uri = matchstr(root, '^.\{-\}://') . substitute(uri, '^[^/]*\zs', '.' . domain, '')
   else
-    let uri = 'http://'.binding.'/'.s:sub(uri,'^/','')
+    let uri = root . '/' . substitute(uri, '^/', '', '')
   endif
   call s:initOpenURL()
   if (exists(':OpenURL') == 2) && !a:bang
@@ -1760,9 +1766,9 @@ function! s:Preview(bang, lnum, uri) abort
     " Work around bug where URLs ending in / get handled as FTP
     let url = uri.(uri =~ '/$' ? '?' : '')
     silent exe 'pedit '.url
-    let root = rails#app().path()
+    let app_path = rails#app().path()
     wincmd w
-    let b:rails_root = root
+    let b:rails_root = app_path
     if &filetype ==# ''
       if uri =~ '\.css$'
         setlocal filetype=css
@@ -1964,30 +1970,41 @@ function! rails#get_binding_for(pid) abort
   if has('win32')
     let output = system('netstat -anop tcp')
     let binding = matchstr(output, '\n\s*TCP\s\+\zs\S\+\ze\s\+\S\+\s\+LISTENING\s\+'.a:pid.'\>')
-    return s:sub(binding, '^([^[]*:.*):', '[\1]:')
-  endif
-  if executable('lsof')
-    let lsof = 'lsof'
-  elseif executable('/usr/sbin/lsof')
-    let lsof = '/usr/sbin/lsof'
-  endif
-  if exists('lsof')
-    let output = system(lsof.' -anP -i4tcp -sTCP:LISTEN -p'.a:pid)
-    let binding = matchstr(output, '\S\+:\d\+\ze\s\+(LISTEN)\n')
-    let binding = s:sub(binding, '^\*', '0.0.0.0')
-    if empty(binding)
-      let output = system(lsof.' -anP -i6tcp -sTCP:LISTEN -p'.a:pid)
-      let binding = matchstr(output, '\S\+:\d\+\ze\s\+(LISTEN)\n')
-      let binding = s:sub(binding, '^\*', '[::]')
+  else
+    if executable('lsof')
+      let lsof = 'lsof'
+    elseif executable('/usr/sbin/lsof')
+      let lsof = '/usr/sbin/lsof'
     endif
-    return binding
+    if exists('lsof')
+      let output = system(lsof.' -anP -i4tcp -sTCP:LISTEN -p'.a:pid)
+      let binding = matchstr(output, '\S\+:\d\+\ze\s\+(LISTEN)\n')
+      let binding = s:sub(binding, '^\*', '0.0.0.0')
+      if empty(binding)
+        let output = system(lsof.' -anP -i6tcp -sTCP:LISTEN -p'.a:pid)
+        let binding = matchstr(output, '\S\+:\d\+\ze\s\+(LISTEN)\n')
+        let binding = s:sub(binding, '^\*', '[::]')
+      endif
+    elseif executable('netstat')
+      let output = system('netstat -antp')
+      let binding = matchstr(output, '\S\+:\d\+\ze\s\+\S\+\s\+LISTEN\s\+'.a:pid.'/')
+    else
+      let binding = ''
+    endif
   endif
-  if executable('netstat')
-    let output = system('netstat -antp')
-    let binding = matchstr(output, '\S\+:\d\+\ze\s\+\S\+\s\+LISTEN\s\+'.a:pid.'/')
-    return s:sub(binding, '^([^[]*:.*):', '[\1]:')
+  let binding = substitute(binding, '^\(^[^[]*:.*\):', '[\1]:', '')
+  if empty(binding)
+    return ''
   endif
-  return ''
+  let accepts_ssl = 0
+  if s:webcat() =~# '^curl'
+    call system('curl --max-time 2 -k --silent --head --fail ' . shellescape('https://'.binding))
+    let accepts_ssl = !v:shell_error
+  elseif s:webcat() =~# '^wget'
+    call system('wget --timeout=2 --no-check-certificate --method=HEAD -q -S ' . shellescape('https://'.binding))
+    let accepts_ssl = !v:shell_error
+  endif
+  return (accepts_ssl ? 'https://' : 'http://') . binding
 endfunction
 
 function! s:ServerCommand(kill, bg, arg) abort
@@ -2686,9 +2703,9 @@ function! s:app_routes() dict abort
     let cwd = getcwd()
     let routes = []
     let paths = {}
-    let binding = self.server_binding()
-    if len(binding) && len(s:webcat())
-      let html = system(s:webcat() . ' ' . shellescape('http://' . binding . '/rails/info/routes'))
+    let root = self.server_root()
+    if len(root) && len(s:webcat())
+      let html = system(s:webcat() . ' ' . shellescape(root . '/rails/info/routes'))
       for line in split(matchstr(html, '.*<tbody>\zs.*\ze</tbody>'), "\n")
         let val = matchstr(line, '\C<td data-route-name=''\zs[^'']*''\ze>')
         if len(val)
@@ -3532,6 +3549,9 @@ function! s:AR(cmd,related,line1,line2,count,...) abort
   elseif a:cmd =~# 'D'
     let modified = &l:modified
     let template = s:split(get(rails#buffer().projected('template'), 0, []))
+    if type(get(template, 0)) == v:t_list
+      let template = template[0]
+    endif
     call map(template, 's:gsub(v:val, "\t", "  ")')
     if a:line2 == a:count
       call append(a:line2, template)
@@ -4253,8 +4273,6 @@ function! s:app_gems() dict abort
     let project = bundler#project(self.path())
     if has_key(project, 'paths')
       return project.paths()
-    elseif has_key(project, 'gems')
-      return project.gems()
     endif
   endif
   return {}
@@ -4263,11 +4281,7 @@ endfunction
 function! s:app_has_gem(gem) dict abort
   if self.has('bundler') && exists('*bundler#project')
     let project = bundler#project(self.path())
-    if has_key(project, 'has')
-      return project.has(a:gem)
-    elseif has_key(project, 'gems')
-      return has_key(bundler#project(self.path()).gems(), a:gem)
-    endif
+    return has_key(project, 'versions') && has_key(project.versions(), a:gem)
   else
     return 0
   endif
@@ -4604,6 +4618,7 @@ let s:has_projections = {
       \  }
       \}
 
+let s:projections_for_gems = {}
 function! s:app_projections() dict abort
   let dict = s:combine_projections({}, s:default_projections)
   for [k, v] in items(s:has_projections)
@@ -4613,28 +4628,43 @@ function! s:app_projections() dict abort
   endfor
   call s:combine_projections(dict, self.smart_projections())
   call s:combine_projections(dict, get(g:, 'rails_projections', ''))
-  for gem in keys(get(g:, 'rails_gem_projections', {}))
+  for [gem, data] in items(get(g:, 'rails_gem_projections', {}))
     if self.has_gem(gem)
       try
-        if type(g:rails_gem_projections[gem]) ==# v:t_string
-          let file = g:rails_gem_projections[gem]
-          if file !~# '^\a\+:\|^/'
+        if type(data) ==# v:t_string && data isnot# 'lib/projections.json' && data isnot# 'lib/rails/projections.json'
+          if data !~# '^\a\+:\|^/\|^$'
             if !has_key(self.gems(), gem)
               continue
             endif
-            let file = self.gems()[gem] . '/' . file
+            let data = self.gems()[gem] . '/' . data
           endif
-          if file =~# '/$'
-            let file .= 'projections.json'
+          if data =~# '/$'
+            let data .= 'projections.json'
           endif
-          call s:combine_projections(dict, rails#json_parse(s:readfile(file)))
-        else
-          call s:combine_projections(dict, g:rails_gem_projections[gem])
+          call s:combine_projections(dict, rails#json_parse(s:readfile(data)))
+        elseif type(data) ==# v:t_dict
+          call s:combine_projections(dict, data)
         endif
       catch
       endtry
     endif
   endfor
+  let gem_path = escape(join(values(self.gems()),','), ' ')
+  if get(g:, 'rails_projections_inside_gems', 1) && !empty(gem_path)
+    if !has_key(s:projections_for_gems, gem_path)
+      let gem_projections = {}
+      for path in ['lib/', 'lib/rails/']
+        for file in findfile(path.'projections.json', gem_path, -1)
+          try
+            call s:combine_projections(gem_projections, rails#json_parse(s:readfile(self.path(file))))
+          catch
+          endtry
+        endfor
+      endfor
+      let s:projections_for_gems[gem_path] = gem_projections
+    endif
+    call s:combine_projections(dict, s:projections_for_gems[gem_path])
+  endif
   if self.cache.needs('projections')
     call self.cache.set('projections', {})
 

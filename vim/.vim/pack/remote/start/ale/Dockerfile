@@ -1,9 +1,11 @@
-FROM testbed/vim:20
+ARG TESTBED_VIM_VERSION=24
+
+FROM testbed/vim:${TESTBED_VIM_VERSION}
 
 RUN install_vim -tag v8.0.0027 -build \
-                -tag v8.2.4693 -build \
+                -tag v9.0.0297 -build \
                 -tag neovim:v0.2.0 -build \
-                -tag neovim:v0.7.0 -build
+                -tag neovim:v0.8.0 -build
 
 ENV PACKAGES="\
     bash \

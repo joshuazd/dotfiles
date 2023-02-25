@@ -19,6 +19,7 @@ INTRODUCTION                                    *test*
 This plugin allows you to:
 
   * run nearest test (to the cursor)
+  * run nearest test class (to the cursor)
   * run (current) test file
   * run test suite
   * run last test
@@ -29,6 +30,7 @@ test runner it has to use for the file you're looking at.
 Add your preferred mappings to your `.vimrc` file:
 >
   nmap <silent> <leader>t :TestNearest<CR>
+  nmap <silent> <leader>C :TestClass<CR>
   nmap <silent> <leader>T :TestFile<CR>
   nmap <silent> <leader>a :TestSuite<CR>
   nmap <silent> <leader>l :TestLast<CR>
@@ -44,6 +46,11 @@ In all commands [args] are forwarded to the underlying test runner.
                              runners may not support this). If the current
                              file is not a test file, it reruns a previous
                              "nearest test" (if present).
+
+                                                *test-:TestClass*
+:TestClass [args]            Run the first test class above or on the same
+                             line as the cursor (some test runners may not
+                             support this).
 
                                                 *test-:TestFile*
 :TestFile [args]             Run tests for the current file. If the current
@@ -99,11 +106,17 @@ In all commands [args] are forwarded to the underlying test runner.
                                                 *test-:TAP*
 :TAP [args]                  Uses the `tap` or `tape` command.
 
+                                                *test-:Teenytest*
+:Teenytest [args]            Uses the `teenytest` command.
+
                                                 *test-:Lab*
 :Lab [args]                  Uses the `lab` command.
 
                                                 *test-:Jest*
 :Jest [args]                 Uses the `jest` command.
+
+                                                *test-:Vitest*
+:Vitest [args]                 Uses the `vitest` command.
 
                                                 *test-:Playwright*
 :Playwright [args]           Uses the `playwright test` command.
@@ -187,6 +200,9 @@ In all commands [args] are forwarded to the underlying test runner.
 
                                                 *test-:CargoTest*
 :CargoTest [args]            Uses the `cargo` `test` command.
+
+                                                *test-:CargoNextest*
+:CargoNextest [args]         Uses the `cargo` `nextest` command.
 
                                                 *test-:FireplaceTest*
 :FireplaceTest [args]        Uses `Fireplace.vim` to run test commands, and
@@ -289,6 +305,8 @@ In all commands [args] are forwarded to the underlying test runner.
 
                                                 *test-:VueTestUtils*
 :VueTestUtils [args]  	         Uses the `vue-cli-service` command.
+                                                *test-:UnitTest*
+:UnitTest [args]              Uses the `nim compile --run` command.
 
 
 MAVEN TEST DIFFERENCES                          *test-maven-test-differences*
@@ -360,6 +378,12 @@ Neoterm ~
 Runs test commands with `:T`. Requires the Neoterm plugin.
 >
   let test#strategy = 'neoterm'
+<
+Toggleterm ~
+
+Runs test commands with `:TermExec`. Requires the Toggleterm plugin.
+>
+  let test#strategy = 'toggleterm'
 <
 Floaterm ~
 
@@ -671,6 +695,19 @@ command on the "alternate" test file.
 You can disable this integration by doing
 >
   let g:test#no_alternate = 1
+<
+
+CUSTOM ALTERNATE FILE                           *test-custom-alternate-file*
+
+If you are using a different library for jumping between implementation and test file
+you can define a custom function that returns the test filename.
+
+>
+function! CustomAlternateFile(cmd)
+  return "test_file_spec.rb"
+endfunction
+
+let g:test#custom_alternate_file = function('echo')
 <
 
 ABOUT                                           *test-about*

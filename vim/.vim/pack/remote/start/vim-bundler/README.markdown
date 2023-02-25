@@ -6,8 +6,7 @@ This is a lightweight bag of Vim goodies for
 [rails.vim](https://github.com/tpope/vim-rails).  Features:
 
 * `:Bundle`, which wraps `bundle`.
-* An internalized version of `bundle open`: `:Bopen` (and `:Bsplit`,
-  `:Btabedit`, etc.).
+* `:Bundle open`, which opens a gem inside the current Vim instance.
 * `'path'` and `'tags'` are automatically altered to include all gems
   from your bundle.  (Generate those tags with
   [gem-ctags](https://github.com/tpope/gem-ctags)!)
@@ -19,28 +18,13 @@ This is a lightweight bag of Vim goodies for
 
 ## Installation
 
-If you don't have a preferred installation method, I recommend
-installing [pathogen.vim](https://github.com/tpope/vim-pathogen), and
-then simply copy and paste:
+Install using your favorite package manager, or use Vim's built-in package
+support:
 
-    cd ~/.vim/bundle
-    git clone git://github.com/tpope/vim-bundler.git
-
-Once help tags have been generated, you can view the manual with
-`:help bundler`.
-
-## FAQ
-
-> I installed the plugin and started Vim.  Why don't any of the commands
-> exist?
-
-This plugin cares about the current file, not the current working
-directory.  Edit a file that's covered by a `Gemfile`.
-
-> I opened a new tab.  Why don't any of the commands exist?
-
-This plugin cares about the current file, not the current working
-directory.  Edit a file that's covered by a `Gemfile`.
+    mkdir -p ~/.vim/pack/tpope/start
+    cd ~/.vim/pack/tpope/start
+    git clone https://tpope.io/vim/bundler.git
+    vim -u NONE -c "helptags bundler/doc" -c q
 
 ## Self-Promotion
 

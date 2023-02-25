@@ -29,6 +29,7 @@ function! s:StartHL()
     if !v:hlsearch || mode() isnot 'n'
         return
     endif
+    let g:cool_is_searching = 1
     let [pos, rpos] = [winsaveview(), getpos('.')]
     silent! exe "keepjumps go".(line2byte('.')+col('.')-(v:searchforward ? 2 : 0))
     try
@@ -42,7 +43,7 @@ function! s:StartHL()
     finally
         call winrestview(pos)
     endtry
-    if !get(g:,'CoolTotalMatches') || !exists('*reltimestr')
+    if !get(g:,'cool_total_matches') || !exists('*reltimestr')
         return
     endif
     exe "silent! norm! :let g:cool_char=nr2char(screenchar(screenrow(),1))\<cr>"
@@ -74,9 +75,10 @@ function! s:StartHL()
 endfunction
 
 function! s:StopHL()
-    if !v:hlsearch || mode() isnot 'n'
+    if !v:hlsearch || mode() isnot 'n' || &buftype == 'terminal'
         return
     else
+        let g:cool_is_searching = 0
         silent call feedkeys("\<Plug>(StopHL)", 'm')
     endif
 endfunction

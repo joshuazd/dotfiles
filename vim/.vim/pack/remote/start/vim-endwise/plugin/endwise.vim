@@ -62,11 +62,11 @@ augroup endwise " {{{1
         \ let b:endwise_words = 'ifdef,ifndef,ifeq,ifneq,define' |
         \ let b:endwise_pattern = '^\s*\(d\zsef\zeine\|\zsif\zen\=\(def\|eq\)\)\>' |
         \ let b:endwise_syngroups = 'makePreCondit,makeDefine'
-  autocmd FileType verilog
+  autocmd FileType verilog,systemverilog
         \ let b:endwise_addition = 'end&' |
-        \ let b:endwise_words = 'begin,module,case,function,primitive,specify,task' |
-        \ let b:endwise_pattern = '\<\%(\zs\zebegin\|module\|case\|function\|primitive\|specify\|task\)\>.*$' |
-        \ let b:endwise_syngroups = 'verilogConditional,verilogLabel,verilogStatement'
+        \ let b:endwise_words = 'begin,module,case,function,primitive,specify,task,generate,package,interface,class,program,property,sequence,table,clocking,checker,config' |
+        \ let b:endwise_pattern = '\<\%(\zs\zebegin\|module\|case\|function\|primitive\|specify\|task\|generate\|package\|interface\|class\|program\|property\|sequence\|table\|clocking\|checker\|config\)\>' |
+        \ let b:endwise_syngroups = 'verilogConditional,verilogLabel,verilogStatement,systemverilogStatement'
   autocmd FileType matlab
         \ let b:endwise_addition = 'end' |
         \ let b:endwise_words = 'function,if,for,switch,while,try' |
@@ -138,7 +138,7 @@ function! s:DefineMap() abort
   elseif rhs =~? '<cr>' || rhs =~# '<[Pp]lug>\w\+CR'
     exe "imap <silent> <CR>" rhs."<SID>(endwise-append)"
   else
-    imap <silent><script><expr> <CR> EndwiseAppend("\r")
+    imap <silent><script><expr> <CR> EndwiseAppend("<Bslash>r")
   endif
 endfunction
 call s:DefineMap()

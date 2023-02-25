@@ -1,10 +1,12 @@
 let test#go#patterns = {
   \ 'test': [
     \ '\v^\s*func ((Test|Example).*)\(',
+    \ '\v^\s*func \(.*\) ((Test).*)\(',
     \ '\v^\s*t\.Run\("(.*)"',
   \],
   \ 'namespace': [
     \ '\v^\s*func ((Test).*)\(',
+    \ '\v^\s*t\.Run\("(.*)"',
   \],
 \}
 function! test#go#test_file(runner, file_pattern, file) abort

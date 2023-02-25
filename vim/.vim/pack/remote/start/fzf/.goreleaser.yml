@@ -72,6 +72,9 @@ builds:
       - amd64
       - arm
       - arm64
+      - loong64
+      - ppc64le
+      - s390x
     goarm:
       - 5
       - 6
@@ -98,6 +101,10 @@ archives:
         format: zip
     files:
       - non-existent*
+
+checksum:
+  extra_files:
+    - glob: ./dist/fzf-*darwin*.zip
 
 release:
   github:

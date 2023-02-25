@@ -12,6 +12,12 @@ func TestNumbers(t *testing.T) {
 	t.Run("[].*+?|$^()", func(t *testing.T) {
 		// sub test assertions
 	})
+
+	t.Run("this is", func(t *testing.T) {
+		t.Run("nested", func(t *testing.T) {
+			// nested test assertions
+		})
+	})
 }
 
 func Testテスト(*testing.T) {
@@ -23,4 +29,10 @@ func ExampleSomething() {
 }
 
 func Something() {
+}
+
+type TestSomeTestifySuite struct{}
+
+func (suite *TestSomeTestifySuite) TestSomethingInASuite() {
+	// assertions
 }
