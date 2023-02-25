@@ -117,9 +117,9 @@ cnoremap <expr> <Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>/<C-
 augroup vimrc
   autocmd!
   autocmd BufReadPost        *            if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g`\"" | endif | norm! zv
-  if exists('##TextYankPost') && executable('base64')
-    autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
-  endif
+  " if exists('##TextYankPost') && executable('base64')
+  "   autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
+  " endif
 augroup END
 
 set statusline=%f\ %m%r%w%q%h%=%<%-20{&filetype}%-15(%l,%c%V%)%P

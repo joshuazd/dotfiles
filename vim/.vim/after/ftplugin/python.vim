@@ -13,6 +13,7 @@ augroup PYTHON
       autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
     endif
 augroup END
+let b:ale_linters = []
 
 " ipython setup {{{
 

@@ -57,7 +57,8 @@ if ($TERM =~# '256' || &t_Co >= 256) || has('gui_running')
     hi diffChanged ctermbg=NONE ctermfg=11 cterm=NONE guibg=NONE guifg=#ebcb8b gui=NONE
     hi diffRemoved ctermbg=NONE ctermfg=1 cterm=NONE guibg=NONE guifg=#bf616a gui=NONE
     hi IncSearch ctermbg=3 ctermfg=0 cterm=NONE guibg=#d08770 guifg=#3b4252 gui=NONE
-    hi Search ctermbg=11 ctermfg=0 cterm=NONE guibg=#ebcb8b guifg=#3b4252 gui=NONE
+    " hi Search ctermbg=11 ctermfg=0 cterm=NONE guibg=#ebcb8b guifg=#3b4252 gui=NONE
+    hi Search ctermbg=11 ctermfg=0 cterm=NONE guibg=#4c566a guifg=#d8dee9 gui=NONE
     hi Directory ctermbg=NONE ctermfg=12 cterm=NONE guibg=NONE guifg=#81a1c1 gui=NONE
     hi MatchParen ctermbg=NONE ctermfg=6 cterm=NONE guibg=NONE guifg=#8fbcbb gui=NONE
     hi SpellBad ctermbg=1 ctermfg=7 cterm=NONE guibg=#bf616a guifg=#d8dee9 gui=NONE guisp=#bf616a

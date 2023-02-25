@@ -37,13 +37,13 @@ endfunction
 
 augroup vimscript
   autocmd!
-  if executable('vint')
-    if exists('g:loaded_dispatch')
-      autocmd BufWritePost <buffer> execute 'Make'|cwindow|redraw!
-    else
-      autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
-    endif
-  endif
+  " if executable('vint')
+  "   if exists('g:loaded_dispatch')
+  "     autocmd BufWritePost <buffer> execute 'Make'|cwindow|redraw!
+  "   else
+  "     autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
+  "   endif
+  " endif
 augroup END
 
 let b:undo_ftplugin = 'setlocal shiftwidth< softtabstop< foldmethod< makeprg< keywordprg< errorformat< path< suffixesadd<'
