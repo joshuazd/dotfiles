@@ -110,10 +110,9 @@ fi
 zle -N fco_preview
 bindkey '^o' fco_preview
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "/usr/local/opt/nvm/nvm.sh" ] && . "/usr/local/opt/nvm/nvm.sh"  # This loads nvm
-[ -s "/usr/local/opt/nvm/etc/bash_completion.d/nvm" ] && . "/usr/local/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
-
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 _fzf_complete_sshrc() {
   _fzf_complete '+m' "$@" < <(
     command cat <(cat ~/.ssh/config /etc/ssh/ssh_config 2> /dev/null | command grep -i '^host ' | command grep -v '[*?]' | awk '{for (i = 2; i <= NF; i++) print $1 " " $i}') \
@@ -140,7 +139,7 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 zstyle ':completion:*:(rm|cp|kill|diff|scp):*' ignore-line yes
-zstyle :compinstall filename '/home/vagrant/.zshrc'
+# zstyle :compinstall filename '/home/vagrant/.zshrc'
 autoload -Uz compinit
 compinit
 # plugins
@@ -203,3 +202,6 @@ _256colors() {
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#5c6370'
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#6b7895'
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=magenta'
+alias hp_development='HP_AWS_ACCESS_KEY_ID=`security find-generic-password -w -s hushpuppy_development_ro_api_key_id -a jzinkduda` HP_AWS_SECRET_ACCESS_KEY=`security find-generic-password -w -s hushpuppy_development_ro_api_key_secret -a jzinkduda` CONFIG_NAME=Development'
+alias hp_test='HP_AWS_ACCESS_KEY_ID=`security find-generic-password -w -s hushpuppy_test_rw_api_key_id -a jzinkduda` HP_AWS_SECRET_ACCESS_KEY=`security find-generic-password -w -s hushpuppy_test_rw_api_key_secret -a jzinkduda` CONFIG_NAME=Test'
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
