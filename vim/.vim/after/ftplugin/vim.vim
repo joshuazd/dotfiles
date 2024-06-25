@@ -23,7 +23,7 @@ nnoremap <buffer> g: :<C-u><C-r>=trim(getline('.'))<CR>
 nnoremap <silent> <buffer> g= :set opfunc=<SID>evaluate<CR>g@
 xnoremap <silent> <buffer> g= :call <SID>evaluate(visualmode(), getline('.'))<CR>
 
-let b:ale_linters = ['vint']
+let b:ale_enabled = v:false
 
 function! s:evaluate(type, ...) abort
   if a:0
@@ -37,13 +37,9 @@ endfunction
 
 augroup vimscript
   autocmd!
-  " if executable('vint')
-  "   if exists('g:loaded_dispatch')
-  "     autocmd BufWritePost <buffer> execute 'Make'|cwindow|redraw!
-  "   else
-  "     autocmd BufWritePost <buffer> silent! make|cwindow|redraw!
-  "   endif
-  " endif
+  if executable('vint')
+    autocmd BufWritePost <buffer> silent! lgetexpr system(expandcmd(&makeprg))|lwindow
+  endif
 augroup END
 
 let b:undo_ftplugin = 'setlocal shiftwidth< softtabstop< foldmethod< makeprg< keywordprg< errorformat< path< suffixesadd<'
