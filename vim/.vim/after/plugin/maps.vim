@@ -34,6 +34,17 @@ if exists('did_plugin_ultisnips')
   xnoremap <silent> <expr> <TAB>   ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
   snoremap <silent> <expr> <TAB>   "<ESC>:call UltiSnips#JumpForwards()<CR>"
   snoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
+
+  inoremap <silent> <C-J> <C-R>=((UltiSnips_ExpandJump() > 0) ? "" : (pumvisible() ? "\<C-y>\<TAB>" : "\<TAB>"))<CR>
+  " inoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
+  xnoremap <silent> <expr> <C-J>   ":<C-U>call UltiSnips#SaveLastVisualSelection()<cr>gvs"
+  snoremap <silent> <expr> <C-J>   "<ESC>:call UltiSnips#JumpForwards()<CR>"
+  " snoremap <silent> <expr> <S-TAB> "<ESC>:call UltiSnips#JumpBackwards()<CR>"
+endif
+
+if exists('g:loaded_copilot')
+  imap <silent><script><expr> <TAB> copilot#Accept("\<TAB>")
+  imap <silent> <C-L> <Plug>(copilot-suggest)
 endif
 
 if exists('g:loaded_mucomplete')
@@ -42,6 +53,12 @@ if exists('g:loaded_mucomplete')
   else
     inoremap <expr> <cr> pumvisible() ? "<c-y><cr>" : "\<cr>"
   endif
+	imap <c-n> <plug>(MUcompleteFwd)
+	imap <c-p> <plug>(MUcompleteBwd)
+	" inoremap <silent> <plug>(MUcompleteFwdKey) <c-j>
+	" imap <c-j> <plug>(MUcompleteCycFwd)
+	" inoremap <silent> <plug>(MUcompleteBwdKey) <c-h>
+	" imap <c-h> <plug>(MUcompleteCycBwd)
 endif
 
 if exists('g:loaded_qlist')
@@ -78,4 +95,8 @@ if exists('g:loaded_signify')
   xmap ih <plug>(signify-motion-inner-visual)
   omap ah <plug>(signify-motion-outer-pending)
   xmap ah <plug>(signify-motion-outer-visual)
+endif
+
+if exists('g:loaded_endwise')
+  nmap o A<CR>
 endif
