@@ -12,3 +12,4 @@ en.utf-8.add.spl
 .pytest-cache
 build
 .coverage*
+vim/.vim/pack/remote/*
