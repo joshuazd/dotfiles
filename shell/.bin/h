@@ -55,4 +55,6 @@ case "$1" in
         ;;
 esac
 
+echo "heroku $c -a $env $postfix"
+
 heroku $c -a $env $postfix

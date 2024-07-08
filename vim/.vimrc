@@ -10,8 +10,58 @@ if has('win32')
   set packpath^=~/.vim
 endif
 
-py3 import sys
 execute 'command! '.(has('packages') ? '-complete=packadd' : '')." -nargs=1 -bang -bar Packadd call pack#add('<args>', '<bang>')"
+function! PackInit() abort
+  Packadd minpac
+
+  call minpac#init()
+  call minpac#add('k-takata/minpac', {'type': 'opt', 'do': {-> system('rm -rf .git .github .gitignore appveyor.yml')}})
+
+  call minpac#init({'package_name': 'remote'})
+
+  call minpac#add('lifepillar/vim-mucomplete')
+  call minpac#add('justinmk/vim-sneak')
+  call minpac#add('tpope/vim-dispatch')
+  call minpac#add('tpope/vim-surround')
+  call minpac#add('tpope/vim-repeat')
+  call minpac#add('tpope/vim-commentary')
+  call minpac#add('tpope/vim-apathy')
+  call minpac#add('tpope/vim-fugitive')
+  call minpac#add('tpope/vim-endwise')
+  call minpac#add('tpope/vim-rails')
+  call minpac#add('tpope/vim-dadbod')
+  call minpac#add('tpope/vim-projectionist')
+  call minpac#add('tpope/vim-vinegar')
+  call minpac#add('tpope/vim-bundler')
+  call minpac#add('vim-ruby/vim-ruby')
+  call minpac#add('tommcdo/vim-lion')
+  call minpac#add('romainl/vim-qf')
+  call minpac#add('romainl/vim-qlist')
+  call minpac#add('romainl/vim-cool')
+  call minpac#add('markonm/traces.vim')
+  call minpac#add('sgur/vim-editorconfig')
+  call minpac#add('natebosch/vim-lsc', {'type': 'opt'})
+  call minpac#add('junegunn/fzf', {'do': {-> system('./install --bin')}})
+  call minpac#add('junegunn/fzf.vim')
+  call minpac#add('ludovicchabant/vim-gutentags')
+  call minpac#add('SirVer/ultisnips', {'type': 'opt'})
+  call minpac#add('joukevandermaas/vim-ember-hbs')
+  call minpac#add('sunaku/vim-ruby-minitest')
+  call minpac#add('mhinz/vim-signify')
+  call minpac#add('dense-analysis/ale')
+  call minpac#add('vim-test/vim-test')
+  call minpac#add('kana/vim-textobj-user')
+  call minpac#add('tek/vim-textobj-ruby')
+  call minpac#add('github/copilot.vim')
+  call minpac#add('jparise/vim-graphql')
+  call minpac#add('hashivim/vim-terraform')
+endfunction
+
+command! PackUpdate call PackInit() | call minpac#update()
+command! PackClean call PackInit() | call minpac#clean()
+command! PackStatus Packadd minpac | call minpac#status()
+
+py3 import sys
 if has('pythonx')
   function! s:load_snippets() abort
     if filereadable($HOME.'/.vim/UltiSnips/'.&filetype.'.snippets') || isdirectory($HOME.'/.vim/UltiSnips/'.&filetype)
@@ -40,6 +90,7 @@ set breakindentopt+=shift:2
 set nrformats-=octal
 set ignorecase
 set smartcase
+set infercase
 set incsearch
 set hlsearch
 set lazyredraw
@@ -79,6 +130,7 @@ set wildignore+=*target/*,*bin/*,*build/*
 set wildignore+=tags,Session.vim,node_modules/*
 set foldmethod=marker
 set foldlevelstart=99
+set pumheight=15
 set complete-=i
 set mouse=nvi
 set ttymouse=sgr
@@ -145,7 +197,7 @@ if executable('rg')
   set grepprg=rg\ --vimgrep
   set grepformat=%f:%l:%c:%m
 elseif executable('ag')
-  set grepprg=ag\ --vimgrep
+  set grepprg=ag\ --vimgrep\ $*
   set grepformat=%f:%l:%c:%m
 endif
 
@@ -195,6 +247,9 @@ for char in [ '_', '.', ':', ',', ';', '<bar>', '/', '<bslash>', '*', '+', '%', 
   execute 'onoremap a' . char . ' :normal va' . char . '<CR>'
 endfor
 
+cnoreabbrev <expr> grep  (getcmdtype() ==# ':' && getcmdline() ==# 'grep')  ? 'Grep'  : 'grep'
+cnoreabbrev <expr> lgrep (getcmdtype() ==# ':' && getcmdline() ==# 'lgrep') ? 'LGrep' : 'lgrep'
+
 nnoremap gb :ls<CR>:b<space>
 nnoremap <Space>a :argadd **/*
 nnoremap <Space>ff :find<space>
@@ -212,6 +267,7 @@ nnoremap <Space>;r :%s/<C-r><C-w>//g<Left><Left>
 xnoremap <Space>;r "ay:<C-u>%s/\V<C-r>=substitute(escape(@a,'\\/'),'<C-v><C-@>','','')<CR>//g<Left><Left>
 nnoremap <Space>;s :call setqflist([])<bar>bufdo vimgrepadd  %<Left><Left>
 nnoremap <Space>gr :silent! grep!  <Bar> redraw! <Bar> cwindow<C-Left><C-Left><C-Left><C-Left><Left>
+nnoremap gr :Grep<Space>
 nnoremap <Esc>OA <Up>
 nnoremap <silent> <nowait> <Esc> :<C-u>nohlsearch<Bar>call popup_clear()<CR>
 
@@ -232,6 +288,11 @@ nnoremap [q :cprevious<CR>
 nnoremap [Q :cfirst<CR>
 nnoremap ]Q :clast<CR>
 nnoremap =q :cclose<CR>
+nnoremap ]l :lnext<CR>
+nnoremap [l :lprevious<CR>
+nnoremap [L :lfirst<CR>
+nnoremap ]L :llast<CR>
+nnoremap =l :lclose<CR>
 
 " make [d and ]d show declarations
 " nnoremap [d :let save=winsaveview()<CR>gD:nohlsearch<CR>md:call winrestview(save)<Bar>echo getline("'d")<CR>
@@ -249,10 +310,12 @@ cnoremap <expr> <S-Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>?<
 nnoremap <silent> <F5> :call vim#VimRefresh()<CR>
 nnoremap <silent> <F11> :call vim#Focus()<CR>
 nnoremap <silent> <Space>m :silent! make<Bar>cwindow<Bar>redraw!<CR>
+nnoremap <silent> <Space>m :silent! cgetexpr system(expandcmd(&makeprg))<CR>
 
 " better tag jumping
 nnoremap <C-]> g<C-]>
 xnoremap <C-]> g<C-]>
+" nnoremap <C-]> :tjump <C-r><C-w><Bar>call search('<C-r><C-w>')<CR>
 nnoremap <expr> <C-w><C-]> winnr('$') > 1
       \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
       \: ":vertical stjump \<C-r>\<C-w>\<CR>"
@@ -298,17 +361,21 @@ augroup vimrc
     autocmd InsertLeave      *            setl listchars+=trail:-
   endif
   autocmd User FugitiveObject             setl signcolumn=auto
-  autocmd User FugitiveObject             let &l:grepprg='git grep -n --no-color'
+  autocmd BufReadPost        *            if !empty(FugitiveGitDir()) | let &l:grepprg='git grep -n --no-color --untracked -I' | endif
         \| let &l:grepformat='%f:%l:%c:%m,%f:%l:%m,%m %f match%ts,%f'
   autocmd BufNewFile  */plugin/*.vim      0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
-  if exists('##TextYankPost') && executable('base64')
-    autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
-  endif
+  autocmd BufWinEnter        *            if &buftype=='quickfix' | setlocal wrap|nnoremap <buffer> gj gj|nnoremap <buffer> gk gk|nnoremap <buffer> j j|nnoremap <buffer> k k|endif
+  " if exists('##TextYankPost') && executable('base64')
+  "   autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
+  " endif
+  " autocmd FileType ruby                   let gemfile = findfile('Gemfile', '.;') | if !empty(gemfile) && filereadable(gemfile)
+  "       \| let g:lsc_server_commands['ruby'] = {'command':'bundle exec solargraph stdio','suppress_stderr': v:true } | endif
+  " autocmd FileType           *            if g:lsc_server_commands->keys()->index(&filetype) != -1 | let g:ale_disable_lsp = 1 | endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
-command! -range=% AnsibleEdit <line1>,<line2>yank a|silent! call ansible#AnsibleEdit()
-command! AnsibleCrypt call ansible#AnsibleEncrypt()
+" command! -range=% AnsibleEdit <line1>,<line2>yank a|silent! call ansible#AnsibleEdit()
+" command! AnsibleCrypt call ansible#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
 command! Focus call vim#Focus()
 command! -nargs=1 -complete=color Theme colo <args>|!jzd theme <args>
@@ -322,6 +389,9 @@ else
         \"import json, sys, collections; print json.dumps(json.load(sys.stdin,object_pairs_hook=collections.OrderedDict), indent=2)"
 endif
 command! -range=% Json2Yaml <line1>,<line2>!python3 -c "import sys,yaml,json;print(yaml.dump(json.loads(sys.stdin.read())))"
+command! -nargs=+ -complete=file_in_path -bar Grep  call grep#grep('cgetexpr', <f-args>)
+command! -nargs=+ -complete=file_in_path -bar LGrep call grep#grep('lgetexpr', <f-args>)
+command! -nargs=0 Pair call pair#pair()
 
 " }}}
 
@@ -368,13 +438,16 @@ let g:lsc_server_commands = {
         \ }
         \},
       \ 'javascript': 'typescript-language-server --stdio',
+      \ 'typescript': 'typescript-language-server --stdio',
+      \ 'typescriptreact': 'typescript-language-server --stdio',
       \ 'ruby': {
         \ 'command': 'solargraph stdio',
         \ 'suppress_stderr': v:true,
         \ 'message_hooks': {
         \   'initialized': function('<SID>lscStart'),
         \ }
-        \}
+        \},
+      \ 'python': 'pylsp'
       \}
 let g:lsc_auto_map = {
       \ 'GoToDefinition': 'gd',
@@ -397,17 +470,18 @@ let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
 " mucomplete
 " this is slow on cygwin
 let g:mucomplete#enable_auto_at_startup = !has('win32unix')
+let g:mucomplete#enable_auto_at_startup = 0
 let g:mucomplete#no_mappings            = 1
 let g:mucomplete#no_popup_mappings      = 1
 let g:mucomplete#always_use_completeopt = 1
 let g:mucomplete#chains                 = {
-      \ 'default'   : ['file', 'omni', 'ulti', 'dict', 'uspl', 'c-p'],
+      \ 'default'   : ['file', 'ulti', 'dict', 'uspl', 'c-p'],
       \ 'html'      : ['file', 'omni', 'ulti', 'keyp'],
       \ 'handlebars': ['file', 'omni', 'ulti', 'keyp'],
       \ 'html.handlebars': ['file', 'omni', 'ulti', 'keyp'],
       \ 'gitcommit' : ['tags', 'c-n'],
       \ 'java'      : ['omni', 'ulti', 'c-p',  'tags', 'file'],
-      \ 'ruby'      : ['ulti', 'omni', 'file', 'tags', 'c-p'],
+      \ 'ruby'      : ['omni', 'ulti', 'tags', 'c-p'],
       \ 'vim'       : ['file', 'ulti', 'cmd',  'c-p',  'tags'],
       \ 'xml'       : ['omni', 'ulti', 'tags', 'c-p'],
       \ 'sql'       : ['c-p',  'ulti', 'tags'],
@@ -446,6 +520,7 @@ let g:gutentags_ctags_exclude = split(&wildignore, ',')
 if has('win32')
   let g:gutentags_ctags_extra_args=['--options=%HOME%\.ctags']
 endif
+let g:gutentags_enabled = 0
 let g:todo_words = [['TODO', '|', 'DONE'], ['ASSIGNED', 'DEVELOP', 'TESTING', '|', 'READY', 'COMPLETE']]
 if executable('python3')
   let g:python_executable = 'python3'
@@ -454,19 +529,67 @@ endif
 " ALE
 let g:ale_fix_on_save = 1
 let g:ale_lint_on_text_changed = 'normal'
-let g:ale_hover_to_floating_preview = 1
+let g:ale_lint_on_insert_leave = 1
+let g:ale_lint_on_enter = 0
+let g:ale_lint_on_filetype_changed = 1
+" let g:ale_hover_to_floating_preview = 1
+let g:ale_open_list = 1
 let g:ale_floating_window_border = ['', '', '', '', '', '', '', '']
 let g:ale_floating_preview_popup_opts = {'borderchars': [' '], 'close': 'none'}
+let g:ale_virtualtext_cursor = 0
+let g:ale_sign_warning = '━'
+let g:ale_ruby_rubocop_executable = 'bundle'
+let g:ale_ruby_standardrb_executable = 'bundle'
+" signify
+let g:signify_sign_add               = '│'
+let g:signify_sign_delete            = '▁'
+let g:signify_sign_delete_first_line = '▔'
+let g:signify_sign_change            = '│'
+let g:signify_sign_add    = '▊'  " U+258A LEFT THREE QUARTERS BLOCK (1 cell)
+let g:signify_sign_change = '██' " U+2588 FULL BLOCK x2 (2 cells)
+let g:signify_sign_change_delete     = g:signify_sign_change . g:signify_sign_delete_first_line
+
 " FZF
 let g:fzf_files_options = ['--preview', 'fzf_preview {} 2>/dev/null']
 let g:fzf_buffers_options = ['--preview', 'fzf_preview {2} 2>/dev/null']
 let g:fzf_preview_window = ['right,50%,<90(down,50%)', 'ctrl-/']
+" let g:fzf_layout = {'window': {'width': 0.85, 'height': 0.85, 'border': 'rounded'}}
 " vim-test
 let test#strategy = 'dispatch'
 let g:test#ruby#minitest#executable = 'm'
 
+let g:ruby_indent_assignment_style = 'variable'
+
+function! s:hi(group, target) abort
+  if &t_Co >= 256 || has('gui_running')
+    let italic = 1
+  else
+    let italic = 0
+  endif
+  let target_id = synIDtrans(hlID(a:target))
+  let t_fg = synIDattr(target_id, 'fg', 'cterm')
+  let t_bg = synIDattr(target_id, 'bg', 'cterm')
+  let t_fmt = synIDattr(target_id, 'reverse', 'cterm') ? 'reverse,' : ''
+  let g_fg = synIDattr(target_id, 'fg', 'gui')
+  let g_bg = synIDattr(target_id, 'bg', 'gui')
+  let g_fmt = synIDattr(target_id, 'reverse', 'gui') ? 'reverse,' : ''
+  let sign_column = synIDtrans(hlID('SignColumn'))
+  let t_bg = synIDattr(sign_column, 'bg', 'cterm')
+  let g_bg = synIDattr(sign_column, 'bg', 'gui')
+  let Syn = {x -> len(x) ? x : 'NONE'}
+  execute 'highlight ' . a:group . ' ctermfg=' . Syn(t_fg) . ' ctermbg=' . Syn(t_bg) .
+        \ ' guifg=' . Syn(g_fg) . ' guibg=' . Syn(g_bg) .
+        \ ' cterm=' . Syn(t_fmt) . ' gui=' . Syn(g_fmt)
+endfunction
 function! s:hl() abort
   hi link lscDiagnosticWarning WarningMsg
+  call s:hi('SignifySignAdd', 'DiffAdd')
+  call s:hi('SignifySignChange', 'DiffChange')
+  call s:hi('SignifySignChangeDelete', 'SignifySignChange')
+  call s:hi('SignifySignDelete', 'DiffDelete')
+  call s:hi('SignifySignDeleteFirstLine', 'SignifySignDelete')
+  call s:hi('ALEWarningSign', 'Todo')
+  call s:hi('ALEErrorSign', 'Error')
 endfunction
 call <SID>hl()
 augroup custom_hi
@@ -475,60 +598,3 @@ augroup custom_hi
 augroup END
 " }}}
 
-fu s:snr() abort
-    return matchstr(expand('<sfile>'), '.*\zs<SNR>\d\+_')
-endfu
-let s:snr = get(s:, 'snr', s:snr())
-let g:fzf_layout = {'window': {'width': 0.85, 'height': 0.85, 'border': 'rounded'}}
-
-inoremap <expr> <c-j> complete#fzf_tags()
-
-fu s:fzf_window(width, height, border_highlight) abort
-    let width = float2nr(&columns * a:width)
-    let height = float2nr(&lines * a:height)
-    let row = float2nr((&lines - height) / 2)
-    let col = float2nr((&columns - width) / 2)
-    let top = '┌' . repeat('─', width - 2) . '┐'
-    let mid = '│' . repeat(' ', width - 2) . '│'
-    let bot = '└' . repeat('─', width - 2) . '┘'
-    let border = [top] + repeat([mid], height - 2) + [bot]
-    let frame = s:create_popup_window(a:border_highlight, {
-        \ 'line': row,
-        \ 'col': col,
-        \ 'width': width,
-        \ 'height': height,
-        \ 'is_frame': 1,
-        \ })
-    call setbufline(frame, 1, border)
-    call s:create_popup_window('Normal', {
-        \ 'line': row + 1,
-        \ 'col': col + 2,
-        \ 'width': width - 4,
-        \ 'height': height - 2,
-        \ })
-endfu
-
-fu s:create_popup_window(hl, opts) abort
-    if has_key(a:opts, 'is_frame')
-        let id = popup_create('', {
-            \ 'line': a:opts.line,
-            \ 'col': a:opts.col,
-            \ 'minwidth': a:opts.width,
-            \ 'minheight': a:opts.height,
-            \ 'zindex': 50,
-            \ })
-        call setwinvar(id, '&wincolor', a:hl)
-        exe 'au BufWipeout * ++once call popup_close('.id.')'
-        return winbufnr(id)
-    else
-        let buf = term_start(&shell, {'hidden': 1})
-        call popup_create(buf, {
-            \ 'line': a:opts.line,
-            \ 'col': a:opts.col,
-            \ 'minwidth': a:opts.width,
-            \ 'minheight': a:opts.height,
-            \ 'zindex': 51,
-            \ })
-        exe 'au BufWipeout * ++once bw! '.buf
-    endif
-endfu

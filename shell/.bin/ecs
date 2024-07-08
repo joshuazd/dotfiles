@@ -1,0 +1,55 @@
+#!/bin/sh
+
+# Usage: ecs [environment] [command]
+# Example: ecs staging run rails c
+
+
+[ "$#" -lt 2 ] && echo "At least 2 arguments required" && exit 1
+
+AURORA_ENV="$1"
+case "$AURORA_ENV" in
+  staging)
+    ECS_CLUSTER=staging
+    ;;
+  production)
+    ECS_CLUSTER=production
+    ;;
+  alpha)
+    ECS_CLUSTER=alpha
+    ;;
+  beta)
+    ECS_CLUSTER=alpha
+    ;;
+  gamma)
+    ECS_CLUSTER=alpha
+    ;;
+  delta)
+    ECS_CLUSTER=alpha
+    ;;
+  *)
+    echo "Invalid environment"
+    exit 1
+    ;;
+esac
+
+shift
+command="$1"
+shift
+args="$*"
+
+case "$command" in
+  run)
+    AURORA_CONTAINER="worker"
+    ;;
+  restart)
+    AURORA_CONTAINER="web"
+    ;;
+  *)
+    echo "Unknown command"
+    exit 1
+    ;;
+esac
+
+echo "aurora-aws-cli -p be-$ECS_CLUSTER services:$command $args -s backend-$AURORA_ENV-$AURORA_CONTAINER"
+
+aurora-aws-cli -p be-$ECS_CLUSTER services:$command $args -s backend-$AURORA_ENV-$AURORA_CONTAINER

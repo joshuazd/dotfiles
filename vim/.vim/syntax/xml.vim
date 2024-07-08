@@ -195,11 +195,11 @@ else
 
 
 
-  syn include @xmlJavaScript syntax/javascript.vim
-  unlet! b:current_syntax
+  " syn include @xmlJavaScript syntax/javascript.vim
+  " unlet! b:current_syntax
 
-  syn include @xmlGroovy syntax/groovy.vim
-  unlet! b:current_syntax
+  " syn include @xmlGroovy syntax/groovy.vim
+  " unlet! b:current_syntax
 
   syn match   xmlScriptTag    +<script\s\+language="[a-z]*"\s*>+ contains=xmlTag,xmlTagName,xmlAttrib,xmlEqual,xmlOperator,xmlString,xmlNamespace,xmlAttribPunct,@xmlStartTagHook contained
   syn match   xmlEndScriptTag +</script>+         contains=xmlTag,xmlEndTag,xmlTagName,xmlNamespace,@xmlTagHook contained
@@ -218,17 +218,17 @@ else
         \ matchgroup=xmlTagPunct end=+>+
         \ contains=xmlError,xmlNamespace,xmlAttribPunct,@xmlTagHook
 
-  syn region xmlJavaScriptRegion
-        \ start=+<script language="js">+
-        \ keepend
-        \ end=+</script>+
-        \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataCdata,xmlCdataEnd,@xmlJavaScript
+  " syn region xmlJavaScriptRegion
+  "       \ start=+<script language="js">+
+  "       \ keepend
+  "       \ end=+</script>+
+  "       \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataCdata,xmlCdataEnd,@xmlJavaScript
 
-  syn region xmlGroovyRegion
-        \ start=+<script language="groovy">+
-        \ keepend
-        \ end=+</script>+
-        \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataCdata,xmlCdataEnd,@xmlGroovy
+  " syn region xmlGroovyRegion
+  "       \ start=+<script language="groovy">+
+  "       \ keepend
+  "       \ end=+</script>+
+  "       \ contains=xmlScriptTag,xmlEndScriptTag,xmlCdataStart,xmlCdataCdata,xmlCdataEnd,@xmlGroovy
 
 endif
 

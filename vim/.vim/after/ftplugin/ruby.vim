@@ -42,60 +42,50 @@ if match(expand('%:.'), '^\/Users\/jzinkduda\/\.rbenv') != -1
   silent! ALEDisableBuffer
 endif
 
-setlocal tags+=$HOME/.rbenv/versions/3.1.3/lib/ruby/gems/3.1.0/gems/tags
+setlocal tags+=$HOME/.rbenv/versions/3.1.4/lib/ruby/gems/3.1.0/gems/tags
 setlocal foldmethod=indent
 setlocal suffixesadd+=.html.erb
 setlocal iskeyword+=!,?
-setlocal path=,,
-setlocal path+=engines/web/app/controllers/web/api
-setlocal path+=engines/web/app/controllers/web
-setlocal path+=engines/api/app/controllers/api/v202209
-setlocal path+=engines/business_models/app/models
-setlocal path+=engines/business_models/app/services
-setlocal path+=engines/business_models/app/services/business_models
-setlocal path+=engines/web/app/services
-setlocal path+=engines/web/app/services/web
-setlocal path+=engines/api/app/services
-setlocal path+=engines/api/app/services/api
-setlocal path+=engines/business_models/lib/utilities
+
+if !exists('g:rails_engine_paths')
+  let eng_path = expand('~/backend/engines')
+  let g:rails_engine_paths = ',,'
+  for folder in ['lib','app/models','app/controllers/**','app/models','app/mailers',
+        \'app/helpers','app/views','app/services','app/workers','app/serializers',
+        \'test/functional/**','test/controllers/**','test/helpers','test/mailers','test/unit',
+        \'test/workers','test/serializers','test/integration']
+      let full_path = eng_path.'/'.'*'.'/'.folder
+      " if isdirectory(full_path)
+      let g:rails_engine_paths ..= full_path.','
+
+      let full_path = expand('~/backend/packs').'/*/'.folder
+
+      let g:rails_engine_paths ..= full_path.','
+      " endif
+      " if isdirectory(full_path.'/'.engine)
+      "   let g:rails_engine_paths ..= full_path.'/'.engine.','
+      " endif
+    " endfor
+  endfor
+endif
+setlocal path-=**
+exec 'setlocal path^='.g:rails_engine_paths
 let b:dispatch='bundle exec standardrb --format emacs --no-color %:S'
 let b:ale_fixers = ['standardrb', 'rubocop', 'trim_whitespace']
-let b:ale_linters = ['brakeman', 'cspell', 'debride', 'rails_best_practices', 'reek', 'ruby', 'solargraph', 'sorbet', 'standardrb']
+let b:ale_linters = ['cspell', 'debride', 'rails_best_practices', 'reek', 'ruby', 'solargraph', 'sorbet', 'standardrb']
+let b:copilot_workspace_folders =
+  \ ['~/backend', '~/backend/engines/web', '~/backend/engines/api', '~/backend/engines/business_models', '~/backend/engines/credit_adapter/', '~/backend/engines/snowflake_client/']
 
 " let b:endstart = '\(^\|\n\)\(.*=\)\?\s*\%(private\s\+\|protected\s\+\|public\s\+\|module_function\s\+\)*\zs\%(module\|class\|def\|if\|unless\|case\|while\|until\|for\|begin\)\>\%(.*[^.:@$]\<end\>\)\@!\|\<do\ze\%(\s*|.*|\)\=\s*'
 let b:endstart = '\(^\|\n\)\(.*=\)\?\s*\%(private\s\+\|protected\s\+\|public\s\+\|module_function\s\+\)*\zs\%(module\|class\|def\|if\|unless\|case\|while\|until\|for\|begin\)\>\|\<do\ze\%(\s*|.*|\)\=\s*'
 let b:endend = '\(^\|\n\)\s*\zsend\ze\s*'
 let b:funcstart = '\(^\|\n\)\(.*=\)\?\s*\%(private\s\+\|protected\s\+\|public\s\+\|module_function\s\+\)*\%(module\|class\|def\|\)\>\s*\zs[A-Za-z0-9_.?]*\ze'
 
-function! ruby#run_command_in_engine(command) abort
-  let cwd = getcwd()
-  exec 'cd '.matchstr(expand('%:.'), '^engines/\w\+')
-  exec a:command
-  exec 'cd '.cwd
-endfunction
-
 command! TN call ruby#run_command_in_engine('TestNearest')
 command! TF call ruby#run_command_in_engine('TestFile')
 
-function! ruby#FindFunc() abort
-  " find most recent function
-  let function_line = search(b:funcstart, 'bnWc')
-  let [bufnum, lnum, col, off] = getpos('.')
-  let search_range = join(getline(function_line, lnum - 1), "\n")
-  let starts = []
-  let ends = []
-  call substitute(search_range, b:endstart, '\=add(starts, submatch(0))', 'g')
-  call substitute(search_range, b:endend, '\=add(ends, submatch(0))', 'g')
-  if len(starts) > len(ends)
-    " inside the function
-    let name = matchstr(getline(function_line), b:funcstart)
-    return (name !=? '' ? ' ' . name : '')
-  else
-    return ''
-  endif
-endfunction
-
-nnoremap <buffer> <Space>p obinding.pry<Esc>
+nnoremap <buffer> <Space>b obinding.pry<Esc>
+nnoremap <buffer> <Space>B Obinding.pry<Esc>
 
 " if &l:statusline !~# '\V%{ruby#FindFunc()}'
 "   setlocal statusline+=%{ruby#FindFunc()}

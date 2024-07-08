@@ -41,6 +41,8 @@ PACKAGES = [
     'vim-test/vim-test',
     'kana/vim-textobj-user',
     'tek/vim-textobj-ruby',
+    'github/copilot.vim',
+    'jparise/vim-graphql',
 ]
 
 HOOKS = {

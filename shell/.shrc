@@ -4,6 +4,8 @@ case "$TERM" in
     xterm*|*rxvt*) TERM=xterm-256color
 esac
 
+[ -f "${HOME}/.secrets" ] && source ~/.secrets
+
 CDPATH=.:~/projects
 
 ANSIBLE_VAULT_PASSWORD_FILE=~/.vault_pass.txt
@@ -12,9 +14,11 @@ RIPGREP_CONFIG_PATH=~/.ripgrep
 
 KEYTIMEOUT=1
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export GPG_TTY=$(tty)
+
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 if [ "$(uname -s)" = "Linux" ]; then
 eval $(dircolors "$HOME/.dir_colors")
@@ -91,4 +95,6 @@ export FZF_DEFAULT_COMMAND FZF_CTRL_T_COMMAND FZF_ALT_C_COMMAND
 
 # _gen_fzf_default_opts
 
+
+export AWS_PROFILE="fe-alpha"
 
