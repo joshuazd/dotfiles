@@ -1,6 +1,9 @@
 
 PATH=/usr/local/opt/make/libexec/gnubin:/usr/local/opt/grep/libexec/gnubin:/usr/local/opt/postgresql@14/bin:$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH:/snap/bin
 PATH=/Users/jzinkduda/Library/Python/3.9/bin:$PATH
+PATH=/opt/homebrew/bin:$PATH
+PATH=/opt/homebrew/opt/grep/libexec/gnubin:$PATH
+PATH=/opt/homebrew/opt/make/libexec/gnubin:$PATH
 LANG=en_US.UTF-8
 export PATH LANG
 

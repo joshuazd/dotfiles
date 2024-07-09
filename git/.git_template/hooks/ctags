@@ -5,4 +5,5 @@ trap 'rm -f "$$.tags"' EXIT
 git ls-files | \
   ctags --tag-relative -L - -f"$$.tags"
 mv "$$.tags" "tags"
-sed -i '' 's#^\([^	][^	]*\)\(	..*\)\(\1\)\(.*\)$#\1\2\\zs\3\4#g' "tags"
+sed -i.bak -e 's#^\([^	][^	]*\)\(	..*\)\(\1\)\(.*\)$#\1\2\\zs\3\4#g' "tags"
+rm "tags.bak"

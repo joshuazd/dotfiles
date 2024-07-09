@@ -41,7 +41,7 @@ function! PackInit() abort
   call minpac#add('markonm/traces.vim')
   call minpac#add('sgur/vim-editorconfig')
   call minpac#add('natebosch/vim-lsc', {'type': 'opt'})
-  call minpac#add('junegunn/fzf', {'do': {-> system('./install --bin')}})
+  call minpac#add('junegunn/fzf', {'do': {-> system('./install --all')}})
   call minpac#add('junegunn/fzf.vim')
   call minpac#add('ludovicchabant/vim-gutentags')
   call minpac#add('SirVer/ultisnips', {'type': 'opt'})

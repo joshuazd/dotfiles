@@ -201,4 +201,25 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#6b7895'
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=magenta'
 alias hp_development='HP_AWS_ACCESS_KEY_ID=`security find-generic-password -w -s hushpuppy_development_ro_api_key_id -a jzinkduda` HP_AWS_SECRET_ACCESS_KEY=`security find-generic-password -w -s hushpuppy_development_ro_api_key_secret -a jzinkduda` CONFIG_NAME=Development'
 alias hp_test='HP_AWS_ACCESS_KEY_ID=`security find-generic-password -w -s hushpuppy_test_rw_api_key_id -a jzinkduda` HP_AWS_SECRET_ACCESS_KEY=`security find-generic-password -w -s hushpuppy_test_rw_api_key_secret -a jzinkduda` CONFIG_NAME=Test'
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# FNM (node version management and autoload)
+eval "$(fnm env)"
+
+FNM_USING_LOCAL_VERSION=0
+FNM_VERSION_FILE_STRATEGY=recursive
+
+autoload -U add-zsh-hook
+_fnm_autoload_hook () {
+  if [[ -f .nvmrc && -r .nvmrc || -f .node-version && -r .node-version ]]; then
+    FNM_USING_LOCAL_VERSION=1
+    fnm use --install-if-missing
+  elif [ $FNM_USING_LOCAL_VERSION -eq 1 ]; then
+    FNM_USING_LOCAL_VERSION=0
+    fnm use default --install-if-missing
+  fi
+}
+
+add-zsh-hook chpwd _fnm_autoload_hook \
+    && _fnm_autoload_hook
+
