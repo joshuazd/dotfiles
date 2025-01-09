@@ -8,6 +8,7 @@
     status = true
 [push]
     default = simple
+	autoSetupRemote = true
 [grep]
     lineNumber = true
 [core]

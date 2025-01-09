@@ -20,7 +20,7 @@ endif
 
 setlocal path-=**
 setlocal foldmethod=indent
-setlocal keywordprg=pydoc3
+" setlocal keywordprg=pydoc3
 setlocal makeprg=flake8\ %:S
 setlocal errorformat=%f:%l:%c:\ %t%n\ %m
 setlocal formatprg=autopep8\ -a\ -a\ -
@@ -34,7 +34,7 @@ setlocal foldnestmax=4
 "     endif
 " augroup END
 " let b:ale_linters = ['pylsp']
-let b:ale_fixers = ['autopep8', 'autoimport']
+let b:ale_fixers = ['autopep8', 'autoimport', 'isort']
 
 " ipython setup {{{
 

@@ -33,6 +33,7 @@ function! PackInit() abort
   call minpac#add('tpope/vim-projectionist')
   call minpac#add('tpope/vim-vinegar')
   call minpac#add('tpope/vim-bundler')
+  call minpac#add('tpope/vim-rhubarb')
   call minpac#add('vim-ruby/vim-ruby')
   call minpac#add('tommcdo/vim-lion')
   call minpac#add('romainl/vim-qf')
@@ -225,6 +226,8 @@ nnoremap [b :bprevious<CR>
 nnoremap ]b :bnext<CR>
 nnoremap <BS> <C-^>g`"
 nnoremap <silent> <Space>x :bn<Bar>bd #<CR>
+nnoremap [t :tabNext<CR>
+nnoremap ]t :tabprevious<CR>
 
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
@@ -255,7 +258,7 @@ nnoremap <Space>a :argadd **/*
 nnoremap <Space>ff :find<space>
 nnoremap <Space>fs :sfind<space>
 nnoremap <Space>fv :vert sfind<space>
-nnoremap <Space>e :e <C-r>=fnameescape(expand('%:p:h'))<CR>/<C-z>
+nnoremap <Space>e :e <C-r>=fnameescape(expand('%:h'))<CR>/<C-z>
 nnoremap <Space>t :tjump /
 
 nnoremap <Space>;l :set colorcolumn=
@@ -447,7 +450,27 @@ let g:lsc_server_commands = {
         \   'initialized': function('<SID>lscStart'),
         \ }
         \},
-      \ 'python': 'pylsp'
+      \ 'python': {
+      \   'command': 'pylsp',
+      \   'workspace_config': {
+      \     'pylsp': {
+      \       'plugins': {
+      \         'pycodestyle': {
+      \           'enabled': v:false
+      \         },
+      \         'mccabe': {
+      \           'enabled': v:false
+      \         },
+      \         'pyflakes': {
+      \           'enabled': v:false
+      \         },
+      \         'flake8': {
+      \           'enabled': v:true
+      \         },
+      \       }
+      \     }
+      \   }
+      \ }
       \}
 let g:lsc_auto_map = {
       \ 'GoToDefinition': 'gd',

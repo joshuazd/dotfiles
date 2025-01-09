@@ -31,7 +31,7 @@ syn match pythonBrackets "{\|}" skipwhite display
 
 syn keyword pythonSelf class nextgroup=pythonClass skipwhite
 syn match pythonClass "\%(\%(class\s\)\s*\)\@<=\h\%(\w\|\.\)*" contained nextgroup=pythonClassVars
-" syn match pythonClass "\%(\%(class\s\)\s*\)\zs\h\%(\w\|\.\)*" contained nextgroup=pythonClassVars
+syn match pythonClass "\%(\%(class\s\)\s*\)\zs\h\%(\w\|\.\)*" contained nextgroup=pythonClassVars
 syn region pythonClassVars matchgroup=pythonBrackets start="(" end=")" contained contains=pythonClassParameters transparent keepend
 syn match pythonClassParameters "[^,\*]*" contained contains=pythonBuiltinObj,pythonBuiltinType,pythonExtraOperator,pythonStatement,pythonBrackets,pythonString,pythonComment skipwhite
 
@@ -67,8 +67,8 @@ syn keyword pythonSelf self cls
 
 " Groups {{{
 
-" syn region pythonGroup matchgroup=pythonBrackets start="(" end=")" contains=pythonGroupParam
-" syn match pythonGroupParam "[^)]*" contained contains=pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonItemAccess skipwhite
+syn region pythonGroup matchgroup=pythonBrackets start="(" end=")" contains=pythonGroupParam
+syn match pythonGroupParam "[^)]*" contained contains=pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,pythonFunctionCall,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonList,pythonGroup,pythonItemAccess skipwhite
 
 " }}}
 
@@ -76,7 +76,7 @@ syn keyword pythonSelf self cls
 
 syn match pythonFunctionCall "\h\w*\ze(" contains=@pythonBuiltinFuncC nextgroup=pythonFuncParams
 syn cluster pythonBuiltinFuncC add=pythonBuiltinFunc,pythonPrint,pythonMagic
-syn region pythonFuncParams matchgroup=pythonBrackets start="(" end=")" extend contained contains=pythonFuncParam,pythonPunct
+syn region pythonFuncParams matchgroup=pythonBrackets start="(" end=")" contained contains=pythonFuncParam,pythonPunct
 " syn match pythonKeywordParam "\(=\s*\)\@<=\h\w*" contained
 syn match pythonKeywordParam "\(=\s*\)\zs\h\w*" contained
 syn match pythonFuncParam "[^,)]*" contained contains=pythonKeywordParam,pythonList,pythonBrackets,pythonItemAccess,pythonKeyword,pythonPunct,pythonOperator,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonConstant,pythonGroup,pythonString,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall,pythonIdentifier,pythonGroup,pythonDict skipwhite
@@ -90,7 +90,7 @@ syn match pythonFunction "\h\w*" contains=@pythonFuncC nextgroup=pythonVars cont
 syn cluster pythonFuncC add=pythonMagic
 syn region pythonVars matchgroup=pythonBrackets start="(" skip=+\(".*"\|'.*'\)+ end=")" contained contains=pythonParameters,pythonPunct keepend
 syn match pythonParameters "[^,]*" contained contains=pythonParam skipwhite
-syn match pythonParam "[^, ]*" contained contains=pythonPunct,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonItemAccess,pythonConstant,pythonString,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField,pythonFunctionCall skipwhite
+syn match pythonParam "[^, ]*" contained contains=pythonPunct,pythonExtraOperator,pythonLambdaExpr,pythonBuiltinObj,pythonBuiltinType,pythonItemAccess,pythonConstant,pythonString,@pythonNumber,pythonSelf,pythonDot,pythonComment,pythonField skipwhite
 
 " }}}
 
@@ -317,7 +317,7 @@ hi link  pythonParam        Identifier
 hi link  pythonBrackets     Delimiter
 hi link  pythonClassParameters Normal
 hi link  pythonSelf         Identifier
-hi link  pythonSelf         Special
+hi link  pythonSelf         Primitive
 
 hi link  pythonMagic        Special
 
@@ -383,7 +383,7 @@ augroup pythonHighlight
 augroup END
 highlight pythonField ctermfg=245 guifg=#8a8a8a
 
-hi link  pythonExClass      Type
+hi link  pythonExClass      Class
 hi link  pythonJedi         Type
 hi link  pythonPunct        Delimiter
 " hi link  pythonIdentifier   Identifier

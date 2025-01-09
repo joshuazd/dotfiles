@@ -1,5 +1,14 @@
 function! pair#pair() abort
-  setglobal number
-  setglobal cursorline
-  set number cursorline
+  let l:pair = get(g:, 'pair', v:false)
+  if !l:pair
+    bufdo setglobal number
+    bufdo setglobal cursorline
+    bufdo set number cursorline
+    let g:pair = v:true
+  else
+    bufdo setglobal nonumber
+    bufdo setglobal nocursorline
+    bufdo set nonumber nocursorline
+    let g:pair = v:false
+  endif
 endfunction

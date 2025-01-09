@@ -12,8 +12,61 @@ _git_prompt_info() {
   echo -n ']%f'
 }
 
+_ruby_prompt() {
+    ruby_version=$(rbenv version-name)
+
+    [[ -z $ruby_version || "${ruby_version}" == "system" ]] && return
+
+    [[ "${ruby_version}" =~ ^[0-9].+$ ]] && ruby_version="v${ruby_version}"
+
+    echo -n "%F{red}💎 ${ruby_version}%f "
+}
+
+_python_prompt() {
+    local py_version
+
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        py_version=${(@)$(python -V 2>&1)[2]}
+    fi
+
+    [[ -z $py_version ]] && return
+
+    echo -n "%F{yellow}🐍 ${py_version}%f "
+}
+
+_venv_prompt() {
+    [ -n "$VIRTUAL_ENV" ] || return
+
+    VENV_NAME="${(A)=VENV_NAME=virtualenv venv .venv}"
+
+    local venv
+
+    if [[ "${VENV_NAME[(i)$VIRTUAL_ENV:t]}" -le "${#VENV_NAME}" ]]; then
+        venv="$VIRTUAL_ENV:h:t"
+    else
+        venv="$VIRTUAL_ENV:t"
+    fi
+
+    echo -n "%F{blue}${venv}%f "
+}
+
+
+_node_prompt() {
+    local node_version
+
+    node_version=$(fnm current 2>/dev/null)
+
+    default_version="v20.15.1"
+
+    [[ $node_version == "system" || $node_version == $default_version || $node_version == "node" ]] && return
+
+    echo -n "%F{green}⬢ ${node_version}%f "
+}
+
+export VIRTUAL_ENV_DISABLE_PROMPT=1
 # PROMPT=" %F{234}%~%f\$(_git_prompt_info) %F{%(?.234.red)}%(!.#.>)%f "
-PROMPT=" %F{111}%~%f\$(_git_prompt_info) %F{%(?.222.red)}%(!.#.$)%f "
+PROMPT=" %F{111}%~%f\$(_git_prompt_info) \$(_ruby_prompt)\$(_python_prompt)\$(_venv_prompt)\$(_node_prompt)
+%F{%(?.222.red)}%(!.#.$)%f "
 setopt promptsubst
 
 # Options
@@ -213,10 +266,10 @@ autoload -U add-zsh-hook
 _fnm_autoload_hook () {
   if [[ -f .nvmrc && -r .nvmrc || -f .node-version && -r .node-version ]]; then
     FNM_USING_LOCAL_VERSION=1
-    fnm use --install-if-missing
+    fnm use --install-if-missing >/dev/null
   elif [ $FNM_USING_LOCAL_VERSION -eq 1 ]; then
     FNM_USING_LOCAL_VERSION=0
-    fnm use default --install-if-missing
+    fnm use default --install-if-missing >/dev/null
   fi
 }
 
