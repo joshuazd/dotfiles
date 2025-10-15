@@ -53,9 +53,10 @@ function! PackInit() abort
   call minpac#add('vim-test/vim-test')
   call minpac#add('kana/vim-textobj-user')
   call minpac#add('tek/vim-textobj-ruby')
-  call minpac#add('github/copilot.vim')
+  call minpac#add('github/copilot.vim', {'type': 'opt'})
   call minpac#add('jparise/vim-graphql')
   call minpac#add('hashivim/vim-terraform')
+  call minpac#add('ap/vim-css-color')
 endfunction
 
 command! PackUpdate call PackInit() | call minpac#update()

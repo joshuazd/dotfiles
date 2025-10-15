@@ -58,7 +58,7 @@ _node_prompt() {
 
     default_version="v20.15.1"
 
-    [[ $node_version == "system" || $node_version == $default_version || $node_version == "node" ]] && return
+    [[ $node_version == "system" || $node_version == $default_version || $node_version == "node" || $node_version == "none" ]] && return
 
     echo -n "%F{green}⬢ ${node_version}%f "
 }
@@ -276,3 +276,7 @@ _fnm_autoload_hook () {
 add-zsh-hook chpwd _fnm_autoload_hook \
     && _fnm_autoload_hook
 
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"

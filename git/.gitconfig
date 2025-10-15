@@ -17,9 +17,8 @@
 	conflicts = diff --name-only --diff-filter=U
 	ctags = !.git/hooks/ctags
 [user]
-	email = jzinkduda@aurorasolar.com
+	email = zinkdudajoshua@gmail.com
 	name = joshuazd
-	signingKey = 6297145E
 [pull]
 	rebase = false
 [init]
