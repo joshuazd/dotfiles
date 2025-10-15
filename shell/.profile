@@ -7,6 +7,7 @@ PATH=/opt/homebrew/bin:$PATH
 PATH=/opt/homebrew/opt/grep/libexec/gnubin:$PATH
 PATH=/opt/homebrew/opt/make/libexec/gnubin:$PATH
 PATH=/Library/TeX/texbin:$PATH
+PATH=$HOME/.rbenv/bin:$PATH
 LANG=en_US.UTF-8
 export PATH LANG
 

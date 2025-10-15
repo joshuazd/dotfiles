@@ -13,7 +13,8 @@ _git_prompt_info() {
 }
 
 _ruby_prompt() {
-    ruby_version=$(rbenv version-name)
+
+    [ -x "$(command -v rbenv)" ] && ruby_version=$(rbenv version-name)
 
     [[ -z $ruby_version || "${ruby_version}" == "system" ]] && return
 
@@ -257,7 +258,7 @@ alias hp_test='HP_AWS_ACCESS_KEY_ID=`security find-generic-password -w -s hushpu
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # FNM (node version management and autoload)
-eval "$(fnm env)"
+[ -x "$(command -v fnm)" ] && eval "$(fnm env)"
 
 FNM_USING_LOCAL_VERSION=0
 FNM_VERSION_FILE_STRATEGY=recursive
