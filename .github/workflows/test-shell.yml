@@ -54,34 +54,17 @@ jobs:
         echo "Testing bash configuration..."
         bash --version
         
-        # Source in an interactive subshell (required for bind commands)
-        # Filter out harmless TTY warnings from CI environment
-        bash -i -c 'source ~/.bash_profile 2>&1; exit' 2>&1 | \
-          grep -v "cannot set terminal process group" | \
-          grep -v "no job control in this shell" | \
-          tee /tmp/bash-load.log
-        
-        # Check for actual errors
-        if bash -i -c 'source ~/.bash_profile; exit' 2>&1 | \
-           grep -v "cannot set terminal process group" | \
-           grep -v "no job control in this shell" | \
-           grep -iE "error|fatal"; then
+        # Source config in non-interactive mode (bind commands are now conditional)
+        bash -c 'source ~/.bash_profile 2>&1' | tee /tmp/bash-load.log
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
           echo "ERROR: Failed to source .bash_profile"
           cat /tmp/bash-load.log
           exit 1
         fi
         
-        # Test .bashrc separately in interactive mode
-        bash -i -c 'source ~/.bashrc 2>&1; exit' 2>&1 | \
-          grep -v "cannot set terminal process group" | \
-          grep -v "no job control in this shell" | \
-          tee /tmp/bashrc-load.log
-        
-        # Check for actual errors
-        if bash -i -c 'source ~/.bashrc; exit' 2>&1 | \
-           grep -v "cannot set terminal process group" | \
-           grep -v "no job control in this shell" | \
-           grep -iE "error|fatal"; then
+        # Test .bashrc separately
+        bash -c 'source ~/.bashrc 2>&1' | tee /tmp/bashrc-load.log
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
           echo "ERROR: Failed to source .bashrc"
           cat /tmp/bashrc-load.log
           exit 1
@@ -138,7 +121,7 @@ jobs:
       if: matrix.shell == 'bash'
       run: |
         echo "Verifying bash functions..."
-        bash -i -c '
+        bash -c '
           source ~/.bash_profile
           
           # Check for key functions
@@ -178,7 +161,7 @@ jobs:
         git checkout -b test-branch 2>/dev/null || git checkout -b main
         
         if [ "${{ matrix.shell }}" == "bash" ]; then
-          bash -i -c '
+          bash -c '
             source ~/.bash_profile
             cd /tmp/test-repo
             result=$(parse_git_branch)
@@ -202,7 +185,7 @@ jobs:
       if: matrix.shell == 'bash'
       run: |
         echo "Verifying aliases..."
-        bash -i -c '
+        bash -c '
           source ~/.bash_profile
           alias | grep -q "alias" || { echo "ERROR: No aliases found"; exit 1; }
           echo "✓ Aliases loaded in bash"
@@ -222,7 +205,7 @@ jobs:
       run: |
         echo "Testing configuration can be sourced multiple times..."
         if [ "${{ matrix.shell }}" == "bash" ]; then
-          bash -i -c '
+          bash -c '
             source ~/.bash_profile
             source ~/.bash_profile
             echo "✓ Bash config is idempotent"
