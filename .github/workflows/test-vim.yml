@@ -35,7 +35,7 @@ jobs:
     - name: Test vimrc loads without errors
       run: |
         vim --version
-        vim -u ~/.vimrc -c 'quit' 2>&1 | tee /tmp/vim-load.log
+        vim -N -u ~/.vimrc -c 'quit' 2>&1 | tee /tmp/vim-load.log
         if grep -i "error" /tmp/vim-load.log; then
           echo "ERROR: Vim configuration has errors"
           exit 1
