@@ -298,11 +298,6 @@ nnoremap [L :lfirst<CR>
 nnoremap ]L :llast<CR>
 nnoremap =l :lclose<CR>
 
-" make [d and ]d show declarations
-" nnoremap [d :let save=winsaveview()<CR>gD:nohlsearch<CR>md:call winrestview(save)<Bar>echo getline("'d")<CR>
-" nnoremap ]d :let save=winsaveview()<CR>gd:nohlsearch<CR>md:call winrestview(save)<Bar>echo getline("'d")<CR>
-
-" nnoremap <silent> <Space>p p=']
 xnoremap <silent> p p:let @+=@0<CR>:let @"=@0<CR>:let @*=@0<CR>
 nnoremap <expr> <silent> zp putoperator#PutOperator()
 nmap <silent> zpp Vp
@@ -313,13 +308,11 @@ cnoremap <expr> <S-Tab> getcmdtype() ==? '/' \|\| getcmdtype() ==? '?' ? "<CR>?<
 
 nnoremap <silent> <F5> :call vim#VimRefresh()<CR>
 nnoremap <silent> <F11> :call vim#Focus()<CR>
-nnoremap <silent> <Space>m :silent! make<Bar>cwindow<Bar>redraw!<CR>
 nnoremap <silent> <Space>m :silent! cgetexpr system(expandcmd(&makeprg))<CR>
 
 " better tag jumping
 nnoremap <C-]> g<C-]>
 xnoremap <C-]> g<C-]>
-" nnoremap <C-]> :tjump <C-r><C-w><Bar>call search('<C-r><C-w>')<CR>
 nnoremap <expr> <C-w><C-]> winnr('$') > 1
       \? "\"ayiw\<C-w>p:tjump \<C-r>a\<CR>"
       \: ":vertical stjump \<C-r>\<C-w>\<CR>"
@@ -369,17 +362,9 @@ augroup vimrc
         \| let &l:grepformat='%f:%l:%c:%m,%f:%l:%m,%m %f match%ts,%f'
   autocmd BufNewFile  */plugin/*.vim      0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
   autocmd BufWinEnter        *            if &buftype=='quickfix' | setlocal wrap|nnoremap <buffer> gj gj|nnoremap <buffer> gk gk|nnoremap <buffer> j j|nnoremap <buffer> k k|endif
-  " if exists('##TextYankPost') && executable('base64')
-  "   autocmd TextYankPost     *            if v:event.operator ==# 'y' | silent! call clip#osc52() | endif
-  " endif
-  " autocmd FileType ruby                   let gemfile = findfile('Gemfile', '.;') | if !empty(gemfile) && filereadable(gemfile)
-  "       \| let g:lsc_server_commands['ruby'] = {'command':'bundle exec solargraph stdio','suppress_stderr': v:true } | endif
-  " autocmd FileType           *            if g:lsc_server_commands->keys()->index(&filetype) != -1 | let g:ale_disable_lsp = 1 | endif
 augroup END
 
 command! TrimWhiteSpace call whitespace#TrimWhiteSpace()
-" command! -range=% AnsibleEdit <line1>,<line2>yank a|silent! call ansible#AnsibleEdit()
-" command! AnsibleCrypt call ansible#AnsibleEncrypt()
 command! -nargs=1 Tabs setlocal tabstop=<args> softtabstop=<args> shiftwidth=<args>
 command! Focus call vim#Focus()
 command! -nargs=1 -complete=color Theme colo <args>|!jzd theme <args>
@@ -491,9 +476,7 @@ let g:lsc_auto_map = {
 let g:UltiSnipsListSnippets        = '<C-@>'
 let g:UltiSnipsJumpForwardTrigger  = "\<C-l>"
 let g:UltiSnipsJumpBackwardTrigger = "\<C-h>"
-" mucomplete
-" this is slow on cygwin
-let g:mucomplete#enable_auto_at_startup = !has('win32unix')
+" mucomplete - manual completion only
 let g:mucomplete#enable_auto_at_startup = 0
 let g:mucomplete#no_mappings            = 1
 let g:mucomplete#no_popup_mappings      = 1
@@ -556,21 +539,18 @@ let g:ale_lint_on_text_changed = 'normal'
 let g:ale_lint_on_insert_leave = 1
 let g:ale_lint_on_enter = 0
 let g:ale_lint_on_filetype_changed = 1
-" let g:ale_hover_to_floating_preview = 1
-" let g:ale_open_list = 1
 let g:ale_floating_window_border = ['', '', '', '', '', '', '', '']
 let g:ale_floating_preview_popup_opts = {'borderchars': [' '], 'close': 'none'}
 let g:ale_virtualtext_cursor = 0
 let g:ale_sign_warning = '━'
 let g:ale_ruby_rubocop_executable = 'bundle'
 let g:ale_ruby_standardrb_executable = 'bundle'
+
 " signify
-let g:signify_sign_add               = '│'
+let g:signify_sign_add               = '▊'  " U+258A LEFT THREE QUARTERS BLOCK
+let g:signify_sign_change            = '██' " U+2588 FULL BLOCK x2
 let g:signify_sign_delete            = '▁'
 let g:signify_sign_delete_first_line = '▔'
-let g:signify_sign_change            = '│'
-let g:signify_sign_add    = '▊'  " U+258A LEFT THREE QUARTERS BLOCK (1 cell)
-let g:signify_sign_change = '██' " U+2588 FULL BLOCK x2 (2 cells)
 let g:signify_sign_change_delete     = g:signify_sign_change . g:signify_sign_delete_first_line
 
 " FZF
