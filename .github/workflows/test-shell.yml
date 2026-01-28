@@ -37,6 +37,16 @@ jobs:
         ln -sf "$GITHUB_WORKSPACE/shell/.bash_profile" ~/.bash_profile
         ln -sf "$GITHUB_WORKSPACE/shell/.zshrc" ~/.zshrc
         ln -sf "$GITHUB_WORKSPACE/shell/.zprofile" ~/.zprofile
+        ln -sf "$GITHUB_WORKSPACE/config/.dir_colors" ~/.dir_colors
+        
+        # Create empty files for optional dependencies
+        touch ~/.secrets
+        touch ~/.fzf.bash
+        touch ~/.vault_pass.txt
+        touch ~/.ripgrep
+        
+        # Create directories that may be referenced
+        mkdir -p ~/.nvm
     
     - name: Test shell config loads (bash)
       if: matrix.shell == 'bash'
@@ -44,16 +54,16 @@ jobs:
         echo "Testing bash configuration..."
         bash --version
         
-        # Source in a subshell to avoid affecting the current environment
-        bash -c 'source ~/.bash_profile 2>&1' | tee /tmp/bash-load.log
+        # Source in an interactive subshell (required for bind commands)
+        bash -i -c 'source ~/.bash_profile 2>&1; exit' | tee /tmp/bash-load.log
         if [ ${PIPESTATUS[0]} -ne 0 ]; then
           echo "ERROR: Failed to source .bash_profile"
           cat /tmp/bash-load.log
           exit 1
         fi
         
-        # Test .bashrc separately
-        bash -c 'source ~/.bashrc 2>&1' | tee /tmp/bashrc-load.log
+        # Test .bashrc separately in interactive mode
+        bash -i -c 'source ~/.bashrc 2>&1; exit' | tee /tmp/bashrc-load.log
         if [ ${PIPESTATUS[0]} -ne 0 ]; then
           echo "ERROR: Failed to source .bashrc"
           cat /tmp/bashrc-load.log
@@ -111,7 +121,7 @@ jobs:
       if: matrix.shell == 'bash'
       run: |
         echo "Verifying bash functions..."
-        bash -c '
+        bash -i -c '
           source ~/.bash_profile
           
           # Check for key functions
@@ -151,7 +161,7 @@ jobs:
         git checkout -b test-branch 2>/dev/null || git checkout -b main
         
         if [ "${{ matrix.shell }}" == "bash" ]; then
-          bash -c '
+          bash -i -c '
             source ~/.bash_profile
             cd /tmp/test-repo
             result=$(parse_git_branch)
@@ -172,27 +182,30 @@ jobs:
         echo "✓ Prompt functions executed without errors"
     
     - name: Verify aliases load
+      if: matrix.shell == 'bash'
       run: |
         echo "Verifying aliases..."
-        if [ "${{ matrix.shell }}" == "bash" ]; then
-          bash -c '
-            source ~/.bash_profile
-            alias | grep -q "alias" || { echo "ERROR: No aliases found"; exit 1; }
-            echo "✓ Aliases loaded in bash"
-          '
-        else
-          zsh -c '
-            source ~/.zshrc
-            alias | grep -q "alias" || echo "WARNING: No aliases found (may be expected)"
-            echo "✓ Alias loading checked in zsh"
-          '
-        fi
+        bash -i -c '
+          source ~/.bash_profile
+          alias | grep -q "alias" || { echo "ERROR: No aliases found"; exit 1; }
+          echo "✓ Aliases loaded in bash"
+        '
+    
+    - name: Verify aliases load
+      if: matrix.shell == 'zsh'
+      run: |
+        echo "Verifying aliases..."
+        zsh -c '
+          source ~/.zshrc
+          alias | grep -q "alias" || echo "WARNING: No aliases found (may be expected)"
+          echo "✓ Alias loading checked in zsh"
+        '
     
     - name: Test configuration is idempotent
       run: |
         echo "Testing configuration can be sourced multiple times..."
         if [ "${{ matrix.shell }}" == "bash" ]; then
-          bash -c '
+          bash -i -c '
             source ~/.bash_profile
             source ~/.bash_profile
             echo "✓ Bash config is idempotent"
