@@ -15,8 +15,12 @@ shopt -s cdspell
  [[ -f /etc/bash_completion ]] && . /etc/bash_completion
 
 set -o vi
-bind -m vi-insert '"\C-p": previous-history'
-bind -m vi-insert '"\C-n": next-history'
+
+# Only run bind commands in proper interactive shells with job control
+if [[ $- == *i* ]] && [[ -t 0 ]]; then
+  bind -m vi-insert '"\C-p": previous-history' 2>/dev/null
+  bind -m vi-insert '"\C-n": next-history' 2>/dev/null
+fi
 
 # Load shared functions (includes parse_git_branch)
 [ -f "${HOME}/.functions" ] && source "${HOME}/.functions"

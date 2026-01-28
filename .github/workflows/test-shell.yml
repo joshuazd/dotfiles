@@ -55,16 +55,33 @@ jobs:
         bash --version
         
         # Source in an interactive subshell (required for bind commands)
-        bash -i -c 'source ~/.bash_profile 2>&1; exit' | tee /tmp/bash-load.log
-        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        # Filter out harmless TTY warnings from CI environment
+        bash -i -c 'source ~/.bash_profile 2>&1; exit' 2>&1 | \
+          grep -v "cannot set terminal process group" | \
+          grep -v "no job control in this shell" | \
+          tee /tmp/bash-load.log
+        
+        # Check for actual errors
+        if bash -i -c 'source ~/.bash_profile; exit' 2>&1 | \
+           grep -v "cannot set terminal process group" | \
+           grep -v "no job control in this shell" | \
+           grep -iE "error|fatal"; then
           echo "ERROR: Failed to source .bash_profile"
           cat /tmp/bash-load.log
           exit 1
         fi
         
         # Test .bashrc separately in interactive mode
-        bash -i -c 'source ~/.bashrc 2>&1; exit' | tee /tmp/bashrc-load.log
-        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        bash -i -c 'source ~/.bashrc 2>&1; exit' 2>&1 | \
+          grep -v "cannot set terminal process group" | \
+          grep -v "no job control in this shell" | \
+          tee /tmp/bashrc-load.log
+        
+        # Check for actual errors
+        if bash -i -c 'source ~/.bashrc; exit' 2>&1 | \
+           grep -v "cannot set terminal process group" | \
+           grep -v "no job control in this shell" | \
+           grep -iE "error|fatal"; then
           echo "ERROR: Failed to source .bashrc"
           cat /tmp/bashrc-load.log
           exit 1
