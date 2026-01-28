@@ -123,6 +123,7 @@ jobs:
         echo "Verifying bash functions..."
         bash -c '
           source ~/.bash_profile
+          source ~/.bashrc  # Explicitly source bashrc for non-interactive shells
           
           # Check for key functions
           declare -f parse_git_branch > /dev/null || { echo "ERROR: parse_git_branch not found"; exit 1; }
@@ -163,6 +164,7 @@ jobs:
         if [ "${{ matrix.shell }}" == "bash" ]; then
           bash -c '
             source ~/.bash_profile
+            source ~/.bashrc  # Explicitly source bashrc for non-interactive shells
             cd /tmp/test-repo
             result=$(parse_git_branch)
             echo "Git branch result: $result"
@@ -187,6 +189,7 @@ jobs:
         echo "Verifying aliases..."
         bash -c '
           source ~/.bash_profile
+          source ~/.bashrc  # Explicitly source bashrc for non-interactive shells
           alias | grep -q "alias" || { echo "ERROR: No aliases found"; exit 1; }
           echo "✓ Aliases loaded in bash"
         '
@@ -207,7 +210,9 @@ jobs:
         if [ "${{ matrix.shell }}" == "bash" ]; then
           bash -c '
             source ~/.bash_profile
+            source ~/.bashrc
             source ~/.bash_profile
+            source ~/.bashrc
             echo "✓ Bash config is idempotent"
           '
         else
