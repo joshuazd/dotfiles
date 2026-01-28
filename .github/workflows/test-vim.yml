@@ -45,9 +45,11 @@ jobs:
     - name: Check vimscript syntax
       run: |
         echo "Checking .vimrc syntax..."
-        vim -u NONE -c 'source ~/.vimrc' -c 'quit' 2>&1 | tee /tmp/vim-syntax.log
+        # Use -N for nocompatible mode to properly parse vimscript
+        vim -N -u NONE -c 'source ~/.vimrc' -c 'quit' 2>&1 | tee /tmp/vim-syntax.log
         if grep -iE "(error|E\d+:)" /tmp/vim-syntax.log; then
           echo "ERROR: Syntax errors found in .vimrc"
+          cat /tmp/vim-syntax.log
           exit 1
         fi
         echo "✓ .vimrc syntax is valid"
