@@ -82,18 +82,22 @@ jobs:
         zsh --version
         
         # Source in a subshell to avoid affecting the current environment
-        zsh -c 'source ~/.zprofile 2>&1' | tee /tmp/zsh-load.log
-        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        echo "Loading .zprofile..."
+        if ! zsh -c 'source ~/.zprofile' 2>&1 | tee /tmp/zsh-load.log; then
           echo "ERROR: Failed to source .zprofile"
+          echo "=== Error output ==="
           cat /tmp/zsh-load.log
           exit 1
         fi
         
         # Test .zshrc separately
-        zsh -c 'source ~/.zshrc 2>&1' | tee /tmp/zshrc-load.log
-        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+        echo "Loading .zshrc..."
+        if ! zsh -c 'source ~/.zshrc' 2>&1 | tee /tmp/zshrc-load.log; then
           echo "ERROR: Failed to source .zshrc"
+          echo "=== Error output ==="
           cat /tmp/zshrc-load.log
+          echo "=== Last 20 lines ==="
+          tail -20 /tmp/zshrc-load.log
           exit 1
         fi
         

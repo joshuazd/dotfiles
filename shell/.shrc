@@ -30,7 +30,7 @@ KEYTIMEOUT=1
 
 # Devpack and GPG
 export DEVPACK_SILENT=1
-export GPG_TTY=$(tty)
+export GPG_TTY=$(tty 2>/dev/null || echo "not a tty")
 
 ####################################
 # NODE VERSION MANAGER (NVM)
