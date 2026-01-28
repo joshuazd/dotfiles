@@ -95,8 +95,8 @@ setopt globcomplete
 setopt listpacked
 
 # Editing settings
-stty -ixon
-zmodload zsh/zle
+[[ -t 0 ]] && stty -ixon
+zmodload zsh/zle 2>/dev/null
 bindkey -v
 autoload zmv
 autoload -U edit-command-line
@@ -203,7 +203,7 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 zstyle ':completion:*:(rm|cp|kill|diff|scp):*' ignore-line yes
 # zstyle :compinstall filename '/home/vagrant/.zshrc'
 autoload -Uz compinit
-compinit
+compinit -i 2>/dev/null
 # plugins
 if [[ -n "$ZSH_CUSTOM" && -d "$ZSH_CUSTOM" ]]; then
   [[ -d "${ZSH_CUSTOM}/plugins/git" ]] && fpath=($fpath ${ZSH_CUSTOM}/plugins/git)
