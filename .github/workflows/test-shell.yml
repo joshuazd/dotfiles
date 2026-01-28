@@ -38,15 +38,18 @@ jobs:
         ln -sf "$GITHUB_WORKSPACE/shell/.zshrc" ~/.zshrc
         ln -sf "$GITHUB_WORKSPACE/shell/.zprofile" ~/.zprofile
         ln -sf "$GITHUB_WORKSPACE/config/.dir_colors" ~/.dir_colors
+        ln -sf "$GITHUB_WORKSPACE/shell/.zsh_custom" ~/.zsh_custom
         
         # Create empty files for optional dependencies
         touch ~/.secrets
         touch ~/.fzf.bash
+        touch ~/.fzf.zsh
         touch ~/.vault_pass.txt
         touch ~/.ripgrep
         
         # Create directories that may be referenced
         mkdir -p ~/.nvm
+        mkdir -p ~/.pyenv
     
     - name: Test shell config loads (bash)
       if: matrix.shell == 'bash'

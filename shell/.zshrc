@@ -205,14 +205,16 @@ zstyle ':completion:*:(rm|cp|kill|diff|scp):*' ignore-line yes
 autoload -Uz compinit
 compinit
 # plugins
-fpath=($fpath ${ZSH_CUSTOM}/plugins/git)
-source "${ZSH_CUSTOM}/plugins/git/git.plugin.zsh"
-source "${ZSH_CUSTOM}/my_scripts.zsh"
-source "${ZSH_CUSTOM}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
-source "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-source "${ZSH_CUSTOM}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+if [[ -n "$ZSH_CUSTOM" && -d "$ZSH_CUSTOM" ]]; then
+  [[ -d "${ZSH_CUSTOM}/plugins/git" ]] && fpath=($fpath ${ZSH_CUSTOM}/plugins/git)
+  [[ -f "${ZSH_CUSTOM}/plugins/git/git.plugin.zsh" ]] && source "${ZSH_CUSTOM}/plugins/git/git.plugin.zsh"
+  [[ -f "${ZSH_CUSTOM}/my_scripts.zsh" ]] && source "${ZSH_CUSTOM}/my_scripts.zsh"
+  [[ -f "${ZSH_CUSTOM}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && source "${ZSH_CUSTOM}/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  [[ -f "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && source "${ZSH_CUSTOM}/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  [[ -f "${ZSH_CUSTOM}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh" ]] && source "${ZSH_CUSTOM}/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+fi
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg=none,fg=magenta,bold'
-compdef sshrc=ssh
+(( $+commands[compdef] )) && compdef sshrc=ssh
 # fzf setup
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # history settings
@@ -230,7 +232,7 @@ setopt hist_ignore_all_dups
 setopt hist_ignore_space
 setopt hist_reduce_blanks
 
-compdef _jzd jzd
+(( $+commands[compdef] )) && compdef _jzd jzd
 
 _jzd() {
   local cmd=$(basename $words[1])
@@ -290,6 +292,6 @@ add-zsh-hook chpwd _fnm_autoload_hook \
 
 export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init - zsh)"
+[ -x "$(command -v pyenv)" ] && eval "$(pyenv init - zsh)"
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
-source /Users/joshua.zink-duda/.hunt-cli/autocomplete_zsh
+[ -f "$HOME/.hunt-cli/autocomplete_zsh" ] && source "$HOME/.hunt-cli/autocomplete_zsh"
