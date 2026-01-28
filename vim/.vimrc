@@ -53,7 +53,7 @@ function! PackInit() abort
   call minpac#add('vim-test/vim-test')
   call minpac#add('kana/vim-textobj-user')
   call minpac#add('tek/vim-textobj-ruby')
-  call minpac#add('github/copilot.vim', {'type': 'opt'})
+  call minpac#add('github/copilot.vim')
   call minpac#add('jparise/vim-graphql')
   call minpac#add('hashivim/vim-terraform')
   call minpac#add('ap/vim-css-color')
@@ -168,9 +168,9 @@ set completepopup+=border:off,align:menu
 
 if &termencoding ==# 'utf-8' || &encoding ==# 'utf-8'
   set fillchars=vert:│,diff:─
-  set listchars=tab:│\ ,trail:─,extends:→,nbsp:␣
+  set listchars=tab:│\ ,trail:─,extends:→,nbsp:␣,leadmultispace:│\ 
 else
-  set listchars=tab:\|\ ,trail:-,extends:>,nbsp:.
+  set listchars=tab:\|\ ,trail:-,extends:>,nbsp:.,leadmultispace:\|\ 
 endif
 set list
 
@@ -557,7 +557,7 @@ let g:ale_lint_on_insert_leave = 1
 let g:ale_lint_on_enter = 0
 let g:ale_lint_on_filetype_changed = 1
 " let g:ale_hover_to_floating_preview = 1
-let g:ale_open_list = 1
+" let g:ale_open_list = 1
 let g:ale_floating_window_border = ['', '', '', '', '', '', '', '']
 let g:ale_floating_preview_popup_opts = {'borderchars': [' '], 'close': 'none'}
 let g:ale_virtualtext_cursor = 0
@@ -581,6 +581,7 @@ let g:fzf_preview_window = ['right,50%,<90(down,50%)', 'ctrl-/']
 " vim-test
 let test#strategy = 'dispatch'
 let g:test#ruby#minitest#executable = 'm'
+let g:test#ruby#rspec#executable = 'bundle exec rspec --no-color --format failures'
 
 let g:ruby_indent_assignment_style = 'variable'
 
