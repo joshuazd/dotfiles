@@ -4,6 +4,7 @@
 #           LS ALIASES
 ####################################
 
+# Note: --color=auto works on GNU ls (Linux) and modern macOS with coreutils
 alias ls='ls --color=auto'
 alias ..="cd ..; ls"
 alias ...="cd ../..; ls"
@@ -29,7 +30,7 @@ alias grep='grep --color=auto --exclude-dir=.git'
 alias rg='rg -g ''!tags'''
 alias history='fc -il 1'
 alias md='mkdir -p'
-alias viesb='vi *_ESB/src/**/*.xml'
+alias viesb='vi *_ESB/src/**/*.xml'  # Edit ESB XML files
 
 ####################################
 #          RAILS ALIASES
@@ -45,37 +46,26 @@ alias mcar='cp "`/bin/ls -dtr1 *_Deployment/target/* | tail -1`" /mnt/h/car-file
 alias build='mvn install; mcar'
 
 ####################################
-#           VIM ALIASES
+#          VIM ALIASES
 ####################################
 
+# Standard vim invocation
 alias vi=vim
+
+# Vim maintenance
 alias vimup='vim +helptags\ ALL +PlugUpgrade +PlugUpdate'
+
+# Lightweight vim configurations (progressively smaller)
 alias cvi='vi -u ~/.vim/microvimrc --noplugin -N'
 alias e='vi --noplugin -Nu ~/.vim/microvimrc'
 alias mvi='vi --noplugin -Nu ~/.vim/minvimrc'
 alias nvi='vi --noplugin -Nu ~/.vim/nanovimrc'
+
+# Vim with quickfix from command history
 alias viq='vim -q <(fc -e -)'
+
+# Edit git conflict files
 alias vigc='vi `git conflicts`'
-
-####################################
-#         CYGWIN ALIASES
-####################################
-if [[ $(uname -s) == CYGWIN* ]]; then
-    alias home='cd /cygdrive/c/Users/jzinkduda'
-    alias documents='cd /cygdrive/c/Users/jzinkduda/Documents'
-    alias desktop='cd /cygdrive/c/Users/jzinkduda/Desktop'
-    alias downloads='cd /cygdrive/c/Users/jzinkduda/Downloads'
-    alias repo='cd /cygdrive/c/GITRepo'
-    alias apps='cd /cygdrive/c/apps'
-    alias promote='cd /cygdrive/i/Public/WSO2_ESBSetup/promote'
-
-    alias wls='cd /cygdrive/c/apps/wls12120/user_projects/domains/mydomain/servers/myserver/logs'
-    alias wso='cd /cygdrive/c/apps/wso2esb-5.0.0/bin'
-
-    alias esb='sh /cygdrive/c/apps/wso2esb-5.0.0/bin/wso2server.sh'
-    alias esblog='less +F /cygdrive/c/apps/wso2esb-5.0.0/repository/logs/wso2carbon.log'
-    alias subl='/cygdrive/c/Program\ Files/Sublime\ Text\ 3/subl.exe'
-fi
 
 ####################################
 #          GIT ALIASES

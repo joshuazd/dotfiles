@@ -1,18 +1,22 @@
+####################################
+# ZSH PROFILE - LOGIN SHELL
+####################################
+# Sourced by login zsh shells
+# Sources .profile for environment, then sets up zsh-specific tools
 
 . "$HOME/.profile"
 
-# Setting PATH for Python 2.7
-# The original version is saved in .zprofile.pysave
-# PATH="/Library/Frameworks/Python.framework/Versions/2.7/bin:${PATH}"
-# export PATH
-
-# Added by OrbStack: command-line tools and integration
-# source ~/.orbstack/shell/init.zsh 2>/dev/null || :
+# Homebrew environment (macOS)
 eval "$(/opt/homebrew/bin/brew shellenv)"
-eval $(/opt/homebrew/bin/brew shellenv)
+
+# Mise (polyglot runtime manager)
 eval "$(mise activate zsh)"
 
-# AWS vars - portal Makefile depends on these being set
+####################################
+# AWS CONFIGURATION
+####################################
+# Portal Makefile depends on these being set
+
 export AWS_PROFILE=joshua.zink-duda
 export AWS_VAULT_BACKEND=keychain
 export AWS_REGION=us-east-1

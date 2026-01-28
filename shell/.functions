@@ -1,0 +1,57 @@
+#!/bin/sh
+# Shell functions for both bash and zsh
+
+####################################
+# GIT PROMPT HELPERS
+####################################
+
+# Get current git branch (bash-compatible)
+parse_git_branch() {
+	BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
+	if [ ! "${BRANCH}" == "" ]
+	then
+		echo "[${BRANCH}] "
+	else
+		echo ""
+	fi
+}
+
+# Get current git branch (zsh-compatible)
+git_current_branch() {
+    local ref
+    ref=$(command git symbolic-ref --quiet HEAD 2> /dev/null)
+    local ret=$?
+    if [[ $ret != 0 ]]; then
+        [[ $ret == 128 ]] && return # no git repo
+        ref=$(command git rev-parse --short HEAD 2> /dev/null) || return
+    fi
+    echo "$ZSH_THEME_GIT_PROMPT_PREFIX${ref#refs/heads/}$ZSH_THEME_GIT_PROMPT_SUFFIX"
+}
+
+####################################
+# FZF GIT HELPERS
+####################################
+
+# Fuzzy git branch checkout
+fbr() {
+    local branches branch
+    branches=$(git branch -a) &&
+    branch=$(echo "$branches" | fzf +s +m -e) &&
+    git checkout $(echo "$branch" | sed "s:.* remotes/origin/::" | sed "s:.* ::")
+}
+
+# Fuzzy git checkout with preview
+fco_preview() {
+    local tags branches target
+    branches=$(
+        git --no-pager branch --all \
+            --format="%(if)%(HEAD)%(then)%(else)%(if:equals=HEAD)%(refname:strip=3)%(then)%(else)%1B[0;34;1mbranch%09%1B[m%(refname:short)%(end)%(end)" \
+        | sed '/^$/d') || return
+    tags=$(
+        git --no-pager tag | awk '{print "\x1b[35;1mtag\x1b[m\t" $1}') || return
+    target=$(
+        (echo "$branches"; echo "$tags") |
+        fzf --no-hscroll --no-multi -n 2 \
+            --ansi --preview="git --no-pager log -150 --pretty=format:%s '..{2}'") || return
+    git checkout $(awk '{print $2}' <<<"$target" )
+}

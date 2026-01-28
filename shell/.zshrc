@@ -1,3 +1,8 @@
+####################################
+# ZSH CONFIGURATION
+####################################
+# Sources: .zprofile → .profile → .shrc → .zshrc
+# This file contains zsh-specific settings
 
 . "$HOME/.shrc"
 

@@ -1,3 +1,8 @@
+####################################
+# BASH CONFIGURATION
+####################################
+# Sources: .bash_profile → .profile → .shrc → .bashrc
+# This file contains bash-specific settings
 
 . "$HOME/.shrc" 2>/dev/null
 
@@ -13,42 +18,8 @@ set -o vi
 bind -m vi-insert '"\C-p": previous-history'
 bind -m vi-insert '"\C-n": next-history'
 
-_git_prompt_info() {
-    sym=$(command git symbolic-ref HEAD 2> /dev/null)
-    rev=$(command git rev-parse HEAD 2> /dev/null)
-    ref=${sym#refs/heads/} || \
-      ref=${rev[1][1,7]} || \
-      return 0
-      if [ -n "$ref" ]; then
-          echo -n " ["
-          echo -n $ref
-          echo -n "]"
-      fi
-}
-
-# _build_prompt() {
-#     # ret=$([ $? -eq 0 ] && echo '93' || echo '31')
-#     # prompt="\e[94m$(dirs +0)\e[m\e["
-#     prompt="$(dirs +0)"
-#     # case "$TERM" in
-#     #     *-256color) prompt+='38;5;242' ;;
-#     #     *)          prompt+='91'       ;;
-#     # esac
-#     # prompt+="m$(_git_prompt_info)\e["$ret"m $\e[m"
-#     prompt+=" $"
-#     echo -ne " "$prompt" "
-# }
-
-# get current branch in git repo
-function parse_git_branch() {
-	BRANCH=`git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'`
-	if [ ! "${BRANCH}" == "" ]
-	then
-		echo "[${BRANCH}] "
-	else
-		echo ""
-	fi
-}
+# Load shared functions (includes parse_git_branch)
+[ -f "${HOME}/.functions" ] && source "${HOME}/.functions"
 
 function _prompt_symbol() {
     RETVAL=$?
@@ -72,6 +43,6 @@ PROMPT_COMMAND=_build_prompt
 # Aliases
 [ -f "${HOME}/.aliases" ] && source "${HOME}/.aliases"
 
-[ -x "$(command -v rbenv)" ] && eval "$(rbenv init - zsh)"
+[ -x "$(command -v rbenv)" ] && eval "$(rbenv init - bash)"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash

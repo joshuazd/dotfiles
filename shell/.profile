@@ -1,19 +1,56 @@
+####################################
+# PROFILE - LOGIN SHELL CONFIG
+####################################
+# Sourced by login shells (.bash_profile, .zprofile)
+# Sets up PATH and environment variables
 
-PATH=/usr/local/opt/make/libexec/gnubin:/usr/local/opt/grep/libexec/gnubin:/usr/local/opt/postgresql@14/bin:$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH:/snap/bin
-PATH=/Users/jzinkduda/Library/Python/3.9/bin:$PATH
-# PATH=/Users/jzinkduda/Library/Python/3.13/bin:$PATH
-# PATH=/opt/homebrew/opt/python@3.13/libexec/bin:$PATH
+####################################
+# PATH CONFIGURATION
+####################################
+
+# Homebrew
 PATH=/opt/homebrew/bin:$PATH
 PATH=/opt/homebrew/opt/grep/libexec/gnubin:$PATH
 PATH=/opt/homebrew/opt/make/libexec/gnubin:$PATH
+PATH=/opt/homebrew/opt/postgresql@16/bin:$PATH
+
+# GNU tools (Linux fallback)
+PATH=/usr/local/opt/make/libexec/gnubin:$PATH
+PATH=/usr/local/opt/grep/libexec/gnubin:$PATH
+PATH=/usr/local/opt/postgresql@14/bin:$PATH
+
+# User binaries
+PATH=$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH
+
+# System paths
+PATH=$PATH:/snap/bin
 PATH=/Library/TeX/texbin:$PATH
+
+# Python
+PATH=/Users/jzinkduda/Library/Python/3.9/bin:$PATH
+
+# Ruby
 PATH=$HOME/.rbenv/bin:$PATH
+
+export PATH
+####################################
+# LOCALE
+####################################
+
 LANG=en_US.UTF-8
-export PATH LANG
+export LANG
+
+####################################
+# EDITOR SETTINGS
+####################################
 
 EDITOR=vim\ --noplugin\ -Nu\ ~/.vim/nanovimrc
 VISUAL=$EDITOR
 export EDITOR VISUAL
+
+####################################
+# HISTORY SETTINGS
+####################################
 
 HISTIGNORE="&:ls:l:[bf]g:exit:reset:clear:cd:cd ..:cd.:zh"
 HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
@@ -22,6 +59,11 @@ HISTFILE=~/.history
 SAVEHIST=5000
 export HISTIGNORE HISTCONTROL HISTSIZE HISTFILE SAVEHIST
 
+####################################
+# SHELL ENVIRONMENT
+####################################
+
+# Note: JAVA_HOME paths may need updating based on your Java installation
 # JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
 JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-amd64/"
 export JAVA_HOME
@@ -32,6 +74,11 @@ TMUX_CUSTOM=$HOME/.tmux_custom
 SHELL=/bin/zsh
 TZ='America/Chicago'
 export WORDCHARS ZSH_CUSTOM TMUX_CUSTOM SHELL TZ
+
+####################################
+# FZF COLOR SCHEMES
+####################################
+# Function to set FZF colors - call with theme name (nier, nord, or default)
 
 _gen_fzf_default_opts() {
 
@@ -117,5 +164,5 @@ _gen_fzf_default_opts() {
     export FZF_DEFAULT_OPTS FZF_CTRL_R_OPTS FZF_CTRL_T_OPTS FZF_ALT_C_OPTS
 }
 
+# Initialize FZF with nord theme
 _gen_fzf_default_opts nord
-
