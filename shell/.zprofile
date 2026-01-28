@@ -7,10 +7,10 @@
 . "$HOME/.profile"
 
 # Homebrew environment (macOS)
-eval "$(/opt/homebrew/bin/brew shellenv)"
+[ -x /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Mise (polyglot runtime manager)
-eval "$(mise activate zsh)"
+[ -x "$(command -v mise)" ] && eval "$(mise activate zsh)"
 
 ####################################
 # AWS CONFIGURATION
