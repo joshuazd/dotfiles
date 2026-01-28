@@ -14,6 +14,8 @@ RIPGREP_CONFIG_PATH=~/.ripgrep
 
 KEYTIMEOUT=1
 
+export DEVPACK_SILENT=1
+
 export GPG_TTY=$(tty)
 
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
@@ -95,6 +97,4 @@ export FZF_DEFAULT_COMMAND FZF_CTRL_T_COMMAND FZF_ALT_C_COMMAND
 
 # _gen_fzf_default_opts
 
-
-export AWS_PROFILE="fe-alpha"
 

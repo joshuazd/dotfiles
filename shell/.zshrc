@@ -14,9 +14,15 @@ _git_prompt_info() {
 
 _ruby_prompt() {
 
-    [ -x "$(command -v rbenv)" ] && ruby_version=$(rbenv version-name)
+    # [ -x "$(command -v rbenv)" ] && ruby_version=$(rbenv version-name)
 
-    [[ -z $ruby_version || "${ruby_version}" == "system" ]] && return
+    # [[ -z $ruby_version || "${ruby_version}" == "system" ]] && return
+    
+    [ -x "$(command -v ruby)" ] && ruby_version=$(ruby --version | awk '{print $2}')
+
+    [ -x "$(command -v ruby)" ] && ruby_bin=$(which ruby)
+
+    [[ -z $ruby_version || "${ruby_bin}" == "/usr/bin/ruby" ]] && return
 
     [[ "${ruby_version}" =~ ^[0-9].+$ ]] && ruby_version="v${ruby_version}"
 
@@ -281,3 +287,4 @@ export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+source /Users/joshua.zink-duda/.hunt-cli/autocomplete_zsh

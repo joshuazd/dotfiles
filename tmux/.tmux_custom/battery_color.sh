@@ -5,7 +5,7 @@ CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 battery_color_fg() {
 	percentage=$($CURRENT_DIR/battery_percentage.sh | sed -e 's/%//')
     if [ $percentage -eq 100 ]; then
-        printf '#[fg=colour62]'
+        printf '#[fg=colour70]'
     elif [ $percentage -le 99 -a $percentage -ge 60 ]; then
         printf '#[fg=colour83]'
     elif [ $percentage -le 59 -a $percentage -ge 30 ]; then
