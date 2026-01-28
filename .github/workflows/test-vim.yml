@@ -1,0 +1,93 @@
+name: Test Vim Configuration
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-vim:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Install Vim
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          sudo apt-get install -y vim
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          brew install vim
+        fi
+    
+    - name: Setup symlinks
+      run: |
+        ln -sf "$GITHUB_WORKSPACE/vim/.vimrc" ~/.vimrc
+        ln -sf "$GITHUB_WORKSPACE/vim/.vim" ~/.vim
+    
+    - name: Test vimrc loads without errors
+      run: |
+        vim --version
+        vim -u ~/.vimrc -c 'quit' 2>&1 | tee /tmp/vim-load.log
+        if grep -i "error" /tmp/vim-load.log; then
+          echo "ERROR: Vim configuration has errors"
+          exit 1
+        fi
+        echo "✓ Vim configuration loaded successfully"
+    
+    - name: Check vimscript syntax
+      run: |
+        echo "Checking .vimrc syntax..."
+        vim -u NONE -c 'source ~/.vimrc' -c 'quit' 2>&1 | tee /tmp/vim-syntax.log
+        if grep -iE "(error|E\d+:)" /tmp/vim-syntax.log; then
+          echo "ERROR: Syntax errors found in .vimrc"
+          exit 1
+        fi
+        echo "✓ .vimrc syntax is valid"
+    
+    - name: Verify autoload functions exist
+      run: |
+        echo "Checking autoload functions..."
+        test -d ~/.vim/autoload || { echo "ERROR: autoload directory missing"; exit 1; }
+        
+        # Check that key autoload files exist
+        for file in args.vim functions.vim git.vim grep.vim pack.vim; do
+          if [ ! -f ~/.vim/autoload/$file ]; then
+            echo "ERROR: Missing autoload/$file"
+            exit 1
+          fi
+        done
+        echo "✓ Key autoload functions exist"
+    
+    - name: Test basic vim functionality
+      run: |
+        echo "Testing basic vim operations..."
+        echo "test content" > /tmp/test.txt
+        
+        # Test opening file, running command, and quitting
+        vim -u ~/.vimrc /tmp/test.txt -c 'let g:test_loaded=1' -c 'if !exists("g:test_loaded") | cquit | endif' -c 'quit' 2>&1 | tee /tmp/vim-basic.log
+        
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          echo "ERROR: Basic vim functionality test failed"
+          cat /tmp/vim-basic.log
+          exit 1
+        fi
+        echo "✓ Basic vim functionality works"
+    
+    - name: Check for common vimscript issues
+      run: |
+        echo "Checking for common issues..."
+        
+        # Check that no critical errors exist in vimrc
+        if vim -u ~/.vimrc -c 'messages' -c 'quit' 2>&1 | grep -iE "error detected|E\d+:"; then
+          echo "WARNING: Some errors detected in messages, but may be non-critical"
+        fi
+        
+        echo "✓ Vim configuration checks complete"

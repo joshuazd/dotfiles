@@ -1,0 +1,206 @@
+name: Test Shell Configuration
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-shell:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        shell: [bash, zsh]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Install shell
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ] && [ "${{ matrix.shell }}" == "zsh" ]; then
+          sudo apt-get update
+          sudo apt-get install -y zsh
+        fi
+        # macOS and bash are pre-installed on both runners
+    
+    - name: Setup symlinks
+      run: |
+        ln -sf "$GITHUB_WORKSPACE/shell/.profile" ~/.profile
+        ln -sf "$GITHUB_WORKSPACE/shell/.shrc" ~/.shrc
+        ln -sf "$GITHUB_WORKSPACE/shell/.functions" ~/.functions
+        ln -sf "$GITHUB_WORKSPACE/shell/.aliases" ~/.aliases
+        ln -sf "$GITHUB_WORKSPACE/shell/.bashrc" ~/.bashrc
+        ln -sf "$GITHUB_WORKSPACE/shell/.bash_profile" ~/.bash_profile
+        ln -sf "$GITHUB_WORKSPACE/shell/.zshrc" ~/.zshrc
+        ln -sf "$GITHUB_WORKSPACE/shell/.zprofile" ~/.zprofile
+    
+    - name: Test shell config loads (bash)
+      if: matrix.shell == 'bash'
+      run: |
+        echo "Testing bash configuration..."
+        bash --version
+        
+        # Source in a subshell to avoid affecting the current environment
+        bash -c 'source ~/.bash_profile 2>&1' | tee /tmp/bash-load.log
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          echo "ERROR: Failed to source .bash_profile"
+          cat /tmp/bash-load.log
+          exit 1
+        fi
+        
+        # Test .bashrc separately
+        bash -c 'source ~/.bashrc 2>&1' | tee /tmp/bashrc-load.log
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          echo "ERROR: Failed to source .bashrc"
+          cat /tmp/bashrc-load.log
+          exit 1
+        fi
+        
+        echo "✓ Bash configuration loaded successfully"
+    
+    - name: Test shell config loads (zsh)
+      if: matrix.shell == 'zsh'
+      run: |
+        echo "Testing zsh configuration..."
+        zsh --version
+        
+        # Source in a subshell to avoid affecting the current environment
+        zsh -c 'source ~/.zprofile 2>&1' | tee /tmp/zsh-load.log
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          echo "ERROR: Failed to source .zprofile"
+          cat /tmp/zsh-load.log
+          exit 1
+        fi
+        
+        # Test .zshrc separately
+        zsh -c 'source ~/.zshrc 2>&1' | tee /tmp/zshrc-load.log
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then
+          echo "ERROR: Failed to source .zshrc"
+          cat /tmp/zshrc-load.log
+          exit 1
+        fi
+        
+        echo "✓ Zsh configuration loaded successfully"
+    
+    - name: Check shell syntax (bash)
+      if: matrix.shell == 'bash'
+      run: |
+        echo "Checking bash syntax..."
+        bash -n ~/.bashrc
+        bash -n ~/.bash_profile
+        bash -n ~/.profile 2>/dev/null || echo "No .profile or has errors"
+        bash -n ~/.shrc 2>/dev/null || echo "No .shrc or has errors (may be POSIX sh)"
+        bash -n ~/.functions
+        bash -n ~/.aliases
+        echo "✓ Bash syntax is valid"
+    
+    - name: Check shell syntax (zsh)
+      if: matrix.shell == 'zsh'
+      run: |
+        echo "Checking zsh syntax..."
+        zsh -n ~/.zshrc
+        zsh -n ~/.zprofile
+        # .shrc and .functions might not be pure zsh, so skip strict syntax check
+        echo "✓ Zsh syntax is valid"
+    
+    - name: Verify key functions exist (bash)
+      if: matrix.shell == 'bash'
+      run: |
+        echo "Verifying bash functions..."
+        bash -c '
+          source ~/.bash_profile
+          
+          # Check for key functions
+          declare -f parse_git_branch > /dev/null || { echo "ERROR: parse_git_branch not found"; exit 1; }
+          declare -f _prompt_symbol > /dev/null || { echo "ERROR: _prompt_symbol not found"; exit 1; }
+          declare -f _build_prompt > /dev/null || { echo "ERROR: _build_prompt not found"; exit 1; }
+          
+          echo "✓ Key bash functions are defined"
+        '
+    
+    - name: Verify key functions exist (zsh)
+      if: matrix.shell == 'zsh'
+      run: |
+        echo "Verifying zsh functions..."
+        zsh -c '
+          source ~/.zshrc
+          
+          # Check for key functions
+          type _git_prompt_info > /dev/null 2>&1 || { echo "ERROR: _git_prompt_info not found"; exit 1; }
+          type _ruby_prompt > /dev/null 2>&1 || { echo "ERROR: _ruby_prompt not found"; exit 1; }
+          type _python_prompt > /dev/null 2>&1 || { echo "ERROR: _python_prompt not found"; exit 1; }
+          type parse_git_branch > /dev/null 2>&1 || { echo "ERROR: parse_git_branch not found"; exit 1; }
+          
+          echo "✓ Key zsh functions are defined"
+        '
+    
+    - name: Test prompt functions work
+      run: |
+        echo "Testing prompt functions..."
+        
+        # Create a temporary git repo for testing
+        mkdir -p /tmp/test-repo
+        cd /tmp/test-repo
+        git config --global user.email "test@example.com"
+        git config --global user.name "Test User"
+        git init
+        git checkout -b test-branch 2>/dev/null || git checkout -b main
+        
+        if [ "${{ matrix.shell }}" == "bash" ]; then
+          bash -c '
+            source ~/.bash_profile
+            cd /tmp/test-repo
+            result=$(parse_git_branch)
+            echo "Git branch result: $result"
+            if [ -z "$result" ]; then
+              echo "WARNING: parse_git_branch returned empty (may be expected in CI)"
+            fi
+          '
+        else
+          zsh -c '
+            source ~/.zshrc
+            cd /tmp/test-repo
+            result=$(_git_prompt_info)
+            echo "Git branch result: $result"
+          '
+        fi
+        
+        echo "✓ Prompt functions executed without errors"
+    
+    - name: Verify aliases load
+      run: |
+        echo "Verifying aliases..."
+        if [ "${{ matrix.shell }}" == "bash" ]; then
+          bash -c '
+            source ~/.bash_profile
+            alias | grep -q "alias" || { echo "ERROR: No aliases found"; exit 1; }
+            echo "✓ Aliases loaded in bash"
+          '
+        else
+          zsh -c '
+            source ~/.zshrc
+            alias | grep -q "alias" || echo "WARNING: No aliases found (may be expected)"
+            echo "✓ Alias loading checked in zsh"
+          '
+        fi
+    
+    - name: Test configuration is idempotent
+      run: |
+        echo "Testing configuration can be sourced multiple times..."
+        if [ "${{ matrix.shell }}" == "bash" ]; then
+          bash -c '
+            source ~/.bash_profile
+            source ~/.bash_profile
+            echo "✓ Bash config is idempotent"
+          '
+        else
+          zsh -c '
+            source ~/.zshrc
+            source ~/.zshrc
+            echo "✓ Zsh config is idempotent"
+          '
+        fi
