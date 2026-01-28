@@ -74,7 +74,7 @@ jobs:
         echo "test content" > /tmp/test.txt
         
         # Test opening file, running command, and quitting
-        vim -u ~/.vimrc /tmp/test.txt -c 'let g:test_loaded=1' -c 'if !exists("g:test_loaded") | cquit | endif' -c 'quit' 2>&1 | tee /tmp/vim-basic.log
+        vim -N -u ~/.vimrc /tmp/test.txt -c 'let g:test_loaded=1' -c 'if !exists("g:test_loaded") | cquit | endif' -c 'quit' 2>&1 | tee /tmp/vim-basic.log
         
         if [ ${PIPESTATUS[0]} -ne 0 ]; then
           echo "ERROR: Basic vim functionality test failed"
@@ -88,7 +88,7 @@ jobs:
         echo "Checking for common issues..."
         
         # Check that no critical errors exist in vimrc
-        if vim -u ~/.vimrc -c 'messages' -c 'quit' 2>&1 | grep -iE "error detected|E\d+:"; then
+        if vim -N -u ~/.vimrc -c 'messages' -c 'quit' 2>&1 | grep -iE "error detected|E\d+:"; then
           echo "WARNING: Some errors detected in messages, but may be non-critical"
         fi
         
