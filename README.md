@@ -41,13 +41,15 @@ See [vim/README.md](vim/README.md) for detailed documentation.
 
 ```bash
 # macOS
-brew install vim git tmux
+brew install vim git tmux stow
 
 # Ubuntu/Debian
-sudo apt-get install vim git tmux
+sudo apt-get install vim git tmux stow
 ```
 
-### Basic Setup
+### Using GNU Stow
+
+This repository is organized for use with [GNU Stow](https://www.gnu.org/software/stow/), which creates symlinks automatically.
 
 1. Clone the repository:
 ```bash
@@ -55,44 +57,25 @@ git clone https://github.com/joshuazd/dotfiles.git ~/.dotfiles
 cd ~/.dotfiles
 ```
 
-2. Create symbolic links for the configurations you want:
+2. Use stow to install configurations:
 
-**Vim:**
 ```bash
-ln -sf ~/.dotfiles/vim/.vimrc ~/.vimrc
-ln -sf ~/.dotfiles/vim/.vim ~/.vim
+# Install all configurations
+stow vim shell tmux git config
+
+# Or install individual configurations
+stow vim     # Installs vim configuration
+stow shell   # Installs shell configuration
+stow tmux    # Installs tmux configuration
+stow git     # Installs git configuration
 ```
 
-**Shell (Bash):**
+3. To uninstall a configuration:
 ```bash
-ln -sf ~/.dotfiles/shell/.bash_profile ~/.bash_profile
-ln -sf ~/.dotfiles/shell/.bashrc ~/.bashrc
-ln -sf ~/.dotfiles/shell/.profile ~/.profile
-ln -sf ~/.dotfiles/shell/.shrc ~/.shrc
-ln -sf ~/.dotfiles/shell/.functions ~/.functions
-ln -sf ~/.dotfiles/shell/.aliases ~/.aliases
+stow -D vim  # Removes vim symlinks
 ```
 
-**Shell (Zsh):**
-```bash
-ln -sf ~/.dotfiles/shell/.zshrc ~/.zshrc
-ln -sf ~/.dotfiles/shell/.zprofile ~/.zprofile
-ln -sf ~/.dotfiles/shell/.profile ~/.profile
-ln -sf ~/.dotfiles/shell/.shrc ~/.shrc
-ln -sf ~/.dotfiles/shell/.functions ~/.functions
-ln -sf ~/.dotfiles/shell/.aliases ~/.aliases
-```
-
-**Tmux:**
-```bash
-ln -sf ~/.dotfiles/tmux/.tmux.conf ~/.tmux.conf
-```
-
-**Git:**
-```bash
-ln -sf ~/.dotfiles/git/.gitconfig ~/.gitconfig
-ln -sf ~/.dotfiles/git/.gitignore_global ~/.gitignore_global
-```
+**Note:** Stow creates symlinks from `~/.dotfiles/<package>/<file>` to `~/<file>`. For example, `~/.dotfiles/vim/.vimrc` becomes `~/.vimrc`.
 
 ### Post-Installation
 
@@ -111,12 +94,6 @@ pip install python-lsp-server flake8
 
 # JavaScript/TypeScript
 npm install -g typescript-language-server
-```
-
-**Shell plugins (if using zsh custom plugins):**
-```bash
-# Plugins are included in shell/.zsh_custom/plugins/
-# Already configured if you symlinked .zshrc
 ```
 
 ## Testing
