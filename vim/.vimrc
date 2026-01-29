@@ -358,7 +358,7 @@ augroup vimrc
     autocmd InsertLeave      *            setl listchars+=trail:-
   endif
   autocmd User FugitiveObject             setl signcolumn=auto
-  autocmd BufReadPost        *            if !empty(FugitiveGitDir()) | let &l:grepprg='git grep -n --no-color --untracked -I' | endif
+  autocmd BufReadPost        *            if exists('*FugitiveGitDir') && !empty(FugitiveGitDir()) | let &l:grepprg='git grep -n --no-color --untracked -I' | endif
         \| let &l:grepformat='%f:%l:%c:%m,%f:%l:%m,%m %f match%ts,%f'
   autocmd BufNewFile  */plugin/*.vim      0r ~/.vim/skeleton.vim|call skeleton#replace()|call skeleton#edit()
   autocmd BufWinEnter        *            if &buftype=='quickfix' | setlocal wrap|nnoremap <buffer> gj gj|nnoremap <buffer> gk gk|nnoremap <buffer> j j|nnoremap <buffer> k k|endif
