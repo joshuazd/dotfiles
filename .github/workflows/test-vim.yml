@@ -76,11 +76,21 @@ jobs:
         # Test opening file, running command, and quitting
         vim -N -u ~/.vimrc /tmp/test.txt -c 'let g:test_loaded=1' -c 'if !exists("g:test_loaded") | cquit | endif' -c 'quit' 2>&1 | tee /tmp/vim-basic.log
         
+        # Check exit code
         if [ ${PIPESTATUS[0]} -ne 0 ]; then
-          echo "ERROR: Basic vim functionality test failed"
+          echo "ERROR: Basic vim functionality test failed (non-zero exit code)"
           cat /tmp/vim-basic.log
           exit 1
         fi
+        
+        # Check for error messages in output
+        if grep -iE "E\d+:|error detected|error:" /tmp/vim-basic.log; then
+          echo "ERROR: Vim produced error messages during basic functionality test"
+          echo "=== Full output ==="
+          cat /tmp/vim-basic.log
+          exit 1
+        fi
+        
         echo "✓ Basic vim functionality works"
     
     - name: Check for common vimscript issues
