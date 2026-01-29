@@ -13,7 +13,7 @@ This repository contains configuration files organized by tool:
 - **vim/** - Comprehensive Vim configuration with LSP support, native package management, and custom plugins
 - **shell/** - Shell configurations for bash and zsh with shared functions and aliases
 - **tmux/** - Terminal multiplexer configuration with custom keybindings
-- **git/** - Git configuration and aliases
+- **git/** - Git configuration
 - **config/** - Additional tool configurations
 
 ## Features
@@ -69,6 +69,7 @@ stow vim     # Installs vim configuration
 stow shell   # Installs shell configuration
 stow tmux    # Installs tmux configuration
 stow git     # Installs git configuration
+stow config  # Installs tool configuration
 ```
 
 3. To uninstall a configuration:
