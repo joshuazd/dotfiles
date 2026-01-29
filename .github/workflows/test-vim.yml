@@ -1,4 +1,4 @@
-name: Test Vim Configuration
+name: Vim Config
 
 on:
   push:

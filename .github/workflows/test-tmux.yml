@@ -1,4 +1,4 @@
-name: Test Tmux Configuration
+name: Tmux Config
 
 on:
   push:
