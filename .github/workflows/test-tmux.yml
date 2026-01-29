@@ -1,0 +1,144 @@
+name: Test Tmux Configuration
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-tmux:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Install Tmux
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get update
+          sudo apt-get install -y tmux
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          brew install tmux
+        fi
+    
+    - name: Setup symlinks
+      run: |
+        ln -sf "$GITHUB_WORKSPACE/tmux/.tmux.conf" ~/.tmux.conf
+        ln -sf "$GITHUB_WORKSPACE/tmux/.tmux_custom" ~/.tmux_custom
+        
+        # Set TMUX_CUSTOM environment variable
+        echo "TMUX_CUSTOM=$HOME/.tmux_custom" >> $GITHUB_ENV
+    
+    - name: Test tmux config syntax
+      run: |
+        echo "Testing tmux configuration syntax..."
+        tmux --version
+        
+        # Test config file can be parsed
+        if ! tmux -f ~/.tmux.conf list-keys >/dev/null 2>&1; then
+          echo "ERROR: Tmux configuration has syntax errors"
+          tmux -f ~/.tmux.conf list-keys 2>&1
+          exit 1
+        fi
+        
+        echo "✓ Tmux configuration syntax is valid"
+    
+    - name: Test tmux server starts
+      run: |
+        echo "Testing tmux server can start..."
+        
+        # Start a detached tmux session
+        tmux -f ~/.tmux.conf new-session -d -s test-session
+        
+        # Check that session was created
+        if ! tmux list-sessions | grep -q "test-session"; then
+          echo "ERROR: Failed to create tmux session"
+          tmux list-sessions
+          exit 1
+        fi
+        
+        echo "✓ Tmux server started successfully"
+    
+    - name: Test key bindings
+      run: |
+        echo "Testing key bindings are loaded..."
+        
+        # Check that custom prefix is set
+        prefix=$(tmux show-option -gv prefix)
+        if [ "$prefix" != "C-Space" ]; then
+          echo "ERROR: Custom prefix not set (expected C-Space, got $prefix)"
+          exit 1
+        fi
+        
+        # Check that some custom key bindings exist
+        if ! tmux list-keys | grep -q "bind-key.*C-Space"; then
+          echo "ERROR: Custom C-Space binding not found"
+          tmux list-keys | grep "C-Space" || echo "No C-Space bindings"
+          exit 1
+        fi
+        
+        echo "✓ Key bindings loaded correctly"
+    
+    - name: Test options are set
+      run: |
+        echo "Testing tmux options..."
+        
+        # Check some key options
+        base_index=$(tmux show-option -gv base-index)
+        if [ "$base_index" != "1" ]; then
+          echo "ERROR: base-index not set to 1 (got $base_index)"
+          exit 1
+        fi
+        
+        mouse=$(tmux show-option -gv mouse)
+        if [ "$mouse" != "on" ]; then
+          echo "ERROR: mouse not enabled (got $mouse)"
+          exit 1
+        fi
+        
+        escape_time=$(tmux show-option -gsv escape-time)
+        if [ "$escape_time" != "0" ]; then
+          echo "ERROR: escape-time not set to 0 (got $escape_time)"
+          exit 1
+        fi
+        
+        echo "✓ Tmux options configured correctly"
+    
+    - name: Test window and pane creation
+      run: |
+        echo "Testing window and pane operations..."
+        
+        # Create a new window
+        tmux new-window -t test-session: -n test-window
+        
+        # Check window was created
+        if ! tmux list-windows -t test-session | grep -q "test-window"; then
+          echo "ERROR: Failed to create window"
+          tmux list-windows -t test-session
+          exit 1
+        fi
+        
+        # Split the window
+        tmux split-window -h -t test-session:test-window
+        
+        # Check pane was created (should have 2 panes)
+        pane_count=$(tmux list-panes -t test-session:test-window | wc -l)
+        if [ "$pane_count" -lt 2 ]; then
+          echo "ERROR: Failed to split window (only $pane_count pane(s))"
+          exit 1
+        fi
+        
+        echo "✓ Window and pane operations work"
+    
+    - name: Cleanup
+      if: always()
+      run: |
+        # Kill the test session
+        tmux kill-session -t test-session 2>/dev/null || true
+        echo "✓ Cleanup complete"

@@ -2,6 +2,7 @@
 
 [![Vim Config Tests](https://github.com/joshuazd/dotfiles/actions/workflows/test-vim.yml/badge.svg)](https://github.com/joshuazd/dotfiles/actions/workflows/test-vim.yml)
 [![Shell Config Tests](https://github.com/joshuazd/dotfiles/actions/workflows/test-shell.yml/badge.svg)](https://github.com/joshuazd/dotfiles/actions/workflows/test-shell.yml)
+[![Tmux Config Tests](https://github.com/joshuazd/dotfiles/actions/workflows/test-tmux.yml/badge.svg)](https://github.com/joshuazd/dotfiles/actions/workflows/test-tmux.yml)
 
 Personal configuration files for Unix-based development environments.
 
