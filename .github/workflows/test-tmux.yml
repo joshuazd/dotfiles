@@ -38,7 +38,7 @@ jobs:
     - name: Test tmux config syntax
       run: |
         echo "Testing tmux configuration syntax..."
-        tmux --version
+        tmux -V
         
         # Test config file can be parsed
         if ! tmux -f ~/.tmux.conf list-keys >/dev/null 2>&1; then
