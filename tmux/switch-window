@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Tmux window switcher with preview
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+window=$(tmux list-windows -F "#I #W (#{window_panes} panes)" | \
+    fzf --tmux 90%,90% \
+        --preview="$SCRIPT_DIR/preview-window {1}" \
+        --preview-window=right:70%:wrap | \
+    awk '{print $1}') &&
+    tmux select-window -t "$window"

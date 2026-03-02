@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Preview all panes in a tmux window
+window_id=$1
+panes=$(tmux list-panes -t ":$window_id" -F "#{pane_index}")
+pane_count=$(echo "$panes" | wc -w | tr -d ' ')
+
+# Calculate lines per pane (accounting for separators)
+preview_height=${FZF_PREVIEW_LINES:-40}
+preview_width=${FZF_PREVIEW_COLUMNS:-80}
+
+if [ "$pane_count" -gt 1 ]; then
+    lines_per_pane=$(( (preview_height - pane_count + 1) / pane_count ))
+else
+    lines_per_pane=$preview_height
+fi
+
+for pane in $panes; do
+    if [ "$pane_count" -gt 1 ]; then
+        label=" Pane $pane "
+        label_len=${#label}
+        separator_len=$(( (preview_width - label_len) / 2 ))
+        printf "%${separator_len}s" | tr ' ' '─'
+        printf "%s" "$label"
+        printf "%${separator_len}s\n" | tr ' ' '─'
+    fi
+    tmux capture-pane -ep -t ":$window_id.$pane" | tail -n "$lines_per_pane"
+done
