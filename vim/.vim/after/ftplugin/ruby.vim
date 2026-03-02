@@ -16,6 +16,7 @@ if executable('solargraph') && exists(':Packadd') && &filetype ==? 'ruby'
   setlocal keywordprg=:LSClientShowHover
   setlocal omnifunc=lsc#complete#complete
 endif
+Packadd copilot.vim
 
 nnoremap <buffer> <space>c :Econtroller<space>
 nnoremap <buffer> <space>m :Emodel<space>

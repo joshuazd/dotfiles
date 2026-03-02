@@ -414,6 +414,29 @@ function! s:fixEdit(idx, maybeEdit) abort
         \ 'edit': a:maybeEdit.command.arguments[0],
         \ 'title': a:maybeEdit.command.title}
 endfunction
+function! s:fixGoToDef(result) abort
+  " echom a:result
+  if type(a:result) == type([])
+    if len(a:result) == 0
+      return a:result
+    endif
+    let l:location = a:result[0]
+  else
+    let l:location = a:result
+  endif
+
+  if has_key(l:location, 'uri') && has_key(l:location, 'range')
+    return l:location
+  endif
+
+  let l:range = l:location.targetRange
+  let l:uri = l:location.targetUri
+  if has_key(l:location, 'targetSelectionRange')
+    let l:range = l:location.targetSelectionRange
+  endif
+  let l:response = {'range': l:range, 'uri': l:uri}
+  return l:response
+endfunction
 function! s:lscStart(name, params) abort
   echom 'Server started!'
   return a:params
@@ -430,10 +453,13 @@ let g:lsc_server_commands = {
       \ 'typescript': 'typescript-language-server --stdio',
       \ 'typescriptreact': 'typescript-language-server --stdio',
       \ 'ruby': {
-        \ 'command': 'solargraph stdio',
-        \ 'suppress_stderr': v:true,
+        \ 'command': 'ruby-lsp',
+        \ 'suppress_stderr': v:false,
         \ 'message_hooks': {
         \   'initialized': function('<SID>lscStart'),
+        \ },
+        \ 'response_hooks': {
+        \   'textDocument/definition': function('<SID>fixGoToDef')
         \ }
         \},
       \ 'python': {
@@ -554,9 +580,12 @@ let g:signify_sign_delete_first_line = '▔'
 let g:signify_sign_change_delete     = g:signify_sign_change . g:signify_sign_delete_first_line
 
 " FZF
-let g:fzf_files_options = ['--preview', 'fzf_preview {} 2>/dev/null']
-let g:fzf_buffers_options = ['--preview', 'fzf_preview {2} 2>/dev/null']
+let g:fzf_files_options = ['--border-label', ' Files ', '--bind', 'focus:+transform-header:file --brief {} || echo "No file selected"']
+let g:fzf_buffers_options = ['--border-label', ' Buffers ']
 let g:fzf_preview_window = ['right,50%,<90(down,50%)', 'ctrl-/']
+if exists('$TMUX')
+  let g:fzf_layout = { 'tmux': '90%,70%' }
+endif
 " let g:fzf_layout = {'window': {'width': 0.85, 'height': 0.85, 'border': 'rounded'}}
 " vim-test
 let test#strategy = 'dispatch'
