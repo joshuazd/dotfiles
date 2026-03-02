@@ -20,6 +20,8 @@
 	email = zinkdudajoshua@gmail.com
 	name = joshuazd
 [pull]
-	rebase = false
+	rebase = true
 [init]
 	templatedir = ~/.git_template
+[rebase]
+	autoStash = true
