@@ -20,3 +20,5 @@
 export AWS_PROFILE=joshua.zink-duda
 export AWS_VAULT_BACKEND=keychain
 export AWS_REGION=us-east-1
+eval $(/opt/homebrew/bin/brew shellenv)
+eval "$(mise activate zsh)"

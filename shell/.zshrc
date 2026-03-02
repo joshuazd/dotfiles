@@ -22,7 +22,7 @@ _ruby_prompt() {
     # [ -x "$(command -v rbenv)" ] && ruby_version=$(rbenv version-name)
 
     # [[ -z $ruby_version || "${ruby_version}" == "system" ]] && return
-    
+
     [ -x "$(command -v ruby)" ] && ruby_version=$(ruby --version | awk '{print $2}')
 
     [ -x "$(command -v ruby)" ] && ruby_bin=$(which ruby)
@@ -122,7 +122,21 @@ vim-files() {
 zle -N vim-files
 bindkey '\ev' vim-files
 
-precmd() { RPROMPT="" }
+precmd() {
+  RPROMPT=""
+  if [[ -n "$TMUX" ]]; then
+    tmux set-window-option automatic-rename on
+    tmux set-window-option allow-rename on
+  fi
+}
+
+preexec() {
+  if [[ -n "$TMUX" && "${1%% *}" == "claude" ]]; then
+    tmux set-window-option automatic-rename off
+    tmux set-window-option allow-rename off
+    tmux rename-window 'claude'
+  fi
+}
 function zle-line-init zle-keymap-select {
     case $KEYMAP in
         vicmd)      RPS1="%F{blue}-- NORMAL --%f" ;;
@@ -133,6 +147,17 @@ function zle-line-init zle-keymap-select {
 }
 zle -N zle-line-init
 zle -N zle-keymap-select
+
+switch-window() {
+    local window
+    window=$(tmux list-windows -F "#I #W" | \
+        fzf --query="$1" --select-1 --exit-0 --preview='') &&
+        local tmp=(${(@s: :)window}) &&
+    tmux select-window -t "$tmp[1]"
+}
+zle -N switch-window
+bindkey '^f' switch-window
+
 
 __fgitsel() {
   local cmd="git status --short | awk ' { print \$2 }'"
