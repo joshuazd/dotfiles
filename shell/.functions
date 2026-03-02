@@ -36,7 +36,7 @@ git_current_branch() {
 fbr() {
     local branches branch
     branches=$(git branch -a) &&
-    branch=$(echo "$branches" | fzf +s +m -e) &&
+    branch=$(echo "$branches" | fzf +s +m -e --preview='git log --oneline --graph --color=always --decorate $(echo {} | sed "s:.* remotes/origin/::" | sed "s:.* ::")') &&
     git checkout $(echo "$branch" | sed "s:.* remotes/origin/::" | sed "s:.* ::")
 }
 

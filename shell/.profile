@@ -21,6 +21,7 @@ PATH=/usr/local/opt/postgresql@14/bin:$PATH
 
 # User binaries
 PATH=$HOME/.bin:$HOME/bin:$HOME/.local/bin:$PATH
+PATH=$HOME/scripts:$PATH
 
 # System paths
 PATH=$PATH:/snap/bin
@@ -126,9 +127,18 @@ _gen_fzf_default_opts() {
             local color0E='#88c0d0'
             local color0F='#eceff4'
             FZF_DEFAULT_OPTS="
-              --color=bg+:$color08,bg:$color00,spinner:$color0C,hl:$color05
-              --color=fg:$color04,header:$color0D,info:$color0A,pointer:$color0C
-              --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
+              --color=bg:$color00,bg+:$color08
+              --color=hl:$color02,hl+:bold
+              --color=fg:$color07,fg+:bold
+              --color=spinner:$color0C,info:$color0A,pointer:$color0C
+              --color=marker:$color0C,prompt:$color0A
+              --color=gutter:$color00
+              --color=border:$color08,label:$color07
+              --color=list-border:$color0A,list-label:$color02
+              --color=input-border:$color0D,input-label:$color05
+              --color=header-border:$color04,header-label:$color0C
+              --color=preview-border:$color03,preview-label:$color03
+              --color=header:$color06
               --layout=reverse
             "
             ;;
@@ -158,9 +168,15 @@ _gen_fzf_default_opts() {
             ;;
     esac
 
-    FZF_CTRL_R_OPTS="--preview=''"
-    FZF_CTRL_T_OPTS="--preview='fzf_preview {} 2>/dev/null'"
-    FZF_ALT_C_OPTS="--preview='fzf_preview {} 2>/dev/null'"
+    # FZF_CTRL_R_OPTS="--preview=''"
+    # FZF_CTRL_T_OPTS="--preview='fzf_preview {} 2>/dev/null'"
+    # FZF_ALT_C_OPTS="--preview='fzf_preview {} 2>/dev/null'"
+    FZF_CTRL_R_OPTS="--border-label ' Command History '\
+        --preview=''"
+    FZF_ALT_C_OPTS="--border-label ' Directories '"
+    FZF_CTRL_T_OPTS="--border-label ' Files ' \
+    --bind 'focus:+transform-header:file --brief {} || echo ""No file selected""'"
+
     export FZF_DEFAULT_OPTS FZF_CTRL_R_OPTS FZF_CTRL_T_OPTS FZF_ALT_C_OPTS
 }
 

@@ -1,0 +1,14 @@
+--style full
+--border --padding 1,2
+--preview 'fzf-preview.sh {}'
+--input-label ' Input '
+--header-label ' File Type '
+--bind 'result:transform-list-label:
+    if [[ -z $FZF_QUERY ]]; then
+        echo " $FZF_MATCH_COUNT items "
+    else
+        echo " $FZF_MATCH_COUNT matches for [$FZF_QUERY] "
+    fi
+    '
+--bind 'focus:transform-preview-label:[[ -n {} ]] && printf " Previewing [%s] " {}'
+--tmux 90%,70%
