@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+#
+# git-worktree-done - Switch away from a worktree session and clean it up
+#
+# Usage: git-worktree-done
+#
+# When run from inside a git worktree tmux session, switches to the most
+# recently used other tmux session and opens a popup to run
+# git-worktree-cleanup for the current worktree.
+#
+# Example:
+#   git-worktree-done
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/}
+
+Switch away from the current worktree tmux session and clean it up.
+
+Must be run from inside a git worktree that has a corresponding tmux session.
+Switches to the most recently used other tmux session, then opens a popup
+running git-worktree-cleanup for the current worktree directory.
+
+Example:
+  ${0##*/}
+    Switches to the last session and cleans up the current worktree
+USAGE
+}
+
+#######################################
+# Main function
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  # Must be in tmux
+  if ! is_in_tmux; then
+    error "Not running in tmux"
+    return 1
+  fi
+
+  local cleanup_script="${SCRIPT_DIR}/git-worktree-cleanup"
+  if [ ! -x "${cleanup_script}" ]; then
+    error "git-worktree-cleanup not found or not executable: ${cleanup_script}"
+    return 1
+  fi
+
+  local current_session worktree_path target_session current_client
+  current_session="$(tmux display-message -p '#S')"
+  worktree_path="$(tmux display-message -p '#{pane_current_path}')"
+  current_client="$(tmux display-message -p '#{client_name}')"
+
+  # Must be in a git repo
+  if ! (cd "${worktree_path}" && is_git_repo); then
+    error "Not in a git repository: ${worktree_path}"
+    return 1
+  fi
+
+  # Find the most recently used session other than the current one
+  target_session="$(tmux list-sessions -F '#{session_last_attached} #{session_name}' | \
+    sort -rn | \
+    awk -v cur="${current_session}" '$2 != cur { print $2; exit }')"
+
+  if [ -z "${target_session}" ]; then
+    error "No other tmux session to switch to"
+    error "Create another session before running cleanup"
+    return 1
+  fi
+
+  # Switch away first so cleanup can safely kill the current session
+  tmux switch-client -c "${current_client}" -t "${target_session}"
+
+  # Open popup in the destination session to run cleanup
+  local popup_command
+  popup_command="${cleanup_script} '${worktree_path}'"
+
+  tmux display-popup \
+    -c "${current_client}" \
+    -t "${target_session}:" \
+    -E -w 80% -h 60% \
+    "${popup_command}"
+
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

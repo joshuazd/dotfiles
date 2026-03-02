@@ -1,0 +1,289 @@
+#!/usr/bin/env bash
+#
+# git-worktree-new - Create a git worktree one level up from the repository
+#
+# Usage: git-worktree-new <branch-name>
+#
+# Creates a new git worktree for the specified branch in a directory one level
+# up from the current repository. The directory name is derived from the branch
+# name with common prefixes removed (feature/, bugfix/, hotfix/, etc.)
+#
+# Example:
+#   git-worktree-new feature/this-is-a-branch
+#   Creates worktree at: ../this-is-a-branch
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--prefix <value>] <branch-name>
+
+Create a git worktree one level up from the current repository.
+
+Arguments:
+  --prefix value  Prepend value to the derived directory name (optional)
+  branch-name     Name of the branch to checkout (can include prefixes like
+                  feature/, bugfix/, hotfix/, etc.)
+
+Examples:
+  ${0##*/} feature/add-login
+    Creates worktree at: ../add-login
+
+  ${0##*/} --prefix pr- feature/add-login
+    Creates worktree at: ../pr-add-login
+
+  ${0##*/} bugfix/fix-header
+    Creates worktree at: ../fix-header
+
+  ${0##*/} my-branch
+    Creates worktree at: ../my-branch
+USAGE
+}
+
+#######################################
+# Check if a branch exists (locally or remotely)
+# Arguments:
+#   Branch name
+# Returns:
+#   0 if branch exists, 1 otherwise
+#######################################
+branch_exists() {
+  local branch_name="${1}"
+  
+  # Check if branch exists locally
+  if git show-ref --verify --quiet "refs/heads/${branch_name}"; then
+    return 0
+  fi
+  
+  # Check if branch exists on any remote
+  if git show-ref --verify --quiet "refs/remotes/origin/${branch_name}"; then
+    return 0
+  fi
+  
+  return 1
+}
+
+#######################################
+# Set up portal-specific dev files in a new worktree
+# Detects portal repos by presence of Procfile.dev
+# Arguments:
+#   worktree_path  — absolute path to the new worktree
+#   repo_root      — absolute path to the main repo
+#######################################
+setup_portal_files() {
+  local worktree_path="${1}"
+  local repo_root="${2}"
+
+  # Only run for portal repos
+  if [ ! -f "${repo_root}/Procfile.dev" ]; then
+    return 0
+  fi
+
+  info "Setting up portal dev files..."
+
+  # Symlink these files/dirs from the main repo into the worktree
+  local symlinks=(
+    .env
+    .pryrc.local
+    node_modules
+  )
+  for item in "${symlinks[@]}"; do
+    if [ -e "${repo_root}/${item}" ] && [ ! -e "${worktree_path}/${item}" ]; then
+      ln -s "${repo_root}/${item}" "${worktree_path}/${item}"
+      info "Symlinked ${item}"
+    fi
+  done
+
+  # Copy these from the main repo so each worktree can regenerate them independently
+  local copies=(
+    public/assets
+    app/javascript/routes.js
+    app/javascript/routes.d.ts
+  )
+  for item in "${copies[@]}"; do
+    if [ -e "${repo_root}/${item}" ] && [ ! -e "${worktree_path}/${item}" ]; then
+      cp -r "${repo_root}/${item}" "${worktree_path}/${item}"
+      info "Copied ${item}"
+    fi
+  done
+
+  # Create Procfile.personal with port 3001 so it doesn't clash with the main server
+  if [ ! -f "${worktree_path}/Procfile.personal" ]; then
+    cat > "${worktree_path}/Procfile.personal" <<'PROCFILE'
+web: DD_LOGS_INJECTION=false bundle exec rails s -p 3001 -b 0.0.0.0
+sidekiq: DD_LOGS_INJECTION=false PORT=3001 bundle exec sidekiq -C config/sidekiq_dev_config.yml
+webpack: yarn build --watch
+css: bin/rails tailwindcss:watch
+PROCFILE
+    info "Created Procfile.personal (port 3001)"
+  fi
+
+  # Create Makefile.local that skips docker.up (already running in ~/portal)
+  if [ ! -f "${worktree_path}/Makefile.local" ]; then
+    printf 'docker.ecr.login:\n\t@:\n\ndocker.up:\n\t@:\n\ndev.server:\n\taws-vault exec $${AWS_PROFILE} -- foreman start -f Procfile.personal\n' \
+      > "${worktree_path}/Makefile.local"
+    info "Created Makefile.local"
+  fi
+}
+
+#######################################
+# Symlink local Claude settings into a new worktree
+# Arguments:
+#   worktree_path  — absolute path to the new worktree
+#   repo_root      — absolute path to the main repo
+#######################################
+setup_claude_files() {
+  local worktree_path="${1}"
+  local repo_root="${2}"
+
+  local symlinks=(
+    CLAUDE.local.md
+  )
+  for item in "${symlinks[@]}"; do
+    if [ -e "${repo_root}/${item}" ] && [ ! -e "${worktree_path}/${item}" ]; then
+      ln -s "${repo_root}/${item}" "${worktree_path}/${item}"
+      info "Symlinked ${item}"
+    fi
+  done
+
+  # Symlink individual files from .claude/ to avoid git seeing the directory as untracked
+  if [ -d "${repo_root}/.claude" ]; then
+    mkdir -p "${worktree_path}/.claude"
+    for src in "${repo_root}/.claude/"*.json; do
+      [ -e "${src}" ] || continue
+      local dest="${worktree_path}/.claude/$(basename "${src}")"
+      if [ ! -e "${dest}" ]; then
+        ln -s "${src}" "${dest}"
+        info "Symlinked .claude/$(basename "${src}")"
+      fi
+    done
+  fi
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Branch name
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local prefix=""
+  local branch_name=""
+  local dir_name
+  local worktree_path
+  local repo_root
+
+  # Parse arguments
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --prefix)
+        prefix="${2}"
+        shift 2
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        branch_name="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  if [ -z "${branch_name}" ]; then
+    error "Missing required argument: branch-name"
+    printf "\\n"
+    usage
+    return 1
+  fi
+
+  # Check if we're in a git repository
+  if ! is_git_repo; then
+    error "Not in a git repository"
+    return 1
+  fi
+
+  # Get the repository root
+  repo_root="$(git rev-parse --show-toplevel)"
+
+  # Get directory name by stripping prefixes, then apply optional prefix
+  dir_name="$(get_name_from_branch "${branch_name}")"
+  dir_name="${prefix}${dir_name}"
+
+  # Construct the worktree path (one level up from repo root)
+  worktree_path="${repo_root}/../${dir_name}"
+  
+  # Check if directory already exists
+  if [ -e "${worktree_path}" ]; then
+    error "Directory already exists: ${worktree_path}"
+    return 1
+  fi
+  
+  info "Creating worktree for branch '${branch_name}'"
+  info "Location: ${worktree_path}"
+  
+  # Check if branch exists
+  if branch_exists "${branch_name}"; then
+    info "Branch '${branch_name}' exists, checking it out"
+    if ! git worktree add "${worktree_path}" "${branch_name}"; then
+      error "Failed to create worktree"
+      return 1
+    fi
+  else
+    info "Branch '${branch_name}' does not exist, creating new branch"
+    if ! git worktree add -b "${branch_name}" "${worktree_path}"; then
+      error "Failed to create worktree with new branch"
+      return 1
+    fi
+  fi
+
+  info "Worktree created successfully"
+
+  # Set up remote tracking if not already configured (e.g. new branch created with -b,
+  # or existing local branch without an upstream set)
+  if ! git config "branch.${branch_name}.remote" > /dev/null 2>&1; then
+    git config "branch.${branch_name}.remote" "origin"
+    git config "branch.${branch_name}.merge" "refs/heads/${branch_name}"
+    info "Configured remote tracking: origin/${branch_name}"
+  fi
+
+  # Trust the new worktree directory in Claude Code
+  if [ -x "${SCRIPT_DIR}/claude-trust" ]; then
+    "${SCRIPT_DIR}/claude-trust" "${worktree_path}" || true
+  fi
+
+  setup_portal_files "${worktree_path}" "${repo_root}"
+  setup_claude_files "${worktree_path}" "${repo_root}"
+  info "To navigate: cd ${worktree_path}"
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Check for required argument
+if [ "${#}" -lt 1 ]; then
+  error "Missing required argument: branch-name"
+  printf "\\n"
+  usage
+  exit 1
+fi
+
+# Run main function
+main "${@}"

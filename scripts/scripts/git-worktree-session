@@ -1,0 +1,206 @@
+#!/usr/bin/env bash
+#
+# git-worktree-session - Create a git worktree and tmux session
+#
+# Usage: git-worktree-session [--detached] <branch-name>
+#
+# Creates a git worktree and then creates a tmux session for it.
+# The session is named after the branch (without prefix) and opens in the
+# worktree directory.
+#
+# Arguments:
+#   --detached    Create session in detached mode (optional)
+#   branch-name   Name of the branch
+#
+# Example:
+#   git-worktree-session feature/my-branch
+#   git-worktree-session --detached feature/my-branch
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--detached] [--prefix <value>] <branch-name>
+
+Create a git worktree and tmux session.
+
+Arguments:
+  --detached      Create tmux session in detached mode (optional)
+  --prefix value  Prepend value to the session and directory name (optional)
+  branch-name     Name of the branch to create worktree for
+
+The script will:
+  1. Create a git worktree via git-worktree-new
+  2. Create a tmux session named after the branch
+  3. Open the session in the worktree directory
+
+Examples:
+  ${0##*/} feature/my-branch
+    Creates worktree and attached tmux session named "my-branch"
+
+  ${0##*/} --detached feature/add-login
+    Creates worktree and detached tmux session named "add-login"
+
+  ${0##*/} --detached --prefix pr- feature/add-login
+    Creates worktree at ../pr-add-login and detached session named "pr-add-login"
+USAGE
+}
+
+#######################################
+# Get the worktree path for a branch
+# Arguments:
+#   Branch name
+# Outputs:
+#   Writes worktree path to stdout
+#######################################
+get_worktree_path() {
+  local branch_name="${1}"
+  local repo_root
+  local dir_name
+  
+  repo_root="$(git rev-parse --show-toplevel)"
+  dir_name="$(get_name_from_branch "${branch_name}")"
+  
+  printf "%s/../%s" "${repo_root}" "${dir_name}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional --detached flag and branch name
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local detached=false
+  local prefix=""
+  local branch_name=""
+  local session_name
+  local worktree_path
+  local worktree_script
+  local repo_root
+  local dir_name
+
+  # Parse arguments
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --detached)
+        detached=true
+        shift
+        ;;
+      --prefix)
+        prefix="${2}"
+        shift 2
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        branch_name="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  # Check if branch name was provided
+  if [ -z "${branch_name}" ]; then
+    error "Missing required argument: branch-name"
+    printf "\\n"
+    usage
+    return 1
+  fi
+
+  # Compute session name and worktree path (with optional prefix)
+  dir_name="$(get_name_from_branch "${branch_name}")"
+  session_name="${prefix}${dir_name}"
+  repo_root="$(git rev-parse --show-toplevel)"
+  worktree_path="${repo_root}/../${session_name}"
+
+  # Create the worktree directly
+  worktree_script="${SCRIPT_DIR}/git-worktree-new"
+
+  if [ ! -x "${worktree_script}" ]; then
+    error "git-worktree-new script not found or not executable: ${worktree_script}"
+    return 1
+  fi
+
+  info "Creating worktree..."
+
+  if [ -n "${prefix}" ]; then
+    if ! "${worktree_script}" --prefix "${prefix}" "${branch_name}"; then
+      error "Failed to create worktree"
+      return 1
+    fi
+  else
+    if ! "${worktree_script}" "${branch_name}"; then
+      error "Failed to create worktree"
+      return 1
+    fi
+  fi
+  
+  # Check if the worktree directory exists
+  if [ ! -d "${worktree_path}" ]; then
+    error "Worktree directory not found: ${worktree_path}"
+    return 1
+  fi
+
+  info "Creating tmux session '${session_name}' in ${worktree_path}"
+  
+  # Create the tmux session
+  if ${detached}; then
+    # Create detached session
+    tmux new-session -d -s "${session_name}" -c "${worktree_path}"
+    # Create window named 'server'
+    tmux new-window -t "${session_name}:2" -n "server" -c "${worktree_path}"
+    # Create window named 'ai'
+    tmux new-window -t "${session_name}:3" -n "ai" -c "${worktree_path}"
+    # Switch back to first window
+    tmux select-window -t "${session_name}:1"
+    info "Detached session '${session_name}' created"
+    info "To attach: tmux attach-session -t ${session_name}"
+  else
+    # If we're already in a tmux session, create detached and switch to it
+    # Otherwise, create and attach directly
+    if is_in_tmux; then
+      # Create detached session and switch to it
+      tmux new-session -d -s "${session_name}" -c "${worktree_path}"
+      # Create window named 'server'
+      tmux new-window -t "${session_name}:2" -n "server" -c "${worktree_path}"
+      # Create window named 'ai'
+      tmux new-window -t "${session_name}:3" -n "ai" -c "${worktree_path}"
+      # Switch back to first window
+      tmux select-window -t "${session_name}:1"
+      info "Switching to session '${session_name}'"
+      tmux switch-client -t "${session_name}"
+    else
+      # Not in tmux, create and attach
+      tmux new-session -s "${session_name}" -c "${worktree_path}" \; \
+        new-window -t "${session_name}:2" -n "server" -c "${worktree_path}" \; \
+        new-window -t "${session_name}:3" -n "ai" -c "${worktree_path}" \; \
+        select-window -t "${session_name}:1"
+    fi
+  fi
+  
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

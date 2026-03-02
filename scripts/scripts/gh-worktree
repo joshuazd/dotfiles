@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+#
+# gh-worktree - Create a worktree from a GitHub pull request
+#
+# Usage: gh-worktree [--detached] [--non-interactive] <pr-number-or-url>
+#
+# Takes a GitHub PR number or URL, fetches the branch name via the gh CLI,
+# and creates a worktree session for that branch. All output is shown in a tmux popup.
+#
+# Arguments:
+#   --detached          Create tmux session in detached mode (optional)
+#   --non-interactive   Don't wait for user to press Enter before closing popup (optional)
+#   pr-number-or-url    PR number (123), #123, or full GitHub PR URL
+#
+# Example:
+#   gh-worktree 123
+#   gh-worktree '#123'
+#   gh-worktree https://github.com/org/repo/pull/123
+#   gh-worktree --detached 123
+#   gh-worktree --non-interactive 123
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--detached] [--non-interactive] <pr-number-or-url>
+
+Create a worktree from a GitHub pull request.
+
+Arguments:
+  --detached          Create tmux session in detached mode (optional)
+  --non-interactive   Don't wait for user input before closing popup (optional)
+  pr-number-or-url    PR number (123), #123, or full GitHub PR URL
+
+The script will:
+  1. Open a tmux popup
+  2. Fetch the branch name from the GitHub PR via gh CLI
+  3. Create worktree and tmux session (shown in popup)
+  4. Switch to new session after popup closes (unless --detached)
+
+Examples:
+  ${0##*/} 123
+    Creates worktree for PR #123 (interactive popup)
+
+  ${0##*/} '#123'
+    Creates worktree for PR #123 (hash prefix stripped automatically)
+
+  ${0##*/} https://github.com/org/repo/pull/123
+    Creates worktree from PR URL (interactive popup)
+
+  ${0##*/} --detached 123
+    Creates detached worktree session for PR #123
+
+  ${0##*/} --non-interactive 123
+    Creates worktree without waiting for user confirmation
+USAGE
+}
+
+#######################################
+# Normalize PR input: strip leading '#' if present
+# Arguments:
+#   PR number, #PR number, or URL
+# Outputs:
+#   Writes normalized input to stdout
+#######################################
+normalize_pr_input() {
+  local input="${1}"
+  printf "%s" "${input#\#}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional --detached / --non-interactive flags and PR number or URL
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local detached=false
+  local interactive=true
+  local pr_input=""
+  local branch_name
+  local session_script
+  local current_dir
+  local session_name
+
+  # Parse arguments
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --detached)
+        detached=true
+        shift
+        ;;
+      --non-interactive)
+        interactive=false
+        shift
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        pr_input="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  # Check if PR input was provided
+  if [ -z "${pr_input}" ]; then
+    error "Missing required argument: pr-number-or-url"
+    printf "\\n"
+    usage
+    return 1
+  fi
+
+  # Check if we're in tmux
+  if ! is_in_tmux; then
+    error "Not running in tmux"
+    error "This script requires tmux to be running"
+    return 1
+  fi
+
+  # Check if gh command is available
+  if ! command -v gh > /dev/null 2>&1; then
+    error "GitHub CLI 'gh' not found"
+    error "Please install it first: https://cli.github.com"
+    return 1
+  fi
+
+  # Get the path to git-worktree-session script
+  session_script="$(resolve_session_script "${SCRIPT_DIR}")" || return 1
+
+  pr_input="$(normalize_pr_input "${pr_input}")"
+  current_dir="$(pwd)"
+
+  info "Fetching PR ${pr_input} from GitHub..."
+  branch_name="$(gh pr view "${pr_input}" --json headRefName -q '.headRefName')"
+
+  if [ -z "${branch_name}" ]; then
+    error "Could not determine branch name for PR ${pr_input}"
+    return 1
+  fi
+
+  info "Found branch: ${branch_name}"
+  session_name="pr-$(get_name_from_branch "${branch_name}")"
+
+  run_worktree_popup "${current_dir}" "${session_script}" "${branch_name}" "${session_name}" "${detached}" "${interactive}" "pr-"
+
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

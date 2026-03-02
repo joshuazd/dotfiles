@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+#
+# dispatch-from-chrome - Get the active Chrome tab URL and dispatch it
+#
+# Intended to be invoked by the SwiftBar dispatch plugin (terminal=false).
+# Gets the active tab URL from Google Chrome, validates it looks like a
+# Shortcut story or GitHub PR, then runs dispatch inside the most recently
+# active tmux session and brings iTerm2 to the front attached to that session.
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Send a macOS notification
+notify() {
+  osascript -e "display notification \"${*}\" with title \"Dispatch\""
+}
+
+# Get the URL of the active tab in Google Chrome
+get_chrome_url() {
+  osascript -e \
+    'tell application "Google Chrome" to return URL of active tab of first window' \
+    2>/dev/null || true
+}
+
+# Find the name of the most recently active tmux session
+get_tmux_session() {
+  tmux list-sessions -F "#{session_last_attached} #{session_name}" 2>/dev/null \
+    | sort -rn \
+    | head -1 \
+    | awk '{print $2}'
+}
+
+main() {
+  # Get current Chrome tab URL
+  local url
+  url="$(get_chrome_url)"
+
+  if [[ -z "${url}" ]]; then
+    notify "Could not get Chrome tab URL — is Chrome running?"
+    exit 1
+  fi
+
+  # Validate the URL looks like something dispatch can handle
+  if ! [[ "${url}" =~ app\.shortcut\.com ]] && \
+     ! [[ "${url}" =~ github\.com.*/pull/ ]]; then
+    notify "Not a Shortcut story or GitHub PR"
+    exit 0
+  fi
+
+  # Find the most recently used tmux session
+  local tmux_session
+  tmux_session="$(get_tmux_session)"
+
+  if [[ -z "${tmux_session}" ]]; then
+    notify "No active tmux session found — start tmux first"
+    exit 1
+  fi
+
+  # Write the URL to a temp file to avoid shell-quoting issues with the URL
+  local url_file
+  url_file="$(mktemp /tmp/dispatch-url-XXXXXX)"
+  printf "%s" "${url}" > "${url_file}"
+
+  # DISPATCH_IN_POPUP=1 tells run_worktree_popup in common.sh to run
+  # git-worktree-session inline rather than opening a nested popup, so the
+  # entire flow (fetch + setup + switch) happens inside a single popup.
+  local popup_cmd
+  popup_cmd="[ -f ~/.secrets ] && source ~/.secrets; export DISPATCH_IN_POPUP=1; url=\$(cat '${url_file}'); rm -f '${url_file}'; cd ~/portal && '${SCRIPT_DIR}/dispatch' --non-interactive \"\${url}\" || { echo; echo 'Dispatch failed. Press Enter to close...'; read -r; }"
+
+  # Resolve the full path to tmux — iTerm2 runs `command` strings directly
+  # (not via a shell) so bare "tmux" won't be found if it lives in /opt/homebrew/bin.
+  local tmux_path
+  tmux_path="$(command -v tmux)"
+
+  if tmux list-clients -t "${tmux_session}" 2>/dev/null | grep -q .; then
+    # Session already has an attached client — bring iTerm2 to front and open
+    # a popup in the current window.
+    osascript -e 'tell application "iTerm2" to activate'
+    tmux display-popup -t "${tmux_session}" -E -w 80% -h 60% "${popup_cmd}"
+  else
+    # Session is detached — open iTerm2 and attach to the session to get a
+    # client, then show the popup once the client is ready.
+    osascript <<APPLESCRIPT
+tell application "iTerm2"
+  activate
+  if (count of windows) = 0 then
+    create window with default profile command "${tmux_path} attach -t ${tmux_session}"
+  else
+    tell current window
+      create tab with default profile command "${tmux_path} attach -t ${tmux_session}"
+    end tell
+  end if
+end tell
+APPLESCRIPT
+
+    # Wait for the client to attach (up to 5 seconds)
+    local deadline=$(( SECONDS + 5 ))
+    while ! tmux list-clients -t "${tmux_session}" 2>/dev/null | grep -q .; do
+      if [ "${SECONDS}" -ge "${deadline}" ]; then
+        notify "Timed out waiting for tmux client to attach"
+        rm -f "${url_file}"
+        exit 1
+      fi
+      sleep 0.1
+    done
+
+    tmux display-popup -t "${tmux_session}" -E -w 80% -h 60% "${popup_cmd}"
+  fi
+}
+
+main "$@"

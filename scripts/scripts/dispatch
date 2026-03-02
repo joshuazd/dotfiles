@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+#
+# dispatch - Route a story or PR to the appropriate workflow script
+#
+# Usage: dispatch [--detached] [-d] [--non-interactive] <url-or-id>
+#
+# Detects the type of the given input and delegates to the right script:
+#   - Shortcut story URL or sc-<id>  →  shortcut-implement
+#   - GitHub PR URL                  →  gh-review
+#
+# All flags are forwarded to the delegated script.
+#
+# Arguments:
+#   --detached, -d      Create session without switching to it (optional)
+#   --non-interactive   Don't wait for user input before closing popup (optional)
+#   url-or-id           Shortcut story URL/sc-id or GitHub PR URL
+#
+# Examples:
+#   dispatch https://app.shortcut.com/workspace/story/12345
+#   dispatch sc-12345
+#   dispatch https://github.com/org/repo/pull/42
+#   dispatch --detached https://github.com/org/repo/pull/42
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--detached] [--non-interactive] <url-or-id>
+
+Route a story or PR to the appropriate workflow script.
+
+  Shortcut story URL or sc-<id>  →  shortcut-implement
+  GitHub PR URL                  →  gh-review
+
+Arguments:
+  --detached, -d      Create session without switching to it (optional)
+  --non-interactive   Don't wait for user input before closing popup (optional)
+  url-or-id           Shortcut story URL/sc-id or GitHub PR URL
+
+Examples:
+  ${0##*/} https://app.shortcut.com/workspace/story/12345
+    Implements Shortcut story 12345
+
+  ${0##*/} sc-12345
+    Implements Shortcut story sc-12345
+
+  ${0##*/} https://github.com/org/repo/pull/42
+    Reviews GitHub PR #42
+
+  ${0##*/} --detached https://github.com/org/repo/pull/42
+    Sets up PR review session without switching to it
+USAGE
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional flags and URL or ID
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local input=""
+  local passthrough_args=()
+
+  # Parse arguments — collect flags to forward and extract the positional input
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --detached|-d|--non-interactive)
+        passthrough_args+=("${1}")
+        shift
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        input="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  if [ -z "${input}" ]; then
+    error "Missing required argument: url-or-id"
+    printf "\\n"
+    usage
+    return 1
+  fi
+
+  # Detect Shortcut: URL or sc-<id> prefix
+  if [[ "${input}" =~ app\.shortcut\.com ]] || [[ "${input}" =~ ^sc-[0-9]+ ]]; then
+    exec "${SCRIPT_DIR}/shortcut-implement" "${passthrough_args[@]}" "${input}"
+  # Detect GitHub PR URL
+  elif [[ "${input}" =~ github\.com.*\/pull\/ ]]; then
+    exec "${SCRIPT_DIR}/gh-review" "${passthrough_args[@]}" "${input}"
+  else
+    error "Could not detect input type: ${input}"
+    error "Expected a Shortcut story URL/sc-id or a GitHub PR URL"
+    return 1
+  fi
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

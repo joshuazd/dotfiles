@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+#
+# claude-trust - Add a directory to Claude Code's trusted directories
+#
+# Usage: claude-trust [directory]
+#
+# Adds the given directory (or current directory if not specified) to
+# ~/.claude.json so Claude Code won't prompt "Do you trust this folder?"
+#
+# Example:
+#   claude-trust                     # trust current directory
+#   claude-trust /path/to/worktree   # trust a specific path
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+CLAUDE_CONFIG="${HOME}/.claude.json"
+
+dir="${1:-$(pwd)}"
+dir="$(cd "${dir}" && pwd)"  # resolve to absolute path
+
+if [ ! -f "${CLAUDE_CONFIG}" ]; then
+  echo "Error: Claude config not found at ${CLAUDE_CONFIG}" >&2
+  exit 1
+fi
+
+python3 - "${dir}" "${CLAUDE_CONFIG}" <<'PYEOF'
+import json, sys
+
+dir_path = sys.argv[1]
+config_path = sys.argv[2]
+
+with open(config_path, 'r') as f:
+    config = json.load(f)
+
+config.setdefault('projects', {})
+config['projects'].setdefault(dir_path, {})
+
+if config['projects'][dir_path].get('hasTrustDialogAccepted') is True:
+    print(f"Already trusted: {dir_path}")
+    sys.exit(0)
+
+config['projects'][dir_path]['hasTrustDialogAccepted'] = True
+
+with open(config_path, 'w') as f:
+    json.dump(config, f, indent=2)
+    f.write('\n')
+
+print(f"Trusted: {dir_path}")
+PYEOF

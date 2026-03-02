@@ -1,0 +1,240 @@
+#!/usr/bin/env bash
+#
+# shortcut-worktree - Create a worktree from a Shortcut story
+#
+# Usage: shortcut-worktree [--detached] [--non-interactive] <story-url-or-id>
+#
+# Takes a Shortcut story URL or ID, fetches the git branch name from the story,
+# and creates a worktree session for that branch. All output is shown in a tmux popup.
+#
+# Arguments:
+#   --detached          Create tmux session in detached mode (optional)
+#   --non-interactive   Don't wait for user to press Enter before closing popup (optional)
+#   story-url-or-id     Shortcut story URL or numeric ID
+#
+# Example:
+#   shortcut-worktree sc-12345
+#   shortcut-worktree https://app.shortcut.com/workspace/story/12345
+#   shortcut-worktree --detached 12345
+#   shortcut-worktree --non-interactive sc-12345
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--detached] [--non-interactive] <story-url-or-id>
+
+Create a worktree from a Shortcut story.
+
+Arguments:
+  --detached          Create tmux session in detached mode (optional)
+  --non-interactive   Don't wait for user input before closing popup (optional)
+  story-url-or-id     Shortcut story URL or numeric ID
+
+The script will:
+  1. Open a tmux popup
+  2. Extract story ID from URL or use provided ID
+  3. Fetch story details from Shortcut (shown in popup)
+  4. Extract git branch name from the story
+  5. Create worktree and tmux session (shown in popup)
+  6. Switch to new session after popup closes (unless --detached)
+
+Examples:
+  ${0##*/} sc-12345
+    Creates worktree for story sc-12345 (interactive popup)
+
+  ${0##*/} https://app.shortcut.com/workspace/story/12345
+    Creates worktree from story URL (interactive popup)
+
+  ${0##*/} --detached 12345
+    Creates detached worktree session for story 12345
+    
+  ${0##*/} --non-interactive sc-12345
+    Creates worktree without waiting for user confirmation
+USAGE
+}
+
+#######################################
+# Extract story ID from URL or ID string
+# Arguments:
+#   Story URL or ID
+# Outputs:
+#   Writes numeric story ID to stdout
+#######################################
+extract_story_id() {
+  local input="${1}"
+  local story_id
+  
+  # Check if it's a URL
+  if [[ "${input}" =~ https?:// ]]; then
+    # Extract ID from URL (matches /story/12345)
+    if [[ "${input}" =~ /story/([0-9]+) ]]; then
+      story_id="${BASH_REMATCH[1]}"
+    else
+      error "Could not extract story ID from URL: ${input}"
+      return 1
+    fi
+  # Check if it's sc-12345 format
+  elif [[ "${input}" =~ ^sc-([0-9]+)$ ]]; then
+    story_id="${BASH_REMATCH[1]}"
+  # Check if it's just a number
+  elif [[ "${input}" =~ ^[0-9]+$ ]]; then
+    story_id="${input}"
+  else
+    error "Invalid story format: ${input}"
+    error "Expected: URL, sc-12345, or 12345"
+    return 1
+  fi
+  
+  printf "%s" "${story_id}"
+}
+
+#######################################
+# Get branch name from Shortcut story
+# Arguments:
+#   Story ID
+#   Optional: --quiet flag to suppress info messages
+# Outputs:
+#   Writes branch name to stdout
+#######################################
+get_branch_from_story() {
+  local story_id="${1}"
+  local quiet=false
+  local json_output
+  local branch_name
+  
+  # Check for --quiet flag
+  if [ "${#}" -ge 2 ] && [ "${2}" = "--quiet" ]; then
+    quiet=true
+  fi
+  
+  if ! ${quiet}; then
+    info "Fetching story ${story_id} from Shortcut..."
+  fi
+  
+  # Fetch story details as JSON (redirect stderr to hide loading spinner)
+  if ! json_output="$(short story "${story_id}" --format "%j" 2>/dev/null)"; then
+    error "Failed to fetch story from Shortcut"
+    return 1
+  fi
+  
+  # Extract branch name from JSON
+  # The branch name is in the "formatted_vcs_branch_name" field
+  if command -v jq > /dev/null 2>&1; then
+    # Use jq if available
+    branch_name="$(printf "%s" "${json_output}" | jq --raw-output '.formatted_vcs_branch_name // empty')"
+  else
+    # Fallback: use grep and sed
+    branch_name="$(printf "%s" "${json_output}" | grep -o '"formatted_vcs_branch_name":"[^"]*"' | sed 's/"formatted_vcs_branch_name":"\([^"]*\)"/\1/' || true)"
+  fi
+  
+  if [ -z "${branch_name}" ]; then
+    error "No branch name found for story ${story_id}"
+    error "The story may not have a branch associated with it"
+    return 1
+  fi
+  
+  if ! ${quiet}; then
+    info "Found branch: ${branch_name}"
+  fi
+  printf "%s" "${branch_name}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional --detached flag and story URL or ID
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local detached=false
+  local interactive=true
+  local story_input=""
+  local story_id
+  local branch_name
+  local session_script
+  local current_dir
+  local session_name
+  
+  # Parse arguments
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --detached)
+        detached=true
+        shift
+        ;;
+      --non-interactive)
+        interactive=false
+        shift
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        story_input="${1}"
+        shift
+        ;;
+    esac
+  done
+  
+  # Check if story input was provided
+  if [ -z "${story_input}" ]; then
+    error "Missing required argument: story-url-or-id"
+    printf "\\n"
+    usage
+    return 1
+  fi
+  
+  # Check if we're in tmux
+  if ! is_in_tmux; then
+    error "Not running in tmux"
+    error "This script requires tmux to be running"
+    return 1
+  fi
+  
+  # Check if short command is available
+  if ! command -v short > /dev/null 2>&1; then
+    error "Shortcut CLI 'short' not found"
+    error "Please install it first"
+    return 1
+  fi
+  
+  # Get the current directory to pass to the popup
+  current_dir="$(pwd)"
+
+  # Get the path to git-worktree-session script
+  session_script="$(resolve_session_script "${SCRIPT_DIR}")" || return 1
+
+  # Pre-fetch story and branch info before opening the popup
+  story_id="$(extract_story_id "${story_input}")"
+  info "Fetching story ${story_id} from Shortcut..."
+  branch_name="$(get_branch_from_story "${story_id}" --quiet)"
+  info "Found branch: ${branch_name}"
+  session_name="$(get_name_from_branch "${branch_name}")"
+
+  run_worktree_popup "${current_dir}" "${session_script}" "${branch_name}" "${session_name}" "${detached}" "${interactive}"
+  
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+#
+# gh-review - Review a GitHub pull request with Claude
+#
+# Usage: gh-review [--detached] [--non-interactive] <pr-number-or-url>
+#
+# Fetches the PR branch, sets up a worktree session, builds a review prompt
+# from the PR description and diff, and launches Claude interactively in the
+# 'ai' tmux window pre-seeded with the full review context.
+#
+# Arguments:
+#   --detached          Create session without switching to it (optional)
+#   -d                  Shorthand for --detached (optional)
+#   --non-interactive   Don't wait for user input before closing popup (optional)
+#   pr-number-or-url    PR number (123), #123, or full GitHub PR URL
+#
+# Example:
+#   gh-review 123
+#   gh-review '#123'
+#   gh-review https://github.com/org/repo/pull/123
+#   gh-review --detached 123
+#   gh-review --non-interactive 123
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--detached] [--non-interactive] <pr-number-or-url>
+
+Review a GitHub pull request with Claude.
+
+Arguments:
+  --detached, -d      Create session without switching to it (optional)
+  --non-interactive   Don't wait for user input before closing popup (optional)
+  pr-number-or-url    PR number (123), #123, or full GitHub PR URL
+
+The script will:
+  1. Fetch the PR branch name via gh CLI
+  2. Open a tmux popup to create a worktree and tmux session
+  3. Build a review prompt from the PR title, description, and diff
+  4. Launch Claude in the 'ai' window with the review prompt
+  5. Switch to the 'ai' window (unless --detached)
+
+Examples:
+  ${0##*/} 123
+    Reviews PR #123 (interactive popup)
+
+  ${0##*/} '#123'
+    Reviews PR #123 (hash prefix stripped automatically)
+
+  ${0##*/} https://github.com/org/repo/pull/123
+    Reviews PR from URL
+
+  ${0##*/} --detached 123
+    Reviews PR #123 without switching to the session
+
+  ${0##*/} --non-interactive 123
+    Reviews PR without waiting for user confirmation
+USAGE
+}
+
+#######################################
+# Normalize PR input: strip leading '#' if present
+# Arguments:
+#   PR number, #PR number, or URL
+# Outputs:
+#   Writes normalized input to stdout
+#######################################
+normalize_pr_input() {
+  local input="${1}"
+  printf "%s" "${input#\#}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional --detached / --non-interactive flags and PR number or URL
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local detached=false
+  local interactive=true
+  local pr_input=""
+  local branch_name
+  local session_script
+  local current_dir
+  local session_name
+
+  # Parse arguments
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --detached|-d)
+        detached=true
+        shift
+        ;;
+      --non-interactive)
+        interactive=false
+        shift
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        pr_input="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  # Check if PR input was provided
+  if [ -z "${pr_input}" ]; then
+    error "Missing required argument: pr-number-or-url"
+    printf "\\n"
+    usage
+    return 1
+  fi
+
+  # Check if we're in tmux
+  if ! is_in_tmux; then
+    error "Not running in tmux"
+    error "This script requires tmux to be running"
+    return 1
+  fi
+
+  # Check if gh command is available
+  if ! command -v gh > /dev/null 2>&1; then
+    error "GitHub CLI 'gh' not found"
+    error "Please install it first: https://cli.github.com"
+    return 1
+  fi
+
+  # Get the path to git-worktree-session script
+  session_script="$(resolve_session_script "${SCRIPT_DIR}")" || return 1
+
+  pr_input="$(normalize_pr_input "${pr_input}")"
+  current_dir="$(pwd)"
+
+  info "Fetching PR ${pr_input} from GitHub..."
+  branch_name="$(gh pr view "${pr_input}" --json headRefName -q '.headRefName')"
+
+  if [ -z "${branch_name}" ]; then
+    error "Could not determine branch name for PR ${pr_input}"
+    return 1
+  fi
+
+  info "Found branch: ${branch_name}"
+  session_name="pr-$(get_name_from_branch "${branch_name}")"
+
+  # Pass detached=true so run_worktree_popup skips switch-client;
+  # we switch to :ai ourselves below.
+  run_worktree_popup "${current_dir}" "${session_script}" "${branch_name}" \
+    "${session_name}" "true" "${interactive}" "pr-"
+
+  info "Launching Claude in ai window..."
+  tmux send-keys -t "${session_name}:ai" \
+    "claude -- '/review-pr ${pr_input}'" Enter
+
+  if ! ${detached}; then
+    tmux switch-client -t "${session_name}:ai"
+  fi
+
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

@@ -1,0 +1,253 @@
+#!/usr/bin/env bash
+#
+# shortcut-implement - Implement a Shortcut story with Claude
+#
+# Usage: shortcut-implement [--detached] [-d] [--non-interactive] <story-url-or-id>
+#
+# Fetches a Shortcut story, sets up a worktree session, builds an implementation
+# prompt from the story title and description, and launches Claude interactively
+# in the 'ai' tmux window pre-seeded with the story context.
+#
+# Arguments:
+#   --detached, -d      Create session without switching to it (optional)
+#   --non-interactive   Don't wait for user input before closing popup (optional)
+#   story-url-or-id     Shortcut story URL, sc-12345, or numeric ID
+#
+# Example:
+#   shortcut-implement sc-12345
+#   shortcut-implement 12345
+#   shortcut-implement https://app.shortcut.com/workspace/story/12345
+#   shortcut-implement --detached sc-12345
+#   shortcut-implement --non-interactive 12345
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--detached] [--non-interactive] <story-url-or-id>
+
+Implement a Shortcut story with Claude.
+
+Arguments:
+  --detached, -d      Create session without switching to it (optional)
+  --non-interactive   Don't wait for user input before closing popup (optional)
+  story-url-or-id     Shortcut story URL, sc-12345, or numeric ID
+
+The script will:
+  1. Fetch the story details from Shortcut
+  2. Open a tmux popup to create a worktree and tmux session
+  3. Build an implementation prompt from the story title and description
+  4. Launch Claude in the 'ai' window with the implementation prompt
+  5. Switch to the 'ai' window (unless --detached)
+
+Examples:
+  ${0##*/} sc-12345
+    Implements story sc-12345 (interactive popup)
+
+  ${0##*/} 12345
+    Implements story 12345 (numeric ID)
+
+  ${0##*/} https://app.shortcut.com/workspace/story/12345
+    Implements story from URL
+
+  ${0##*/} --detached sc-12345
+    Sets up session without switching to it
+
+  ${0##*/} --non-interactive sc-12345
+    Implements story without waiting for user confirmation
+USAGE
+}
+
+#######################################
+# Extract story ID from URL or ID string
+# Arguments:
+#   Story URL or ID
+# Outputs:
+#   Writes numeric story ID to stdout
+#######################################
+extract_story_id() {
+  local input="${1}"
+  local story_id
+
+  # Check if it's a URL
+  if [[ "${input}" =~ https?:// ]]; then
+    if [[ "${input}" =~ /story/([0-9]+) ]]; then
+      story_id="${BASH_REMATCH[1]}"
+    else
+      error "Could not extract story ID from URL: ${input}"
+      return 1
+    fi
+  # Check if it's sc-12345 format
+  elif [[ "${input}" =~ ^sc-([0-9]+)$ ]]; then
+    story_id="${BASH_REMATCH[1]}"
+  # Check if it's just a number
+  elif [[ "${input}" =~ ^[0-9]+$ ]]; then
+    story_id="${input}"
+  else
+    error "Invalid story format: ${input}"
+    error "Expected: URL, sc-12345, or 12345"
+    return 1
+  fi
+
+  printf "%s" "${story_id}"
+}
+
+#######################################
+# Fetch story JSON from Shortcut
+# Arguments:
+#   story_id — numeric story ID
+# Outputs:
+#   Writes JSON to stdout
+#######################################
+fetch_story_json() {
+  local story_id="${1}"
+  local json_output
+
+  if ! json_output="$(short story "${story_id}" --format "%j" 2>/dev/null)"; then
+    error "Failed to fetch story ${story_id} from Shortcut"
+    return 1
+  fi
+
+  printf "%s" "${json_output}"
+}
+
+#######################################
+# Extract branch name from story JSON
+# Arguments:
+#   json — story JSON string
+# Outputs:
+#   Writes branch name to stdout
+#######################################
+branch_from_json() {
+  local json="${1}"
+  local branch_name
+
+  if command -v jq > /dev/null 2>&1; then
+    branch_name="$(printf "%s" "${json}" | jq --raw-output '.formatted_vcs_branch_name // empty')"
+  else
+    branch_name="$(printf "%s" "${json}" | grep -o '"formatted_vcs_branch_name":"[^"]*"' | sed 's/"formatted_vcs_branch_name":"\([^"]*\)"/\1/' || true)"
+  fi
+
+  if [ -z "${branch_name}" ]; then
+    error "No branch name found in story"
+    error "The story may not have a branch associated with it"
+    return 1
+  fi
+
+  printf "%s" "${branch_name}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional --detached / --non-interactive flags and story URL or ID
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local detached=false
+  local interactive=true
+  local story_input=""
+  local story_id
+  local story_json
+  local branch_name
+  local session_script
+  local current_dir
+  local session_name
+
+  # Parse arguments
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --detached|-d)
+        detached=true
+        shift
+        ;;
+      --non-interactive)
+        interactive=false
+        shift
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        story_input="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  # Check if story input was provided
+  if [ -z "${story_input}" ]; then
+    error "Missing required argument: story-url-or-id"
+    printf "\\n"
+    usage
+    return 1
+  fi
+
+  # Check if we're in tmux
+  if ! is_in_tmux; then
+    error "Not running in tmux"
+    error "This script requires tmux to be running"
+    return 1
+  fi
+
+  # Check if short command is available
+  if ! command -v short > /dev/null 2>&1; then
+    error "Shortcut CLI 'short' not found"
+    error "Please install it first"
+    return 1
+  fi
+
+  # Get the path to git-worktree-session script
+  session_script="$(resolve_session_script "${SCRIPT_DIR}")" || return 1
+
+  current_dir="$(pwd)"
+  story_id="$(extract_story_id "${story_input}")"
+
+  info "Fetching story ${story_id} from Shortcut..."
+  story_json="$(fetch_story_json "${story_id}")"
+
+  info "Ensuring story ownership..."
+  "${SCRIPT_DIR}/shortcut-claim" --quiet "${story_id}"
+
+  branch_name="$(branch_from_json "${story_json}")"
+  info "Found branch: ${branch_name}"
+
+  session_name="$(get_name_from_branch "${branch_name}")"
+
+  # Pass detached=true so run_worktree_popup skips switch-client;
+  # we switch to :ai ourselves below.
+  run_worktree_popup "${current_dir}" "${session_script}" "${branch_name}" \
+    "${session_name}" "true" "${interactive}"
+
+  info "Launching Claude in ai window..."
+  tmux send-keys -t "${session_name}:ai" \
+    "claude --permission-mode plan -- '/implement ${story_id}'" Enter
+
+  if ! ${detached}; then
+    tmux switch-client -t "${session_name}:ai"
+  fi
+
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

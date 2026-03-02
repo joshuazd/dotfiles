@@ -1,0 +1,220 @@
+#!/usr/bin/env bash
+#
+# git-worktree-cleanup - Remove a git worktree and clean up
+#
+# Usage: git-worktree-cleanup [directory]
+#
+# Removes a git worktree directory and performs cleanup. Verifies that the
+# target is actually a worktree and not the main repository before removal.
+# Returns to the main repository after cleanup.
+#
+# Arguments:
+#   directory    Path to worktree directory (default: current directory)
+#
+# Example:
+#   git-worktree-cleanup ../my-feature
+#   cd ../my-feature && git-worktree-cleanup
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [directory]
+
+Remove a git worktree and perform cleanup.
+
+Arguments:
+  directory    Path to worktree directory (default: current directory)
+
+The script will:
+  1. Verify the target is a worktree (not the main repository)
+  2. Navigate to the main repository
+  3. Remove the worktree directory
+  4. Prune any stale worktree references
+  5. Kill the corresponding tmux session (if it exists)
+
+Examples:
+  ${0##*/}
+    Removes current directory (if it's a worktree)
+
+  ${0##*/} ../my-feature
+    Removes the specified worktree directory
+USAGE
+}
+
+#######################################
+# Check if directory is a worktree (not main repo)
+# Arguments:
+#   Directory path
+# Returns:
+#   0 if it's a worktree, 1 if it's the main repo or not a git repo
+#######################################
+is_worktree() {
+  local dir="${1}"
+  local git_dir
+  local git_common_dir
+  
+  (
+    cd "${dir}" || return 1
+    
+    if ! is_git_repo; then
+      return 1
+    fi
+    
+    # Get git directories
+    git_dir="$(git rev-parse --git-dir)"
+    git_common_dir="$(git rev-parse --git-common-dir)"
+    
+    # In a worktree, these will be different
+    # In the main repo, they will be the same
+    [ "${git_dir}" != "${git_common_dir}" ]
+  )
+}
+
+#######################################
+# Get the main repository path
+# Arguments:
+#   Directory path (must be in a git repo or worktree)
+# Outputs:
+#   Writes main repository path to stdout
+#######################################
+get_main_repo_path() {
+  local dir="${1}"
+  
+  (
+    cd "${dir}" || return 1
+    dirname "$(git rev-parse --git-common-dir)"
+  )
+}
+
+#######################################
+# Check if a tmux session exists
+# Arguments:
+#   Session name
+# Returns:
+#   0 if session exists, 1 otherwise
+#######################################
+tmux_session_exists() {
+  local session_name="${1}"
+  tmux has-session -t "${session_name}" 2>/dev/null
+}
+
+#######################################
+# Kill a tmux session if it exists
+# Arguments:
+#   Session name
+# Returns:
+#   0 on success or if session doesn't exist, 1 on failure
+#######################################
+kill_tmux_session() {
+  local session_name="${1}"
+  
+  if tmux_session_exists "${session_name}"; then
+    info "Killing tmux session '${session_name}'"
+    if tmux kill-session -t "${session_name}"; then
+      info "Tmux session killed"
+      return 0
+    else
+      warn "Failed to kill tmux session"
+      return 1
+    fi
+  else
+    info "No tmux session named '${session_name}' found"
+    return 0
+  fi
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional directory path
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local target_dir="${1:-.}"
+  local absolute_path
+  local main_repo_path
+  local session_name
+  
+  # Convert to absolute path
+  absolute_path="$(cd "${target_dir}" && pwd)"
+  
+  # Get the directory name (which should match the session name)
+  session_name="$(basename "${absolute_path}")"
+  
+  # Check if it's a git repository
+  if ! (cd "${absolute_path}" && is_git_repo); then
+    error "Not a git repository: ${absolute_path}"
+    return 1
+  fi
+  
+  # Check if it's a worktree (not main repo)
+  if ! is_worktree "${absolute_path}"; then
+    error "Not a worktree: ${absolute_path}"
+    error "This appears to be the main repository. Only worktrees can be cleaned up with this script."
+    return 1
+  fi
+  
+  # Get main repository path
+  main_repo_path="$(get_main_repo_path "${absolute_path}")"
+  
+  info "Worktree directory: ${absolute_path}"
+  info "Main repository: ${main_repo_path}"
+  
+  # Navigate to main repository
+  info "Navigating to main repository..."
+  cd "${main_repo_path}" || {
+    error "Failed to navigate to main repository"
+    return 1
+  }
+
+  # Kill corresponding tmux session if it exists
+  kill_tmux_session "${session_name}"
+  
+  
+  # Remove the worktree using git
+  info "Removing worktree..."
+  if git worktree remove --force "${absolute_path}"; then
+    info "Worktree removed successfully"
+  else
+    error "Failed to remove worktree with git, attempting manual cleanup..."
+    
+    # Fallback: manually remove directory
+    if rm --recursive --force "${absolute_path}"; then
+      warn "Directory removed manually"
+    else
+      error "Failed to remove directory"
+      return 1
+    fi
+  fi
+  
+  # Prune worktree references
+  info "Pruning stale worktree references..."
+  git worktree prune
+  
+  info "Cleanup complete!"
+  info "Current directory: $(pwd)"
+  
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

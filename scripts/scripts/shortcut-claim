@@ -1,0 +1,211 @@
+#!/usr/bin/env bash
+#
+# shortcut-claim - Claim ownership of a Shortcut story
+#
+# Usage: shortcut-claim [--quiet] <story-url-or-id>
+#
+# Fetches a Shortcut story and adds the current authenticated user as an owner
+# if they are not already listed. Exits cleanly if already an owner.
+#
+# Arguments:
+#   --quiet, -q         Suppress story output after claiming (optional)
+#   story-url-or-id     Shortcut story URL, sc-12345, or numeric ID
+#
+# Example:
+#   shortcut-claim sc-12345
+#   shortcut-claim 12345
+#   shortcut-claim https://app.shortcut.com/workspace/story/12345
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--quiet] <story-url-or-id>
+
+Claim ownership of a Shortcut story.
+
+Arguments:
+  --quiet, -q         Suppress story output after claiming (optional)
+  story-url-or-id     Shortcut story URL, sc-12345, or numeric ID
+
+The script will:
+  1. Fetch the story details from Shortcut
+  2. Check if you are already an owner
+  3. Add you as an owner if not already listed
+
+Examples:
+  ${0##*/} sc-12345
+    Claims ownership of story sc-12345
+
+  ${0##*/} 12345
+    Claims ownership of story 12345 (numeric ID)
+
+  ${0##*/} https://app.shortcut.com/workspace/story/12345
+    Claims ownership of story from URL
+USAGE
+}
+
+#######################################
+# Extract story ID from URL or ID string
+# Arguments:
+#   Story URL or ID
+# Outputs:
+#   Writes numeric story ID to stdout
+#######################################
+extract_story_id() {
+  local input
+  # Strip all whitespace/control characters — anchored regexes fail on stray chars
+  input="$(printf '%s' "${1}" | tr -d '[:space:]')"
+  local story_id
+
+  # Check if it's a URL
+  if [[ "${input}" =~ https?:// ]]; then
+    if [[ "${input}" =~ /story/([0-9]+) ]]; then
+      story_id="${BASH_REMATCH[1]}"
+    else
+      error "Could not extract story ID from URL: ${input}"
+      return 1
+    fi
+  # Check if it's sc-12345 format
+  elif [[ "${input}" =~ ^sc-([0-9]+)$ ]]; then
+    story_id="${BASH_REMATCH[1]}"
+  # Check if it's just a number
+  elif [[ "${input}" =~ ^[0-9]+$ ]]; then
+    story_id="${input}"
+  else
+    error "Invalid story format: ${input}"
+    error "Expected: URL, sc-12345, or 12345"
+    return 1
+  fi
+
+  printf "%s" "${story_id}"
+}
+
+#######################################
+# Get the current authenticated member's UUID and mention name
+# Outputs:
+#   Writes "<uuid> <mention_name>" to stdout
+#######################################
+get_current_member() {
+  local member_json
+  local uuid
+  local mention
+
+  if ! member_json="$(short api /member 2>/dev/null)"; then
+    error "Failed to fetch current member from Shortcut"
+    return 1
+  fi
+
+  uuid="$(printf "%s" "${member_json}" | jq -r '.id')"
+  mention="$(printf "%s" "${member_json}" | jq -r '.mention_name')"
+
+  if [ -z "${uuid}" ] || [ "${uuid}" = "null" ]; then
+    error "Could not determine current member UUID"
+    return 1
+  fi
+
+  printf "%s %s" "${uuid}" "${mention}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Story URL or ID
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local story_input=""
+  local quiet=false
+  local story_id
+  local story_json
+  local current_uuid
+  local member_info
+  local already_owner
+  local new_owner_ids
+
+  # Parse arguments
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --quiet|-q)
+        quiet=true
+        shift
+        ;;
+      *)
+        story_input="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  # Check if story input was provided
+  if [ -z "${story_input}" ]; then
+    error "Missing required argument: story-url-or-id"
+    printf "\\n"
+    usage
+    return 1
+  fi
+
+  # Check dependencies
+  if ! command -v short > /dev/null 2>&1; then
+    error "Shortcut CLI 'short' not found"
+    error "Please install it first"
+    return 1
+  fi
+
+  if ! command -v jq > /dev/null 2>&1; then
+    error "jq not found"
+    error "Please install jq first"
+    return 1
+  fi
+
+  story_id="$(extract_story_id "${story_input}")"
+
+  info "Fetching story ${story_id}..."
+  if ! story_json="$(short story "${story_id}" --format "%j" 2>/dev/null)"; then
+    error "Failed to fetch story ${story_id} from Shortcut"
+    return 1
+  fi
+
+  member_info="$(get_current_member)"
+  current_uuid="${member_info%% *}"
+
+  already_owner="$(jq --arg id "${current_uuid}" '.owner_ids | contains([$id])' <<< "${story_json}")"
+
+  if [ "${already_owner}" = "true" ]; then
+    info "Already an owner of sc-${story_id}"
+    return 0
+  fi
+
+  new_owner_ids="$(jq -r --arg id "${current_uuid}" '[(.owner_ids // [])[], $id] | unique | join(",")' <<< "${story_json}")"
+
+  info "Claiming ownership of sc-${story_id}..."
+  if ${quiet}; then
+    short story "${story_id}" --owners "${new_owner_ids}" > /dev/null
+  else
+    short story "${story_id}" --owners "${new_owner_ids}"
+  fi
+  info "Done — you are now an owner of sc-${story_id}"
+
+  return 0
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

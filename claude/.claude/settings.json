@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bundle exec rubocop*)",
+      "Bash(bundle exec rspec*)",
+      "Bash(gh pr diff*)",
+      "Skill(*)"
+    ],
+    "additionalDirectories": [
+      "~/"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "swift-lsp@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
+  }
+}
