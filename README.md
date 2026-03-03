@@ -4,6 +4,18 @@
 [![Shell Config Tests](https://github.com/joshuazd/dotfiles/actions/workflows/test-shell.yml/badge.svg)](https://github.com/joshuazd/dotfiles/actions/workflows/test-shell.yml)
 [![Tmux Config Tests](https://github.com/joshuazd/dotfiles/actions/workflows/test-tmux.yml/badge.svg)](https://github.com/joshuazd/dotfiles/actions/workflows/test-tmux.yml)
 
+## Quick Install
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/joshuazd/dotfiles/master/install.sh)"
+```
+
+To clone to a custom path (default is `~/dotfiles`):
+
+```bash
+DOTFILES=~/.dotfiles bash -c "$(curl -fsSL https://raw.githubusercontent.com/joshuazd/dotfiles/master/install.sh)"
+```
+
 Personal configuration files for Unix-based development environments.
 
 ## Overview
