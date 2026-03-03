@@ -180,6 +180,7 @@ setup_claude_files() {
 #######################################
 main() {
   local prefix=""
+  local fetch=false
   local branch_name=""
   local dir_name
   local worktree_path
@@ -191,6 +192,10 @@ main() {
       --prefix)
         prefix="${2}"
         shift 2
+        ;;
+      --fetch)
+        fetch=true
+        shift
         ;;
       -*)
         error "Unknown option: ${1}"
@@ -234,7 +239,15 @@ main() {
   
   info "Creating worktree for branch '${branch_name}'"
   info "Location: ${worktree_path}"
-  
+
+  # Fetch from origin if requested, to ensure the worktree gets the latest remote state
+  if ${fetch}; then
+    info "Fetching latest for branch '${branch_name}' from origin..."
+    if ! git fetch origin "${branch_name}"; then
+      warn "Could not fetch '${branch_name}' from origin; using local state"
+    fi
+  fi
+
   # Check if branch exists
   if branch_exists "${branch_name}"; then
     info "Branch '${branch_name}' exists, checking it out"
@@ -251,6 +264,13 @@ main() {
   fi
 
   info "Worktree created successfully"
+
+  # If fetching was requested and a remote tracking branch exists, reset worktree to remote HEAD.
+  # This handles the case where a local branch exists but is behind the remote.
+  if ${fetch} && git show-ref --verify --quiet "refs/remotes/origin/${branch_name}"; then
+    git -C "${worktree_path}" reset --hard "origin/${branch_name}"
+    info "Updated worktree to origin/${branch_name}"
+  fi
 
   # Set up remote tracking if not already configured (e.g. new branch created with -b,
   # or existing local branch without an upstream set)
