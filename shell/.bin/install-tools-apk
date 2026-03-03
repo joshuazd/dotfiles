@@ -1,0 +1,66 @@
+#!/bin/sh
+set -o errexit -o nounset
+
+TAG="${1:-core}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PACKAGES="$SCRIPT_DIR/packages.tsv"
+
+# Alpine containers often run as root; use sudo only if available
+SUDO=""
+command -v sudo >/dev/null 2>&1 && [ "$(id -u)" -ne 0 ] && SUDO=sudo
+
+# Enable community repo if not already enabled
+if [ -f /etc/apk/repositories ]; then
+    grep -q "community" /etc/apk/repositories \
+        || $SUDO sed -i 's|#.*community|&|; s|^#\(.*community\)|\1|' /etc/apk/repositories \
+        || echo "Note: enable the Alpine community repo for some packages"
+fi
+
+# --- Special installers ---
+
+install_gh() {
+    # gh is available in Alpine 3.17+ community repo
+    $SUDO apk add --no-cache github-cli
+}
+
+install_mise() {
+    curl https://mise.run | sh
+}
+
+install_claude_code() {
+    if ! command -v node >/dev/null 2>&1; then
+        "$HOME/.local/bin/mise" use -g node@lts
+    fi
+    npm install -g @anthropic-ai/claude-code
+}
+
+# --- Parse packages.tsv: column 6 = apk ---
+
+plain=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $6 !~ /^@/ { print $6 }
+' "$PACKAGES")
+
+special=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $6 ~ /^@/ { sub(/^@/, "", $6); print $6 }
+' "$PACKAGES")
+
+# --- Install plain packages ---
+
+if [ -n "$plain" ]; then
+    # shellcheck disable=SC2086
+    echo "$plain" | xargs $SUDO apk add --no-cache
+fi
+
+# --- Run special installers ---
+
+echo "$special" | while IFS= read -r name; do
+    [ -z "$name" ] && continue
+    case "$name" in
+        gh)           install_gh ;;
+        mise)         install_mise ;;
+        claude-code)  install_claude_code ;;
+        *)            echo "install-tools-apk: no installer for '$name'" >&2 ;;
+    esac
+done
