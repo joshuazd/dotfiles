@@ -1,5 +1,5 @@
 #!/bin/sh
-set -o errexit -o nounset
+set -eu
 
 DOTFILES="${DOTFILES:-$HOME/dotfiles}"
 REPO="https://github.com/joshuazd/dotfiles.git"
@@ -10,7 +10,7 @@ if ! command -v git >/dev/null 2>&1; then
 fi
 
 if [ -d "$DOTFILES" ]; then
-    echo "Dotfiles already present at $DOTFILES — skipping clone."
+    echo "Dotfiles already present at $DOTFILES - skipping clone."
 else
     git clone "$REPO" "$DOTFILES"
 fi
