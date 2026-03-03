@@ -1,0 +1,56 @@
+#!/bin/sh
+set -o errexit -o nounset
+
+TAG="${1:-core}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PACKAGES="$SCRIPT_DIR/packages.tsv"
+
+# --- Special installers ---
+
+install_gh() {
+    # gh is in the extra repo on Arch
+    sudo pacman -S --noconfirm github-cli
+}
+
+install_mise() {
+    curl https://mise.run | sh
+}
+
+install_claude_code() {
+    if ! command -v node >/dev/null 2>&1; then
+        "$HOME/.local/bin/mise" use -g node@lts
+    fi
+    npm install -g @anthropic-ai/claude-code
+}
+
+# --- Parse packages.tsv: column 5 = pacman ---
+
+plain=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $5 !~ /^@/ { print $5 }
+' "$PACKAGES")
+
+special=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $5 ~ /^@/ { sub(/^@/, "", $5); print $5 }
+' "$PACKAGES")
+
+# --- Install plain packages ---
+# base-devel is a package group; pass --needed to skip already-installed packages
+
+if [ -n "$plain" ]; then
+    # shellcheck disable=SC2086
+    echo "$plain" | xargs sudo pacman -S --noconfirm --needed
+fi
+
+# --- Run special installers ---
+
+echo "$special" | while IFS= read -r name; do
+    [ -z "$name" ] && continue
+    case "$name" in
+        gh)           install_gh ;;
+        mise)         install_mise ;;
+        claude-code)  install_claude_code ;;
+        *)            echo "install-tools-pacman: no installer for '$name'" >&2 ;;
+    esac
+done
