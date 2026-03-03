@@ -1,0 +1,71 @@
+#!/bin/sh
+set -o errexit -o nounset
+
+TAG="${1:-core}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PACKAGES="$SCRIPT_DIR/packages.tsv"
+
+# --- Special installers ---
+
+install_gh() {
+    # Official GitHub CLI apt repository
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+    sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo apt update
+    sudo apt install -y gh
+}
+
+install_mise() {
+    curl https://mise.run | sh
+}
+
+install_claude_code() {
+    if ! command -v node >/dev/null 2>&1; then
+        # Use mise to install node if not present
+        "$HOME/.local/bin/mise" use -g node@lts
+    fi
+    npm install -g @anthropic-ai/claude-code
+}
+
+# --- Parse packages.tsv: column 3 = apt ---
+
+plain=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $3 !~ /^@/ { print $3 }
+' "$PACKAGES")
+
+special=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $3 ~ /^@/ { sub(/^@/, "", $3); print $3 }
+' "$PACKAGES")
+
+# --- Install plain packages ---
+
+if [ -n "$plain" ]; then
+    sudo apt update
+    # shellcheck disable=SC2086
+    echo "$plain" | xargs sudo apt install -y
+fi
+
+# --- Fix binary names that differ from package names ---
+# fd-find installs as fdfind; bat may install as batcat
+mkdir -p "$HOME/.local/bin"
+[ -x /usr/bin/fdfind ] && [ ! -e "$HOME/.local/bin/fd" ] \
+    && ln -sf /usr/bin/fdfind "$HOME/.local/bin/fd"
+[ -x /usr/bin/batcat ] && [ ! -e "$HOME/.local/bin/bat" ] \
+    && ln -sf /usr/bin/batcat "$HOME/.local/bin/bat"
+
+# --- Run special installers ---
+
+echo "$special" | while IFS= read -r name; do
+    [ -z "$name" ] && continue
+    case "$name" in
+        gh)           install_gh ;;
+        mise)         install_mise ;;
+        claude-code)  install_claude_code ;;
+        *)            echo "install-tools-apt: no installer for '$name'" >&2 ;;
+    esac
+done
