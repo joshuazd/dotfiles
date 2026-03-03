@@ -1,0 +1,28 @@
+#!/bin/sh
+set -o errexit -o nounset
+
+# TAG unused on Mac — Brewfile covers everything
+
+# Resolve symlinks so this script can find dotfiles root when run from ~/.bin/
+self="$0"
+while [ -L "$self" ]; do
+    self_dir="$(cd "$(dirname "$self")" && pwd)"
+    self="$self_dir/$(readlink "$self")"
+done
+SCRIPT_DIR="$(cd "$(dirname "$self")" && pwd)"
+DOTFILES="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Install Homebrew if not present
+if ! command -v brew >/dev/null 2>&1; then
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    # Apple Silicon path
+    [ -f /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+brew bundle --file="$DOTFILES/Brewfile"
+
+# claude-code via npm (not in Homebrew)
+if ! command -v claude >/dev/null 2>&1; then
+    npm install -g @anthropic-ai/claude-code
+fi
