@@ -1,8 +1,10 @@
-#! /usr/bin/env sh
+#!/bin/sh
+set -o errexit -o nounset
 
-cd "$(dirname "$0")"
+TAG="${1:-core}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-"$PWD/install-symlinks"
-"$PWD/install-tmux"
-"$PWD/install-vim"
-"$PWD/install-tools"
+"$SCRIPT_DIR/install-tools" "$TAG"
+"$SCRIPT_DIR/install-symlinks"
+"$SCRIPT_DIR/install-pack"
+vim +helptags\ ALL +qall

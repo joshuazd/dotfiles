@@ -12,13 +12,13 @@ case "$option" in
         vim +helptags\ ALL +qall
         ;;
     tools)
-        exec "$HOME/.bin/install-tools" ;;
+        exec "$HOME/.bin/install-tools" "${2:-}" ;;
     tmux)
         exec "$HOME/.bin/install-tmux" ;;
     vim)
         exec "$HOME/.bin/install-vim" ;;
     all)
-        exec "$HOME/.bin/install-all" ;;
+        exec "$HOME/.bin/install-all" "${2:-}" ;;
     *)
         ;;
 esac
