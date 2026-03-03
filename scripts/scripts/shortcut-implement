@@ -70,85 +70,6 @@ USAGE
 }
 
 #######################################
-# Extract story ID from URL or ID string
-# Arguments:
-#   Story URL or ID
-# Outputs:
-#   Writes numeric story ID to stdout
-#######################################
-extract_story_id() {
-  local input="${1}"
-  local story_id
-
-  # Check if it's a URL
-  if [[ "${input}" =~ https?:// ]]; then
-    if [[ "${input}" =~ /story/([0-9]+) ]]; then
-      story_id="${BASH_REMATCH[1]}"
-    else
-      error "Could not extract story ID from URL: ${input}"
-      return 1
-    fi
-  # Check if it's sc-12345 format
-  elif [[ "${input}" =~ ^sc-([0-9]+)$ ]]; then
-    story_id="${BASH_REMATCH[1]}"
-  # Check if it's just a number
-  elif [[ "${input}" =~ ^[0-9]+$ ]]; then
-    story_id="${input}"
-  else
-    error "Invalid story format: ${input}"
-    error "Expected: URL, sc-12345, or 12345"
-    return 1
-  fi
-
-  printf "%s" "${story_id}"
-}
-
-#######################################
-# Fetch story JSON from Shortcut
-# Arguments:
-#   story_id — numeric story ID
-# Outputs:
-#   Writes JSON to stdout
-#######################################
-fetch_story_json() {
-  local story_id="${1}"
-  local json_output
-
-  if ! json_output="$(short story "${story_id}" --format "%j" 2>/dev/null)"; then
-    error "Failed to fetch story ${story_id} from Shortcut"
-    return 1
-  fi
-
-  printf "%s" "${json_output}"
-}
-
-#######################################
-# Extract branch name from story JSON
-# Arguments:
-#   json — story JSON string
-# Outputs:
-#   Writes branch name to stdout
-#######################################
-branch_from_json() {
-  local json="${1}"
-  local branch_name
-
-  if command -v jq > /dev/null 2>&1; then
-    branch_name="$(printf "%s" "${json}" | jq --raw-output '.formatted_vcs_branch_name // empty')"
-  else
-    branch_name="$(printf "%s" "${json}" | grep -o '"formatted_vcs_branch_name":"[^"]*"' | sed 's/"formatted_vcs_branch_name":"\([^"]*\)"/\1/' || true)"
-  fi
-
-  if [ -z "${branch_name}" ]; then
-    error "No branch name found in story"
-    error "The story may not have a branch associated with it"
-    return 1
-  fi
-
-  printf "%s" "${branch_name}"
-}
-
-#######################################
 # Main function
 # Arguments:
 #   Optional --detached / --non-interactive flags and story URL or ID
@@ -227,10 +148,11 @@ main() {
 
   session_name="$(get_name_from_branch "${branch_name}")"
 
-  # Pass detached=true so run_worktree_popup skips switch-client;
+  # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :ai ourselves below.
-  run_worktree_popup "${current_dir}" "${session_script}" "${branch_name}" \
-    "${session_name}" "true" "${interactive}"
+  local -a popup_args=("--detached")
+  ${interactive} || popup_args+=("--non-interactive")
+  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
   info "Launching Claude in ai window..."
   tmux send-keys -t "${session_name}:ai" \

@@ -57,42 +57,6 @@ USAGE
 }
 
 #######################################
-# Extract story ID from URL or ID string
-# Arguments:
-#   Story URL or ID
-# Outputs:
-#   Writes numeric story ID to stdout
-#######################################
-extract_story_id() {
-  local input
-  # Strip all whitespace/control characters — anchored regexes fail on stray chars
-  input="$(printf '%s' "${1}" | tr -d '[:space:]')"
-  local story_id
-
-  # Check if it's a URL
-  if [[ "${input}" =~ https?:// ]]; then
-    if [[ "${input}" =~ /story/([0-9]+) ]]; then
-      story_id="${BASH_REMATCH[1]}"
-    else
-      error "Could not extract story ID from URL: ${input}"
-      return 1
-    fi
-  # Check if it's sc-12345 format
-  elif [[ "${input}" =~ ^sc-([0-9]+)$ ]]; then
-    story_id="${BASH_REMATCH[1]}"
-  # Check if it's just a number
-  elif [[ "${input}" =~ ^[0-9]+$ ]]; then
-    story_id="${input}"
-  else
-    error "Invalid story format: ${input}"
-    error "Expected: URL, sc-12345, or 12345"
-    return 1
-  fi
-
-  printf "%s" "${story_id}"
-}
-
-#######################################
 # Get the current authenticated member's UUID and mention name
 # Outputs:
 #   Writes "<uuid> <mention_name>" to stdout

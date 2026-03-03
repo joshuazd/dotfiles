@@ -43,7 +43,11 @@ All scripts source `common.sh` (via `SCRIPT_DIR` resolution) which provides:
 - `help_wanted` — detects `-h`/`--help`/`-?` flags
 - `is_git_repo` / `is_in_tmux` — environment checks
 - `get_name_from_branch` — strips `feature/`, `bugfix/`, `hotfix/` etc. prefixes
-- `run_worktree_popup` — opens a tmux popup to run `git-worktree-session`; if `DISPATCH_IN_POPUP=1`, runs inline instead to avoid nested popups
+- `extract_story_id` — normalises Shortcut story URL, `sc-<id>`, or bare integer to a numeric ID
+- `normalize_pr_input` — strips a leading `#` from a PR number or URL
+- `fetch_story_json` — fetches story JSON from Shortcut via the `short` CLI
+- `branch_from_json` — extracts `formatted_vcs_branch_name` from story JSON
+- `run_worktree_popup` — opens a tmux popup to run `git-worktree-session`; accepts `--detached`, `--non-interactive`, `--prefix <value>`, `--fetch` flags; if `DISPATCH_IN_POPUP=1`, runs inline instead to avoid nested popups
 - `resolve_session_script` — locates `git-worktree-session` relative to `SCRIPT_DIR`
 
 ### Core Workflow Pipeline

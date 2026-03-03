@@ -31,12 +31,13 @@ source "${SCRIPT_DIR}/common.sh"
 #######################################
 usage() {
   cat <<USAGE
-Usage: ${0##*/} [--detached] [--prefix <value>] <branch-name>
+Usage: ${0##*/} [--detached] [--fetch] [--prefix <value>] <branch-name>
 
 Create a git worktree and tmux session.
 
 Arguments:
   --detached      Create tmux session in detached mode (optional)
+  --fetch         Fetch from origin and reset worktree to remote HEAD (optional)
   --prefix value  Prepend value to the session and directory name (optional)
   branch-name     Name of the branch to create worktree for
 
@@ -58,24 +59,6 @@ USAGE
 }
 
 #######################################
-# Get the worktree path for a branch
-# Arguments:
-#   Branch name
-# Outputs:
-#   Writes worktree path to stdout
-#######################################
-get_worktree_path() {
-  local branch_name="${1}"
-  local repo_root
-  local dir_name
-  
-  repo_root="$(git rev-parse --show-toplevel)"
-  dir_name="$(get_name_from_branch "${branch_name}")"
-  
-  printf "%s/../%s" "${repo_root}" "${dir_name}"
-}
-
-#######################################
 # Main function
 # Arguments:
 #   Optional --detached flag and branch name
@@ -84,6 +67,7 @@ get_worktree_path() {
 #######################################
 main() {
   local detached=false
+  local fetch=false
   local prefix=""
   local branch_name=""
   local session_name
@@ -97,6 +81,10 @@ main() {
     case "${1}" in
       --detached)
         detached=true
+        shift
+        ;;
+      --fetch)
+        fetch=true
         shift
         ;;
       --prefix)
@@ -138,16 +126,14 @@ main() {
 
   info "Creating worktree..."
 
-  if [ -n "${prefix}" ]; then
-    if ! "${worktree_script}" --prefix "${prefix}" "${branch_name}"; then
-      error "Failed to create worktree"
-      return 1
-    fi
-  else
-    if ! "${worktree_script}" "${branch_name}"; then
-      error "Failed to create worktree"
-      return 1
-    fi
+  local worktree_args=()
+  [ -n "${prefix}" ] && worktree_args+=("--prefix" "${prefix}")
+  ${fetch} && worktree_args+=("--fetch")
+  worktree_args+=("${branch_name}")
+
+  if ! "${worktree_script}" "${worktree_args[@]}"; then
+    error "Failed to create worktree"
+    return 1
   fi
   
   # Check if the worktree directory exists

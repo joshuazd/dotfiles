@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 #
-# common.sh - Shared functions for git worktree scripts
+# common.sh - Shared library for workflow scripts
 #
-# This file contains common functions used by multiple git worktree scripts.
-# Source this file in your scripts to use these functions.
+# Provides output helpers, environment checks, git/tmux utilities, Shortcut
+# data access, and the run_worktree_popup orchestration function.
 #
 # Usage:
-#   source "${HOME}/scripts/common.sh"
+#   source "${SCRIPT_DIR}/common.sh"
 
 # Color codes for output
 readonly RED='\033[0;31m'
@@ -113,33 +113,148 @@ resolve_session_script() {
 }
 
 #######################################
-# Open a tmux popup to run git-worktree-session, then optionally switch to the new session
+# Extract story ID from Shortcut URL or ID string
+# Strips whitespace, handles URLs, sc-<id>, and bare integers.
 # Arguments:
+#   Story URL or ID
+# Outputs:
+#   Writes numeric story ID to stdout
+# Returns:
+#   0 on success, 1 on invalid input
+#######################################
+extract_story_id() {
+  local input
+  input="$(printf '%s' "${1}" | tr -d '[:space:]')"
+  local story_id
+
+  if [[ "${input}" =~ https?:// ]]; then
+    if [[ "${input}" =~ /story/([0-9]+) ]]; then
+      story_id="${BASH_REMATCH[1]}"
+    else
+      error "Could not extract story ID from URL: ${input}"
+      return 1
+    fi
+  elif [[ "${input}" =~ ^sc-([0-9]+)$ ]]; then
+    story_id="${BASH_REMATCH[1]}"
+  elif [[ "${input}" =~ ^[0-9]+$ ]]; then
+    story_id="${input}"
+  else
+    error "Invalid story format: ${input}"
+    error "Expected: URL, sc-12345, or 12345"
+    return 1
+  fi
+
+  printf "%s" "${story_id}"
+}
+
+#######################################
+# Normalize PR input: strip leading '#' if present
+# Arguments:
+#   PR number, #PR number, or URL
+# Outputs:
+#   Writes normalized input to stdout
+#######################################
+normalize_pr_input() {
+  printf "%s" "${1#\#}"
+}
+
+#######################################
+# Fetch story JSON from Shortcut
+# Arguments:
+#   story_id — numeric story ID
+# Outputs:
+#   Writes JSON to stdout
+#######################################
+fetch_story_json() {
+  local story_id="${1}"
+  local json_output
+
+  if ! json_output="$(short story "${story_id}" --format "%j" 2>/dev/null)"; then
+    error "Failed to fetch story ${story_id} from Shortcut"
+    return 1
+  fi
+
+  printf "%s" "${json_output}"
+}
+
+#######################################
+# Extract branch name from story JSON
+# Arguments:
+#   json — story JSON string
+# Outputs:
+#   Writes branch name to stdout
+#######################################
+branch_from_json() {
+  local json="${1}"
+  local branch_name
+
+  if command -v jq > /dev/null 2>&1; then
+    branch_name="$(printf "%s" "${json}" | jq --raw-output '.formatted_vcs_branch_name // empty')"
+  else
+    branch_name="$(printf "%s" "${json}" | grep -o '"formatted_vcs_branch_name":"[^"]*"' | sed 's/"formatted_vcs_branch_name":"\([^"]*\)"/\1/' || true)"
+  fi
+
+  if [ -z "${branch_name}" ]; then
+    error "No branch name found in story"
+    error "The story may not have a branch associated with it"
+    return 1
+  fi
+
+  printf "%s" "${branch_name}"
+}
+
+#######################################
+# Open a tmux popup to run git-worktree-session, then optionally switch to the new session
+# Flags (any order, before or after positionals):
+#   --detached        Skip the session switch after the popup
+#   --non-interactive Don't pause for Enter before the popup closes
+#   --prefix <value>  Prepend value to session/dir name (default: "")
+#   --fetch           Fetch from origin and reset to remote HEAD
+# Positional arguments:
 #   current_dir    — working directory to cd into inside the popup
 #   session_script — absolute path to git-worktree-session
 #   branch_name    — branch to pass to git-worktree-session
 #   session_name   — tmux session name to switch to afterwards
-#   detached       — "true" to skip the session switch
-#   interactive    — "true" to pause for Enter before the popup closes
 # Returns:
 #   0 on success
 #######################################
 run_worktree_popup() {
-  local current_dir="${1}"
-  local session_script="${2}"
-  local branch_name="${3}"
-  local session_name="${4}"
-  local detached="${5}"
-  local interactive="${6}"
-  local prefix="${7:-}"
+  local detached=false
+  local interactive=true
+  local prefix=""
+  local fetch=false
+  local -a positionals=()
+
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --detached)        detached=true;    shift ;;
+      --non-interactive) interactive=false; shift ;;
+      --prefix)          prefix="${2}";    shift 2 ;;
+      --fetch)           fetch=true;       shift ;;
+      *)                 positionals+=("${1}"); shift ;;
+    esac
+  done
+
+  local current_dir="${positionals[0]}"
+  local session_script="${positionals[1]}"
+  local branch_name="${positionals[2]}"
+  local session_name="${positionals[3]}"
 
   local prefix_flag=""
   if [ -n "${prefix}" ]; then
     prefix_flag="--prefix '${prefix}'"
   fi
 
+  local fetch_flag=""
+  if ${fetch}; then
+    fetch_flag="--fetch"
+  fi
+
+  # The inner --detached tells git-worktree-session to create the tmux session
+  # without attaching — required here because we're inside a popup. The outer
+  # $detached variable controls whether *this* script switches the client after.
   local popup_command
-  popup_command="cd '${current_dir}' && '${session_script}' --detached ${prefix_flag} '${branch_name}'"
+  popup_command="cd '${current_dir}' && '${session_script}' --detached ${prefix_flag} ${fetch_flag} '${branch_name}'"
 
   if ${interactive}; then
     popup_command+="; printf '\\n${BLUE}Press Enter to close...${RESET}'; read -r"
@@ -156,4 +271,3 @@ run_worktree_popup() {
     tmux switch-client -t "${session_name}"
   fi
 }
-

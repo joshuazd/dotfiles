@@ -71,18 +71,6 @@ USAGE
 }
 
 #######################################
-# Normalize PR input: strip leading '#' if present
-# Arguments:
-#   PR number, #PR number, or URL
-# Outputs:
-#   Writes normalized input to stdout
-#######################################
-normalize_pr_input() {
-  local input="${1}"
-  printf "%s" "${input#\#}"
-}
-
-#######################################
 # Main function
 # Arguments:
 #   Optional --detached / --non-interactive flags and PR number or URL
@@ -159,10 +147,12 @@ main() {
   info "Found branch: ${branch_name}"
   session_name="pr-$(get_name_from_branch "${branch_name}")"
 
-  # Pass detached=true so run_worktree_popup skips switch-client;
+  # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :ai ourselves below.
-  run_worktree_popup "${current_dir}" "${session_script}" "${branch_name}" \
-    "${session_name}" "true" "${interactive}" "pr-"
+  # Pass --fetch so the worktree is always at the latest remote HEAD.
+  local -a popup_args=("--detached" "--fetch" "--prefix" "pr-")
+  ${interactive} || popup_args+=("--non-interactive")
+  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
   info "Launching Claude in ai window..."
   tmux send-keys -t "${session_name}:ai" \
