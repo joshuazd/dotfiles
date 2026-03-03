@@ -1,0 +1,60 @@
+#!/bin/sh
+set -o errexit -o nounset
+
+TAG="${1:-core}"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PACKAGES="$SCRIPT_DIR/packages.tsv"
+
+# Use dnf if available, fall back to yum
+DNF=dnf
+command -v dnf >/dev/null 2>&1 || DNF=yum
+
+# --- Special installers ---
+
+install_gh() {
+    sudo "$DNF" install -y 'dnf-command(config-manager)' 2>/dev/null || true
+    sudo "$DNF" config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+    sudo "$DNF" install -y gh
+}
+
+install_mise() {
+    curl https://mise.run | sh
+}
+
+install_claude_code() {
+    if ! command -v node >/dev/null 2>&1; then
+        "$HOME/.local/bin/mise" use -g node@lts
+    fi
+    npm install -g @anthropic-ai/claude-code
+}
+
+# --- Parse packages.tsv: column 4 = dnf ---
+
+plain=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $4 !~ /^@/ { print $4 }
+' "$PACKAGES")
+
+special=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $4 ~ /^@/ { sub(/^@/, "", $4); print $4 }
+' "$PACKAGES")
+
+# --- Install plain packages ---
+
+if [ -n "$plain" ]; then
+    # shellcheck disable=SC2086
+    echo "$plain" | xargs sudo "$DNF" install -y
+fi
+
+# --- Run special installers ---
+
+echo "$special" | while IFS= read -r name; do
+    [ -z "$name" ] && continue
+    case "$name" in
+        gh)           install_gh ;;
+        mise)         install_mise ;;
+        claude-code)  install_claude_code ;;
+        *)            echo "install-tools-dnf: no installer for '$name'" >&2 ;;
+    esac
+done
