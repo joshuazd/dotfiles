@@ -6,10 +6,11 @@ allowed-tools: Bash(short story:*), Bash(gh pr view*)
 
 Please implement the following Shortcut story.
 
-Instructions: Before writing any implementation code, invoke the `superpowers:test-driven-development`
-skill. Then implement the story as described. Create a working implementation,
-write tests where appropriate, and follow the existing code patterns and conventions
-in the project. Ask me if anything in the requirements is unclear before proceeding.
+Instructions:
+1. Invoke `superpowers:writing-plans` to create a structured implementation plan with TDD steps for each task. Save to `docs/plans/YYYY-MM-DD-<story-name>.md`.
+2. After the plan is ready, invoke `superpowers:subagent-driven-development` to execute it with fresh subagents per task. If tasks are tightly coupled, use `superpowers:executing-plans` instead.
+
+Ask me if anything in the requirements is unclear before proceeding.
 
 ---
 
