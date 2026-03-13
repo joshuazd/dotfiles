@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+#
+# switch-session - fzf session picker that previews the :claude window
+
+current_client="$(tmux display-message -p '#{client_name}')"
+socket_path="$(tmux display-message -p '#{socket_path}')"
+
+session=$(tmux list-sessions -F '#{session_last_attached} #{session_name}' \
+    | sort -rn \
+    | awk '{print $2}' \
+    | fzf --tmux 90%,90% \
+        --preview="tmux -S '$socket_path' capture-pane -p -t {}:claude 2>/dev/null || tmux -S '$socket_path' capture-pane -p -t {}:1 2>/dev/null" \
+        --preview-window=down:70%:wrap:follow \
+        --bind='j:down,k:up') || exit 0
+
+tmux switch-client -c "${current_client}" -t "${session}:claude" 2>/dev/null \
+  || tmux switch-client -c "${current_client}" -t "${session}"
