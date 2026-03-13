@@ -94,3 +94,4 @@ Automatically check ONE of these based on the changes:
 - Use the repo's PR template if one exists
 - Add a description only — do NOT check any boxes, fill in any checklists, or modify any other fields in the template
 - Always add the `ai-assisted` label (`--label "ai-assisted"`)
+- If the repo's git remote is `portal` (check with `gh repo view --json name -q .name`), also add `--label "TEAM: SOC" --label "SOC Copilot"`

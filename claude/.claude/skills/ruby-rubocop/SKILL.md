@@ -6,13 +6,9 @@ version: 1.0.0
 
 # Ruby Rubocop
 
-## Always run on all changed files, including specs
+## Automatic Linting
 
-```bash
-bundle exec rubocop <file1> <file2> ...
-```
-
-Never skip spec files — they have their own cops.
+Rubocop runs automatically via a PostToolUse hook on every Edit/Write to a Ruby file. No need to run it manually.
 
 ## Known offense patterns
 

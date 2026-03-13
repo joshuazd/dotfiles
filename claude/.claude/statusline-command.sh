@@ -1,21 +1,21 @@
 #!/bin/sh
 # Claude Code status line: colorful with model, dir, git, context, cost
 
-# ANSI color codes
-RESET='\033[0m'
-BOLD='\033[1m'
-DIM='\033[2m'
+# ANSI color codes — use printf to store real escape bytes, not literal \033
+RESET=$(printf '\033[0m')
+BOLD=$(printf '\033[1m')
+DIM=$(printf '\033[2m')
 
 # Colors matching the zsh prompt palette
-BLUE='\033[38;5;111m'      # %F{111} - light blue (directory color)
-GOLD='\033[38;5;222m'      # %F{222} - light gold (prompt char color)
-GRAY='\033[38;5;8m'        # %F{8}   - dark gray (git branch color)
-GREEN='\033[38;5;72m'      # green   - node / good cost
-YELLOW='\033[38;5;221m'    # yellow  - warning context
-RED='\033[38;5;196m'       # red     - high context / vim normal
-CYAN='\033[38;5;81m'       # cyan    - model name
-PURPLE='\033[38;5;141m'    # purple  - vim insert mode
-ORANGE='\033[38;5;208m'    # orange  - cost accent
+BLUE=$(printf '\033[38;5;111m')      # %F{111} - light blue (directory color)
+GOLD=$(printf '\033[38;5;222m')      # %F{222} - light gold (prompt char color)
+GRAY=$(printf '\033[38;5;8m')        # %F{8}   - dark gray (git branch color)
+GREEN=$(printf '\033[38;5;72m')      # green   - node / good cost
+YELLOW=$(printf '\033[38;5;221m')    # yellow  - warning context
+RED=$(printf '\033[38;5;196m')       # red     - high context / vim normal
+CYAN=$(printf '\033[38;5;81m')       # cyan    - model name
+PURPLE=$(printf '\033[38;5;141m')    # purple  - vim insert mode
+ORANGE=$(printf '\033[38;5;208m')    # orange  - cost accent
 
 input=$(cat)
 
@@ -104,11 +104,11 @@ if [ -n "$used_pct" ]; then
   ctx_segment="${DIM}ctx:${RESET}${ctx_color}${bar} ${used_pct_fmt}%${RESET}"
 fi
 
-# Cost color: green below $0.25, orange $0.25-$0.99, red $1.00+
+# Cost color: green below $0.50, orange $0.50-$1.99, red $2.00+
 cost_num=$(echo "$cost" | tr -d '$')
-if echo "$cost_num" | awk '{exit ($1 < 1.00)}'; then
+if echo "$cost_num" | awk '{exit ($1 < 2.00)}'; then
   cost_color="$RED"
-elif echo "$cost_num" | awk '{exit ($1 < 0.25)}'; then
+elif echo "$cost_num" | awk '{exit ($1 < 0.50)}'; then
   cost_color="$ORANGE"
 else
   cost_color="$GREEN"
@@ -123,25 +123,27 @@ elif [ "$vim_mode" = "INSERT" ]; then
   vim_segment="${PURPLE}${BOLD} INSERT ${RESET}  "
 fi
 
-# Separator
-SEP="${DIM} | ${RESET}"
+# Separator — use printf to emit actual escape bytes into the variable
+SEP=$(printf '\033[0m\033[22m\033[2m | \033[0m')
 
 # Build status line
-printf "${vim_segment}"
-printf "${CYAN}${BOLD}${model}${RESET}"
-printf "${DIM} v${version}${RESET}"
-printf "${SEP}"
-printf "${BLUE}${short_cwd}${RESET}"
+BOLD_OFF=$(printf '\033[22m')
+
+printf '%s' "${vim_segment}"
+printf '%s%s%s%s' "${CYAN}" "${BOLD}" "${model}" "${BOLD_OFF}"
+printf '%s v%s%s' "${DIM}" "${version}" "${RESET}"
+printf '%s' "${SEP}"
+printf '%s%s%s' "${BLUE}" "${short_cwd}" "${RESET}"
 
 if [ -n "$git_branch" ]; then
-  printf "${GRAY} [${git_branch}]${RESET}"
+  printf '%s [%s]%s' "${GRAY}" "${git_branch}" "${RESET}"
 fi
 
-printf "${SEP}"
+printf '%s' "${SEP}"
 
 if [ -n "$ctx_segment" ]; then
-  printf "${ctx_segment}"
-  printf "${SEP}"
+  printf '%s' "${ctx_segment}"
+  printf '%s' "${SEP}"
 fi
 
-printf "${cost_color}${BOLD}${cost}${RESET}"
+printf '%s%s%s%s' "${cost_color}" "${BOLD}" "${cost}" "${RESET}"

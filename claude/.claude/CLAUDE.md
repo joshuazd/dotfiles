@@ -1,19 +1,28 @@
 # Global Preferences
+Be extremely concise. Sacrifice grammar for the sake of concision.
+Push back on silly ideas.
 
 ## CLI Tools
 - Shortcut: use `short` CLI, not API calls
 - GitHub: use `gh` CLI, not API calls
+- PR comments have 3 separate APIs (top-level, inline review, review verdicts) — `gh pr view --json comments` only gets top-level; use the `/gh` skill for the full picture
+
+## Shell Aliases
+- `cp` and `rm` are aliased to interactive mode (`-i`) — use `\rm` and `\cp` to bypass aliases and avoid confirmation prompts that hang
 
 ## Memory
 - Store project-specific memories in the repo's `CLAUDE.local.md`, not in the auto-memory directory
 - The auto-memory directory changes per worktree path and won't persist across worktrees
 - Append a `## Notes` section (or similar) to `CLAUDE.local.md` for things worth remembering
 
+## Code Changes
+- Before implementing anything, search for existing patterns, helpers, utilities, and abstractions that already solve the problem — reuse over reinvention
+- Check for existing base classes, concerns, service objects, shared helpers, and similar patterns before writing new ones
+
 ## Ruby Workflow
-- Run `bundle exec rubocop` on changed files before committing; fix all offenses before committing
+- Linting is handled automatically by a PostToolUse hook — no need to run linters manually
 - After implementing a story, check whether specs need updating
 - Always run relevant spec files to confirm nothing is broken
-- Run rubocop and specs in parallel
 
 ## Debugging
 
@@ -36,11 +45,4 @@
 - `URI.parse("github.com").host` → nil (no scheme = no authority)
 - To test a `return false if host.nil?` branch, use a `mailto:` URI
 
-### SimpleCov branch coverage
-- A test can pass for the wrong reason — verify which branch is actually being exercised
-- Adding more test cases through the same code path does not increase branch coverage
-- Distinguish "new branches covered" from "more confidence on existing branches" before writing tests
-
-### Rails: pending migrations before specs
-- Run `bin/rails db:migrate` if specs fail with `ActiveRecord::PendingMigrationError`
 

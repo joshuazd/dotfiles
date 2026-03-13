@@ -3,11 +3,48 @@
     "allow": [
       "Bash(bundle exec rubocop*)",
       "Bash(bundle exec rspec*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git show*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git status*)",
+      "Bash(git blame*)",
+      "Bash(git branch*)",
+      "Bash(git remote*)",
       "Bash(gh pr diff*)",
+      "Bash(gh pr view*)",
+      "Bash(gh pr list*)",
+      "Bash(gh pr status*)",
+      "Bash(gh pr checks*)",
+      "Bash(gh issue view*)",
+      "Bash(gh issue list*)",
+      "Bash(gh run view*)",
+      "Bash(gh run list*)",
+      "Bash(gh repo view*)",
+      "Bash(gh release view*)",
+      "Bash(gh release list*)",
+      "Bash(gh workflow list*)",
+      "Bash(gh workflow view*)",
+      "Bash(jq*)",
       "Skill(*)"
     ],
     "additionalDirectories": [
       "~/"
+    ]
+  },
+  "model": "opus[1m]",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/lint.sh"
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -16,6 +53,31 @@
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "ruby-lsp@claude-plugins-official": true
+  },
+  "spinnerVerbs": {
+    "mode": "replace",
+    "verbs": [
+      "Hunting",
+      "Wrecking hackers",
+      "Investigating",
+      "Remediating",
+      "Defending",
+      "Detecting threats",
+      "Securing",
+      "Triaging",
+      "Tracking",
+      "Monitoring",
+      "Uncovering",
+      "Neutralizing",
+      "Protecting",
+      "Analyzing",
+      "Disrupting attackers",
+      "Reverse-engineering",
+      "Shutting down threats",
+      "Gathering intel",
+      "Force multiplying"
+    ]
   }
 }
