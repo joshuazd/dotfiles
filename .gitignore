@@ -16,3 +16,4 @@ vim/.vim/pack/remote/*
 .vim/.netrwhist
 scripts/scripts/dispatch-bar
 *.bak
+.claude/settings.local.json
