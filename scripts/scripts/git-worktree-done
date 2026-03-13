@@ -63,16 +63,15 @@ main() {
   worktree_path="$(tmux display-message -p '#{pane_current_path}')"
   current_client="$(tmux display-message -p '#{client_name}')"
 
-  # Must be in a git repo
-  if ! (cd "${worktree_path}" && is_git_repo); then
-    error "Not in a git repository: ${worktree_path}"
-    return 1
+  # Pane path may be stale (e.g. leftover .removing dir) — fall back to session path
+  if [[ ! -d "${worktree_path}" ]]; then
+    worktree_path="$(tmux display-message -p '#{session_path}')"
   fi
 
   # Find the most recently used session other than the current one
-  target_session="$(tmux list-sessions -F '#{session_last_attached} #{session_name}' | \
+  target_session="$(tmux list-sessions -F '#{session_last_attached}|#{session_name}' | \
     sort -rn | \
-    awk -v cur="${current_session}" '$2 != cur { print $2; exit }')"
+    awk -F'|' -v cur="${current_session}" '$2 != cur { print $2; exit }')"
 
   if [ -z "${target_session}" ]; then
     error "No other tmux session to switch to"
@@ -81,15 +80,14 @@ main() {
   fi
 
   # Switch away first so cleanup can safely kill the current session
-  tmux switch-client -c "${current_client}" -t "${target_session}"
+  tmux switch-client -c "${current_client}" -t "=${target_session}"
 
   # Open popup in the destination session to run cleanup
   local popup_command
-  popup_command="${cleanup_script} '${worktree_path}'"
+  popup_command="${cleanup_script} --session '${current_session}' '${worktree_path}'"
 
   tmux display-popup \
     -c "${current_client}" \
-    -t "${target_session}:" \
     -E -w 80% -h 60% \
     "${popup_command}"
 

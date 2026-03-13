@@ -181,6 +181,7 @@ setup_claude_files() {
 main() {
   local prefix=""
   local fetch=false
+  local rebase_main=false
   local branch_name=""
   local dir_name
   local worktree_path
@@ -195,6 +196,10 @@ main() {
         ;;
       --fetch)
         fetch=true
+        shift
+        ;;
+      --rebase-main)
+        rebase_main=true
         shift
         ;;
       -*)

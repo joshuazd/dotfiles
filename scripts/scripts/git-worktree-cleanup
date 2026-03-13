@@ -107,7 +107,7 @@ get_main_repo_path() {
 #######################################
 tmux_session_exists() {
   local session_name="${1}"
-  tmux has-session -t "${session_name}" 2>/dev/null
+  tmux has-session -t "=${session_name}" 2>/dev/null
 }
 
 #######################################
@@ -122,7 +122,7 @@ kill_tmux_session() {
   
   if tmux_session_exists "${session_name}"; then
     info "Killing tmux session '${session_name}'"
-    if tmux kill-session -t "${session_name}"; then
+    if tmux kill-session -t "=${session_name}"; then
       info "Tmux session killed"
       return 0
     else
@@ -136,6 +136,33 @@ kill_tmux_session() {
 }
 
 #######################################
+# Remove mise tracked-config symlinks targeting a worktree
+# Arguments:
+#   Absolute path to the worktree directory
+#######################################
+cleanup_mise_tracked_configs() {
+  local worktree_path="${1}"
+  local tracked_dir="${HOME}/.local/state/mise/tracked-configs"
+
+  [ -d "${tracked_dir}" ] || return 0
+
+  local count=0
+  for link in "${tracked_dir}"/*; do
+    [ -L "${link}" ] || continue
+    local target
+    target="$(readlink "${link}")"
+    if [[ "${target}" == "${worktree_path}"/* ]]; then
+      \rm "${link}"
+      ((count++)) || true
+    fi
+  done
+
+  if [ "${count}" -gt 0 ]; then
+    info "Removed ${count} mise tracked-config entries"
+  fi
+}
+
+#######################################
 # Main function
 # Arguments:
 #   Optional directory path
@@ -143,67 +170,99 @@ kill_tmux_session() {
 #   0 on success, 1 on failure
 #######################################
 main() {
-  local target_dir="${1:-.}"
+  local target_dir=""
+  local session_name=""
   local absolute_path
   local main_repo_path
-  local session_name
-  
-  # Convert to absolute path
-  absolute_path="$(cd "${target_dir}" && pwd)"
-  
-  # Get the directory name (which should match the session name)
-  session_name="$(basename "${absolute_path}")"
-  
+
+  while [[ "${#}" -gt 0 ]]; do
+    case "${1}" in
+      --session) session_name="${2}"; shift 2 ;;
+      *) target_dir="${1}"; shift ;;
+    esac
+  done
+  target_dir="${target_dir:-.}"
+
+  # Convert to absolute path — directory may already be gone if called after removal
+  if [[ -d "${target_dir}" ]]; then
+    absolute_path="$(cd "${target_dir}" && pwd)"
+  else
+    # Resolve as best we can without cd
+    absolute_path="$(perl -MCwd -e 'print Cwd::abs_path($ARGV[0])' "${target_dir}" 2>/dev/null || echo "${target_dir}")"
+  fi
+
+  # Resolve session name if not provided via --session
+  if [[ -z "${session_name}" ]]; then
+    session_name="$(tmux list-sessions -F '#{session_name}|#{session_path}' 2>/dev/null \
+      | awk -F'|' -v path="${absolute_path}" '$2 == path { print $1; exit }')"
+
+    # Fallback to basename for sessions created before session-name override existed
+    if [[ -z "${session_name}" ]]; then
+      session_name="$(basename "${absolute_path}")"
+    fi
+  fi
+
+  # Kill corresponding tmux session if it exists (do this early so it always runs)
+  kill_tmux_session "${session_name}"
+
+  # If directory is already gone, clean up mise entries and exit
+  if [[ ! -d "${absolute_path}" ]]; then
+    info "Directory already removed: ${absolute_path}"
+    cleanup_mise_tracked_configs "${absolute_path}"
+    info "Cleanup complete!"
+    return 0
+  fi
+
   # Check if it's a git repository
   if ! (cd "${absolute_path}" && is_git_repo); then
     error "Not a git repository: ${absolute_path}"
     return 1
   fi
-  
+
   # Check if it's a worktree (not main repo)
   if ! is_worktree "${absolute_path}"; then
     error "Not a worktree: ${absolute_path}"
     error "This appears to be the main repository. Only worktrees can be cleaned up with this script."
     return 1
   fi
-  
+
   # Get main repository path
   main_repo_path="$(get_main_repo_path "${absolute_path}")"
-  
+
+  # Clean up mise tracked-config entries before removing the worktree
+  cleanup_mise_tracked_configs "${absolute_path}"
+
   info "Worktree directory: ${absolute_path}"
   info "Main repository: ${main_repo_path}"
-  
+
   # Navigate to main repository
   info "Navigating to main repository..."
   cd "${main_repo_path}" || {
     error "Failed to navigate to main repository"
     return 1
   }
+  
+  
+  # Fast worktree removal: move directory aside (instant), then delete in background
+  local trash_dir="${absolute_path}.removing.$$"
 
-  # Kill corresponding tmux session if it exists
-  kill_tmux_session "${session_name}"
-  
-  
-  # Remove the worktree using git
   info "Removing worktree..."
-  if git worktree remove --force "${absolute_path}"; then
+  if mv "${absolute_path}" "${trash_dir}"; then
+    # Directory is gone from the worktree path — prune the stale reference
+    git worktree prune
+
+    # Delete in the tmux server context (survives popup close)
+    tmux run-shell -b "rm -rf '${trash_dir}'"
+    info "Worktree removed (background cleanup started)"
+  elif git worktree remove --force "${absolute_path}"; then
+    # Fallback: let git handle it synchronously
+    git worktree prune
     info "Worktree removed successfully"
   else
-    error "Failed to remove worktree with git, attempting manual cleanup..."
-    
-    # Fallback: manually remove directory
-    if rm --recursive --force "${absolute_path}"; then
-      warn "Directory removed manually"
-    else
-      error "Failed to remove directory"
-      return 1
-    fi
+    error "Failed to remove worktree"
+    return 1
   fi
-  
-  # Prune worktree references
-  info "Pruning stale worktree references..."
-  git worktree prune
-  
+
   info "Cleanup complete!"
   info "Current directory: $(pwd)"
   

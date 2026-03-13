@@ -137,8 +137,10 @@ main() {
   current_dir="$(pwd)"
 
   info "Fetching PR ${pr_input} from GitHub..."
-  branch_name="$(gh pr view "${pr_input}" --json headRefName -q '.headRefName')"
+  local pr_json
+  pr_json="$(gh pr view "${pr_input}" --json headRefName,title,number)"
 
+  branch_name="$(printf "%s" "${pr_json}" | jq -r '.headRefName')"
   if [ -z "${branch_name}" ]; then
     error "Could not determine branch name for PR ${pr_input}"
     return 1
@@ -147,19 +149,29 @@ main() {
   info "Found branch: ${branch_name}"
   session_name="pr-$(get_name_from_branch "${branch_name}")"
 
+  # Derive a human-readable session name from the PR title
+  local pr_title pr_number
+  pr_title="$(printf "%s" "${pr_json}" | jq -r '.title // empty')"
+  pr_number="$(printf "%s" "${pr_json}" | jq -r '.number')"
+  local session_name_flag=()
+  if [ -n "${pr_title}" ] && [ -n "${pr_number}" ]; then
+    session_name="$(session_name_from_title "PR" "${pr_number}" "${pr_title}")"
+    session_name_flag=("--session-name" "${session_name}")
+  fi
+
   # Pass --detached so run_worktree_popup skips switch-client;
-  # we switch to :ai ourselves below.
+  # we switch to :claude ourselves below.
   # Pass --fetch so the worktree is always at the latest remote HEAD.
   local -a popup_args=("--detached" "--fetch" "--prefix" "pr-")
   ${interactive} || popup_args+=("--non-interactive")
-  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
+  run_worktree_popup "${popup_args[@]}" "${session_name_flag[@]+"${session_name_flag[@]}"}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
-  info "Launching Claude in ai window..."
-  tmux send-keys -t "${session_name}:ai" \
+  info "Launching Claude in claude window..."
+  tmux send-keys -t "=${session_name}:claude" \
     "claude -- '/review-pr ${pr_input}'" Enter
 
   if ! ${detached}; then
-    tmux switch-client -t "${session_name}:ai"
+    tmux switch-client -t "=${session_name}:claude"
   fi
 
   return 0

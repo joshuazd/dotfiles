@@ -178,6 +178,62 @@ fetch_story_json() {
 }
 
 #######################################
+# Extract story title (.name) from story JSON
+# Arguments:
+#   json — story JSON string
+# Outputs:
+#   Writes title to stdout (empty if not found)
+#######################################
+title_from_json() {
+  local json="${1}"
+  local title
+
+  if command -v jq > /dev/null 2>&1; then
+    title="$(printf "%s" "${json}" | jq --raw-output '.name // empty')"
+  else
+    title="$(printf "%s" "${json}" | grep -o '"name":"[^"]*"' | head -1 | sed 's/"name":"\([^"]*\)"/\1/' || true)"
+  fi
+
+  printf "%s" "${title}"
+}
+
+#######################################
+# Build a tmux-safe session name from a prefix, ID, and title
+# Strips colons and periods (break tmux targeting), truncates to ~50 chars
+# at a word boundary.
+# Arguments:
+#   prefix — e.g. "SC" or "PR"
+#   id     — e.g. "190583" or "4521"
+#   title  — e.g. "Emit Datadog metrics: for investigation"
+# Outputs:
+#   e.g. "SC-190583 Emit Datadog metrics for investigation"
+#######################################
+session_name_from_title() {
+  local prefix="${1}"
+  local id="${2}"
+  local title="${3}"
+
+  # Strip tmux-unsafe characters
+  title="${title//:/}"
+  title="${title//./}"
+
+  local head="${prefix}-${id} "
+  local max_title_len=$(( 50 - ${#head} ))
+
+  if [ "${#title}" -gt "${max_title_len}" ]; then
+    # Truncate at word boundary
+    local truncated="${title:0:${max_title_len}}"
+    # Remove partial trailing word
+    if [ "${title:${max_title_len}:1}" != " " ] && [ "${title:${max_title_len}:1}" != "" ]; then
+      truncated="${truncated% *}"
+    fi
+    title="${truncated}"
+  fi
+
+  printf "%s" "${head}${title}"
+}
+
+#######################################
 # Extract branch name from story JSON
 # Arguments:
 #   json — story JSON string
@@ -206,10 +262,11 @@ branch_from_json() {
 #######################################
 # Open a tmux popup to run git-worktree-session, then optionally switch to the new session
 # Flags (any order, before or after positionals):
-#   --detached        Skip the session switch after the popup
-#   --non-interactive Don't pause for Enter before the popup closes
-#   --prefix <value>  Prepend value to session/dir name (default: "")
-#   --fetch           Fetch from origin and reset to remote HEAD
+#   --detached            Skip the session switch after the popup
+#   --non-interactive     Don't pause for Enter before the popup closes
+#   --prefix <value>      Prepend value to session/dir name (default: "")
+#   --fetch               Fetch from origin and reset to remote HEAD
+#   --session-name <name> Override the tmux session name (default: branch-derived)
 # Positional arguments:
 #   current_dir    — working directory to cd into inside the popup
 #   session_script — absolute path to git-worktree-session
@@ -223,14 +280,16 @@ run_worktree_popup() {
   local interactive=true
   local prefix=""
   local fetch=false
+  local session_name_override=""
   local -a positionals=()
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      --detached)        detached=true;    shift ;;
-      --non-interactive) interactive=false; shift ;;
-      --prefix)          prefix="${2}";    shift 2 ;;
-      --fetch)           fetch=true;       shift ;;
+      --detached)        detached=true;              shift ;;
+      --non-interactive) interactive=false;           shift ;;
+      --prefix)          prefix="${2}";              shift 2 ;;
+      --fetch)           fetch=true;                 shift ;;
+      --session-name)    session_name_override="${2}"; shift 2 ;;
       *)                 positionals+=("${1}"); shift ;;
     esac
   done
@@ -250,11 +309,16 @@ run_worktree_popup() {
     fetch_flag="--fetch"
   fi
 
+  local session_name_flag=""
+  if [ -n "${session_name_override}" ]; then
+    session_name_flag="--session-name '${session_name_override}'"
+  fi
+
   # The inner --detached tells git-worktree-session to create the tmux session
   # without attaching — required here because we're inside a popup. The outer
   # $detached variable controls whether *this* script switches the client after.
   local popup_command
-  popup_command="cd '${current_dir}' && '${session_script}' --detached ${prefix_flag} ${fetch_flag} '${branch_name}'"
+  popup_command="cd '${current_dir}' && '${session_script}' --detached ${prefix_flag} ${fetch_flag} ${session_name_flag} '${branch_name}'"
 
   if ${interactive}; then
     popup_command+="; printf '\\n${BLUE}Press Enter to close...${RESET}'; read -r"
@@ -268,6 +332,6 @@ run_worktree_popup() {
 
   if ! ${detached}; then
     info "Switching to session '${session_name}'"
-    tmux switch-client -t "${session_name}"
+    tmux switch-client -t "=${session_name}"
   fi
 }

@@ -66,10 +66,9 @@ dispatch / dispatch-from-chrome / SwiftBar
 
 ### Tmux Session Layout
 
-Every session created by `git-worktree-session` has three windows:
-- Window 1: main terminal
+Every session created by `git-worktree-session` has two windows:
+- Window 1: `claude` (Claude is launched here by implement/review scripts)
 - Window 2: `server`
-- Window 3: `ai` (Claude is launched here by implement/review scripts)
 
 ### Worktree Placement
 
@@ -81,7 +80,7 @@ Worktrees are created one level up from the main repo root: `../branch-name`. Th
 
 ### Claude Integration
 
-`shortcut-implement` and `gh-review` build a prompt from the story/PR context, write it to a temp file, and send it to the `:ai` tmux window via `tmux send-keys`. The `claude-trust` script modifies `~/.claude.json` to pre-trust new worktree directories so Claude doesn't prompt for confirmation.
+`shortcut-implement` and `gh-review` build a prompt from the story/PR context and send it to the `:claude` tmux window via `tmux send-keys`. The `claude-trust` script modifies `~/.claude.json` to pre-trust new worktree directories so Claude doesn't prompt for confirmation.
 
 ### dispatch-from-chrome
 

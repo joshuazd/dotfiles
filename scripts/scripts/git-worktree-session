@@ -31,15 +31,16 @@ source "${SCRIPT_DIR}/common.sh"
 #######################################
 usage() {
   cat <<USAGE
-Usage: ${0##*/} [--detached] [--fetch] [--prefix <value>] <branch-name>
+Usage: ${0##*/} [--detached] [--fetch] [--prefix <value>] [--session-name <name>] <branch-name>
 
 Create a git worktree and tmux session.
 
 Arguments:
-  --detached      Create tmux session in detached mode (optional)
-  --fetch         Fetch from origin and reset worktree to remote HEAD (optional)
-  --prefix value  Prepend value to the session and directory name (optional)
-  branch-name     Name of the branch to create worktree for
+  --detached          Create tmux session in detached mode (optional)
+  --fetch             Fetch from origin and reset worktree to remote HEAD (optional)
+  --prefix value      Prepend value to the directory name (optional)
+  --session-name name Override the tmux session name (default: branch-derived)
+  branch-name         Name of the branch to create worktree for
 
 The script will:
   1. Create a git worktree via git-worktree-new
@@ -69,6 +70,7 @@ main() {
   local detached=false
   local fetch=false
   local prefix=""
+  local session_name_override=""
   local branch_name=""
   local session_name
   local worktree_path
@@ -91,6 +93,10 @@ main() {
         prefix="${2}"
         shift 2
         ;;
+      --session-name)
+        session_name_override="${2}"
+        shift 2
+        ;;
       -*)
         error "Unknown option: ${1}"
         return 1
@@ -110,11 +116,18 @@ main() {
     return 1
   fi
 
-  # Compute session name and worktree path (with optional prefix)
+  # Compute directory name and worktree path (prefix applies to dir only)
   dir_name="$(get_name_from_branch "${branch_name}")"
-  session_name="${prefix}${dir_name}"
+  local dir_with_prefix="${prefix}${dir_name}"
   repo_root="$(git rev-parse --show-toplevel)"
-  worktree_path="${repo_root}/../${session_name}"
+  worktree_path="${repo_root}/../${dir_with_prefix}"
+
+  # Session name: use override if provided, otherwise match directory name
+  if [ -n "${session_name_override}" ]; then
+    session_name="${session_name_override}"
+  else
+    session_name="${dir_with_prefix}"
+  fi
 
   # Create the worktree directly
   worktree_script="${SCRIPT_DIR}/git-worktree-new"
@@ -145,37 +158,33 @@ main() {
   info "Creating tmux session '${session_name}' in ${worktree_path}"
   
   # Create the tmux session
+  # Use '=' prefix for exact session matching (names may contain spaces)
   if ${detached}; then
     # Create detached session
-    tmux new-session -d -s "${session_name}" -c "${worktree_path}"
+    tmux new-session -d -s "${session_name}" -n "claude" -c "${worktree_path}"
     # Create window named 'server'
-    tmux new-window -t "${session_name}:2" -n "server" -c "${worktree_path}"
-    # Create window named 'ai'
-    tmux new-window -t "${session_name}:3" -n "ai" -c "${worktree_path}"
-    # Switch back to first window
-    tmux select-window -t "${session_name}:1"
+    tmux new-window -t "=${session_name}:2" -n "server" -c "${worktree_path}"
+    # Switch back to claude window
+    tmux select-window -t "=${session_name}:1"
     info "Detached session '${session_name}' created"
-    info "To attach: tmux attach-session -t ${session_name}"
+    info "To attach: tmux attach-session -t '=${session_name}'"
   else
     # If we're already in a tmux session, create detached and switch to it
     # Otherwise, create and attach directly
     if is_in_tmux; then
       # Create detached session and switch to it
-      tmux new-session -d -s "${session_name}" -c "${worktree_path}"
+      tmux new-session -d -s "${session_name}" -n "claude" -c "${worktree_path}"
       # Create window named 'server'
-      tmux new-window -t "${session_name}:2" -n "server" -c "${worktree_path}"
-      # Create window named 'ai'
-      tmux new-window -t "${session_name}:3" -n "ai" -c "${worktree_path}"
-      # Switch back to first window
-      tmux select-window -t "${session_name}:1"
+      tmux new-window -t "=${session_name}:2" -n "server" -c "${worktree_path}"
+      # Switch back to claude window
+      tmux select-window -t "=${session_name}:1"
       info "Switching to session '${session_name}'"
-      tmux switch-client -t "${session_name}"
+      tmux switch-client -t "=${session_name}"
     else
       # Not in tmux, create and attach
-      tmux new-session -s "${session_name}" -c "${worktree_path}" \; \
-        new-window -t "${session_name}:2" -n "server" -c "${worktree_path}" \; \
-        new-window -t "${session_name}:3" -n "ai" -c "${worktree_path}" \; \
-        select-window -t "${session_name}:1"
+      tmux new-session -s "${session_name}" -n "claude" -c "${worktree_path}" \; \
+        new-window -t "=${session_name}:2" -n "server" -c "${worktree_path}" \; \
+        select-window -t "=${session_name}:1"
     fi
   fi
   
