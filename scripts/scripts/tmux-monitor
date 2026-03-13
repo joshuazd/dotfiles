@@ -1,0 +1,403 @@
+#!/usr/bin/env bash
+#
+# tmux-monitor - Live-updating tmux session status table
+#
+# Usage: tmux-monitor [-i SECONDS]
+#
+# Displays a continuously refreshing table of all tmux sessions with
+# git status information. Runs outside tmux.
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+INTERVAL=3
+
+# Colors
+BOLD='\033[1m'
+DIM='\033[2m'
+CYAN='\033[0;36m'
+PURPLE='\033[0;35m'
+BRIGHT_GREEN='\033[92m'
+BRIGHT_RED='\033[91m'
+BRIGHT_YELLOW='\033[93m'
+
+# Column widths
+COL_SESSION=52
+COL_GIT=18
+COL_PR=20
+
+# PR cache: branch → "number|state|isDraft|url|checks|review"
+declare -A pr_cache=()
+PR_REFRESH_INTERVAL=10
+render_count=0
+
+#######################################
+# Truncate a string to max N chars, appending … if truncated
+#######################################
+trunc() {
+  local max="${1}" str="${2}"
+  if [[ "${#str}" -gt "${max}" ]]; then
+    printf "%s…" "${str:0:$(( max - 1 ))}"
+  else
+    printf "%s" "${str}"
+  fi
+}
+
+#######################################
+# Compute git status column string
+# Arguments:
+#   path   — git repo path
+#   branch — current branch name
+# Outputs:
+#   e.g. "~3 +1 -1 ↑ 2" or "clean"
+#######################################
+git_status_col() {
+  local path="${1}"
+  local branch="${2}"
+
+  local porcelain
+  porcelain="$(git --no-optional-locks -C "${path}" status --porcelain 2>/dev/null || true)"
+
+  local modified=0 added=0 deleted=0
+  if [[ -n "${porcelain}" ]]; then
+    while IFS= read -r line; do
+      local xy="${line:0:2}"
+      case "${xy}" in
+        "M "|" M"|"MM") (( modified++ )) ;;
+        "A "|"??")      (( added++ )) ;;
+        "D "|" D")      (( deleted++ )) ;;
+        *)
+          # Handle other statuses: R=rename as modified, C=copy as added
+          case "${xy:0:1}" in
+            R|U) (( modified++ )) ;;
+            C)   (( added++ )) ;;
+          esac
+          case "${xy:1:1}" in
+            M) (( modified++ )) ;;
+            D) (( deleted++ )) ;;
+          esac
+          ;;
+      esac
+    done <<< "${porcelain}"
+  fi
+
+  local unpushed=0
+  local remote_ref
+  remote_ref="$(git -C "${path}" rev-parse --verify "origin/${branch}" 2>/dev/null || true)"
+  if [[ -n "${remote_ref}" ]]; then
+    unpushed="$(git -C "${path}" rev-list "origin/${branch}..HEAD" --count 2>/dev/null || echo 0)"
+  fi
+
+  local parts=()
+  [[ "${modified}" -gt 0 ]] && parts+=("~${modified}")
+  [[ "${added}" -gt 0 ]]    && parts+=( "+${added}")
+  [[ "${deleted}" -gt 0 ]]  && parts+=("-${deleted}")
+  [[ "${unpushed}" -gt 0 ]] && parts+=("↑ ${unpushed}")
+
+  if [[ "${#parts[@]}" -eq 0 ]]; then
+    printf "—"
+  else
+    local IFS=' '
+    printf "%s" "${parts[*]}"
+  fi
+}
+
+#######################################
+# Extract owner/repo from a git remote URL
+# Handles both SSH and HTTPS formats
+#######################################
+remote_to_nwo() {
+  local url="${1}"
+  url="${url%.git}"
+  # SSH: git@github.com:owner/repo → owner/repo
+  # HTTPS: https://github.com/owner/repo → owner/repo
+  url="${url#*github.com:}"
+  url="${url#*github.com/}"
+  printf "%s" "${url}"
+}
+
+#######################################
+# Refresh PR cache for all unique branches
+# Arguments:
+#   branches_and_repos — associative array name (branch → repo_path)
+#######################################
+refresh_pr_cache() {
+  local -n _bar="${1}"
+  local -A seen_branches=()
+
+  for branch in "${!_bar[@]}"; do
+    [[ -n "${seen_branches["${branch}"]:-}" ]] && continue
+    seen_branches["${branch}"]=1
+
+    local repo_path="${_bar["${branch}"]}"
+    local remote_url
+    remote_url="$(git -C "${repo_path}" remote get-url origin 2>/dev/null || true)"
+    [[ -z "${remote_url}" ]] && continue
+
+    local nwo
+    nwo="$(remote_to_nwo "${remote_url}")"
+
+    local json
+    json="$(cd "${repo_path}" && gh pr view "${branch}" \
+      --json number,state,isDraft,url,statusCheckRollup,reviewDecision 2>/dev/null || true)"
+
+    if [[ -n "${json}" ]]; then
+      local number state isDraft url checks
+      number="$(printf '%s' "${json}" | jq -r '.number')"
+      state="$(printf '%s' "${json}" | jq -r '.state')"
+      isDraft="$(printf '%s' "${json}" | jq -r '.isDraft')"
+      url="$(printf '%s' "${json}" | jq -r '.url')"
+
+      # Derive single check status from statusCheckRollup
+      local check_statuses
+      check_statuses="$(printf '%s' "${json}" | jq -r \
+        '.statusCheckRollup // [] | .[] | (.conclusion // .status // .state // empty)')"
+      if [[ -z "${check_statuses}" ]]; then
+        checks=""
+      elif printf '%s\n' "${check_statuses}" | grep -qiE 'FAILURE|ERROR'; then
+        checks="fail"
+      elif printf '%s\n' "${check_statuses}" | grep -qiE 'PENDING|QUEUED|IN_PROGRESS|WAITING'; then
+        checks="pending"
+      else
+        checks="pass"
+      fi
+
+      local review
+      review="$(printf '%s' "${json}" | jq -r '.reviewDecision // empty')"
+
+      pr_cache["${branch}"]="${number}|${state}|${isDraft}|${url}|${checks}|${review}"
+    else
+      pr_cache["${branch}"]=""
+    fi
+  done
+}
+
+#######################################
+# Format PR column for a given branch
+# Arguments:
+#   branch — branch name
+# Outputs:
+#   Colorized PR string with OSC 8 hyperlink
+#######################################
+pr_col() {
+  local branch="${1}"
+  local cached="${pr_cache["${branch}"]:-}"
+
+  if [[ -z "${cached}" ]]; then
+    printf "—"
+    return
+  fi
+
+  local number state isDraft url checks review
+  IFS='|' read -r number state isDraft url checks review <<< "${cached}"
+
+  local color label
+  if [[ "${isDraft}" == "true" ]]; then
+    color="${DIM}"
+    label="Draft"
+  elif [[ "${state}" == "MERGED" ]]; then
+    color="${PURPLE}"
+    label="Merged"
+  elif [[ "${state}" == "CLOSED" ]]; then
+    color="${RED}"
+    label="Closed"
+  else
+    color="${GREEN}"
+    label="Open"
+  fi
+
+  # OSC 8 hyperlink + color
+  printf "%b\\033]8;;%s\\033\\\\#%s\\033]8;;\\033\\\\%b" \
+    "${color}" "${url}" "${number}" "${RESET}"
+
+  # Check status indicator
+  case "${checks:-}" in
+    pass)    printf " %b✓%b" "${BRIGHT_GREEN}" "${RESET}" ;;
+    fail)    printf " %b✗%b" "${BRIGHT_RED}" "${RESET}" ;;
+    pending) printf " %b●%b" "${BRIGHT_YELLOW}" "${RESET}" ;;
+  esac
+
+  # Review decision indicator (open PRs only)
+  if [[ "${state}" == "OPEN" ]]; then
+    case "${review:-}" in
+      APPROVED)          printf " %b☑%b" "${BRIGHT_GREEN}" "${RESET}" ;;
+      CHANGES_REQUESTED) printf " %b✎%b" "${BRIGHT_RED}" "${RESET}" ;;
+    esac
+  fi
+}
+
+#######################################
+# Setup terminal for live updates
+#######################################
+setup_terminal() {
+  tput civis 2>/dev/null || true   # hide cursor
+  tput clear 2>/dev/null || true
+}
+
+#######################################
+# Restore terminal on exit
+#######################################
+restore_terminal() {
+  tput cnorm 2>/dev/null || true   # show cursor
+  tput sgr0 2>/dev/null || true    # reset attributes
+  printf "\n"
+}
+
+#######################################
+# Collect session data and render the table
+#######################################
+collect_and_render() {
+  local -a sessions=()
+  local -a pane_paths=()
+
+  while IFS='|' read -r session pane_path; do
+    sessions+=("${session}")
+    pane_paths+=("${pane_path}")
+  done < <(tmux list-panes -a \
+    -F '#{session_created}|#{session_name}|#{pane_current_path}' \
+    -f '#{&&:#{==:#{window_index},1},#{==:#{pane_index},1}}' 2>/dev/null \
+    | sort -t'|' -k1,1n | cut -d'|' -f2-)
+
+  # Collect bell flags: any window with bell_flag=1 marks the session
+  local -A bell_sessions=()
+  while IFS='|' read -r sess flag; do
+    if [[ "${flag}" == "1" ]]; then
+      bell_sessions["${sess}"]=1
+    fi
+  done < <(tmux list-windows -a -F '#{session_name}|#{window_bell_flag}' 2>/dev/null)
+
+  # Resolve branches and git roots for each session
+  local -a branches=()
+  local -a git_roots=()
+  local -A branch_to_repo=()
+
+  local i
+  for i in "${!sessions[@]}"; do
+    local path="${pane_paths[$i]}"
+    local git_root=""
+    local branch=""
+
+    git_root="$(git -C "${path}" rev-parse --show-toplevel 2>/dev/null || true)"
+    if [[ -n "${git_root}" ]]; then
+      branch="$(git -C "${git_root}" branch --show-current 2>/dev/null || true)"
+      if [[ -n "${branch}" ]]; then
+        branch_to_repo["${branch}"]="${git_root}"
+      fi
+    fi
+
+    git_roots+=("${git_root}")
+    branches+=("${branch}")
+  done
+
+  # Refresh PR cache periodically
+  (( render_count++ )) || true
+  if (( render_count % PR_REFRESH_INTERVAL == 1 )); then
+    refresh_pr_cache branch_to_repo
+  fi
+
+  # Move cursor to top-left and start drawing
+  tput cup 0 0
+
+  # Header
+  printf "  ${BOLD}${CYAN}%-${COL_SESSION}s  %-${COL_GIT}s  %-${COL_PR}s${RESET}\033[K\n" "Session" "Git" "PR"
+  local divider_len=$(( COL_SESSION + COL_GIT + COL_PR + 7 ))
+  printf "  ${DIM}%s${RESET}\033[K\n" "$(printf '─%.0s' $(seq 1 "${divider_len}"))"
+
+  for i in "${!sessions[@]}"; do
+    local session="${sessions[$i]}"
+    local git_root="${git_roots[$i]}"
+    local branch="${branches[$i]}"
+    local gcol="—"
+    local pcol
+
+    if [[ -n "${git_root}" ]] && [[ -n "${branch}" ]]; then
+      gcol="$(git_status_col "${git_root}" "${branch}")"
+      pcol="$(pr_col "${branch}")"
+    else
+      pcol="—"
+    fi
+
+    # Format session column: yellow + asterisk when bell is active
+    local session_display
+    local has_bell="${bell_sessions["${session}"]:-}"
+    if [[ -n "${has_bell}" ]]; then
+      local truncated
+      truncated="$(trunc $(( COL_SESSION - 2 )) "${session}")"
+      local pad=$(( COL_SESSION - ${#truncated} - 2 ))
+      session_display="${YELLOW}${truncated} *${RESET}"
+      [[ "${pad}" -gt 0 ]] && session_display+="$(printf '%*s' "${pad}" '')"
+    else
+      session_display="$(trunc "${COL_SESSION}" "${session}")"
+      local pad=$(( COL_SESSION - ${#session_display} ))
+      [[ "${pad}" -gt 0 ]] && session_display+="$(printf '%*s' "${pad}" '')"
+    fi
+
+    # PR column contains escape sequences — pad manually
+    local pr_text
+    if [[ "${pcol}" == "—" ]]; then
+      pr_text="$(printf "%-${COL_PR}s" "—")"
+    else
+      # Strip ANSI/OSC escapes to measure visible length
+      local visible
+      visible="$(printf '%b' "${pcol}" | sed $'s/\033[[][0-9;]*m//g; s/\033]8;;[^\033]*\033\\\\//g')"
+      local pr_pad=$(( COL_PR - ${#visible} ))
+      pr_text="${pcol}"
+      [[ "${pr_pad}" -gt 0 ]] && pr_text+="$(printf '%*s' "${pr_pad}" '')"
+    fi
+
+    # Git column may contain multi-byte UTF-8 (↑, —) — pad manually
+    local git_visible_len
+    git_visible_len="$(printf '%s' "${gcol}" | LC_ALL=en_US.UTF-8 wc -m | tr -d ' ')"
+    local git_pad=$(( COL_GIT - git_visible_len ))
+    local git_text="${gcol}"
+    [[ "${git_pad}" -gt 0 ]] && git_text+="$(printf '%*s' "${git_pad}" '')"
+
+    printf "  %b  %s  %b\033[K\n" "${session_display}" "${git_text}" "${pr_text}"
+  done
+
+  printf "\033[K\n"
+  printf "  ${DIM}Refreshing every %ds · Ctrl-C to exit${RESET}\033[K" "${INTERVAL}"
+
+  # Erase any stale lines below (ANSI CSI J — more reliable than tput ed)
+  printf '\033[J'
+}
+
+#######################################
+# Main
+#######################################
+main() {
+  if help_wanted "${@}"; then
+    printf "Usage: tmux-monitor [-i SECONDS]\n\n"
+    printf "Live-updating tmux session status table.\n\n"
+    printf "Options:\n"
+    printf "  -i, --interval SECONDS  Refresh interval (default: 3)\n"
+    exit 0
+  fi
+
+  while [[ "${#}" -gt 0 ]]; do
+    case "${1}" in
+      -i|--interval) INTERVAL="${2}"; shift 2 ;;
+      *) error "Unknown option: ${1}"; exit 1 ;;
+    esac
+  done
+
+  if ! tmux list-sessions &>/dev/null; then
+    error "No tmux server running"
+    exit 1
+  fi
+
+  trap restore_terminal EXIT INT TERM
+  trap 'tput clear 2>/dev/null; collect_and_render' WINCH
+  setup_terminal
+
+  while true; do
+    collect_and_render
+    sleep "${INTERVAL}" || true  # sleep interrupted by WINCH returns non-zero
+  done
+}
+
+main "${@}"

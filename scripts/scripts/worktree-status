@@ -1,0 +1,189 @@
+#!/usr/bin/env bash
+#
+# worktree-status - Show a status table of tmux sessions with git and story info
+#
+# Usage: worktree-status
+#
+# Displays a popup table of all tmux sessions annotated with:
+#   - git branch and dirty/unpushed state
+#   - Shortcut story state (fetched from sc-NNNN in the branch name)
+#
+# Bind in tmux:
+#   bind-key W display-popup -E -w 120 -h 40 "$HOME/scripts/worktree-status"
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+# Column widths
+COL_SESSION=40
+COL_BRANCH=35
+COL_GIT=12
+COL_STORY=20
+
+# Colors
+BOLD='\033[1m'
+DIM='\033[2m'
+RESET='\033[0m'
+CYAN='\033[0;36m'
+
+#######################################
+# Truncate a string to max N chars, appending … if truncated
+# Arguments:
+#   max — maximum visible length
+#   str — string to truncate
+#######################################
+trunc() {
+  local max="${1}" str="${2}"
+  if [[ "${#str}" -gt "${max}" ]]; then
+    printf "%s…" "${str:0:$(( max - 1 ))}"
+  else
+    printf "%s" "${str}"
+  fi
+}
+
+#######################################
+# Print a row with fixed-width columns
+# Arguments:
+#   session, branch, git_col, story
+#######################################
+print_row() {
+  local session="${1}"
+  local branch="${2}"
+  local git_col="${3}"
+  local story="${4}"
+  printf "  %-${COL_SESSION}s %-${COL_BRANCH}s %-${COL_GIT}s %s\n" \
+    "$(trunc "${COL_SESSION}" "${session}")" \
+    "$(trunc "${COL_BRANCH}" "${branch}")" \
+    "${git_col}" "${story}"
+}
+
+#######################################
+# Compute git status column string
+# Arguments:
+#   path  — git repo path
+#   branch — current branch name
+# Outputs:
+#   Writes column string to stdout
+#######################################
+git_col() {
+  local path="${1}"
+  local branch="${2}"
+  local dirty=""
+  local unpushed=0
+
+  if [[ -n "$(git -C "${path}" status --porcelain 2>/dev/null)" ]]; then
+    dirty="dirty"
+  fi
+
+  local remote_ref
+  remote_ref="$(git -C "${path}" rev-parse --verify "origin/${branch}" 2>/dev/null || true)"
+  if [[ -n "${remote_ref}" ]]; then
+    unpushed="$(git -C "${path}" rev-list "origin/${branch}..HEAD" --count 2>/dev/null || echo 0)"
+  fi
+
+  if [[ "${unpushed}" -gt 0 && -n "${dirty}" ]]; then
+    printf "%d↑ dirty" "${unpushed}"
+  elif [[ "${unpushed}" -gt 0 ]]; then
+    printf "%d↑" "${unpushed}"
+  elif [[ -n "${dirty}" ]]; then
+    printf "dirty"
+  else
+    printf "clean"
+  fi
+}
+
+main() {
+  local tmpdir
+  tmpdir="$(mktemp -d)"
+  # shellcheck disable=SC2064
+  trap "rm -rf '${tmpdir}'" EXIT
+
+  # Collect session -> path mapping (window 1, pane 1 of each session)
+  local -a sessions=()
+  local -a paths=()
+
+  while IFS='|' read -r session pane_path; do
+    sessions+=("${session}")
+    paths+=("${pane_path}")
+  done < <(tmux list-panes -a \
+    -F '#{session_name}|#{pane_current_path}' \
+    -f '#{&&:#{==:#{window_index},1},#{==:#{pane_index},1}}' 2>/dev/null)
+
+  # Spawn one background subshell per session; each writes branch|git_col|story
+  local -a result_files=()
+  local -a bg_pids=()
+
+  local i
+  for i in "${!sessions[@]}"; do
+    local session="${sessions[$i]}"
+    local path="${paths[$i]}"
+    local result_file="${tmpdir}/${i}"
+    result_files+=("${result_file}")
+
+    (
+      trap - EXIT
+      local branch="—"
+      local gcol="—"
+      local story="—"
+
+      local git_root
+      git_root="$(git -C "${path}" rev-parse --show-toplevel 2>/dev/null || true)"
+
+      if [[ -n "${git_root}" ]]; then
+        branch="$(git -C "${git_root}" branch --show-current 2>/dev/null || echo "—")"
+        if [[ -z "${branch}" ]]; then
+          branch="—"
+        fi
+
+        if [[ "${branch}" != "—" ]]; then
+          gcol="$(git_col "${git_root}" "${branch}")"
+        fi
+
+        if [[ "${branch}" =~ sc-([0-9]+) ]]; then
+          local story_id="${BASH_REMATCH[1]}"
+          if command -v short > /dev/null 2>&1 && command -v jq > /dev/null 2>&1; then
+            local fetched_state
+            fetched_state="$(short story "${story_id}" --format "%j" 2>/dev/null \
+              | jq -r '.state.name // empty' 2>/dev/null || true)"
+            [[ -n "${fetched_state}" ]] && story="${fetched_state}"
+          fi
+        fi
+      fi
+
+      printf "%s|%s|%s\n" "${branch}" "${gcol}" "${story}" > "${result_file}"
+    ) &
+    bg_pids+=($!)
+  done
+
+  # Wait for all background subshells
+  for pid in "${bg_pids[@]+"${bg_pids[@]}"}"; do
+    wait "${pid}" 2>/dev/null || true
+  done
+
+  # Print table
+  printf "\n"
+  printf "  ${BOLD}${CYAN}%-${COL_SESSION}s %-${COL_BRANCH}s %-${COL_GIT}s %s${RESET}\n" \
+    "Session" "Branch" "Git" "Story"
+  local divider_len=$(( COL_SESSION + COL_BRANCH + COL_GIT + COL_STORY + 6 ))
+  printf "  ${DIM}%s${RESET}\n" "$(printf '─%.0s' $(seq 1 "${divider_len}"))"
+
+  for i in "${!sessions[@]}"; do
+    local session="${sessions[$i]}"
+    local branch="—" gcol="—" story="—"
+
+    local result_file="${result_files[$i]}"
+    if [[ -f "${result_file}" ]]; then
+      IFS='|' read -r branch gcol story < "${result_file}"
+    fi
+
+    print_row "${session}" "${branch}" "${gcol}" "${story}"
+  done
+
+  printf "\n"
+
+  # Keep popup open until a key is pressed
+  read -r -n 1 -s -p "" 2>/dev/null || true
+}
+
+main "${@}"
