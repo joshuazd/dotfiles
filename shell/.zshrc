@@ -125,8 +125,12 @@ bindkey '\ev' vim-files
 precmd() {
   RPROMPT=""
   if [[ -n "$TMUX" ]]; then
-    tmux set-window-option automatic-rename on
-    tmux set-window-option allow-rename on
+    local window_name
+    window_name="$(tmux display-message -p '#W')"
+    if [[ "$window_name" != "claude" ]]; then
+      tmux set-window-option automatic-rename on
+      tmux set-window-option allow-rename on
+    fi
   fi
 }
 
