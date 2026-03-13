@@ -29,6 +29,8 @@ This repository contains configuration files organized by tool:
 - **tmux/** - Terminal multiplexer configuration with custom keybindings
 - **git/** - Git configuration
 - **config/** - Additional tool configurations
+- **scripts/** - Utility scripts (dispatch, gh helpers, tmux utilities)
+- **claude/** - Claude Code trust settings
 
 ## Features
 
@@ -145,9 +147,12 @@ dotfiles/
 │   ├── .shrc            # Shared shell config
 │   ├── .profile         # Login shell config
 │   ├── .functions       # Shared functions
-│   └── .aliases         # Shared aliases
+│   ├── .aliases         # Shared aliases
+│   └── .bin/            # Utility scripts (30+)
 ├── tmux/                # Tmux configuration
 ├── git/                 # Git configuration
+├── scripts/             # Stow-managed utility scripts
+├── claude/              # Claude Code trust settings
 └── config/              # Misc tool configs
 ```
 

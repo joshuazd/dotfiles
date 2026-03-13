@@ -37,12 +37,12 @@ After installing vim, run `:PackUpdate` to install remote plugins.
 
 - `.shrc` and `.profile` are shared between bash and zsh — shell-agnostic config lives here
 - `.bashrc` / `.zshrc` source `.shrc` and add shell-specific settings
-- `.functions` and `.aliases` are sourced by `.shrc`
+- `.functions` and `.aliases` are sourced by `.bashrc` and `.zshrc` individually
 - Optional files (`.fzf.bash`, `.fzf.zsh`, `.secrets`, `~/.ripgrep`) are sourced only if they exist
 
 ### Vim
 
-- `.vimrc` is the entry point (~605 lines)
+- `.vimrc` is the entry point
 - Native package management via `pack/`:
   - `pack/local/start/` — custom local plugins (always loaded)
   - `pack/remote/start/` — external plugins managed by minpac
@@ -58,4 +58,12 @@ After installing vim, run `:PackUpdate` to install remote plugins.
 ### Config
 
 - `config/` holds miscellaneous tool configs (`.dir_colors`, etc.)
-- `colors/` holds terminal color themes (Nord material palette)
+- `colors/` holds legacy terminal color themes (mintty/Xresources for Windows/Linux — not used on macOS). Active color themes live in `vim/.vim/colors/` and `tmux/.tmux_custom/colors/`
+
+### Scripts
+
+- `scripts/` — utility scripts installed via stow (dispatch, gh helpers, tmux utilities, etc.)
+
+### Claude
+
+- `claude/` — Claude Code trust settings (`CLAUDE.md`)
