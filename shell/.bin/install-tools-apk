@@ -23,13 +23,10 @@ install_gh() {
     $SUDO apk add --no-cache github-cli
 }
 
-install_mise() {
-    curl https://mise.run | sh
-}
-
 install_claude_code() {
-    if ! command -v node >/dev/null 2>&1; then
-        "$HOME/.local/bin/mise" use -g node@lts
+    if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+        echo "install-tools-apk: node/npm not found, skipping claude-code" >&2
+        return
     fi
     npm install -g @anthropic-ai/claude-code
 }
@@ -59,7 +56,6 @@ echo "$special" | while IFS= read -r name; do
     [ -z "$name" ] && continue
     case "$name" in
         gh)           install_gh ;;
-        mise)         install_mise ;;
         claude-code)  install_claude_code ;;
         *)            echo "install-tools-apk: no installer for '$name'" >&2 ;;
     esac

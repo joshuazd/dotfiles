@@ -1,18 +1,19 @@
-# tool	tag	apt	dnf	pacman	apk
-zsh	core	zsh	zsh	zsh	zsh
-vim	core	vim	vim	vim	vim
-tmux	core	tmux	tmux	tmux	tmux
-git	core	git	git	git	git
-stow	core	stow	stow	stow	stow
-fzf	core	fzf	fzf	fzf	fzf
-ripgrep	core	ripgrep	ripgrep	ripgrep	ripgrep
-fd	core	fd-find	fd-find	fd	fd
-bat	core	bat	bat	bat	bat
-jq	core	jq	jq	jq	jq
-curl	core	curl	curl	curl	curl
-make	core	make	make	base-devel	make
-universal-ctags	core	universal-ctags	ctags	ctags	ctags
-the_silver_searcher	core	silversearcher-ag	the_silver_searcher	the_silver_searcher	the_silver_searcher
-gh	full	@gh	@gh	@gh	@gh
-mise	full	@mise	@mise	@mise	@mise
-claude-code	full	@claude-code	@claude-code	@claude-code	@claude-code
+# tool	tag	apt	dnf	pacman	apk	brew
+zsh	core	zsh	zsh	zsh	zsh	zsh
+vim	core	vim	vim	vim	vim	vim
+tmux	core	tmux	tmux	tmux	tmux	tmux
+git	core	git	git	git	git	git
+stow	core	stow	stow	stow	stow	stow
+fzf	core	fzf	fzf	fzf	fzf	fzf
+ripgrep	core	ripgrep	ripgrep	ripgrep	ripgrep	ripgrep
+fd	core	fd-find	fd-find	fd	fd	fd
+bat	core	bat	bat	bat	bat	bat
+jq	core	jq	jq	jq	jq	jq
+curl	core	curl	curl	curl	curl	curl
+wget	core	wget	wget	wget	wget	wget
+make	core	make	make	base-devel	make	make
+universal-ctags	core	universal-ctags	ctags	ctags	ctags	universal-ctags
+the_silver_searcher	core	silversearcher-ag	the_silver_searcher	the_silver_searcher	the_silver_searcher	the_silver_searcher
+gh	full	@gh	@gh	@gh	@gh	gh
+nodejs	full	nodejs	nodejs	nodejs	nodejs	node
+claude-code	full	@claude-code	@claude-code	@claude-code	@claude-code	@claude-code

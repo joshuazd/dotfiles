@@ -1,24 +1,22 @@
 #!/bin/sh
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit 1
 
-option="$1"
+option="${1:-}"
 
 case "$option" in
     symlinks)
         exec "$HOME/.bin/install-symlinks" ;;
-    pack)
-        "$HOME/.bin/install-pack"
-        vim +helptags\ ALL +qall
-        ;;
     tools)
         exec "$HOME/.bin/install-tools" "${2:-}" ;;
-    tmux)
-        exec "$HOME/.bin/install-tmux" ;;
-    vim)
-        exec "$HOME/.bin/install-vim" ;;
     all)
         exec "$HOME/.bin/install-all" "${2:-}" ;;
     *)
+        echo "Usage: jzd install <command> [tag]"
+        echo ""
+        echo "Commands:"
+        echo "  all [core|full]      Install tools and symlinks"
+        echo "  tools [core|full]    Install packages only"
+        echo "  symlinks             Stow dotfile symlinks"
         ;;
 esac

@@ -54,46 +54,45 @@ See [vim/README.md](vim/README.md) for detailed documentation.
 
 ## Installation
 
-### Prerequisites
+### Automated Install
+
+The `jzd install` command handles tool installation and symlink setup. Packages are defined in `shell/.bin/packages.tsv` and installed via the native package manager (Homebrew on macOS, apt/dnf/pacman/apk on Linux).
 
 ```bash
-# macOS
-brew install vim git tmux stow
+git clone https://github.com/joshuazd/dotfiles.git ~/dotfiles
+cd ~/dotfiles
 
-# Ubuntu/Debian
-sudo apt-get install vim git tmux stow
+# Install core tools + symlinks
+shell/.bin/jzd install all
+
+# Install everything (core + full, e.g. gh, nodejs, claude-code)
+shell/.bin/jzd install all full
 ```
 
-### Using GNU Stow
+Individual steps:
+```bash
+jzd install tools           # core packages only
+jzd install tools full      # core + full packages
+jzd install symlinks        # stow dotfile symlinks
+```
+
+### Manual Install with Stow
 
 This repository is organized for use with [GNU Stow](https://www.gnu.org/software/stow/), which creates symlinks automatically.
 
-1. Clone the repository:
-```bash
-git clone https://github.com/joshuazd/dotfiles.git ~/.dotfiles
-cd ~/.dotfiles
-```
-
-2. Use stow to install configurations:
-
 ```bash
 # Install all configurations
-stow vim shell tmux git config
+stow vim shell tmux git config scripts claude
 
-# Or install individual configurations
-stow vim     # Installs vim configuration
-stow shell   # Installs shell configuration
-stow tmux    # Installs tmux configuration
-stow git     # Installs git configuration
-stow config  # Installs tool configuration
-```
+# Or install individually
+stow vim     # Vim configuration
+stow shell   # Shell configuration + install scripts
 
-3. To uninstall a configuration:
-```bash
+# Remove a configuration
 stow -D vim  # Removes vim symlinks
 ```
 
-**Note:** Stow creates symlinks from `~/.dotfiles/<package>/<file>` to `~/<file>`. For example, `~/.dotfiles/vim/.vimrc` becomes `~/.vimrc`.
+**Note:** Stow creates symlinks from `~/dotfiles/<package>/<file>` to `~/<file>`.
 
 ### Post-Installation
 
@@ -104,14 +103,9 @@ vim -c 'PackUpdate' -c 'qa'
 
 **Language servers (optional):**
 ```bash
-# Ruby
-gem install solargraph
-
-# Python
-pip install python-lsp-server flake8
-
-# JavaScript/TypeScript
-npm install -g typescript-language-server
+gem install solargraph                    # Ruby
+pip install python-lsp-server flake8     # Python
+npm install -g typescript-language-server # JavaScript/TypeScript
 ```
 
 ## Testing

@@ -1,18 +1,29 @@
 #!/bin/sh
 set -o errexit -o nounset
 
-# TAG unused on Mac — Brewfile covers everything
+TAG="${1:-core}"
 
-# Resolve symlinks so this script can find dotfiles root when run from ~/.bin/
+# Resolve symlinks so this script can find packages.tsv when run from ~/.bin/
 self="$0"
 while [ -L "$self" ]; do
     self_dir="$(cd "$(dirname "$self")" && pwd)"
     self="$self_dir/$(readlink "$self")"
 done
 SCRIPT_DIR="$(cd "$(dirname "$self")" && pwd)"
-DOTFILES="$(cd "$SCRIPT_DIR/../.." && pwd)"
+PACKAGES="$SCRIPT_DIR/packages.tsv"
 
-# Install Homebrew if not present
+# --- Special installers ---
+
+install_claude_code() {
+    if ! command -v node >/dev/null 2>&1 && ! command -v npm >/dev/null 2>&1; then
+        echo "install-tools-mac: node/npm not found, skipping claude-code" >&2
+        return
+    fi
+    npm install -g @anthropic-ai/claude-code
+}
+
+# --- Install Homebrew if not present ---
+
 if ! command -v brew >/dev/null 2>&1; then
     echo "Installing Homebrew..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -20,9 +31,31 @@ if ! command -v brew >/dev/null 2>&1; then
     [ -f /opt/homebrew/bin/brew ] && eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-brew bundle --file="$DOTFILES/Brewfile"
+# --- Parse packages.tsv: column 7 = brew ---
 
-# claude-code via npm (not in Homebrew)
-if ! command -v claude >/dev/null 2>&1; then
-    npm install -g @anthropic-ai/claude-code
+plain=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $7 !~ /^@/ { print $7 }
+' "$PACKAGES")
+
+special=$(awk -F'\t' -v tag="$TAG" '
+    /^#/ || /^$/ { next }
+    ($2 == "core" || tag == "full") && $7 ~ /^@/ { sub(/^@/, "", $7); print $7 }
+' "$PACKAGES")
+
+# --- Install plain packages ---
+
+if [ -n "$plain" ]; then
+    # shellcheck disable=SC2086
+    echo "$plain" | xargs brew install
 fi
+
+# --- Run special installers ---
+
+echo "$special" | while IFS= read -r name; do
+    [ -z "$name" ] && continue
+    case "$name" in
+        claude-code)  install_claude_code ;;
+        *)            echo "install-tools-mac: no installer for '$name'" >&2 ;;
+    esac
+done
