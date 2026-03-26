@@ -9,7 +9,7 @@ DIM=$(printf '\033[2m')
 # Colors matching the zsh prompt palette
 BLUE=$(printf '\033[38;5;111m')      # %F{111} - light blue (directory color)
 GOLD=$(printf '\033[38;5;222m')      # %F{222} - light gold (prompt char color)
-GRAY=$(printf '\033[38;5;8m')        # %F{8}   - dark gray (git branch color)
+GRAY=$(printf '\033[38;5;246m')      # mid-gray (git branch color)
 GREEN=$(printf '\033[38;5;72m')      # green   - node / good cost
 YELLOW=$(printf '\033[38;5;221m')    # yellow  - warning context
 RED=$(printf '\033[38;5;196m')       # red     - high context / vim normal
@@ -39,14 +39,6 @@ if [ -d "$cwd/.git" ] || git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
     || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
 fi
 
-# Hide branch when the last dir component ends with the last branch component (redundant in worktree flow)
-# Covers exact match (dir "my-feature", branch "feature/my-feature") and
-# prefixed dir (dir "pr-sc-188342-foo", branch "feature/sc-188342-foo")
-last_dir_component=$(basename "$cwd")
-last_branch_component=$(echo "$git_branch" | awk -F/ '{print $NF}')
-case "$last_dir_component" in
-  *"$last_branch_component") git_branch="" ;;
-esac
 
 # Token pricing per million tokens
 total_input=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
@@ -118,32 +110,32 @@ fi
 vim_segment=""
 vim_mode=$(echo "$input" | jq -r '.vim.mode // empty')
 if [ "$vim_mode" = "NORMAL" ]; then
-  vim_segment="${RED}${BOLD} NORMAL ${RESET}  "
+  vim_segment="${RED} NORMAL ${RESET}  "
 elif [ "$vim_mode" = "INSERT" ]; then
-  vim_segment="${PURPLE}${BOLD} INSERT ${RESET}  "
+  vim_segment="${PURPLE} INSERT ${RESET}  "
 fi
 
 # Separator — use printf to emit actual escape bytes into the variable
-SEP=$(printf '\033[0m\033[22m\033[2m | \033[0m')
+SEP=$(printf '\033[0m\033[2m | \033[0m')
 
 # Build status line
-BOLD_OFF=$(printf '\033[22m')
 
-printf '%s' "${vim_segment}"
-printf '%s%s%s%s' "${CYAN}" "${BOLD}" "${model}" "${BOLD_OFF}"
-printf '%s v%s%s' "${DIM}" "${version}" "${RESET}"
-printf '%s' "${SEP}"
+# Line 1: cwd + git branch
 printf '%s%s%s' "${BLUE}" "${short_cwd}" "${RESET}"
 
 if [ -n "$git_branch" ]; then
-  printf '%s [%s]%s' "${GRAY}" "${git_branch}" "${RESET}"
+  printf ' %s⎇ %s%s' "${GRAY}" "${git_branch}" "${RESET}"
 fi
 
-printf '%s' "${SEP}"
+# Line 2: vim mode + model + version + context + cost
+printf '\n'
+printf '%s' "${vim_segment}"
+NORM=$(tput sgr0)
+printf '%s%s%s%s%s%s v%s\033[0m \033[2m|\033[0m ' "${CYAN}" "${BOLD}" "${model}" "${NORM}" "${CYAN}" "${DIM}" "${version}"
 
 if [ -n "$ctx_segment" ]; then
   printf '%s' "${ctx_segment}"
   printf '%s' "${SEP}"
 fi
 
-printf '%s%s%s%s' "${cost_color}" "${BOLD}" "${cost}" "${RESET}"
+printf '%s%s%s' "${cost_color}" "${cost}" "${RESET}"
