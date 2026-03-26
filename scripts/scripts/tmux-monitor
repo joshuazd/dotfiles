@@ -6,6 +6,11 @@
 #
 # Displays a continuously refreshing table of all tmux sessions with
 # git status information. Runs outside tmux.
+#
+# Architecture: three concurrent actors sharing data via files in tmpdir:
+#   Render loop (foreground, every 3s) — reads tmux state, reads cache, draws table
+#   Git worker  (background, every 3s) — reads manifest, writes git/<session> files
+#   PR worker   (background, every 30s) — reads git/* files, writes pr/<branch> files
 
 set -o errexit
 set -o nounset
@@ -15,6 +20,8 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 INTERVAL=3
+GIT_INTERVAL=3
+PR_INTERVAL=30
 
 # Colors
 BOLD='\033[1m'
@@ -30,10 +37,9 @@ COL_SESSION=52
 COL_GIT=18
 COL_PR=20
 
-# PR cache: branch → "number|state|isDraft|url|checks|review"
-declare -A pr_cache=()
-PR_REFRESH_INTERVAL=10
-render_count=0
+# Tmpdir for inter-process cache
+tmpdir=""
+worker_pids=()
 
 #######################################
 # Truncate a string to max N chars, appending … if truncated
@@ -48,12 +54,25 @@ trunc() {
 }
 
 #######################################
+# Atomic write: write to tmp file, then mv
+# Arguments:
+#   dest — target file path
+#   content — string to write
+#######################################
+atomic_write() {
+  local dest="${1}" content="${2}"
+  local tmp="${dest%/*}/.${dest##*/}.tmp"
+  printf '%s' "${content}" > "${tmp}" 2>/dev/null || return 0
+  mv -f "${tmp}" "${dest}" 2>/dev/null || return 0
+}
+
+#######################################
 # Compute git status column string
 # Arguments:
 #   path   — git repo path
 #   branch — current branch name
 # Outputs:
-#   e.g. "~3 +1 -1 ↑ 2" or "clean"
+#   e.g. "~3 +1 -1 ↑ 2" or "—"
 #######################################
 git_status_col() {
   local path="${1}"
@@ -71,7 +90,6 @@ git_status_col() {
         "A "|"??")      (( added++ )) ;;
         "D "|" D")      (( deleted++ )) ;;
         *)
-          # Handle other statuses: R=rename as modified, C=copy as added
           case "${xy:0:1}" in
             R|U) (( modified++ )) ;;
             C)   (( added++ )) ;;
@@ -113,66 +131,147 @@ git_status_col() {
 remote_to_nwo() {
   local url="${1}"
   url="${url%.git}"
-  # SSH: git@github.com:owner/repo → owner/repo
-  # HTTPS: https://github.com/owner/repo → owner/repo
   url="${url#*github.com:}"
   url="${url#*github.com/}"
   printf "%s" "${url}"
 }
 
 #######################################
-# Refresh PR cache for all unique branches
-# Arguments:
-#   branches_and_repos — associative array name (branch → repo_path)
+# Git worker — runs in background
+# Reads sessions.manifest, writes git/<session> cache files
 #######################################
-refresh_pr_cache() {
-  local -n _bar="${1}"
-  local -A seen_branches=()
+start_git_worker() {
+  set +o errexit
+  local first=1
 
-  for branch in "${!_bar[@]}"; do
-    [[ -n "${seen_branches["${branch}"]:-}" ]] && continue
-    seen_branches["${branch}"]=1
+  while true; do
+    if [[ "${first}" -eq 1 ]]; then
+      first=0
+    else
+      sleep "${GIT_INTERVAL}" || true
+    fi
 
-    local repo_path="${_bar["${branch}"]}"
-    local remote_url
-    remote_url="$(git -C "${repo_path}" remote get-url origin 2>/dev/null || true)"
-    [[ -z "${remote_url}" ]] && continue
+    [[ -f "${tmpdir}/sessions.manifest" ]] || continue
 
-    local nwo
-    nwo="$(remote_to_nwo "${remote_url}")"
+    while IFS='|' read -r session pane_path; do
+      [[ -z "${session}" ]] && continue
 
-    local json
-    json="$(cd "${repo_path}" && gh pr view "${branch}" \
-      --json number,state,isDraft,url,statusCheckRollup,reviewDecision 2>/dev/null || true)"
+      local git_root=""
+      local branch=""
+      local gcol="—"
 
-    if [[ -n "${json}" ]]; then
-      local number state isDraft url checks
-      number="$(printf '%s' "${json}" | jq -r '.number')"
-      state="$(printf '%s' "${json}" | jq -r '.state')"
-      isDraft="$(printf '%s' "${json}" | jq -r '.isDraft')"
-      url="$(printf '%s' "${json}" | jq -r '.url')"
-
-      # Derive single check status from statusCheckRollup
-      local check_statuses
-      check_statuses="$(printf '%s' "${json}" | jq -r \
-        '.statusCheckRollup // [] | .[] | (.conclusion // .status // .state // empty)')"
-      if [[ -z "${check_statuses}" ]]; then
-        checks=""
-      elif printf '%s\n' "${check_statuses}" | grep -qiE 'FAILURE|ERROR'; then
-        checks="fail"
-      elif printf '%s\n' "${check_statuses}" | grep -qiE 'PENDING|QUEUED|IN_PROGRESS|WAITING'; then
-        checks="pending"
-      else
-        checks="pass"
+      git_root="$(git -C "${pane_path}" rev-parse --show-toplevel 2>/dev/null || true)"
+      if [[ -n "${git_root}" ]]; then
+        branch="$(git -C "${git_root}" branch --show-current 2>/dev/null || true)"
+        if [[ -n "${branch}" ]]; then
+          gcol="$(git_status_col "${git_root}" "${branch}")"
+        fi
       fi
 
-      local review
-      review="$(printf '%s' "${json}" | jq -r '.reviewDecision // empty')"
+      atomic_write "${tmpdir}/git/${session//\//__}" "${branch}|${git_root}|${gcol}"
+    done < "${tmpdir}/sessions.manifest"
+  done
+}
 
-      pr_cache["${branch}"]="${number}|${state}|${isDraft}|${url}|${checks}|${review}"
+#######################################
+# PR worker — runs in background
+# Reads git/* cache files to build branch→repo map, fetches PR data
+#######################################
+start_pr_worker() {
+  # Workers run in subshells — disable errexit so benign failures don't kill us
+  set +o errexit
+
+  # Wait for git worker to populate cache before first PR fetch
+  while ! compgen -G "${tmpdir}/git/*" >/dev/null 2>&1; do
+    sleep 1
+  done
+
+  local first=1
+
+  while true; do
+    if [[ "${first}" -eq 1 ]]; then
+      first=0
     else
-      pr_cache["${branch}"]=""
+      sleep "${PR_INTERVAL}" || true
     fi
+
+    # Build branch→repo map from git cache files
+    local -A branch_to_repo=()
+    local -A seen_branches=()
+
+    for git_file in "${tmpdir}/git"/*; do
+      [[ -f "${git_file}" ]] || continue
+      local data
+      data="$(<"${git_file}")"
+      local branch git_root _gcol
+      IFS='|' read -r branch git_root _gcol <<< "${data}"
+      [[ -z "${branch}" || -z "${git_root}" ]] && continue
+      [[ -n "${seen_branches["${branch}"]:-}" ]] && continue
+      seen_branches["${branch}"]=1
+      branch_to_repo["${branch}"]="${git_root}"
+    done
+
+    # Fetch PR data for each branch
+    for branch in "${!branch_to_repo[@]}"; do
+      local repo_path="${branch_to_repo["${branch}"]}"
+      local remote_url
+      remote_url="$(git -C "${repo_path}" remote get-url origin 2>/dev/null || true)"
+      [[ -z "${remote_url}" ]] && continue
+
+      local json
+      json="$(cd "${repo_path}" && gh pr view "${branch}" \
+        --json number,state,isDraft,url,statusCheckRollup,reviewDecision,latestReviews 2>/dev/null || true)"
+
+      if [[ -n "${json}" ]]; then
+        local number state isDraft url checks
+        number="$(printf '%s' "${json}" | jq -r '.number')"
+        state="$(printf '%s' "${json}" | jq -r '.state')"
+        isDraft="$(printf '%s' "${json}" | jq -r '.isDraft')"
+        url="$(printf '%s' "${json}" | jq -r '.url')"
+
+        local check_statuses
+        check_statuses="$(printf '%s' "${json}" | jq -r \
+          '.statusCheckRollup // [] | .[] | (.conclusion // .status // .state // empty)')"
+        if [[ -z "${check_statuses}" ]]; then
+          checks=""
+        elif printf '%s\n' "${check_statuses}" | grep -qiE 'FAILURE|ERROR'; then
+          checks="fail"
+        elif printf '%s\n' "${check_statuses}" | grep -qiE 'PENDING|QUEUED|IN_PROGRESS|WAITING'; then
+          checks="pending"
+        else
+          checks="pass"
+        fi
+
+        local review
+        review="$(printf '%s' "${json}" | jq -r '.reviewDecision // empty')"
+
+        local approvals
+        approvals="$(printf '%s' "${json}" | jq '[.latestReviews // [] | .[] | select(.state == "APPROVED")] | length')"
+
+        local unresolved=0
+        if [[ "${state}" == "OPEN" ]]; then
+          local threads_json
+          threads_json="$(cd "${repo_path}" && gh api graphql -f query='
+            query($owner: String!, $repo: String!, $number: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $number) {
+                  reviewThreads(first: 100) {
+                    nodes { isResolved isOutdated }
+                  }
+                }
+              }
+            }
+          ' -F owner='{owner}' -F repo='{repo}' -F number="${number}" 2>/dev/null || true)"
+          if [[ -n "${threads_json}" ]]; then
+            unresolved="$(printf '%s' "${threads_json}" | jq '[.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false and .isOutdated == false)] | length')"
+          fi
+        fi
+
+        atomic_write "${tmpdir}/pr/${branch//\//__}" "${number}|${state}|${isDraft}|${url}|${checks}|${review}|${approvals}|${unresolved}"
+      else
+        atomic_write "${tmpdir}/pr/${branch//\//__}" ""
+      fi
+    done
   done
 }
 
@@ -185,15 +284,23 @@ refresh_pr_cache() {
 #######################################
 pr_col() {
   local branch="${1}"
-  local cached="${pr_cache["${branch}"]:-}"
+  local pr_file="${tmpdir}/pr/${branch//\//__}"
+
+  if [[ ! -f "${pr_file}" ]]; then
+    printf "—"
+    return
+  fi
+
+  local cached
+  cached="$(<"${pr_file}")"
 
   if [[ -z "${cached}" ]]; then
     printf "—"
     return
   fi
 
-  local number state isDraft url checks review
-  IFS='|' read -r number state isDraft url checks review <<< "${cached}"
+  local number state isDraft url checks review approvals unresolved
+  IFS='|' read -r number state isDraft url checks review approvals unresolved <<< "${cached}"
 
   local color label
   if [[ "${isDraft}" == "true" ]]; then
@@ -226,7 +333,18 @@ pr_col() {
     case "${review:-}" in
       APPROVED)          printf " %b☑%b" "${BRIGHT_GREEN}" "${RESET}" ;;
       CHANGES_REQUESTED) printf " %b✎%b" "${BRIGHT_RED}" "${RESET}" ;;
+      *)
+        # Show partial approvals even when overall decision isn't APPROVED
+        if [[ "${approvals:-0}" -gt 0 ]]; then
+          printf " %b☑%b" "${BRIGHT_YELLOW}" "${RESET}"
+        fi
+        ;;
     esac
+
+    # Unresolved review comments indicator (open PRs only)
+    if [[ "${unresolved:-0}" -gt 0 ]]; then
+      printf " %b☐ %s%b" "${BRIGHT_YELLOW}" "${unresolved}" "${RESET}"
+    fi
   fi
 }
 
@@ -248,9 +366,31 @@ restore_terminal() {
 }
 
 #######################################
-# Collect session data and render the table
+# Cleanup: kill workers, remove tmpdir, restore terminal
 #######################################
-collect_and_render() {
+cleanup() {
+  for pid in "${worker_pids[@]}"; do
+    kill "${pid}" 2>/dev/null || true
+    wait "${pid}" 2>/dev/null || true
+  done
+  worker_pids=()
+  [[ -n "${tmpdir}" ]] && \rm -rf "${tmpdir}"
+  restore_terminal
+}
+
+#######################################
+# Render the table from tmux state + cached data
+#######################################
+render() {
+  local current_session
+  current_session="$(tmux display-message -p '#{session_name}')"
+  local last_session
+  last_session="$(tmux list-sessions -F '#{session_activity}|#{session_name}' 2>/dev/null \
+    | sort -t'|' -k1,1rn \
+    | while IFS='|' read -r _ts name; do
+        [[ "${name}" != "${current_session}" ]] && printf '%s' "${name}" && break
+      done)"
+
   local -a sessions=()
   local -a pane_paths=()
 
@@ -262,7 +402,15 @@ collect_and_render() {
     -f '#{&&:#{==:#{window_index},1},#{==:#{pane_index},1}}' 2>/dev/null \
     | sort -t'|' -k1,1n | cut -d'|' -f2-)
 
-  # Collect bell flags: any window with bell_flag=1 marks the session
+  # Write sessions.manifest for workers
+  local manifest=""
+  local i
+  for i in "${!sessions[@]}"; do
+    manifest+="${sessions[$i]}|${pane_paths[$i]}"$'\n'
+  done
+  atomic_write "${tmpdir}/sessions.manifest" "${manifest}"
+
+  # Collect bell flags
   local -A bell_sessions=()
   while IFS='|' read -r sess flag; do
     if [[ "${flag}" == "1" ]]; then
@@ -270,52 +418,41 @@ collect_and_render() {
     fi
   done < <(tmux list-windows -a -F '#{session_name}|#{window_bell_flag}' 2>/dev/null)
 
-  # Resolve branches and git roots for each session
+  # Read git cache for each session
   local -a branches=()
-  local -a git_roots=()
-  local -A branch_to_repo=()
+  local -a gcols=()
 
-  local i
   for i in "${!sessions[@]}"; do
-    local path="${pane_paths[$i]}"
-    local git_root=""
-    local branch=""
+    local session="${sessions[$i]}"
+    local git_file="${tmpdir}/git/${session//\//__}"
+    local branch="" gcol="—"
 
-    git_root="$(git -C "${path}" rev-parse --show-toplevel 2>/dev/null || true)"
-    if [[ -n "${git_root}" ]]; then
-      branch="$(git -C "${git_root}" branch --show-current 2>/dev/null || true)"
-      if [[ -n "${branch}" ]]; then
-        branch_to_repo["${branch}"]="${git_root}"
-      fi
+    if [[ -f "${git_file}" ]]; then
+      local data
+      data="$(<"${git_file}")"
+      local _git_root
+      IFS='|' read -r branch _git_root gcol <<< "${data}"
     fi
 
-    git_roots+=("${git_root}")
     branches+=("${branch}")
+    gcols+=("${gcol}")
   done
-
-  # Refresh PR cache periodically
-  (( render_count++ )) || true
-  if (( render_count % PR_REFRESH_INTERVAL == 1 )); then
-    refresh_pr_cache branch_to_repo
-  fi
 
   # Move cursor to top-left and start drawing
   tput cup 0 0
 
   # Header
-  printf "  ${BOLD}${CYAN}%-${COL_SESSION}s  %-${COL_GIT}s  %-${COL_PR}s${RESET}\033[K\n" "Session" "Git" "PR"
-  local divider_len=$(( COL_SESSION + COL_GIT + COL_PR + 7 ))
+  printf "  ${BOLD}${CYAN}%s %-${COL_SESSION}s  %-${COL_GIT}s  %-${COL_PR}s${RESET}\033[K\n" " " "Session" "Git" "PR"
+  local divider_len=$(( COL_SESSION + COL_GIT + COL_PR + 9 ))
   printf "  ${DIM}%s${RESET}\033[K\n" "$(printf '─%.0s' $(seq 1 "${divider_len}"))"
 
   for i in "${!sessions[@]}"; do
     local session="${sessions[$i]}"
-    local git_root="${git_roots[$i]}"
     local branch="${branches[$i]}"
-    local gcol="—"
+    local gcol="${gcols[$i]}"
     local pcol
 
-    if [[ -n "${git_root}" ]] && [[ -n "${branch}" ]]; then
-      gcol="$(git_status_col "${git_root}" "${branch}")"
+    if [[ -n "${branch}" ]]; then
       pcol="$(pr_col "${branch}")"
     else
       pcol="—"
@@ -341,7 +478,6 @@ collect_and_render() {
     if [[ "${pcol}" == "—" ]]; then
       pr_text="$(printf "%-${COL_PR}s" "—")"
     else
-      # Strip ANSI/OSC escapes to measure visible length
       local visible
       visible="$(printf '%b' "${pcol}" | sed $'s/\033[[][0-9;]*m//g; s/\033]8;;[^\033]*\033\\\\//g')"
       local pr_pad=$(( COL_PR - ${#visible} ))
@@ -356,7 +492,15 @@ collect_and_render() {
     local git_text="${gcol}"
     [[ "${git_pad}" -gt 0 ]] && git_text+="$(printf '%*s' "${git_pad}" '')"
 
-    printf "  %b  %s  %b\033[K\n" "${session_display}" "${git_text}" "${pr_text}"
+    # Session indicator
+    local indicator=" "
+    if [[ "${session}" == "${current_session}" ]]; then
+      indicator="▸"
+    elif [[ "${session}" == "${last_session}" ]]; then
+      indicator="·"
+    fi
+
+    printf "  %s %b  %s  %b\033[K\n" "${indicator}" "${session_display}" "${git_text}" "${pr_text}"
   done
 
   printf "\033[K\n"
@@ -390,12 +534,22 @@ main() {
     exit 1
   fi
 
-  trap restore_terminal EXIT INT TERM
-  trap 'tput clear 2>/dev/null; collect_and_render' WINCH
+  # Setup tmpdir and cache subdirs
+  tmpdir="$(mktemp -d "${TMPDIR:-/tmp}/tmux-monitor.XXXXXX")"
+  mkdir -p "${tmpdir}/git" "${tmpdir}/pr"
+
+  trap cleanup EXIT INT TERM
+  trap 'tput clear 2>/dev/null; render' WINCH
   setup_terminal
 
+  # Start background workers
+  start_git_worker &
+  worker_pids+=($!)
+  start_pr_worker &
+  worker_pids+=($!)
+
   while true; do
-    collect_and_render
+    render
     sleep "${INTERVAL}" || true  # sleep interrupted by WINCH returns non-zero
   done
 }
