@@ -15,7 +15,7 @@ setw -g clock-mode-style 12
 setw -g mode-style fg=colour13,bg=colour0,bold
 
 # Statusbar
-set -g status-position top
+set -g status-position bottom
 set -g status-justify left
 set -g status-bg colour8
 set -g status-fg colour12
