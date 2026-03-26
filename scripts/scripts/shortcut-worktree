@@ -139,9 +139,13 @@ main() {
   story_json="$(fetch_story_json "${story_id}")"
   branch_name="$(branch_from_json "${story_json}")"
   info "Found branch: ${branch_name}"
-  session_name="$(get_name_from_branch "${branch_name}")"
 
-  local -a popup_args=()
+  local title
+  title="$(title_from_json "${story_json}")"
+  local dir_name="sc-${story_id}"
+  session_name="$(session_name_from_title "SC" "${story_id}" "${title}")"
+
+  local -a popup_args=("--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${detached} && popup_args+=("--detached")
   ${interactive} || popup_args+=("--non-interactive")
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"

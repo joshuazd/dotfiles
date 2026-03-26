@@ -27,14 +27,15 @@ source "${SCRIPT_DIR}/common.sh"
 #######################################
 usage() {
   cat <<USAGE
-Usage: ${0##*/} [--prefix <value>] <branch-name>
+Usage: ${0##*/} [--prefix <value>] [--dir-name <name>] <branch-name>
 
 Create a git worktree one level up from the current repository.
 
 Arguments:
-  --prefix value  Prepend value to the derived directory name (optional)
-  branch-name     Name of the branch to checkout (can include prefixes like
-                  feature/, bugfix/, hotfix/, etc.)
+  --prefix value    Prepend value to the derived directory name (optional)
+  --dir-name name   Override the directory name entirely (optional)
+  branch-name       Name of the branch to checkout (can include prefixes like
+                    feature/, bugfix/, hotfix/, etc.)
 
 Examples:
   ${0##*/} feature/add-login
@@ -43,8 +44,8 @@ Examples:
   ${0##*/} --prefix pr- feature/add-login
     Creates worktree at: ../pr-add-login
 
-  ${0##*/} bugfix/fix-header
-    Creates worktree at: ../fix-header
+  ${0##*/} --dir-name sc-12345 feature/sc-12345-emit-metrics
+    Creates worktree at: ../sc-12345
 
   ${0##*/} my-branch
     Creates worktree at: ../my-branch
@@ -135,6 +136,7 @@ PROCFILE
       > "${worktree_path}/Makefile.local"
     info "Created Makefile.local"
   fi
+
 }
 
 #######################################
@@ -180,6 +182,7 @@ setup_claude_files() {
 #######################################
 main() {
   local prefix=""
+  local dir_name_override=""
   local fetch=false
   local rebase_main=false
   local branch_name=""
@@ -192,6 +195,10 @@ main() {
     case "${1}" in
       --prefix)
         prefix="${2}"
+        shift 2
+        ;;
+      --dir-name)
+        dir_name_override="${2}"
         shift 2
         ;;
       --fetch)
@@ -229,9 +236,13 @@ main() {
   # Get the repository root
   repo_root="$(git rev-parse --show-toplevel)"
 
-  # Get directory name by stripping prefixes, then apply optional prefix
-  dir_name="$(get_name_from_branch "${branch_name}")"
-  dir_name="${prefix}${dir_name}"
+  # Get directory name: use override if provided, otherwise derive from branch
+  if [ -n "${dir_name_override}" ]; then
+    dir_name="${dir_name_override}"
+  else
+    dir_name="$(get_name_from_branch "${branch_name}")"
+    dir_name="${prefix}${dir_name}"
+  fi
 
   # Construct the worktree path (one level up from repo root)
   worktree_path="${repo_root}/../${dir_name}"
@@ -292,6 +303,17 @@ main() {
 
   setup_portal_files "${worktree_path}" "${repo_root}"
   setup_claude_files "${worktree_path}" "${repo_root}"
+
+  # Build webpack assets last — after all symlinks/copies are in place
+  if [ -f "${repo_root}/Procfile.dev" ]; then
+    info "Building webpack assets..."
+    if (cd "${worktree_path}" && yarn build); then
+      info "Webpack assets built"
+    else
+      warn "Webpack build failed — run 'yarn build' manually in the worktree"
+    fi
+  fi
+
   info "To navigate: cd ${worktree_path}"
   return 0
 }

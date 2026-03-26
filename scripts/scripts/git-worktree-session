@@ -31,7 +31,7 @@ source "${SCRIPT_DIR}/common.sh"
 #######################################
 usage() {
   cat <<USAGE
-Usage: ${0##*/} [--detached] [--fetch] [--prefix <value>] [--session-name <name>] <branch-name>
+Usage: ${0##*/} [--detached] [--fetch] [--prefix <value>] [--dir-name <name>] [--session-name <name>] <branch-name>
 
 Create a git worktree and tmux session.
 
@@ -39,6 +39,7 @@ Arguments:
   --detached          Create tmux session in detached mode (optional)
   --fetch             Fetch from origin and reset worktree to remote HEAD (optional)
   --prefix value      Prepend value to the directory name (optional)
+  --dir-name name     Override the directory name entirely (optional)
   --session-name name Override the tmux session name (default: branch-derived)
   branch-name         Name of the branch to create worktree for
 
@@ -70,6 +71,7 @@ main() {
   local detached=false
   local fetch=false
   local prefix=""
+  local dir_name_override=""
   local session_name_override=""
   local branch_name=""
   local session_name
@@ -91,6 +93,10 @@ main() {
         ;;
       --prefix)
         prefix="${2}"
+        shift 2
+        ;;
+      --dir-name)
+        dir_name_override="${2}"
         shift 2
         ;;
       --session-name)
@@ -116,17 +122,21 @@ main() {
     return 1
   fi
 
-  # Compute directory name and worktree path (prefix applies to dir only)
-  dir_name="$(get_name_from_branch "${branch_name}")"
-  local dir_with_prefix="${prefix}${dir_name}"
+  # Compute directory name and worktree path
+  if [ -n "${dir_name_override}" ]; then
+    dir_name="${dir_name_override}"
+  else
+    dir_name="$(get_name_from_branch "${branch_name}")"
+    dir_name="${prefix}${dir_name}"
+  fi
   repo_root="$(git rev-parse --show-toplevel)"
-  worktree_path="${repo_root}/../${dir_with_prefix}"
+  worktree_path="${repo_root}/../${dir_name}"
 
   # Session name: use override if provided, otherwise match directory name
   if [ -n "${session_name_override}" ]; then
     session_name="${session_name_override}"
   else
-    session_name="${dir_with_prefix}"
+    session_name="${dir_name}"
   fi
 
   # Create the worktree directly
@@ -140,7 +150,11 @@ main() {
   info "Creating worktree..."
 
   local worktree_args=()
-  [ -n "${prefix}" ] && worktree_args+=("--prefix" "${prefix}")
+  if [ -n "${dir_name_override}" ]; then
+    worktree_args+=("--dir-name" "${dir_name_override}")
+  elif [ -n "${prefix}" ]; then
+    worktree_args+=("--prefix" "${prefix}")
+  fi
   ${fetch} && worktree_args+=("--fetch")
   worktree_args+=("${branch_name}")
 

@@ -147,24 +147,19 @@ main() {
   fi
 
   info "Found branch: ${branch_name}"
-  session_name="pr-$(get_name_from_branch "${branch_name}")"
 
-  # Derive a human-readable session name from the PR title
   local pr_title pr_number
   pr_title="$(printf "%s" "${pr_json}" | jq -r '.title // empty')"
   pr_number="$(printf "%s" "${pr_json}" | jq -r '.number')"
-  local session_name_flag=()
-  if [ -n "${pr_title}" ] && [ -n "${pr_number}" ]; then
-    session_name="$(session_name_from_title "PR" "${pr_number}" "${pr_title}")"
-    session_name_flag=("--session-name" "${session_name}")
-  fi
+  local dir_name="pr-${pr_number}"
+  session_name="$(session_name_from_title "PR" "${pr_number}" "${pr_title}")"
 
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
   # Pass --fetch so the worktree is always at the latest remote HEAD.
-  local -a popup_args=("--detached" "--fetch" "--prefix" "pr-")
+  local -a popup_args=("--detached" "--fetch" "--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${interactive} || popup_args+=("--non-interactive")
-  run_worktree_popup "${popup_args[@]}" "${session_name_flag[@]+"${session_name_flag[@]}"}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
+  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
   info "Launching Claude in claude window..."
   tmux send-keys -t "=${session_name}:claude" \

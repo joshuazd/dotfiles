@@ -134,17 +134,25 @@ main() {
   current_dir="$(pwd)"
 
   info "Fetching PR ${pr_input} from GitHub..."
-  branch_name="$(gh pr view "${pr_input}" --json headRefName -q '.headRefName')"
+  local pr_json
+  pr_json="$(gh pr view "${pr_input}" --json headRefName,number,title)"
 
+  branch_name="$(printf '%s' "${pr_json}" | jq -r '.headRefName')"
   if [ -z "${branch_name}" ]; then
     error "Could not determine branch name for PR ${pr_input}"
     return 1
   fi
 
-  info "Found branch: ${branch_name}"
-  session_name="pr-$(get_name_from_branch "${branch_name}")"
+  local pr_number
+  pr_number="$(printf '%s' "${pr_json}" | jq -r '.number')"
+  local pr_title
+  pr_title="$(printf '%s' "${pr_json}" | jq -r '.title')"
 
-  local -a popup_args=("--prefix" "pr-")
+  info "Found branch: ${branch_name}"
+  local dir_name="pr-${pr_number}"
+  session_name="$(session_name_from_title "PR" "${pr_number}" "${pr_title}")"
+
+  local -a popup_args=("--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${detached} && popup_args+=("--detached")
   ${interactive} || popup_args+=("--non-interactive")
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"

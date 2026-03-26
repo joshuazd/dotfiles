@@ -265,6 +265,7 @@ branch_from_json() {
 #   --detached            Skip the session switch after the popup
 #   --non-interactive     Don't pause for Enter before the popup closes
 #   --prefix <value>      Prepend value to session/dir name (default: "")
+#   --dir-name <name>     Override the directory name entirely
 #   --fetch               Fetch from origin and reset to remote HEAD
 #   --session-name <name> Override the tmux session name (default: branch-derived)
 # Positional arguments:
@@ -279,6 +280,7 @@ run_worktree_popup() {
   local detached=false
   local interactive=true
   local prefix=""
+  local dir_name_override=""
   local fetch=false
   local session_name_override=""
   local -a positionals=()
@@ -288,6 +290,7 @@ run_worktree_popup() {
       --detached)        detached=true;              shift ;;
       --non-interactive) interactive=false;           shift ;;
       --prefix)          prefix="${2}";              shift 2 ;;
+      --dir-name)        dir_name_override="${2}";   shift 2 ;;
       --fetch)           fetch=true;                 shift ;;
       --session-name)    session_name_override="${2}"; shift 2 ;;
       *)                 positionals+=("${1}"); shift ;;
@@ -304,6 +307,11 @@ run_worktree_popup() {
     prefix_flag="--prefix '${prefix}'"
   fi
 
+  local dir_name_flag=""
+  if [ -n "${dir_name_override}" ]; then
+    dir_name_flag="--dir-name '${dir_name_override}'"
+  fi
+
   local fetch_flag=""
   if ${fetch}; then
     fetch_flag="--fetch"
@@ -318,7 +326,7 @@ run_worktree_popup() {
   # without attaching — required here because we're inside a popup. The outer
   # $detached variable controls whether *this* script switches the client after.
   local popup_command
-  popup_command="cd '${current_dir}' && '${session_script}' --detached ${prefix_flag} ${fetch_flag} ${session_name_flag} '${branch_name}'"
+  popup_command="cd '${current_dir}' && '${session_script}' --detached ${prefix_flag} ${dir_name_flag} ${fetch_flag} ${session_name_flag} '${branch_name}'"
 
   if ${interactive}; then
     popup_command+="; printf '\\n${BLUE}Press Enter to close...${RESET}'; read -r"

@@ -146,22 +146,16 @@ main() {
   branch_name="$(branch_from_json "${story_json}")"
   info "Found branch: ${branch_name}"
 
-  session_name="$(get_name_from_branch "${branch_name}")"
-
-  # Derive a human-readable session name from the story title
   local story_title
   story_title="$(title_from_json "${story_json}")"
-  local session_name_flag=()
-  if [ -n "${story_title}" ]; then
-    session_name="$(session_name_from_title "SC" "${story_id}" "${story_title}")"
-    session_name_flag=("--session-name" "${session_name}")
-  fi
+  local dir_name="sc-${story_id}"
+  session_name="$(session_name_from_title "SC" "${story_id}" "${story_title}")"
 
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
-  local -a popup_args=("--detached")
+  local -a popup_args=("--detached" "--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${interactive} || popup_args+=("--non-interactive")
-  run_worktree_popup "${popup_args[@]}" "${session_name_flag[@]+"${session_name_flag[@]}"}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
+  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
   info "Launching Claude in claude window..."
   tmux send-keys -t "=${session_name}:claude" \
