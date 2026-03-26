@@ -54,8 +54,10 @@ short search -i "Iteration Name"      # In iteration
 ## Create a Story
 
 ```bash
-short create -t "Story title" -s "State Name" [-p "Project Name"] [-d "desc"] [-o "Owner"] [-y feature|bug|chore]
+short create -t "Story title" -s "State Name" [-p "Project Name"] [-d "desc"] [-o "Owner"] [-y feature|bug|chore] [--epic "Epic Name"] [-T "Team Name"]
 ```
+
+`short create` does NOT support `-q` (quiet mode). Use `-I` for ID-only output.
 
 ## Discovery (Find Names/IDs)
 
@@ -71,14 +73,29 @@ short projects      # List projects
 
 | Flag | Purpose |
 |------|---------|
-| `-q` | Quiet mode — suppress loading dialog |
+| `-q` | Quiet mode — suppress loading dialog (not available on all subcommands) |
 | `-I` | ID-only output — useful for chaining |
 | `--format` | Template-based output for scripting |
 
-## Edge Cases
+## Raw API Calls
 
 ```bash
-short api <path>    # Raw API call for anything not covered above
+short api <path>                              # GET request
+short api <path> -X POST -f "key=value"       # POST with fields
 ```
 
-Owner and state names support partial/regex matches.
+**`-f` uses `key=value` format** — not `-f key value` (space-separated will error).
+
+### Story Links (blockers, duplicates, relations)
+
+```bash
+short api /story-links -X POST -f "verb=blocks" -f "subject_id=<blocker_id>" -f "object_id=<blocked_id>"
+```
+
+Valid verbs: `blocks`, `duplicates`, `relates to`
+
+## Gotchas
+
+- Owner and state names support partial/regex matches
+- `-d` with heredocs silently fails when the string contains backticks — use plain inline strings instead
+- `-f` sends all values as strings, but the Shortcut API coerces numeric strings to integers for ID fields

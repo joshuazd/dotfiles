@@ -26,8 +26,11 @@
       "Bash(gh release list*)",
       "Bash(gh workflow list*)",
       "Bash(gh workflow view*)",
+      "Bash(gh pr:*)",
       "Bash(jq*)",
-      "Skill(*)"
+      "Bash(short story*)",
+      "Skill(*)",
+      "mcp__plugin_slack_slack__slack_read_thread"
     ],
     "additionalDirectories": [
       "~/"
@@ -54,7 +57,17 @@
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
-    "ruby-lsp@claude-plugins-official": true
+    "ruby-lsp@claude-plugins-official": true,
+    "slack@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "soc-experience": {
+      "source": {
+        "source": "github",
+        "repo": "huntresslabs/soc-experience"
+      },
+      "autoUpdate": true
+    }
   },
   "spinnerVerbs": {
     "mode": "replace",

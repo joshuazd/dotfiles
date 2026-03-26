@@ -17,7 +17,7 @@ run_rubocop() {
   esac
 
   local output
-  output="$(cd "${cwd}" && bundle exec rubocop --force-exclusion "${config_args[@]}" "${file_path}" 2>&1)" || true
+  output="$(cd "${cwd}" && bundle exec rubocop --autocorrect --force-exclusion "${config_args[@]}" "${file_path}" 2>&1)" || true
   if echo "${output}" | grep -qE "[1-9][0-9]* offense"; then
     echo "${output}" >&2
     exit 2

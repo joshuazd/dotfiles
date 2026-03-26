@@ -8,7 +8,7 @@ Please implement the following Shortcut story.
 
 Instructions:
 
-1. **Plan** — Use the Agent tool with `subagent_type: "superpowers:writing-plans"` to create a structured implementation plan. Tell the plan writer:
+1. **Plan** — Use the Agent tool (general-purpose) to create a structured implementation plan. The agent MUST invoke the `superpowers:writing-plans` skill via the Skill tool before doing anything else. Tell the plan writer:
    - Each task will be executed via RED/GREEN TDD, so tasks should be scoped to independently testable behavior
    - If tasks are too tightly coupled for independent TDD (e.g., a migration + model change that can't be tested separately), group them into a single task
    - **The plan MUST include an "Execution Workflow" section at the top** with these exact instructions, so they survive context compression:
