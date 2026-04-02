@@ -100,10 +100,6 @@ make the failing spec pass with the MINIMUM code possible.
 
 [Spec file path and line numbers from RED agent report]
 
-## Full Task Context
-
-[FULL TEXT of task requirements — for orientation only]
-
 ## Your Job
 
 1. Read the failing spec to understand what behavior is expected
@@ -112,6 +108,7 @@ make the failing spec pass with the MINIMUM code possible.
 4. Write the MINIMUM code to make this spec pass
    - Do not anticipate future specs. Only satisfy the current failing one.
    - It is OK to write naive or incomplete code that will be improved in later cycles.
+   - You have NO knowledge of the broader task. The spec is your only requirement.
 5. Run ONLY the failing spec to confirm it passes
 6. Commit with message: "GREEN: [brief description]"
 
@@ -120,6 +117,8 @@ make the failing spec pass with the MINIMUM code possible.
 - Do NOT modify any spec files. The specs are the contract.
 - MINIMUM code means minimum. Hardcoding a return value is fine if it satisfies
   the spec. Later RED specs will force you to generalize.
+- Do NOT build ahead. You do not know what future specs will require.
+  Solve ONLY what the current spec demands.
 - If a spec seems wrong or untestable, report BLOCKED and explain why.
   Do NOT change the spec.
 

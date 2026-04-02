@@ -12,6 +12,7 @@
       "Bash(git blame*)",
       "Bash(git branch*)",
       "Bash(git remote*)",
+      "Bash(git stash*)",
       "Bash(gh pr diff*)",
       "Bash(gh pr view*)",
       "Bash(gh pr list*)",
@@ -30,7 +31,11 @@
       "Bash(jq*)",
       "Bash(short story*)",
       "Skill(*)",
-      "mcp__plugin_slack_slack__slack_read_thread"
+      "mcp__plugin_slack_slack__slack_read_thread",
+      "mcp__datadog-mcp__analyze_datadog_logs",
+      "mcp__datadog-mcp__search_datadog_logs",
+      "mcp__datadog-mcp__search_datadog_metrics",
+      "mcp__datadog-mcp__get_datadog_metric"
     ],
     "additionalDirectories": [
       "~/"
@@ -58,13 +63,21 @@
     "swift-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "ruby-lsp@claude-plugins-official": true,
-    "slack@claude-plugins-official": true
+    "slack@claude-plugins-official": true,
+    "nit@nit": true
   },
   "extraKnownMarketplaces": {
     "soc-experience": {
       "source": {
         "source": "github",
         "repo": "huntresslabs/soc-experience"
+      },
+      "autoUpdate": true
+    },
+    "nit": {
+      "source": {
+        "source": "github",
+        "repo": "joshuazd/nit"
       },
       "autoUpdate": true
     }

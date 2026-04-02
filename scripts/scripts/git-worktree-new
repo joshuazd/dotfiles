@@ -184,7 +184,6 @@ main() {
   local prefix=""
   local dir_name_override=""
   local fetch=false
-  local rebase_main=false
   local branch_name=""
   local dir_name
   local worktree_path
@@ -203,10 +202,6 @@ main() {
         ;;
       --fetch)
         fetch=true
-        shift
-        ;;
-      --rebase-main)
-        rebase_main=true
         shift
         ;;
       -*)
@@ -256,7 +251,7 @@ main() {
   info "Creating worktree for branch '${branch_name}'"
   info "Location: ${worktree_path}"
 
-  # Fetch from origin if requested, to ensure the worktree gets the latest remote state
+  # Fetch before checking existence so remote-only branches are found
   if ${fetch}; then
     info "Fetching latest for branch '${branch_name}' from origin..."
     if ! git fetch origin "${branch_name}"; then
@@ -264,7 +259,7 @@ main() {
     fi
   fi
 
-  # Check if branch exists
+  # Check if branch exists (locally or on remote after fetch)
   if branch_exists "${branch_name}"; then
     info "Branch '${branch_name}' exists, checking it out"
     if ! git worktree add "${worktree_path}" "${branch_name}"; then
@@ -272,29 +267,20 @@ main() {
       return 1
     fi
   else
-    info "Branch '${branch_name}' does not exist, creating new branch"
-    if ! git worktree add -b "${branch_name}" "${worktree_path}"; then
+    info "Fetching latest origin/main..."
+    git fetch origin main
+
+    info "Branch '${branch_name}' does not exist, creating from origin/main"
+    if ! git worktree add -b "${branch_name}" "${worktree_path}" origin/main; then
       error "Failed to create worktree with new branch"
       return 1
     fi
+
+    info "Pushing new branch to origin..."
+    git -C "${worktree_path}" push -u origin "${branch_name}"
   fi
 
   info "Worktree created successfully"
-
-  # If fetching was requested and a remote tracking branch exists, reset worktree to remote HEAD.
-  # This handles the case where a local branch exists but is behind the remote.
-  if ${fetch} && git show-ref --verify --quiet "refs/remotes/origin/${branch_name}"; then
-    git -C "${worktree_path}" reset --hard "origin/${branch_name}"
-    info "Updated worktree to origin/${branch_name}"
-  fi
-
-  # Set up remote tracking if not already configured (e.g. new branch created with -b,
-  # or existing local branch without an upstream set)
-  if ! git config "branch.${branch_name}.remote" > /dev/null 2>&1; then
-    git config "branch.${branch_name}.remote" "origin"
-    git config "branch.${branch_name}.merge" "refs/heads/${branch_name}"
-    info "Configured remote tracking: origin/${branch_name}"
-  fi
 
   # Trust the new worktree directory in Claude Code
   if [ -x "${SCRIPT_DIR}/claude-trust" ]; then
@@ -312,6 +298,12 @@ main() {
     else
       warn "Webpack build failed — run 'yarn build' manually in the worktree"
     fi
+  fi
+
+  # Pre-trigger mise config tracking so that parallel tmux shells
+  # don't race to create the same tracked-config symlinks
+  if command -v mise > /dev/null 2>&1; then
+    (cd "${worktree_path}" && mise current > /dev/null 2>&1) || true
   fi
 
   info "To navigate: cd ${worktree_path}"

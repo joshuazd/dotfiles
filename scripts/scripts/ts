@@ -1,0 +1,162 @@
+#!/usr/bin/env bash
+#
+# ts - Create a tmux session from an existing directory
+#
+# Usage: ts [--detached] [directory]
+#
+# If no directory is given, uses fzf to pick from sibling directories of the
+# current git repo root (where worktrees typically live).
+#
+# Session naming priority:
+#   1. Shortcut story title (if branch contains SC-<id>)
+#   2. GitHub PR title (if branch has an open PR)
+#   3. Prettified branch name (strip type prefix)
+#   4. Directory basename (if not a git repo)
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+# Get script directory and source common functions
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--detached] [directory]
+
+Create a tmux session from an existing directory.
+
+Arguments:
+  --detached, -d   Create session without switching to it (optional)
+  directory        Path to directory (optional — uses fzf if omitted)
+
+Session naming priority:
+  1. Shortcut story title (branch contains SC-<id>)
+  2. GitHub PR title (branch has open PR)
+  3. Prettified branch name
+  4. Directory basename
+
+Examples:
+  ${0##*/}
+    Pick a directory with fzf, create/switch to session
+
+  ${0##*/} ../my-worktree
+    Create session for ../my-worktree
+
+  ${0##*/} --detached ../my-worktree
+    Create session without switching to it
+USAGE
+}
+
+#######################################
+# Pick a directory using fzf
+# Arguments:
+#   search_root — directory whose children to list
+# Outputs:
+#   Writes selected directory path to stdout
+# Returns:
+#   0 on selection, 1 on cancel/error
+#######################################
+pick_directory() {
+  local search_root="${1}"
+
+  if ! command -v fzf > /dev/null 2>&1; then
+    error "fzf not found — install it or pass a directory argument"
+    return 1
+  fi
+
+  local selected
+  selected="$(
+    find "${search_root}" -maxdepth 1 -mindepth 1 -type d \
+      | sort \
+      | fzf --prompt="directory> " \
+            --preview='
+              dir={}
+              if git -C "$dir" rev-parse --git-dir >/dev/null 2>&1; then
+                branch=$(git -C "$dir" symbolic-ref --quiet --short HEAD 2>/dev/null || echo "detached")
+                printf "\033[1;34m%s\033[0m\n\n" "$branch"
+                git -C "$dir" log --oneline --graph --color=always -10
+              else
+                ls -la "$dir"
+              fi
+            ' \
+            --preview-window=right:50%
+  )" || return 1
+
+  printf "%s" "${selected}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional --detached flag and directory path
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+main() {
+  local detached=false
+  local target_dir=""
+
+  # Parse arguments
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --detached|-d)
+        detached=true
+        shift
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        target_dir="${1}"
+        shift
+        ;;
+    esac
+  done
+
+  # If no directory given, use fzf
+  if [ -z "${target_dir}" ]; then
+    local search_root
+
+    if is_git_repo; then
+      search_root="$(git rev-parse --show-toplevel)/.."
+    elif [ -d "${HOME}/code" ]; then
+      search_root="${HOME}/code"
+    else
+      search_root="${HOME}"
+    fi
+
+    search_root="$(cd "${search_root}" && pwd)"
+    target_dir="$(pick_directory "${search_root}")" || return 1
+  fi
+
+  # Resolve to absolute path
+  target_dir="$(cd "${target_dir}" && pwd)"
+
+  if [ ! -d "${target_dir}" ]; then
+    error "Not a directory: ${target_dir}"
+    return 1
+  fi
+
+  info "Resolving session name..."
+  local session_name
+  session_name="$(resolve_session_name "${target_dir}")"
+
+  create_tmux_session "${session_name}" "${target_dir}" "${detached}"
+}
+
+# Check for help flag
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main "${@}"

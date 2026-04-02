@@ -169,40 +169,7 @@ main() {
     return 1
   fi
 
-  info "Creating tmux session '${session_name}' in ${worktree_path}"
-  
-  # Create the tmux session
-  # Use '=' prefix for exact session matching (names may contain spaces)
-  if ${detached}; then
-    # Create detached session
-    tmux new-session -d -s "${session_name}" -n "claude" -c "${worktree_path}"
-    # Create window named 'server'
-    tmux new-window -t "=${session_name}:2" -n "server" -c "${worktree_path}"
-    # Switch back to claude window
-    tmux select-window -t "=${session_name}:1"
-    info "Detached session '${session_name}' created"
-    info "To attach: tmux attach-session -t '=${session_name}'"
-  else
-    # If we're already in a tmux session, create detached and switch to it
-    # Otherwise, create and attach directly
-    if is_in_tmux; then
-      # Create detached session and switch to it
-      tmux new-session -d -s "${session_name}" -n "claude" -c "${worktree_path}"
-      # Create window named 'server'
-      tmux new-window -t "=${session_name}:2" -n "server" -c "${worktree_path}"
-      # Switch back to claude window
-      tmux select-window -t "=${session_name}:1"
-      info "Switching to session '${session_name}'"
-      tmux switch-client -t "=${session_name}"
-    else
-      # Not in tmux, create and attach
-      tmux new-session -s "${session_name}" -n "claude" -c "${worktree_path}" \; \
-        new-window -t "=${session_name}:2" -n "server" -c "${worktree_path}" \; \
-        select-window -t "=${session_name}:1"
-    fi
-  fi
-  
-  return 0
+  create_tmux_session "${session_name}" "${worktree_path}" "${detached}"
 }
 
 # Check for help flag

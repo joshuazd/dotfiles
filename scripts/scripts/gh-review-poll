@@ -1,0 +1,363 @@
+#!/usr/bin/env bash
+#
+# gh-review-poll - Poll GitHub for PRs and auto-dispatch reviews
+#
+# Usage: gh-review-poll <command> [options]
+#
+# Commands:
+#   start   Start the daemon in the background
+#   stop    Stop the running daemon
+#   status  Check if the daemon is running
+#   once    Run a single poll cycle (foreground)
+#   reset   Clear the seen-PRs state
+#
+# Options (start/once):
+#   --repo <owner/repo>  Repository to poll (repeatable, default: CWD repo)
+#   --query <query>      GitHub search query (default: review-requested:@me)
+#   --interval <seconds> Poll interval in seconds (default: 60, start only)
+#
+# Examples:
+#   gh-review-poll start
+#   gh-review-poll start --repo huntresslabs/portal --query 'review-requested:@me author:cgratigny'
+#   gh-review-poll start --interval 120
+#   gh-review-poll once
+#   gh-review-poll stop
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+readonly STATE_DIR="${HOME}/.local/state/gh-review-poll"
+readonly PID_FILE="${STATE_DIR}/pid"
+readonly SEEN_FILE="${STATE_DIR}/seen"
+readonly LOG_FILE="${STATE_DIR}/log"
+
+readonly DEFAULT_QUERY="review-requested:@me"
+readonly DEFAULT_INTERVAL=60
+
+#######################################
+# Print usage information
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} <command> [options]
+
+Poll GitHub for PRs requesting your review and auto-dispatch gh-review.
+
+Commands:
+  start   Start the daemon in the background
+  stop    Stop the running daemon
+  status  Check if the daemon is running
+  once    Run a single poll cycle (foreground)
+  reset   Clear the seen-PRs state
+
+Options (start/once):
+  --repo <owner/repo>  Repository to poll (repeatable, default: CWD repo)
+  --query <query>      GitHub search query
+                       (default: ${DEFAULT_QUERY})
+  --interval <seconds> Poll interval in seconds (default: ${DEFAULT_INTERVAL}, start only)
+
+Examples:
+  ${0##*/} start
+  ${0##*/} start --repo huntresslabs/portal --query 'review-requested:@me author:cgratigny'
+  ${0##*/} start --repo org/repo1 --repo org/repo2
+  ${0##*/} start --interval 120
+  ${0##*/} once
+  ${0##*/} stop
+USAGE
+}
+
+#######################################
+# Ensure state directory exists
+#######################################
+ensure_state_dir() {
+  mkdir -p "${STATE_DIR}"
+  touch "${SEEN_FILE}"
+}
+
+#######################################
+# Check if a PR number already has a tmux session
+# Arguments:
+#   $1 - PR number
+# Returns:
+#   0 if session exists, 1 otherwise
+#######################################
+has_tmux_session() {
+  local pr_number="${1}"
+  tmux list-sessions -F '#{session_name}' 2>/dev/null | grep -q "^PR-${pr_number} "
+}
+
+#######################################
+# Check if a PR key is in the seen file
+# Arguments:
+#   $1 - PR key (owner/repo#number)
+# Returns:
+#   0 if seen, 1 otherwise
+#######################################
+is_seen() {
+  local key="${1}"
+  grep -qxF "${key}" "${SEEN_FILE}" 2>/dev/null
+}
+
+#######################################
+# Mark a PR as seen
+# Arguments:
+#   $1 - PR key (owner/repo#number)
+#######################################
+mark_seen() {
+  local key="${1}"
+  printf "%s\n" "${key}" >> "${SEEN_FILE}"
+}
+
+#######################################
+# Poll a single repo for PRs matching the query
+# Arguments:
+#   $1 - owner/repo
+#   $2 - search query
+#######################################
+poll_repo() {
+  local repo="${1}"
+  local query="${2}"
+  local results
+
+  results="$(gh pr list -R "${repo}" --search "${query}" --json number,url --limit 50 2>&1)" || {
+    error "gh pr list failed for ${repo}: ${results}"
+    return 1
+  }
+
+  local count
+  count="$(printf "%s" "${results}" | jq 'length')"
+
+  if [ "${count}" -eq 0 ]; then
+    return 0
+  fi
+
+  local i=0
+  while [ "${i}" -lt "${count}" ]; do
+    local number url key
+    number="$(printf "%s" "${results}" | jq -r ".[${i}].number")"
+    url="$(printf "%s" "${results}" | jq -r ".[${i}].url")"
+
+    key="${repo}#${number}"
+
+    if is_seen "${key}"; then
+      i=$(( i + 1 ))
+      continue
+    fi
+
+    if has_tmux_session "${number}"; then
+      info "Session already exists for PR-${number}, marking seen"
+      mark_seen "${key}"
+      i=$(( i + 1 ))
+      continue
+    fi
+
+    info "Dispatching review for ${key}"
+    if DISPATCH_IN_POPUP=1 "${SCRIPT_DIR}/gh-review" --detached --non-interactive "${url}"; then
+      mark_seen "${key}"
+      info "Successfully dispatched ${key}"
+    else
+      error "Failed to dispatch ${key}"
+    fi
+
+    i=$(( i + 1 ))
+  done
+}
+
+#######################################
+# Run one poll cycle across all repos
+# Arguments:
+#   $1 - query
+#   Remaining args - repos
+#######################################
+poll_once() {
+  local query="${1}"
+  shift
+  local -a repos=("${@}")
+
+  local repo
+  for repo in "${repos[@]}"; do
+    poll_repo "${repo}" "${query}" || true
+  done
+}
+
+#######################################
+# Run the daemon loop
+# Arguments:
+#   $1 - query
+#   $2 - interval in seconds
+#   Remaining args - repos
+#######################################
+poll_loop() {
+  local query="${1}"
+  local interval="${2}"
+  shift 2
+  local -a repos=("${@}")
+
+  info "Polling every ${interval}s | repos: ${repos[*]} | query: ${query}"
+
+  while true; do
+    poll_once "${query}" "${repos[@]}" || true
+    sleep "${interval}"
+  done
+}
+
+#######################################
+# Check if daemon is alive
+# Returns:
+#   0 if running, 1 otherwise
+#######################################
+is_running() {
+  [ -f "${PID_FILE}" ] && kill -0 "$(cat "${PID_FILE}")" 2>/dev/null
+}
+
+#######################################
+# Start the daemon
+# Arguments:
+#   $1 - query
+#   $2 - interval
+#   Remaining args - repos
+#######################################
+cmd_start() {
+  local query="${1}"
+  local interval="${2}"
+  shift 2
+  local -a repos=("${@}")
+
+  ensure_state_dir
+
+  if is_running; then
+    error "Already running (PID $(cat "${PID_FILE}"))"
+    return 1
+  fi
+
+  info "Starting daemon (PID file: ${PID_FILE})"
+  info "Log: ${LOG_FILE}"
+
+  ( poll_loop "${query}" "${interval}" "${repos[@]}" ) >> "${LOG_FILE}" 2>&1 &
+  local pid=$!
+  printf "%s" "${pid}" > "${PID_FILE}"
+  disown "${pid}"
+
+  info "Started (PID ${pid})"
+}
+
+#######################################
+# Stop the daemon
+#######################################
+cmd_stop() {
+  if ! is_running; then
+    info "Not running"
+    return 0
+  fi
+
+  local pid
+  pid="$(cat "${PID_FILE}")"
+  info "Stopping (PID ${pid})"
+  kill "${pid}" 2>/dev/null || true
+  \rm -f "${PID_FILE}"
+  info "Stopped"
+}
+
+#######################################
+# Show daemon status
+#######################################
+cmd_status() {
+  if is_running; then
+    local pid
+    pid="$(cat "${PID_FILE}")"
+    local seen_count
+    seen_count="$(wc -l < "${SEEN_FILE}" 2>/dev/null | tr -d ' ')"
+    info "Running (PID ${pid}), ${seen_count} PRs seen"
+  else
+    info "Not running"
+    # Clean up stale PID file
+    [ -f "${PID_FILE}" ] && \rm -f "${PID_FILE}"
+  fi
+}
+
+#######################################
+# Clear seen state
+#######################################
+cmd_reset() {
+  ensure_state_dir
+  : > "${SEEN_FILE}"
+  info "Seen state cleared"
+}
+
+#######################################
+# Main
+#######################################
+main() {
+  local command=""
+  local query="${DEFAULT_QUERY}"
+  local interval="${DEFAULT_INTERVAL}"
+  local -a repos=()
+
+  if [ "${#}" -eq 0 ]; then
+    usage
+    return 1
+  fi
+
+  command="${1}"
+  shift
+
+  # Parse remaining flags
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --query)
+        query="${2}"
+        shift 2
+        ;;
+      --interval)
+        interval="${2}"
+        shift 2
+        ;;
+      --repo)
+        repos+=("${2}")
+        shift 2
+        ;;
+      -*)
+        error "Unknown option: ${1}"
+        return 1
+        ;;
+      *)
+        error "Unexpected argument: ${1}"
+        return 1
+        ;;
+    esac
+  done
+
+  # Default to CWD repo if no --repo given
+  if [ "${#repos[@]}" -eq 0 ]; then
+    local cwd_repo
+    cwd_repo="$(gh repo view --json nameWithOwner -q .nameWithOwner 2>/dev/null)" || {
+      error "No --repo specified and CWD is not a GitHub repo"
+      return 1
+    }
+    repos=("${cwd_repo}")
+  fi
+
+  case "${command}" in
+    start)  cmd_start "${query}" "${interval}" "${repos[@]}" ;;
+    stop)   cmd_stop ;;
+    status) cmd_status ;;
+    once)   ensure_state_dir; poll_once "${query}" "${repos[@]}" ;;
+    reset)  cmd_reset ;;
+    *)
+      error "Unknown command: ${command}"
+      usage
+      return 1
+      ;;
+  esac
+}
+
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+main "${@}"
