@@ -13,6 +13,9 @@
     lineNumber = true
 [core]
 	excludesfile = ~/.cvsignore
+	untrackedCache = true
+	fsmonitor = true
+	fsyncMethod = batch
 [alias]
 	conflicts = diff --name-only --diff-filter=U
 	ctags = !.git/hooks/ctags
@@ -25,3 +28,8 @@
 	templatedir = ~/.git_template
 [rebase]
 	autoStash = true
+[maintenance]
+	repo = /Users/joshua.zink-duda/portal
+[checkout]
+	workers = 0
+	thresholdForParallelism = 100

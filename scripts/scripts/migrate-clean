@@ -1,0 +1,236 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# migrate-clean — wraps `bin/rails db:migrate` and reverts artifact-only changes
+# to schema dump files and model annotation blocks while preserving real changes
+# attributable to migrations new on the current branch (vs origin/HEAD).
+#
+# Forward args: `migrate-clean VERSION=...` etc.
+#
+# Conservative on uncertainty: leaves a hunk alone when the heuristic can't
+# confidently classify it (raw SQL migrations, missing base, dirty pre-state).
+#
+# Multi-database: each schema is paired with its migrate dir from database.yml.
+# Annotations are routed to the right schema by parsing each schema's tables.
+
+require "shellwords"
+require "set"
+
+SCHEMAS = [
+  { schema: "db/schema.rb",                     migrate: "db/migrate" },
+  { schema: "db/clickhouse_schema.rb",          migrate: "db/migrate_clickhouse" },
+  { schema: "db/clickhouse_internal_schema.rb", migrate: "db/clickhouse_internal_migrate" },
+  { schema: "db/rio_schema.rb",                 migrate: "db/rio_migrate" },
+  { schema: "db/rio_shard1_schema.rb",          migrate: "db/rio_migrate" },
+  { schema: "db/rio_shard5_schema.rb",          migrate: "db/rio_migrate" },
+  { schema: "db/tenant_schema.rb",              migrate: "db/tenant_migrate" },
+  { schema: "db/timescale_schema.rb",           migrate: "db/timescale_migrate" }
+].freeze
+
+TABLE_TOUCH_PATTERN = /\b(?:create_table|drop_table|change_table|rename_table|create_join_table|drop_join_table|add_column|remove_column|change_column|change_column_default|change_column_null|change_column_comment|rename_column|add_reference|remove_reference|add_belongs_to|remove_belongs_to|add_index|remove_index|add_foreign_key|remove_foreign_key|add_check_constraint|remove_check_constraint|add_timestamps|remove_timestamps)\s+["':]([a-z_][a-z_0-9]*)/.freeze
+
+RAW_SQL_PATTERN = /\b(?:execute|exec_query|exec_update|exec_insert|exec_delete)\s*[\(\s'"]/.freeze
+
+ANNOTATION_START = /^# == Schema Information\b/.freeze
+
+SCHEMA_TABLE_DEFINITION = /^\s*create_table\s+["':]([a-z_][a-z_0-9]*)/.freeze
+
+def sh_capture(*args)
+  IO.popen(args, err: %i[child out], &:read)
+end
+
+def file_clean?(path)
+  `git status --porcelain -- #{Shellwords.escape(path)}`.strip.empty?
+end
+
+def base_ref
+  ref = `git rev-parse --abbrev-ref origin/HEAD 2>/dev/null`.strip
+  return ref unless ref.empty?
+
+  %w[origin/main origin/master].find do |candidate|
+    system("git rev-parse --verify --quiet #{candidate} > /dev/null 2>&1")
+  end || "origin/main"
+end
+
+# Returns [kept_tables_set, uncertain_bool] for migrations new-on-branch in migrate_dir.
+def compute_kept_tables(base, migrate_dir)
+  return [Set.new, false] unless File.directory?(migrate_dir)
+
+  migration_paths = `git diff --name-only #{Shellwords.escape(base)}...HEAD -- #{Shellwords.escape(migrate_dir)}/`
+                    .split("\n")
+                    .reject(&:empty?)
+                    .select { |path| File.exist?(path) }
+
+  kept = Set.new
+  uncertain = false
+
+  migration_paths.each do |migration_path|
+    body = File.read(migration_path)
+
+    if body =~ RAW_SQL_PATTERN
+      uncertain = true
+      break
+    end
+
+    body.scan(TABLE_TOUCH_PATTERN) { |(table)| kept << table }
+  end
+
+  [kept, uncertain]
+end
+
+# Build {table_name => schema_decision} from current schema files.
+def build_table_to_schema_map(schema_decisions)
+  map = {}
+  schema_decisions.each do |decision|
+    next unless File.exist?(decision[:schema])
+
+    File.read(decision[:schema]).scan(SCHEMA_TABLE_DEFINITION) do |(table)|
+      map[table] = decision
+    end
+  end
+  map
+end
+
+def annotation_block_range(content)
+  lines = content.lines
+  start_idx = lines.index { |line| line =~ ANNOTATION_START }
+  return nil unless start_idx
+
+  end_idx = start_idx
+  end_idx += 1 while end_idx + 1 < lines.length && lines[end_idx + 1].start_with?("#")
+  [start_idx, end_idx]
+end
+
+def table_name_from_annotation(content)
+  return Regexp.last_match(1) if content =~ /^# Table name: ([a-z_][a-z_0-9]*)/
+
+  nil
+end
+
+def restore_annotation_block!(path)
+  base_content = sh_capture("git", "show", "HEAD:#{path}")
+  return :no_base unless $?.success? && !base_content.empty?
+
+  current_content = File.read(path)
+  current_range = annotation_block_range(current_content)
+  return :no_block unless current_range
+
+  base_range = annotation_block_range(base_content)
+  current_lines = current_content.lines
+
+  if base_range
+    base_block = base_content.lines[base_range[0]..base_range[1]]
+    current_lines[current_range[0]..current_range[1]] = base_block
+  else
+    next_line = current_lines[current_range[1] + 1]
+    extra = (next_line && next_line.strip.empty?) ? 1 : 0
+    current_lines.slice!(current_range[0], current_range[1] - current_range[0] + 1 + extra)
+  end
+
+  File.write(path, current_lines.join)
+  :ok
+end
+
+def log(message)
+  warn "[migrate-clean] #{message}"
+end
+
+# --- main ---
+
+unless File.exist?("bin/rails")
+  abort "[migrate-clean] must be run from the portal root (no bin/rails found)"
+end
+
+schema_clean_pre = SCHEMAS.to_h { |s| [s[:schema], file_clean?(s[:schema])] }
+dirty_models_pre = `git diff --name-only HEAD -- app/models/`
+                   .split("\n")
+                   .reject(&:empty?)
+                   .to_set
+
+log "running bin/rails db:migrate #{ARGV.join(' ')}".strip
+unless system("bin/rails", "db:migrate", *ARGV)
+  status = $?.exitstatus
+  log "db:migrate failed (exit #{status}); skipping cleanup"
+  exit status
+end
+
+base = base_ref
+schema_decisions = SCHEMAS.map do |s|
+  kept, uncertain = compute_kept_tables(base, s[:migrate])
+  s.merge(kept: kept, uncertain: uncertain)
+end
+
+# --- per-schema cleanup ---
+schema_decisions.each do |s|
+  schema_path = s[:schema]
+  next unless File.exist?(schema_path)
+
+  if file_clean?(schema_path)
+    next
+  end
+
+  if !schema_clean_pre[schema_path]
+    log "#{schema_path}: dirty pre-migrate; leaving alone"
+  elsif s[:uncertain]
+    log "#{schema_path}: uncertain (raw SQL migration in #{s[:migrate]}); leaving alone"
+  elsif s[:kept].empty?
+    log "#{schema_path}: no new-on-branch migrations in #{s[:migrate]}; reverting"
+    system("git", "checkout", "HEAD", "--", schema_path) || log("#{schema_path}: git checkout failed")
+  else
+    log "#{schema_path}: new-on-branch migrations touch #{s[:kept].size} table(s) in #{s[:migrate]}; leaving alone"
+  end
+end
+
+# --- model annotations ---
+table_to_schema = build_table_to_schema_map(schema_decisions)
+
+dirty_models_post = `git diff --name-only HEAD -- app/models/`
+                    .split("\n")
+                    .reject(&:empty?)
+
+candidates = dirty_models_post - dirty_models_pre.to_a
+
+if candidates.empty?
+  log "no model annotation candidates"
+else
+  candidates.each do |path|
+    next unless File.exist?(path)
+
+    table = table_name_from_annotation(File.read(path))
+    if table.nil?
+      log "#{path}: no table name in annotation; leaving alone"
+      next
+    end
+
+    decision = table_to_schema[table]
+    if decision.nil?
+      log "#{path}: table #{table} not found in any schema; leaving alone"
+      next
+    end
+
+    if decision[:uncertain]
+      log "#{path}: uncertain (raw SQL in #{decision[:migrate]}); leaving alone"
+      next
+    end
+
+    if decision[:kept].include?(table)
+      log "#{path}: keeping (table #{table} new on branch in #{decision[:migrate]})"
+      next
+    end
+
+    case restore_annotation_block!(path)
+    when :ok
+      if file_clean?(path)
+        log "#{path}: reverted annotation (table #{table})"
+      else
+        log "#{path}: reverted annotation block (table #{table}); other diffs preserved"
+      end
+    when :no_base
+      log "#{path}: no base content (untracked?); leaving alone"
+    when :no_block
+      log "#{path}: no annotation block to revert; leaving alone"
+    end
+  end
+end
+
+log "done"

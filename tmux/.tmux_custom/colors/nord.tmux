@@ -6,8 +6,10 @@ set -g pane-active-border-style fg=colour8,bg=colour8
 set -g message-style fg=colour46,bold,bg=colour232
 
 # Window Mode
-set -g window-style bg=#1c2028
-set -g window-active-style bg=#222630
+# set -g window-style bg=#1c2028
+# set -g window-active-style bg=#222630
+set -g window-style default
+set -g window-active-style default
 
 # Modes
 setw -g clock-mode-colour colour5
