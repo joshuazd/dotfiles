@@ -10,20 +10,24 @@ version: 1.0.0
 
 ### 1. Commit changes
 
-Check for uncommitted changes, stage relevant changes, and commit them with a descriptive message.
+If there are uncommitted changes, invoke the `commit` skill to stage and commit them. Do not re-implement the commit flow here.
+
+### 2. Resolve default branch
+
+The default branch is not always `main`. Resolve it once and reuse:
 
 ```bash
-git commit -m "Your descriptive commit message here"
+default_branch=$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name)
 ```
 
-### 2. Analyze Branch Changes
+Use `$default_branch` (or `origin/$default_branch`) in the steps below.
 
-Run these commands to analyze the changes in the current branch compared to the main branch:
+### 3. Analyze Branch Changes
 
 ```bash
-git log origin/main..HEAD --oneline
-git diff origin/main..HEAD --stat
-git diff origin/main..HEAD
+git log "origin/$default_branch"..HEAD --oneline
+git diff "origin/$default_branch"..HEAD --stat
+git diff "origin/$default_branch"..HEAD
 ```
 
 Use this information to:
@@ -31,67 +35,68 @@ Use this information to:
 - Identify if migrations exist
 - Identify if tests were added/updated
 
-### 3. Fetch and Rebase from main
-
-Before creating a PR, ensure your branch is up to date with the main branch:
+### 4. Fetch and Rebase
 
 ```bash
-git fetch origin main && git rebase origin/main
+git fetch origin "$default_branch" && git rebase "origin/$default_branch"
 ```
 
 If there are merge conflicts, inform the user and ask how to proceed.
 
-### 4. Push to Remote
+### 5. Push to Remote
 
-After rebasing, push your changes to the remote repository:
+If the branch has not been pushed before:
 
 ```bash
-git push origin HEAD
+git push -u origin HEAD
 ```
 
-### 5. Create Draft PR
+If it has been pushed and step 4 rewrote history, use `--force-with-lease` (never plain `--force`):
 
-Use `gh pr create` with these requirements:
+```bash
+git push --force-with-lease origin HEAD
+```
 
-#### PR Title:
+Check with `git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null` — if it returns an upstream, the branch was pushed before.
+
+### 6. Create Draft PR
+
+Use `gh pr create --draft` with these requirements.
+
+#### PR Title
 - Derive from the user's initial request or context
 - If unclear, derive from branch name or changes
 - Format: Human-readable, concise description
 - Do NOT include shortcut story ID
 
-#### PR Body:
+#### PR Body
 
-The body must use the template from `.github/pull_request_template.md` if it exists.
+The body must use the template from `.github/pull_request_template.md` if it exists. If no template exists, use a minimal body with just the Description section.
 
-##### Template Usage:
-- Preserve ALL checklist items --never delete or omit and `- [ ]` items
-- Preserve section headers --never delete or omit lines starting with `##`
-- Preserve structure --never rearrange sections or checklists
-- Only fill in Description --add content in the Description section, leaving all other sections and checklists empty
+**Template usage:**
+- Preserve ALL checklist items — never delete or omit `- [ ]` items
+- Preserve section headers — never delete lines starting with `##`
+- Preserve structure — never rearrange sections
+- Fill in **only the Description section**. Do NOT check any boxes (including Type), do NOT fill any other fields. Reviewers handle those.
 
-##### Description section
-Write 1-2 sentences maximum describing WHAT changed (facts only):
-- Focus on user-facing changes if present (new features, bug fixes, UI changes)
-- Otherwise, describe internal changes (refactors, optimizations, etc.)
-- Never mention filenames, describe what changed conceptually
-- Be direct and technical
+**Description content** (1–2 sentences, facts only):
+- User-facing changes if present (new features, bug fixes, UI); otherwise internal changes (refactors, optimizations)
+- Describe conceptually — never mention filenames
+- If a Shortcut story is linked, include the story link/ID in the appropriate template field (typically a "Story" or "Ticket" field). If no such field exists in the template, append the link to the Description.
+- No customer impact statements, no value props, no marketing language, no "Generated with Claude Code" footer
 
-Tone Requirements:
-- NO customer impact statements
-- NO value propositions or marketing language
-- NO signature or "Generated with Claude Code" footer
-- Just state the facts
+**Body delivery** (avoid heredoc per global preferences): write the body to a temp file with the Write tool, then pass it via `--body-file`:
 
-##### Type Checkbox
-Automatically check ONE of these based on the changes:
-- `- [x] Feature` if new functionality was added
-- `- [x] Bug` if a bug was fixed
-- `- [x] Chore` if the change is a non-feature, non-bugfix task (e.g., refactor, test update, documentation)
+```bash
+gh pr create --draft --title "..." --body-file /tmp/pr_body.md [labels...]
+```
 
 ## Conventions
 
 - Always create **draft** PRs (`gh pr create --draft`)
-- Use the repo's PR template if one exists
-- Add a description only — do NOT check any boxes, fill in any checklists, or modify any other fields in the template
+- Use the repo's PR template if one exists; otherwise use a minimal body
+- Add a description only — do NOT check any boxes (including Type), fill in any checklists, or modify any other fields
 - Always add the `ai-assisted` label (`--label "ai-assisted"`)
-- If the repo's git remote is `portal` (check with `gh repo view --json name -q .name`), also add `--label "TEAM: SOC" --label "SOC Agentic"`
+- If the repo is `huntresslabs/portal` (check with `gh repo view --json nameWithOwner -q .nameWithOwner`):
+  - Always add `--label "TEAM: SOC"`
+  - Add `--label "SOC Agentic"` **only if the work is agentic-related** (touches agent code, agent eval fixtures, agent prompts/tools, or otherwise scoped to agentic features). If unclear from the diff, ask the user.

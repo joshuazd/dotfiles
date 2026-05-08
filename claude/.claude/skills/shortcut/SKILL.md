@@ -41,15 +41,27 @@ short story <ID> -c "Comment text here"
 
 ## Search Stories
 
+Prefer Shortcut **search operators** (positional args) over the `-t/-o/-s/...` flags. Flags filter client-side *after* fetching everything — the CLI prints `Fetching all stories for search since no search operators were passed` and is very slow. Operators push the query server-side and return in under a second.
+
 ```bash
-short search                          # All stories
+short search -q 'title:InfectionReportManager'           # fast — server-side
+short search -q 'title:"exact phrase" type:bug'          # combine operators
+short search -q 'owner:chrisgratigny state:"Ready for Development"'
+short search -q 'epic:192651'                            # stories in epic
+```
+
+Operator reference: https://help.shortcut.com/hc/en-us/articles/360000046646-Search-Operators
+
+Flag form (slower, client-side regex filter) still works for exploratory searches:
+
+```bash
 short search -o "Owner Name"          # By owner
 short search -s "In Progress"         # By state
-short search -t "keyword"             # By text in name
-short search -y bug                   # By type
 short search --epic "Epic Name"       # In epic
 short search -i "Iteration Name"      # In iteration
 ```
+
+Tip: when a story is in the wrong epic, search `title:<distinctive substring>` — sibling stories on the same code path usually reveal the correct epic.
 
 ## Create a Story
 

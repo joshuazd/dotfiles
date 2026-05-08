@@ -34,16 +34,29 @@ git add path/to/file1 path/to/file2
 
 Draft a message that focuses on the **why** (not just the what). Keep it concise (1–2 sentences).
 
-Use a HEREDOC to preserve formatting:
+Write the message to a per-worktree path inside the gitdir, then commit with `-F`:
 
-```bash
-git commit -m "$(cat <<'EOF'
-Short description of the change
+1. Resolve the path (works in both main repos and worktrees):
 
-Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
-EOF
-)"
-```
+   ```bash
+   git rev-parse --git-path COMMIT_EDITMSG_AI
+   ```
+
+2. Use Write to create that path with content like:
+
+   ```
+   Short description of the change
+
+   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+   ```
+
+3. Commit:
+
+   ```bash
+   git commit -F "$(git rev-parse --git-path COMMIT_EDITMSG_AI)"
+   ```
+
+(Do not use heredoc — it's blocked by a hook. `git rev-parse --git-path` returns the per-worktree gitdir, so parallel worktrees don't collide.)
 
 **Do NOT:**
 - Amend previous commits unless the user explicitly asks

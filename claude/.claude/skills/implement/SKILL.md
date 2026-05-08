@@ -8,32 +8,22 @@ Please implement the following Shortcut story.
 
 Instructions:
 
-1. **Plan** — Use the Agent tool (general-purpose) to create a structured implementation plan. The agent MUST invoke the `superpowers:writing-plans` skill via the Skill tool before doing anything else. Tell the plan writer:
-   - Each task will be executed via RED/GREEN TDD, so tasks should be scoped to independently testable behavior
+1. **Read the story** — Run `short-story-md <story-id>` to fetch the story, then explore the relevant parts of the codebase. Search for existing patterns, helpers, base classes, concerns, and service objects that already solve the problem — reuse over reinvention.
+
+2. **Clarify** — Ask me if anything in the requirements is unclear before proceeding.
+
+3. **Assess complexity** — default to brainstorming. Only skip if the change is trivially mechanical:
+   - **Skip brainstorming** only for: pure renames, copy/text tweaks, single-line bug fixes with confirmed root cause, adding a column with obvious type and no business logic, or a change so localized that no design choice exists.
+   - **Brainstorm otherwise** — invoke `superpowers:brainstorming` via the Skill tool. This includes: any new model/service/concern/job, any new endpoint or controller action, validation that touches multiple models, scopes/queries with non-obvious shape, anything cross-cutting, anything with multiple viable approaches, ambiguous requirements, or unfamiliar domain. CRUD is rarely "straightforward" — if it has callbacks, authorization, or non-trivial validation, brainstorm. When in doubt, brainstorm.
+
+4. **Plan** — Invoke `superpowers:writing-plans` via the Skill tool.
+   - Each task should be scoped to independently testable behavior via RED/GREEN TDD (see `superpowers:test-driven-development`)
    - If tasks are too tightly coupled for independent TDD (e.g., a migration + model change that can't be tested separately), group them into a single task
-   - **The plan MUST include an "Execution Workflow" section at the top** with these exact instructions, so they survive context compression:
 
-     ```
-     ## Execution Workflow
+5. **Execute** — Follow the Execution Workflow section in the plan exactly. If the plan lacks one, invoke `superpowers:executing-plans` (or `superpowers:subagent-driven-development` for parallel work).
 
-     For each task below, execute sequentially:
-     1. Use the Skill tool to call `red-green-tdd` with the full task description as the argument
-        (e.g., `skill: "red-green-tdd", args: "<full task description>"`)
-     2. After RED/GREEN completes, use the Agent tool with `subagent_type: "superpowers:code-reviewer"`
-        to review the task against the plan and coding standards
-     3. Fix any issues before moving to the next task
+6. **Wrap up** — Check whether existing specs need updating for the new behavior. Run the full relevant test suite to confirm nothing is broken. Invoke `superpowers:verification-before-completion` before claiming done.
 
-     After ALL tasks are done, run the full relevant test suite to confirm nothing is broken.
-     ```
-
-2. **Execute** — Exit plan mode, then follow the Execution Workflow section in the plan exactly.
-
-3. **Wrap up** — After all tasks are done, run the full relevant test suite to confirm nothing is broken.
-
-Ask me if anything in the requirements is unclear before proceeding.
+**When blocked:** Stop and ask. If a test fails repeatedly, requirements are unclear, verification fails, or the plan has a critical gap — surface it to me, don't guess your way through.
 
 **Conciseness:** Be extremely concise in all output. Short sentences, no filler, no summaries of what you just did. Push back on silly ideas.
-
----
-
-!`short-story-md "$ARGUMENTS"`
