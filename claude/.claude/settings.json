@@ -13,6 +13,7 @@
       "Bash(git branch*)",
       "Bash(git remote*)",
       "Bash(git stash*)",
+      "Bash(git grep*)",
       "Bash(gh pr diff*)",
       "Bash(gh pr view*)",
       "Bash(gh pr list*)",
@@ -35,7 +36,9 @@
       "mcp__datadog-mcp__analyze_datadog_logs",
       "mcp__datadog-mcp__search_datadog_logs",
       "mcp__datadog-mcp__search_datadog_metrics",
-      "mcp__datadog-mcp__get_datadog_metric"
+      "mcp__datadog-mcp__get_datadog_metric",
+      "Bash(gh api:*)",
+      "Bash(CIRCLECI_TOKEN=$\\(cat ~/.circleci/token\\) bin/failedci)"
     ],
     "additionalDirectories": [
       "~/"
@@ -43,6 +46,55 @@
   },
   "model": "opus[1m]",
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/git-c-rewrite.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/bundle-exec-rewrite.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/gh-pr-create-rewrite.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash ~/.claude/hooks/block-builtin-replaceable.sh",
+            "statusMessage": "Checking for tool-replaceable commands..."
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-git-add-all.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-heredoc.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-pr-ready-on-draft.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-force-push.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-manual-migration-write.sh"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
@@ -105,5 +157,10 @@
       "Gathering intel",
       "Force multiplying"
     ]
-  }
+  },
+  "awaySummaryEnabled": false,
+  "theme": "dark-ansi",
+  "preferredNotifChannel": "terminal_bell",
+  "skipAutoPermissionPrompt": true,
+  "showClearContextOnPlanAccept": true
 }

@@ -16,18 +16,18 @@ run_rubocop() {
       ;;
   esac
 
-  local output
-  output="$(cd "${cwd}" && bundle exec rubocop --autocorrect --force-exclusion "${config_args[@]}" "${file_path}" 2>&1)" || true
-  if echo "${output}" | grep -qE "[1-9][0-9]* offense"; then
+  local output exit_code=0
+  output="$(cd "${cwd}" && bundle exec rubocop --autocorrect --force-exclusion "${config_args[@]}" "${file_path}" 2>&1)" || exit_code=$?
+  if [ "${exit_code}" -ne 0 ]; then
     echo "${output}" >&2
     exit 2
   fi
 }
 
 run_eslint() {
-  local output
-  output="$(cd "${cwd}" && yarn run eslint "${file_path}" 2>&1)" || true
-  if echo "${output}" | grep -qE "[0-9]+ error"; then
+  local output exit_code=0
+  output="$(cd "${cwd}" && yarn run eslint --fix "${file_path}" 2>&1)" || exit_code=$?
+  if [ "${exit_code}" -ne 0 ]; then
     echo "${output}" >&2
     exit 2
   fi

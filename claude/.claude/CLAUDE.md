@@ -7,6 +7,9 @@ Push back on silly ideas.
 - GitHub: use `gh` CLI, not API calls
 - PR comments have 3 separate APIs (top-level, inline review, review verdicts) — `gh pr view --json comments` only gets top-level; use the `/gh` skill for the full picture
 
+## Bash Usage
+- Never use heredoc syntax (`<<EOF`, `<<'EOF'`) in Bash — use the Write tool to create files, and `echo "..." | cmd` or `cmd <<< "..."` to feed stdin to CLI tools
+
 ## Shell Aliases
 - `cp` and `rm` are aliased to interactive mode (`-i`) — use `\rm` and `\cp` to bypass aliases and avoid confirmation prompts that hang
 
