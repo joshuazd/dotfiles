@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+#
+# portal-open - Open the running portal dev server in a browser
+#
+# Reads the dev-server port from tmp/dev.port (written by 'make dev.server'
+# in worktrees created by git-worktree-new). Falls back to port 3000 for the
+# main repo, which has no auto-pick logic.
+#
+# Usage: portal-open [path-or-url]
+#
+# Examples:
+#   portal-open                                                    # /admin/signals
+#   portal-open soc/queue                                          # /soc/queue
+#   portal-open https://huntress.huntress.localhost:3002/foo/bar   # swap port
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+readonly DEFAULT_PATH="/admin/signals"
+readonly DEFAULT_ACCOUNT="huntress"
+readonly FIXED_DOMAIN="huntress.localhost"
+
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [path-or-url]
+
+Open the local portal dev server in a browser. The port is read from
+tmp/dev.port within the current repo's worktree (written by 'make dev.server'),
+falling back to 3000 for the main repo.
+
+Arguments:
+  path-or-url   Either a path (e.g. soc/queue) or a full URL (whose port will
+                be replaced with the worktree's port). Default: ${DEFAULT_PATH}.
+
+Environment:
+  PORTAL_ACCOUNT_SLUG   Account subdomain (default: ${DEFAULT_ACCOUNT})
+USAGE
+}
+
+#######################################
+# Resolve the dev-server port for the current worktree
+# Outputs:
+#   Port number on stdout
+#######################################
+resolve_port() {
+  local repo_root="${1}"
+  local port_file="${repo_root}/tmp/dev.port"
+
+  if [ -f "${port_file}" ]; then
+    cat "${port_file}"
+    return 0
+  fi
+
+  # Main repo or never-started worktree: assume 3000
+  printf '3000\n'
+}
+
+#######################################
+# Build the target URL from the user's argument and the resolved port
+# Arguments:
+#   arg    — user-supplied path or URL (may be empty)
+#   port   — dev-server port
+# Outputs:
+#   Full URL on stdout
+#######################################
+build_url() {
+  local arg="${1}"
+  local port="${2}"
+  local account="${PORTAL_ACCOUNT_SLUG:-${DEFAULT_ACCOUNT}}"
+
+  if [ -z "${arg}" ]; then
+    arg="${DEFAULT_PATH}"
+  fi
+
+  if [[ "${arg}" =~ ^https?:// ]]; then
+    # Full URL: keep host + path, force http and the worktree's port
+    local rest="${arg#http://}"
+    rest="${rest#https://}"
+    local host_port="${rest%%/*}"
+    local path_part=""
+    if [[ "${rest}" == */* ]]; then
+      path_part="/${rest#*/}"
+    fi
+    local host="${host_port%%:*}"
+    printf 'http://%s:%s%s\n' "${host}" "${port}" "${path_part}"
+    return 0
+  fi
+
+  local path="${arg}"
+  [[ "${path}" != /* ]] && path="/${path}"
+  printf 'http://%s.%s:%s%s\n' "${account}" "${FIXED_DOMAIN}" "${port}" "${path}"
+}
+
+main() {
+  local arg="${1:-}"
+
+  if ! is_git_repo; then
+    error "Not in a git repository"
+    return 1
+  fi
+
+  local repo_root
+  repo_root="$(git rev-parse --show-toplevel)"
+
+  local port
+  port="$(resolve_port "${repo_root}")"
+
+  local url
+  url="$(build_url "${arg}" "${port}")"
+
+  [ -t 1 ] && info "Opening ${url}"
+  open "${url}"
+}
+
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+main "${@}"

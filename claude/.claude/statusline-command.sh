@@ -39,6 +39,16 @@ if [ -d "$cwd/.git" ] || git -C "$cwd" rev-parse --git-dir >/dev/null 2>&1; then
     || git -C "$cwd" rev-parse --short HEAD 2>/dev/null)
 fi
 
+# Dev server port (set by worktree Makefile.local at dev.server time)
+# Only show if something is actually listening — otherwise the file is stale
+dev_port=""
+if [ -f "$cwd/tmp/dev.port" ]; then
+  candidate=$(tr -d '[:space:]' < "$cwd/tmp/dev.port" 2>/dev/null)
+  if [ -n "$candidate" ] && lsof -nP -iTCP:"$candidate" -sTCP:LISTEN -t >/dev/null 2>&1; then
+    dev_port="$candidate"
+  fi
+fi
+
 
 # Token pricing per million tokens
 total_input=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
@@ -125,6 +135,10 @@ printf '%s%s%s' "${BLUE}" "${short_cwd}" "${RESET}"
 
 if [ -n "$git_branch" ]; then
   printf ' %s⎇ %s%s' "${GRAY}" "${git_branch}" "${RESET}"
+fi
+
+if [ -n "$dev_port" ]; then
+  printf ' %s:%s%s' "${GREEN}" "${dev_port}" "${RESET}"
 fi
 
 # Line 2: vim mode + model + version + context + cost

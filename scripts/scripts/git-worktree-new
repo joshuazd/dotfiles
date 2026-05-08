@@ -114,27 +114,33 @@ setup_portal_files() {
   )
   for item in "${copies[@]}"; do
     if [ -e "${repo_root}/${item}" ] && [ ! -e "${worktree_path}/${item}" ]; then
-      cp -r "${repo_root}/${item}" "${worktree_path}/${item}"
-      info "Copied ${item}"
+      # -c forces APFS clonefile (CoW) — instant regardless of size
+      cp -cR "${repo_root}/${item}" "${worktree_path}/${item}"
+      info "Cloned ${item}"
     fi
   done
 
-  # Create Procfile.personal with port 3001 so it doesn't clash with the main server
-  if [ ! -f "${worktree_path}/Procfile.personal" ]; then
-    cat > "${worktree_path}/Procfile.personal" <<'PROCFILE'
-web: DD_LOGS_INJECTION=false bundle exec rails s -p 3001 -b 0.0.0.0
-sidekiq: DD_LOGS_INJECTION=false PORT=3001 bundle exec sidekiq -C config/sidekiq_dev_config.yml
-webpack: yarn build --watch
-css: bin/rails tailwindcss:watch
-PROCFILE
-    info "Created Procfile.personal (port 3001)"
-  fi
-
-  # Create Makefile.local that skips docker.up (already running in ~/portal)
+  # Create Makefile.local: skip docker.up (already running in ~/portal),
+  # auto-pick the lowest free port >= 3001 at runtime, and run Procfile.dev
+  # with -m all=1,temporal=0 to disable the temporal worker.
   if [ ! -f "${worktree_path}/Makefile.local" ]; then
-    printf 'docker.ecr.login:\n\t@:\n\ndocker.up:\n\t@:\n\ndev.server:\n\taws-vault exec $${AWS_PROFILE} -- foreman start -f Procfile.personal\n' \
-      > "${worktree_path}/Makefile.local"
-    info "Created Makefile.local"
+    cat > "${worktree_path}/Makefile.local" <<'MAKEFILE'
+docker.ecr.login:
+	@:
+
+docker.up:
+	@:
+
+dev.server:
+	@port=3001; \
+	while lsof -nP -iTCP:$$port -sTCP:LISTEN >/dev/null 2>&1; do \
+	  port=$$((port + 1)); \
+	done; \
+	mkdir -p tmp && echo $$port > tmp/dev.port; \
+	echo "Starting dev server on port $$port"; \
+	PORT=$$port aws-vault exec $${AWS_PROFILE} -- foreman start -f Procfile.dev -m all=1,temporal=0
+MAKEFILE
+    info "Created Makefile.local (auto-picks port at dev.server time)"
   fi
 
 }
@@ -289,16 +295,6 @@ main() {
 
   setup_portal_files "${worktree_path}" "${repo_root}"
   setup_claude_files "${worktree_path}" "${repo_root}"
-
-  # Build webpack assets last — after all symlinks/copies are in place
-  if [ -f "${repo_root}/Procfile.dev" ]; then
-    info "Building webpack assets..."
-    if (cd "${worktree_path}" && yarn build); then
-      info "Webpack assets built"
-    else
-      warn "Webpack build failed — run 'yarn build' manually in the worktree"
-    fi
-  fi
 
   # Pre-trigger mise config tracking so that parallel tmux shells
   # don't race to create the same tracked-config symlinks
