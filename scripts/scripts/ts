@@ -55,15 +55,15 @@ USAGE
 }
 
 #######################################
-# Pick a directory using fzf
+# Pick one or more directories using fzf
 # Arguments:
 #   search_root — directory whose children to list
 # Outputs:
-#   Writes selected directory path to stdout
+#   Writes selected directory paths to stdout (newline-separated; may be multiple)
 # Returns:
 #   0 on selection, 1 on cancel/error
 #######################################
-pick_directory() {
+pick_directories() {
   local search_root="${1}"
 
   if ! command -v fzf > /dev/null 2>&1; then
@@ -75,7 +75,9 @@ pick_directory() {
   selected="$(
     find "${search_root}" -maxdepth 1 -mindepth 1 -type d \
       | sort \
-      | fzf --prompt="directory> " \
+      | fzf --multi \
+            --prompt="directory> " \
+            --header="TAB to mark multiple, ENTER to confirm" \
             --preview='
               dir={}
               if git -C "$dir" rev-parse --git-dir >/dev/null 2>&1; then
@@ -90,6 +92,30 @@ pick_directory() {
   )" || return 1
 
   printf "%s" "${selected}"
+}
+
+#######################################
+# Create (or switch to) a tmux session for a single directory
+# Arguments:
+#   dir            — path to the directory
+#   detached_flag  — "true" to skip switching, "false" to attach/switch
+# Returns:
+#   0 on success, 1 on failure
+#######################################
+create_session_for_dir() {
+  local dir="${1}"
+  local detached_flag="${2}"
+
+  dir="$(cd "${dir}" && pwd)"
+  if [ ! -d "${dir}" ]; then
+    error "Not a directory: ${dir}"
+    return 1
+  fi
+
+  info "Resolving session name for ${dir}..."
+  local session_name
+  session_name="$(resolve_session_name "${dir}")"
+  create_tmux_session "${session_name}" "${dir}" "${detached_flag}"
 }
 
 #######################################
@@ -134,22 +160,31 @@ main() {
     fi
 
     search_root="$(cd "${search_root}" && pwd)"
-    target_dir="$(pick_directory "${search_root}")" || return 1
+
+    local picked
+    picked="$(pick_directories "${search_root}")" || return 1
+
+    local -a targets=()
+    while IFS= read -r line; do
+      [ -n "${line}" ] && targets+=("${line}")
+    done <<< "${picked}"
+
+    if [ "${#targets[@]}" -eq 0 ]; then
+      return 1
+    fi
+
+    if [ "${#targets[@]}" -gt 1 ]; then
+      # Multi-select → all detached, no switch
+      for dir in "${targets[@]}"; do
+        create_session_for_dir "${dir}" true
+      done
+      return 0
+    fi
+
+    target_dir="${targets[0]}"
   fi
 
-  # Resolve to absolute path
-  target_dir="$(cd "${target_dir}" && pwd)"
-
-  if [ ! -d "${target_dir}" ]; then
-    error "Not a directory: ${target_dir}"
-    return 1
-  fi
-
-  info "Resolving session name..."
-  local session_name
-  session_name="$(resolve_session_name "${target_dir}")"
-
-  create_tmux_session "${session_name}" "${target_dir}" "${detached}"
+  create_session_for_dir "${target_dir}" "${detached}"
 }
 
 # Check for help flag
