@@ -1,6 +1,6 @@
 ---
 name: shortcut
-description: Use when performing any Shortcut (project management) operations — viewing stories, updating owners, states, titles, descriptions, adding comments, searching, or creating stories. Always use the `short` CLI, never direct API calls.
+description: Use when interacting with Shortcut in any way — anything mentioning a story ID (sc-NNNNN, [sc-NNNNN]), a Shortcut URL (app.shortcut.com/...), a branch name containing sc-NNNNN, or words like "story", "ticket", "epic", "iteration", "blocker", "Shortcut". Covers viewing/searching stories, updating owner/state/title/description/labels/epics/iterations, adding comments, creating stories, linking blockers/duplicates/related-to, and reading story metadata. Always use the `short` CLI — never curl api.app.shortcut.com or gh api against Shortcut.
 ---
 
 # Shortcut CLI Reference
@@ -8,6 +8,14 @@ description: Use when performing any Shortcut (project management) operations �
 ## Overview
 
 Always use the `short` CLI for Shortcut operations. Never use direct API calls.
+
+## Don't reach for
+
+- ❌ `curl https://api.app.shortcut.com/...` — use `short api <path>` instead
+- ❌ `gh api ...` — `gh` talks to GitHub, not Shortcut
+- ❌ Any `Authorization: Token ...` HTTP request — `short` handles auth
+- ❌ MCP / web tools to look up a story — `short story <ID>` is faster and authoritative
+- ❌ Guessing at owner/state/epic IDs — use the discovery commands (`short members`, `short workflows`, `short epics`)
 
 ## View a Story
 
