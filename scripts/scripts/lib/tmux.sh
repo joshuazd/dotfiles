@@ -153,10 +153,9 @@ resolve_session_name() {
   if [[ "${branch_name}" =~ [Ss][Cc]-([0-9]+) ]]; then
     local story_id="${BASH_REMATCH[1]}"
     if command -v short > /dev/null 2>&1; then
-      local story_json
-      if story_json="$(fetch_story_json "${story_id}" 2>/dev/null)"; then
-        local story_title
-        story_title="$(title_from_json "${story_json}")"
+      local summary story_title
+      if summary="$(fetch_story_summary "${story_id}" 2>/dev/null)"; then
+        story_title="${summary%%$'\t'*}"
         if [ -n "${story_title}" ]; then
           session_name_from_title "SC" "${story_id}" "${story_title}"
           return 0

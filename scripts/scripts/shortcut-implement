@@ -81,7 +81,7 @@ main() {
   local interactive=true
   local story_input=""
   local story_id
-  local story_json
+  local summary
   local branch_name
   local session_script
   local current_dir
@@ -138,16 +138,20 @@ main() {
   story_id="$(extract_story_id "${story_input}")"
 
   info "Fetching story ${story_id} from Shortcut..."
-  story_json="$(fetch_story_json "${story_id}")"
+  summary="$(fetch_story_summary "${story_id}")"
+  local story_title="${summary%%$'\t'*}"
+  branch_name="${summary#*$'\t'}"
+
+  if [ -z "${branch_name}" ] || [ "${branch_name}" = "${summary}" ]; then
+    error "No branch name found for story ${story_id}"
+    return 1
+  fi
 
   info "Ensuring story ownership..."
   "${SCRIPT_DIR}/shortcut-claim" --quiet "${story_id}"
 
-  branch_name="$(branch_from_json "${story_json}")"
   info "Found branch: ${branch_name}"
 
-  local story_title
-  story_title="$(title_from_json "${story_json}")"
   local dir_name="sc-${story_id}"
   session_name="$(session_name_from_title "SC" "${story_id}" "${story_title}")"
 

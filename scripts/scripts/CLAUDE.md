@@ -42,7 +42,7 @@ Functions are organized into focused libraries under `lib/`. All scripts source 
 
 - **`lib/output.sh`** — `error` / `info` / `warn`, color codes, `help_wanted`
 - **`lib/git.sh`** — `is_git_repo`, `get_name_from_branch`, `extract_story_id`, `normalize_pr_input`
-- **`lib/shortcut.sh`** — `fetch_story_json`, `title_from_json`, `branch_from_json`
+- **`lib/shortcut.sh`** — `fetch_story_summary` (returns tab-delimited `title\tbranch` via `short --format`, no JSON parsing)
 - **`lib/tmux.sh`** — `is_in_tmux`, `session_name_from_title`, `setup_nit_pane`, `create_tmux_session`, `resolve_session_name`, `resolve_session_script`, `run_worktree_popup`
 
 Each lib uses a source guard to prevent double-loading. `common.sh` is a thin shim that sources all four.

@@ -93,7 +93,7 @@ main() {
   local story_input=""
   local quiet=false
   local story_id
-  local story_json
+  local owner_ids_json
   local current_uuid
   local member_info
   local already_owner
@@ -137,7 +137,9 @@ main() {
   story_id="$(extract_story_id "${story_input}")"
 
   info "Fetching story ${story_id}..."
-  if ! story_json="$(short story "${story_id}" --format "%j" 2>/dev/null)"; then
+  # Use `short api` rather than `short story --format %j`: the latter emits JSON
+  # with unescaped control chars from description that breaks jq under pipefail.
+  if ! owner_ids_json="$(short api "/stories/${story_id}" 2>/dev/null | jq -c '.owner_ids // []')"; then
     error "Failed to fetch story ${story_id} from Shortcut"
     return 1
   fi
@@ -145,14 +147,14 @@ main() {
   member_info="$(get_current_member)"
   current_uuid="${member_info%% *}"
 
-  already_owner="$(jq --arg id "${current_uuid}" '.owner_ids | contains([$id])' <<< "${story_json}")"
+  already_owner="$(jq --arg id "${current_uuid}" 'contains([$id])' <<< "${owner_ids_json}")"
 
   if [ "${already_owner}" = "true" ]; then
     info "Already an owner of sc-${story_id}"
     return 0
   fi
 
-  new_owner_ids="$(jq -r --arg id "${current_uuid}" '[(.owner_ids // [])[], $id] | unique | join(",")' <<< "${story_json}")"
+  new_owner_ids="$(jq -r --arg id "${current_uuid}" '[.[], $id] | unique | join(",")' <<< "${owner_ids_json}")"
 
   info "Claiming ownership of sc-${story_id}..."
   if ${quiet}; then
