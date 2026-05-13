@@ -46,6 +46,7 @@ inv.signal_added(signal)
 ## Pitfalls
 
 - **Account** has many validations (phone, subdomain, receipt_emails, addresses) — always use `FactoryBot.create(:account)`, never `find_or_create_by!`
+- **Don't reuse `Organization.first` / `Account.first` in dev** for pages that read `account.integrations` — long-lived dev accounts often carry stale `integrations.type` values pointing to deleted STI classes (e.g. `Integrations::EscalationEmail`), raising `ActiveRecord::SubclassNotFound` on render. Create a fresh account.
 - **Organization** factory always creates an associated account — to test "no account", use `update_columns(account_id: nil)` on the org AFTER creation, but beware: the `:with_an_agent` trait creates an agent scoped to the org, and that agent creation may fail if the org's account is nil. Create the investigation first, then nil out the org.
 - **No-org investigations**: create the investigation normally, then `inv.update_columns(organization_id: nil)` — this bypasses the org presence validation
 
