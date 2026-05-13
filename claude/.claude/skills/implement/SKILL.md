@@ -6,6 +6,8 @@ allowed-tools: Bash(short-story-md*)
 
 Please implement the following Shortcut story.
 
+**Routing hint:** If the system prompt contains a `<routing-hint>` block, honor its `exec_tier` when dispatching execution subagents via the `Agent` tool — pass `model: <exec_tier>` to those calls. Planning skills (`brainstorming`, `writing-plans`) stay on the main-session model.
+
 Instructions:
 
 1. **Read the story** — Run `short-story-md <story-id>` to fetch the story, then explore the relevant parts of the codebase. Search for existing patterns, helpers, base classes, concerns, and service objects that already solve the problem — reuse over reinvention.

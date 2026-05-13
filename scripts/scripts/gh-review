@@ -2,7 +2,7 @@
 #
 # gh-review - Review a GitHub pull request with Claude
 #
-# Usage: gh-review [--detached] [--non-interactive] <pr-number-or-url>
+# Usage: gh-review [--detached] [--non-interactive] [--tier T] [--reasoning R] <pr-number-or-url>
 #
 # Fetches the PR branch, sets up a worktree session, builds a review prompt
 # from the PR description and diff, and launches Claude interactively in the
@@ -12,6 +12,8 @@
 #   --detached          Create session without switching to it (optional)
 #   -d                  Shorthand for --detached (optional)
 #   --non-interactive   Don't wait for user input before closing popup (optional)
+#   --tier T            Force model tier (opus|sonnet|haiku). Skips classifier. (optional)
+#   --reasoning R       Force reasoning effort (xhigh|high|medium|low). (optional)
 #   pr-number-or-url    PR number (123), #123, or full GitHub PR URL
 #
 # Example:
@@ -36,13 +38,15 @@ source "${SCRIPT_DIR}/common.sh"
 #######################################
 usage() {
   cat <<USAGE
-Usage: ${0##*/} [--detached] [--non-interactive] <pr-number-or-url>
+Usage: ${0##*/} [--detached] [--non-interactive] [--tier T] [--reasoning R] <pr-number-or-url>
 
 Review a GitHub pull request with Claude.
 
 Arguments:
   --detached, -d      Create session without switching to it (optional)
   --non-interactive   Don't wait for user input before closing popup (optional)
+  --tier T            Force model tier (opus|sonnet|haiku). Skips classifier. (optional)
+  --reasoning R       Force reasoning effort (xhigh|high|medium|low). (optional)
   pr-number-or-url    PR number (123), #123, or full GitHub PR URL
 
 The script will:
@@ -81,6 +85,8 @@ main() {
   local detached=false
   local interactive=true
   local pr_input=""
+  local tier_override=""
+  local reasoning_override=""
   local branch_name
   local session_script
   local current_dir
@@ -96,6 +102,14 @@ main() {
       --non-interactive)
         interactive=false
         shift
+        ;;
+      --tier)
+        tier_override="${2}"
+        shift 2
+        ;;
+      --reasoning)
+        reasoning_override="${2}"
+        shift 2
         ;;
       -*)
         error "Unknown option: ${1}"
@@ -154,6 +168,18 @@ main() {
   local dir_name="pr-${pr_number}"
   session_name="$(session_name_from_title "PR" "${pr_number}" "${pr_title}")"
 
+  # Route: classify PR or honor manual overrides.
+  local route_json
+  if [ -n "${tier_override}" ]; then
+    route_json="$(manual_route "${tier_override}" "${reasoning_override:-xhigh}")"
+  else
+    info "Classifying PR for model routing..."
+    route_json="$(classify_pr "${pr_number}")"
+  fi
+  local route_model route_reasoning route_exec route_rationale
+  IFS=$'\t' read -r route_model route_reasoning route_exec route_rationale <<<"$(parse_route "${route_json}")"
+  info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
+
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
   # Pass --fetch so the worktree is always at the latest remote HEAD.
@@ -162,8 +188,11 @@ main() {
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
   info "Launching Claude in claude window..."
-  tmux send-keys -t "=${session_name}:claude" \
-    "claude -- '/review-pr ${pr_input}'" Enter
+  local launch_cmd
+  launch_cmd="$(claude_launch_cmd \
+    "${route_model}" "${route_reasoning}" "${route_exec}" "${route_rationale}" \
+    "/review-pr ${pr_input}")"
+  tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
 
   if ! ${detached}; then
     tmux switch-client -t "=${session_name}:claude"

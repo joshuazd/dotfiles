@@ -8,6 +8,7 @@
 #   source "${SCRIPT_DIR}/lib/git.sh"      — is_git_repo, get_name_from_branch, extract_story_id, normalize_pr_input
 #   source "${SCRIPT_DIR}/lib/shortcut.sh" — fetch_story_summary
 #   source "${SCRIPT_DIR}/lib/tmux.sh"     — tmux session mgmt, worktree popup, resolve_session_name
+#   source "${SCRIPT_DIR}/lib/route.sh"    — classifier + claude_launch_cmd for model/effort routing
 #
 # Usage:
 #   source "${SCRIPT_DIR}/common.sh"
@@ -18,3 +19,4 @@ source "${_COMMON_LIB_DIR}/output.sh"
 source "${_COMMON_LIB_DIR}/git.sh"
 source "${_COMMON_LIB_DIR}/shortcut.sh"
 source "${_COMMON_LIB_DIR}/tmux.sh"
+source "${_COMMON_LIB_DIR}/route.sh"
