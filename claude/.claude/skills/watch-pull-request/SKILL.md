@@ -43,7 +43,7 @@ Self-review is one pass — don't loop on it.
 
 Loop until Greptile's latest review comes back with **no concerns**. Always re-request a review at the top of each iteration — even if you only pushed back and made no fixes, retriggering gives Greptile a chance to confirm the rebuttal and produce a clean review. Cap at **5 iterations** and escalate to the user if Greptile keeps finding new things.
 
-**a. Clear prior review requests.** Delete your own previous `@greptileai review` comments to keep the thread tidy:
+**a. Trigger a new review.** You MUST delete prior `@greptileai review` comments authored by you before posting the new one. This is REQUIRED, not cosmetic — stale trigger comments accumulate on every iteration, pollute the PR conversation, and make it hard for human reviewers scanning the timeline to tell which review is current. The delete + post is a single atomic step; do not skip the delete even when it's a no-op (iteration 1):
 
 ```bash
 me=$(gh api user -q .login)
@@ -52,16 +52,14 @@ gh api "repos/$owner/$repo/issues/<PR_NUMBER>/comments" \
 | while read -r id; do
     gh api -X DELETE "repos/$owner/$repo/issues/comments/$id"
   done
-```
 
-**b. Trigger a new review.** Capture the current timestamp before this call so step c can detect a *new* Greptile response:
-
-```bash
 trigger_ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 gh pr comment <PR_NUMBER> --body "@greptileai review"
 ```
 
-**c. Wait for Greptile's response.** Poll up to **15 times at 1-minute intervals** (~15 min). Stop polling as soon as Greptile-authored content (top-level comment, review, or review thread) has `updatedAt > $trigger_ts`. If the cap elapses, escalate to the user — don't proceed.
+Capture `trigger_ts` before posting so step b can detect a *new* Greptile response.
+
+**b. Wait for Greptile's response.** Poll up to **15 times at 1-minute intervals** (~15 min). Stop polling as soon as Greptile-authored content (top-level comment, review, or review thread) has `updatedAt > $trigger_ts`. If the cap elapses, escalate to the user — don't proceed.
 
 **CRITICAL: do filtering with `gh api graphql --jq` (gh's internal jq), not by piping to local `jq`.** Greptile review bodies sometimes contain literal control characters (U+0000–U+001F) that cause local `jq` to error with `Invalid string: control characters from U+0000 through U+001F must be escaped`. `gh`'s internal jq handles these — local jq does not. **In bash, this fails silently:** if `jq` errors, `$(...)` captures an empty string; arithmetic comparisons like `[ "$x" -gt 0 ]` then evaluate false on empty input, so the loop polls forever without surfacing the parse error. Always probe with `--jq`, and never pipe `gh api graphql` JSON output through external `jq` for greptile content. Also avoid asking for `body` in this probe — bodies are where the control chars live, and we only need `updatedAt` to detect a fresh response.
 
@@ -96,7 +94,7 @@ done
 
 **Greptile bot login:** match `author.login` with the prefix `greptile` (e.g. `greptile-apps`, `greptile-app`, `greptileai`). Do NOT hardcode a single login — the exact value varies by GitHub App installation.
 
-**d. Pull ALL Greptile feedback — top-level comments, reviews, and review threads.** Greptile leaves feedback in up to three places; check all three. **Always extract `body` fields with `gh api graphql --jq`, never by piping to local `jq`** (control-char issue described in step c).
+**c. Pull ALL Greptile feedback — top-level comments, reviews, and review threads.** Greptile leaves feedback in up to three places; check all three. **Always extract `body` fields with `gh api graphql --jq`, never by piping to local `jq`** (control-char issue described in step b).
 
 ```bash
 gh api graphql -f query='
@@ -114,12 +112,12 @@ gh api graphql -f query='
 - **Review verdict** (from `reviews[]`): if Greptile posted a review (APPROVED / CHANGES_REQUESTED / COMMENTED), its `state` and `body` indicate the verdict. May be empty for some installations.
 - **Review threads** (from `reviewThreads[]`): partition by `comments[0].author.login` starting with `greptile` to isolate Greptile threads. Only consider threads where `isResolved: false` AND `isOutdated: false`.
 
-**e. Check the exit condition.** Exit the loop and continue to step 4 if ALL of:
+**d. Check the exit condition.** Exit the loop and continue to step 4 if ALL of:
 - The Greptile summary comment indicates no actionable concerns (e.g. "Confidence Score: 5/5", "Safe to merge", or no remaining unresolved concerns called out)
 - Any Greptile review verdict is `APPROVED` or absent (no `CHANGES_REQUESTED`)
 - No unresolved/non-outdated Greptile review threads remain
 
-**f. Address every concern** (from review body and from threads). Always post a reply so Greptile sees the response on its next review:
+**e. Address every concern** (from review body and from threads). Always post a reply so Greptile sees the response on its next review:
 
 - If valid: implement the **minimal** fix → commit → push (`git push origin HEAD`, or `--force-with-lease` if you amended).
   - **Thread concerns:** reply to the thread explaining what changed, then resolve the thread.
@@ -139,7 +137,7 @@ mutation($threadId: ID!) {
 }' -f threadId="$thread_id"
 ```
 
-**g. Loop back to step a.**
+**f. Loop back to step a.**
 
 ### 4. Address Human Review Comments
 
@@ -230,7 +228,7 @@ query($owner: String!, $repo: String!, $pr: Int!) {
 
 Returns:
 - **`comments`** — top-level conversation comments (bot messages, general discussion). **Greptile's main review summary lands here**, not in `reviews[]`. Greptile **updates this comment in place** on each re-review — filter on `updatedAt`, not `createdAt`.
-- **`reviewThreads`** — inline diff comments with resolution/outdated status. Each thread has an `id` (use for the `resolveReviewThread` mutation in step 3f). Greptile inline concerns appear here.
+- **`reviewThreads`** — inline diff comments with resolution/outdated status. Each thread has an `id` (use for the `resolveReviewThread` mutation in step 3e). Greptile inline concerns appear here.
 - **`reviews`** — review verdicts (APPROVED, CHANGES_REQUESTED, COMMENTED) and their body text. May be empty for Greptile depending on installation; don't rely on this alone.
 
 ## Notes
