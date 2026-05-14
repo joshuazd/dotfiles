@@ -179,6 +179,7 @@ main() {
   fi
   local route_model route_reasoning route_rationale
   IFS=$'\t' read -r route_model route_reasoning route_rationale <<<"$(parse_route "${route_json}")"
+  info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
 
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
@@ -195,8 +196,6 @@ main() {
       [ "${route_reasoning}" = "high" ] && extra_flags=("--permission-mode" "plan")
       ;;
   esac
-
-  info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
 
   info "Launching Claude in claude window..."
   # The execution-default block survives the plan-accept context clear
