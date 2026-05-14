@@ -188,10 +188,11 @@ main() {
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
   info "Launching Claude in claude window..."
-  # Plan mode is valuable only when planning at Opus; drop it when the
-  # classifier downgrades — the story is mechanical and plan mode is overhead.
+  # Plan mode for opus (anything) or sonnet+high. Skip it only for
+  # sonnet+medium — at that point the story is mechanical enough that
+  # planning is overhead.
   local -a extra_flags=()
-  if [ "${route_model}" = "opus" ]; then
+  if [ "${route_model}" = "opus" ] || { [ "${route_model}" = "sonnet" ] && [ "${route_reasoning}" = "high" ]; }; then
     extra_flags=("--permission-mode" "plan")
   fi
   local launch_cmd
