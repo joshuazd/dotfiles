@@ -27,3 +27,15 @@ If you want subagent dispatch to actually honor a tier, the right mechanism is a
 `opusplan` is a built-in Claude Code model alias: Opus while in plan mode, Sonnet automatically afterward. The story classifier picks it directly for moderate-complexity work (the default tier). Effort is `high` (not `xhigh`) because the launch-time `--effort` flag persists across the mid-session model switch and Sonnet doesn't accept xhigh.
 
 gh-review doesn't use plan mode, so opusplan is not a valid PR-review tier — PR reviews stay on a single model throughout.
+
+## Post-plan-accept context clear
+
+`showClearContextOnPlanAccept: true` is set in settings.json, so accepting a plan wipes the conversation context. Anything that needs to survive the wipe must live in:
+
+1. The system prompt (`--append-system-prompt` content survives — that's where the routing hint and `<execution-default>` block in `shortcut-implement` live)
+2. Auto-discovered `CLAUDE.md` files (reloaded on the new context)
+3. The plan document itself (on disk, re-readable)
+
+The implement skill's own instructions DO NOT survive — they're loaded mid-session via `/implement` and get wiped. That's why the "default to subagent-driven-development" guidance is duplicated into a system-prompt `<execution-default>` block by `shortcut-implement`, not just in the skill.
+
+When adding new post-plan-accept behavioral defaults, put them in the system-prompt block, not in the skill.

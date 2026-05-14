@@ -199,10 +199,18 @@ main() {
   info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
 
   info "Launching Claude in claude window..."
+  # The execution-default block survives the plan-accept context clear
+  # (showClearContextOnPlanAccept). Without it, the implement skill's
+  # "default to subagent-driven-development" instruction is wiped along
+  # with the planning conversation, and the model falls back to inline
+  # executing-plans by default.
+  local execution_default='<execution-default>
+After plan-accept, default to invoking superpowers:subagent-driven-development for execution. Each task runs in a fresh subagent with its own context budget and two-stage review (spec then code-quality). Fall back to superpowers:executing-plans only when plan tasks are tightly coupled (e.g., a single migration + model change that must ship together) or the work is so small (1-2 tasks) that subagent overhead outweighs the benefit.
+</execution-default>'
   local launch_cmd
   launch_cmd="$(claude_launch_cmd \
     "${route_model}" "${route_reasoning}" "${route_rationale}" \
-    "/implement ${story_id}" "${extra_flags[@]}")"
+    "/implement ${story_id}" "${execution_default}" "${extra_flags[@]}")"
   tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
 
   if ! ${detached}; then

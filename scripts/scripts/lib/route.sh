@@ -315,14 +315,18 @@ classify_story() {
 
 #######################################
 # Build the `claude` invocation string for tmux send-keys.
-# Embeds a <routing-hint> block via --append-system-prompt so the in-session
-# model can see what tier it was launched at (informational only).
+# Embeds a <routing-hint> block (plus an optional caller-provided extra
+# block) via --append-system-prompt so the in-session model can see them.
+# The system-prompt content survives Claude Code's plan-accept context
+# clear, which is why operational guidance for post-plan-accept work
+# belongs here rather than in a session skill.
 # Arguments:
-#   tier            — opus | sonnet | haiku  (model tier the classifier picked)
-#   reasoning       — xhigh | high | medium | low
-#   rationale       — one-line classifier reason (shell-safe; printf %q escapes it)
-#   slash_command   — e.g. "/review-pr 123" or "/implement 12345"
-#   extra_flags...  — optional, e.g. "--permission-mode" "plan"
+#   tier               — opus | opusplan | sonnet | haiku
+#   reasoning          — xhigh | high | medium | low
+#   rationale          — one-line classifier reason
+#   slash_command      — e.g. "/review-pr 123" or "/implement 12345"
+#   extra_system_block — optional extra <…> block to append after the routing hint
+#   extra_flags...     — optional, e.g. "--permission-mode" "plan"
 # Outputs:
 #   The full shell command string to stdout
 #######################################
@@ -331,7 +335,8 @@ claude_launch_cmd() {
   local reasoning="${2}"
   local rationale="${3}"
   local slash_command="${4}"
-  shift 4
+  local extra_system_block="${5:-}"
+  shift 5
   local -a extra_flags=("${@}")
 
   local model
@@ -342,6 +347,10 @@ model: ${tier}
 reasoning: ${reasoning}
 rationale: ${rationale}
 </routing-hint>"
+
+  if [ -n "${extra_system_block}" ]; then
+    hint+=$'\n\n'"${extra_system_block}"
+  fi
 
   local hint_quoted
   hint_quoted="$(printf '%q' "${hint}")"

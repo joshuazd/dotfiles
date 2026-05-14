@@ -191,7 +191,7 @@ main() {
   local launch_cmd
   launch_cmd="$(claude_launch_cmd \
     "${route_model}" "${route_reasoning}" "${route_rationale}" \
-    "/review-pr ${pr_input}")"
+    "/review-pr ${pr_input}" "")"
   tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
 
   if ! ${detached}; then
