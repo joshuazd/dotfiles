@@ -88,7 +88,7 @@ The body must use the template from `.github/pull_request_template.md` if it exi
 **Body delivery** (avoid heredoc per global preferences): generate a unique temp path with `mktemp` (never hardcode `/tmp/pr_body.md` — parallel Claude instances will clobber each other), write the body with the Write tool, then pass it via `--body-file`:
 
 ```bash
-pr_body_file=$(mktemp -t pr_body.XXXXXX) && echo "$pr_body_file"
+pr_body_file=$(mktemp "${TMPDIR:-/tmp}/pr_body.XXXXXX") && echo "$pr_body_file"
 # Write tool writes the body to the absolute path printed above
 gh pr create --draft --title "..." --body-file "$pr_body_file" [labels...]
 rm -f "$pr_body_file"
