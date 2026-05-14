@@ -44,7 +44,6 @@
       "~/"
     ]
   },
-  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -158,15 +157,15 @@
       "Force multiplying"
     ]
   },
+  "awaySummaryEnabled": false,
+  "showClearContextOnPlanAccept": true,
+  "theme": "dark-ansi",
+  "preferredNotifChannel": "terminal_bell",
+  "skipAutoPermissionPrompt": true,
   "autoMode": {
     "allow": [
       "$defaults",
       "Deleting your own prior `@greptileai review` trigger comments via `gh api -X DELETE /repos/{owner}/{repo}/issues/comments/{id}` — used by the watch-pull-request skill to keep PR conversations tidy. Safe because it only removes the user's own trigger comments (filtered by `user.login == me` AND `body == \"@greptileai review\"`)."
     ]
-  },
-  "awaySummaryEnabled": false,
-  "theme": "dark-ansi",
-  "preferredNotifChannel": "terminal_bell",
-  "skipAutoPermissionPrompt": true,
-  "showClearContextOnPlanAccept": true
+  }
 }
