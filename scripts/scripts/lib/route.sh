@@ -15,7 +15,7 @@ readonly __LIB_ROUTE_LOADED=1
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/output.sh"
 
-readonly _ROUTE_FALLBACK_JSON='{"model":"opus","reasoning":"xhigh","exec_tier":"sonnet","rationale":"classifier-fallback"}'
+readonly _ROUTE_FALLBACK_JSON='{"model":"opus","reasoning":"xhigh","rationale":"classifier-fallback"}'
 readonly _ROUTE_CLASSIFIER_MODEL="claude-haiku-4-5-20251001"
 readonly _ROUTE_TIMEOUT_SECS=30
 readonly _ROUTE_DEBUG_LOG="${CLAUDE_ROUTE_DEBUG_LOG:-/tmp/route-debug.log}"
@@ -71,22 +71,22 @@ model_id() {
 #   Routing JSON to stdout
 #######################################
 #######################################
-# Parse routing JSON into 4 tab-delimited fields: model, reasoning, exec_tier, rationale.
+# Parse routing JSON into 3 tab-delimited fields: model, reasoning, rationale.
 # All jq stderr is suppressed; on parse failure, the conservative fallback values
 # are emitted so the caller never has to handle errors.
 # Arguments:
 #   route_json — JSON string produced by classify_* or manual_route
 # Outputs:
-#   "<model>\t<reasoning>\t<exec_tier>\t<rationale>" to stdout
+#   "<model>\t<reasoning>\t<rationale>" to stdout
 #######################################
 parse_route() {
   local route_json="${1}"
   local parsed=""
   parsed="$(printf '%s' "${route_json}" \
-    | jq -r '[.model // "opus", .reasoning // "xhigh", .exec_tier // "sonnet", .rationale // "no-rationale"] | @tsv' 2>/dev/null)" || parsed=""
+    | jq -r '[.model // "opus", .reasoning // "xhigh", .rationale // "no-rationale"] | @tsv' 2>/dev/null)" || parsed=""
   if [ -z "${parsed}" ]; then
     _route_debug "parse_route: invalid JSON, using fallback" "${route_json}"
-    parsed=$'opus\txhigh\tsonnet\tclassifier-fallback'
+    parsed=$'opus\txhigh\tclassifier-fallback'
   fi
   printf '%s' "${parsed}"
 }
@@ -94,13 +94,12 @@ parse_route() {
 manual_route() {
   local tier="${1}"
   local reasoning="${2:-}"
-  local exec_tier
   local default_reasoning
 
   case "${tier}" in
-    opus)   exec_tier="sonnet"; default_reasoning="xhigh" ;;
-    sonnet) exec_tier="sonnet"; default_reasoning="high" ;;
-    haiku)  exec_tier="haiku";  default_reasoning="medium" ;;
+    opus)   default_reasoning="xhigh" ;;
+    sonnet) default_reasoning="high" ;;
+    haiku)  default_reasoning="medium" ;;
     *)
       error "Unknown tier: ${tier}"
       return 1
@@ -109,8 +108,8 @@ manual_route() {
 
   [ -z "${reasoning}" ] && reasoning="${default_reasoning}"
 
-  printf '{"model":"%s","reasoning":"%s","exec_tier":"%s","rationale":"manual override"}' \
-    "${tier}" "${reasoning}" "${exec_tier}"
+  printf '{"model":"%s","reasoning":"%s","rationale":"manual override"}' \
+    "${tier}" "${reasoning}"
 }
 
 #######################################
@@ -132,10 +131,8 @@ Valid reasoning levels are tied to the model:
 
 NEVER emit haiku for model — only opus or sonnet.
 
-exec_tier rule: one tier below model. opus→sonnet, sonnet→sonnet.
-
 Output exactly this JSON shape (single line, no trailing newline):
-{\"model\":\"opus|sonnet\",\"reasoning\":\"xhigh|high|medium\",\"exec_tier\":\"opus|sonnet\",\"rationale\":\"one short sentence\"}"
+{\"model\":\"opus|sonnet\",\"reasoning\":\"xhigh|high|medium\",\"rationale\":\"one short sentence\"}"
 
   case "${kind}" in
     pr)
@@ -209,7 +206,7 @@ ${payload}"
   routing="${routing%\`\`\`}"
   routing="$(printf '%s' "${routing}" | tr -d '\n')"
 
-  if ! printf '%s' "${routing}" | jq -e 'has("model") and has("reasoning") and has("exec_tier")' >/dev/null 2>&1; then
+  if ! printf '%s' "${routing}" | jq -e 'has("model") and has("reasoning")' >/dev/null 2>&1; then
     warn "classifier: invalid output, using fallback"
     _route_debug "classifier: validation failed (${kind})" "${routing}"
     printf '%s' "${_ROUTE_FALLBACK_JSON}"
@@ -299,11 +296,10 @@ classify_story() {
 #######################################
 # Build the `claude` invocation string for tmux send-keys.
 # Embeds a <routing-hint> block via --append-system-prompt so the in-session
-# skill can read it.
+# model can see what tier it was launched at (informational only).
 # Arguments:
 #   tier            — opus | sonnet | haiku  (model tier the classifier picked)
 #   reasoning       — xhigh | high | medium | low
-#   exec_tier       — opus | sonnet | haiku
 #   rationale       — one-line classifier reason (shell-safe; printf %q escapes it)
 #   slash_command   — e.g. "/review-pr 123" or "/implement 12345"
 #   extra_flags...  — optional, e.g. "--permission-mode" "plan"
@@ -313,10 +309,9 @@ classify_story() {
 claude_launch_cmd() {
   local tier="${1}"
   local reasoning="${2}"
-  local exec_tier="${3}"
-  local rationale="${4}"
-  local slash_command="${5}"
-  shift 5
+  local rationale="${3}"
+  local slash_command="${4}"
+  shift 4
   local -a extra_flags=("${@}")
 
   local model
@@ -325,7 +320,6 @@ claude_launch_cmd() {
   local hint="<routing-hint>
 model: ${tier}
 reasoning: ${reasoning}
-exec_tier: ${exec_tier}
 rationale: ${rationale}
 </routing-hint>"
 

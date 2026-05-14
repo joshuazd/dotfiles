@@ -176,8 +176,8 @@ main() {
     info "Classifying PR for model routing..."
     route_json="$(classify_pr "${pr_number}")"
   fi
-  local route_model route_reasoning route_exec route_rationale
-  IFS=$'\t' read -r route_model route_reasoning route_exec route_rationale <<<"$(parse_route "${route_json}")"
+  local route_model route_reasoning route_rationale
+  IFS=$'\t' read -r route_model route_reasoning route_rationale <<<"$(parse_route "${route_json}")"
   info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
 
   # Pass --detached so run_worktree_popup skips switch-client;
@@ -190,7 +190,7 @@ main() {
   info "Launching Claude in claude window..."
   local launch_cmd
   launch_cmd="$(claude_launch_cmd \
-    "${route_model}" "${route_reasoning}" "${route_exec}" "${route_rationale}" \
+    "${route_model}" "${route_reasoning}" "${route_rationale}" \
     "/review-pr ${pr_input}")"
   tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
 

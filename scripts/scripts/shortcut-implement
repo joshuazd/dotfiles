@@ -177,9 +177,9 @@ main() {
     info "Classifying story for model routing..."
     route_json="$(classify_story "${story_id}")"
   fi
-  local route_model route_reasoning route_exec route_rationale
-  IFS=$'\t' read -r route_model route_reasoning route_exec route_rationale <<<"$(parse_route "${route_json}")"
-  info "Routing: ${route_model} / ${route_reasoning} (exec=${route_exec}) — ${route_rationale}"
+  local route_model route_reasoning route_rationale
+  IFS=$'\t' read -r route_model route_reasoning route_rationale <<<"$(parse_route "${route_json}")"
+  info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
 
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
@@ -197,7 +197,7 @@ main() {
   fi
   local launch_cmd
   launch_cmd="$(claude_launch_cmd \
-    "${route_model}" "${route_reasoning}" "${route_exec}" "${route_rationale}" \
+    "${route_model}" "${route_reasoning}" "${route_rationale}" \
     "/implement ${story_id}" "${extra_flags[@]}")"
   tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
 

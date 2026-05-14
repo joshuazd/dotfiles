@@ -13,4 +13,10 @@ User prefers to keep reasoning effort at `xhigh` (or `high` for truly mechanical
 
 Why: cost is dominated by the model choice, not the effort level. The user gets more value from full effort on a cheaper model than from a cheaper effort on the heavier model.
 
-How to apply: when editing the classifier prompts in `_classifier_system_prompt` (lib/route.sh), preserve this asymmetry. If you ever add new downgrade triggers, prefer pushing them into the `sonnet + xhigh` bucket before considering `sonnet + high`.
+How to apply: when editing the classifier prompts in `_classifier_system_prompt` (lib/route.sh), preserve this asymmetry. If you ever add new downgrade triggers, prefer pushing them into the `sonnet + high` bucket before considering `sonnet + medium`.
+
+## Routing hint is informational only
+
+The `<routing-hint>` block injected via `--append-system-prompt` is for the model's self-awareness and for debugging — it does NOT reliably steer subagent dispatch. An earlier `exec_tier` field tried to route execution subagents to Sonnet for Opus-planned stories via a skill-level instruction; in practice the hint was too indirect and the model ignored it. The field was removed.
+
+If you want subagent dispatch to actually honor a tier, the right mechanism is a PreToolUse hook that intercepts `Agent` tool calls and injects the `model` parameter directly, not a prompt-time hint.
