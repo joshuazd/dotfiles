@@ -20,7 +20,7 @@ Instructions:
    - Each task should be scoped to independently testable behavior via RED/GREEN TDD (see `superpowers:test-driven-development`)
    - If tasks are too tightly coupled for independent TDD (e.g., a migration + model change that can't be tested separately), group them into a single task
 
-5. **Execute** — Follow the Execution Workflow section in the plan exactly. If the plan lacks one, invoke `superpowers:executing-plans` (or `superpowers:subagent-driven-development` for parallel work).
+5. **Execute** — Default to `superpowers:subagent-driven-development`. Each task runs in a fresh subagent with its own context budget and two-stage review (spec then code-quality), which preserves coordination context in the main session and gives execution work a clean slate per task. Fall back to `superpowers:executing-plans` only when the plan's tasks are tightly coupled (e.g., a single migration + model change that must ship together) or the work is so small (1–2 tasks) that subagent overhead outweighs the benefit. The plan's Execution Workflow section overrides this default if present.
 
 6. **Wrap up** — Check whether existing specs need updating for the new behavior. Run the full relevant test suite to confirm nothing is broken. Invoke `superpowers:verification-before-completion` before claiming done.
 
