@@ -20,3 +20,11 @@ How to apply: when editing the classifier prompts in `_classifier_system_prompt`
 The `<routing-hint>` block injected via `--append-system-prompt` is for the model's self-awareness and for debugging — it does NOT reliably steer subagent dispatch. An earlier `exec_tier` field tried to route execution subagents to Sonnet for Opus-planned stories via a skill-level instruction; in practice the hint was too indirect and the model ignored it. The field was removed.
 
 If you want subagent dispatch to actually honor a tier, the right mechanism is a PreToolUse hook that intercepts `Agent` tool calls and injects the `model` parameter directly, not a prompt-time hint.
+
+## Opus plans, Sonnet executes — via the `opusplan` alias
+
+For shortcut-implement at opus tier with plan mode on, the launch passes `--model opusplan` instead of the literal Opus model ID. `opusplan` is a built-in Claude Code alias that uses Opus while in plan mode and auto-switches to Sonnet the moment plan mode is exited. This is the actual "Opus plans, Sonnet executes" mechanism — much more reliable than skill-level instructions.
+
+Effort is capped at `high` for opusplan launches because Sonnet doesn't support `xhigh` and the launch-time `--effort` flag persists across the mid-session model switch.
+
+gh-review doesn't use plan mode, so opusplan doesn't apply there — PR reviews stay on a single model throughout.

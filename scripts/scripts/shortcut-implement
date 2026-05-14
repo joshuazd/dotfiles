@@ -179,7 +179,6 @@ main() {
   fi
   local route_model route_reasoning route_rationale
   IFS=$'\t' read -r route_model route_reasoning route_rationale <<<"$(parse_route "${route_json}")"
-  info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
 
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
@@ -187,17 +186,32 @@ main() {
   ${interactive} || popup_args+=("--non-interactive")
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
-  info "Launching Claude in claude window..."
-  # Plan mode for opus (anything) or sonnet+high. Skip it only for
-  # sonnet+medium — at that point the story is mechanical enough that
-  # planning is overhead.
+  # Plan mode for opus (anything) or sonnet+high; sonnet+medium skips it.
+  # When planning at opus, launch with the `opusplan` alias so the model
+  # auto-downshifts to Sonnet the moment plan mode is exited — Opus plans,
+  # Sonnet executes. Effort is capped at `high` for opusplan because Sonnet
+  # doesn't support xhigh and the launch-time effort flag persists across
+  # the mid-session model switch.
+  local launch_model="${route_model}"
+  local launch_reasoning="${route_reasoning}"
   local -a extra_flags=()
   if [ "${route_model}" = "opus" ] || { [ "${route_model}" = "sonnet" ] && [ "${route_reasoning}" = "high" ]; }; then
     extra_flags=("--permission-mode" "plan")
+    if [ "${route_model}" = "opus" ]; then
+      launch_model="opusplan"
+      [ "${launch_reasoning}" = "xhigh" ] && launch_reasoning="high"
+    fi
   fi
+
+  info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
+  if [ "${launch_model}" != "${route_model}" ]; then
+    info "Launching as ${launch_model} / ${launch_reasoning} (Opus plans, Sonnet executes on plan-accept)"
+  fi
+
+  info "Launching Claude in claude window..."
   local launch_cmd
   launch_cmd="$(claude_launch_cmd \
-    "${route_model}" "${route_reasoning}" "${route_rationale}" \
+    "${launch_model}" "${launch_reasoning}" "${route_rationale}" \
     "/implement ${story_id}" "${extra_flags[@]}")"
   tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
 

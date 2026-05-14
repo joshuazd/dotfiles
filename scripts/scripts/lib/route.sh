@@ -51,9 +51,10 @@ model_id() {
   local tier="${1}"
 
   case "${tier}" in
-    opus)   printf "claude-opus-4-7[1m]" ;;
-    sonnet) printf "claude-sonnet-4-6[1m]" ;;
-    haiku)  printf "claude-haiku-4-5-20251001" ;;
+    opus)     printf "claude-opus-4-7[1m]" ;;
+    opusplan) printf "opusplan" ;;
+    sonnet)   printf "claude-sonnet-4-6[1m]" ;;
+    haiku)    printf "claude-haiku-4-5-20251001" ;;
     *)
       error "Unknown tier: ${tier}"
       return 1
