@@ -167,5 +167,9 @@
       "$defaults",
       "Deleting your own prior `@greptileai review` trigger comments via `gh api -X DELETE /repos/{owner}/{repo}/issues/comments/{id}` — used by the watch-pull-request skill to keep PR conversations tidy. Safe because it only removes the user's own trigger comments (filtered by `user.login == me` AND `body == \"@greptileai review\"`)."
     ]
+  },
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-7[1m]",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-6[1m]"
   }
 }
