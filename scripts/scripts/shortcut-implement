@@ -186,32 +186,22 @@ main() {
   ${interactive} || popup_args+=("--non-interactive")
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
-  # Plan mode for opus (anything) or sonnet+high; sonnet+medium skips it.
-  # When planning at opus, launch with the `opusplan` alias so the model
-  # auto-downshifts to Sonnet the moment plan mode is exited — Opus plans,
-  # Sonnet executes. Effort is capped at `high` for opusplan because Sonnet
-  # doesn't support xhigh and the launch-time effort flag persists across
-  # the mid-session model switch.
-  local launch_model="${route_model}"
-  local launch_reasoning="${route_reasoning}"
+  # Plan mode for anything that benefits from a planning step: opus,
+  # opusplan, and sonnet+high. sonnet+medium is mechanical enough to skip it.
   local -a extra_flags=()
-  if [ "${route_model}" = "opus" ] || { [ "${route_model}" = "sonnet" ] && [ "${route_reasoning}" = "high" ]; }; then
-    extra_flags=("--permission-mode" "plan")
-    if [ "${route_model}" = "opus" ]; then
-      launch_model="opusplan"
-      [ "${launch_reasoning}" = "xhigh" ] && launch_reasoning="high"
-    fi
-  fi
+  case "${route_model}" in
+    opus|opusplan) extra_flags=("--permission-mode" "plan") ;;
+    sonnet)
+      [ "${route_reasoning}" = "high" ] && extra_flags=("--permission-mode" "plan")
+      ;;
+  esac
 
   info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
-  if [ "${launch_model}" != "${route_model}" ]; then
-    info "Launching as ${launch_model} / ${launch_reasoning} (Opus plans, Sonnet executes on plan-accept)"
-  fi
 
   info "Launching Claude in claude window..."
   local launch_cmd
   launch_cmd="$(claude_launch_cmd \
-    "${launch_model}" "${launch_reasoning}" "${route_rationale}" \
+    "${route_model}" "${route_reasoning}" "${route_rationale}" \
     "/implement ${story_id}" "${extra_flags[@]}")"
   tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
 

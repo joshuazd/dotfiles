@@ -98,9 +98,10 @@ manual_route() {
   local default_reasoning
 
   case "${tier}" in
-    opus)   default_reasoning="xhigh" ;;
-    sonnet) default_reasoning="high" ;;
-    haiku)  default_reasoning="medium" ;;
+    opus)     default_reasoning="xhigh" ;;
+    opusplan) default_reasoning="high" ;;
+    sonnet)   default_reasoning="high" ;;
+    haiku)    default_reasoning="medium" ;;
     *)
       error "Unknown tier: ${tier}"
       return 1
@@ -122,31 +123,49 @@ manual_route() {
 #######################################
 _classifier_system_prompt() {
   local kind="${1}"
-  local shared="You classify engineering tasks for routing to a Claude model. Return strict JSON ONLY — no preamble, no markdown fences, no commentary outside the rationale field.
-
-Default: model=opus, reasoning=xhigh. The user prefers staying on the highest effort their chosen model supports, and is willing to downgrade the model more readily than the effort.
-
-Valid reasoning levels are tied to the model:
-- Opus → xhigh or high (NEVER medium or low)
-- Sonnet → high or medium (NEVER xhigh, NEVER low)
-
-NEVER emit haiku for model — only opus or sonnet.
-
-Output exactly this JSON shape (single line, no trailing newline):
-{\"model\":\"opus|sonnet\",\"reasoning\":\"xhigh|high|medium\",\"rationale\":\"one short sentence\"}"
 
   case "${kind}" in
     pr)
-      printf '%s\n\n%s' "${shared}" "Downgrade rules (PR review):
+      printf '%s' "You classify GitHub PR review tasks for routing to a Claude model. Return strict JSON ONLY — no preamble, no markdown fences, no commentary outside the rationale field.
+
+Default: model=opus, reasoning=xhigh. The user prefers staying on the highest effort their chosen model supports, and is willing to downgrade the model more readily than the effort.
+
+Valid combinations for PR review:
+- opus + xhigh — most reviews (default)
+- sonnet + high — well-scoped, easy-to-verify changes
+- sonnet + medium — purely mechanical changes
+
+NEVER emit haiku, low, or opusplan.
+
+Output exactly this JSON shape (single line, no trailing newline):
+{\"model\":\"opus|sonnet\",\"reasoning\":\"xhigh|high|medium\",\"rationale\":\"one short sentence\"}
+
+Downgrade rules (PR review):
 - sonnet + high: ≤3 files changed, OR no production code touched (only specs/docs/ci/config), OR single-purpose well-scoped change
 - sonnet + medium: lockfile-only OR generated-file-only OR copy/string-only OR pure dependency bump (e.g. Dependabot)
 - Otherwise: opus + xhigh"
       ;;
     story)
-      printf '%s\n\n%s' "${shared}" "Downgrade rules (story implement):
-- sonnet + high: clearly-scoped UI tweak, single-component change, error-message wording, config flag flip, simple migration, isolated bug fix
-- sonnet + medium: chore / cleanup / spec-only stories with no production behavior change, pure doc/copy edits
-- Otherwise: opus + xhigh"
+      printf '%s' "You classify Shortcut stories for routing to a Claude model. Return strict JSON ONLY — no preamble, no markdown fences, no commentary outside the rationale field.
+
+The implement flow always starts in plan mode. \`opusplan\` is a built-in alias: Opus while planning, Sonnet auto-takes-over for execution on plan-accept. Most stories should use opusplan — Opus is for genuinely complex work that benefits from Opus reasoning during execution too.
+
+Valid combinations for story implement:
+- opus + xhigh — execution itself needs Opus (rare, see criteria below)
+- opusplan + high — DEFAULT for moderate-complexity stories: Opus plans, Sonnet executes
+- sonnet + high — well-scoped work that doesn't need a plan-then-execute split
+- sonnet + medium — mechanical changes
+
+NEVER emit haiku, low, or xhigh combined with sonnet/opusplan.
+
+Output exactly this JSON shape (single line, no trailing newline):
+{\"model\":\"opus|opusplan|sonnet\",\"reasoning\":\"xhigh|high|medium\",\"rationale\":\"one short sentence\"}
+
+Tier rules (story implement):
+- opus + xhigh: cross-cutting changes, state machine / enum / status work, novel patterns being introduced, multi-subsystem features, complex backend logic that needs reasoning at every execution step
+- opusplan + high: DEFAULT — well-defined feature work, standard CRUD-ish new endpoint/model, multi-step but clear-shape, anything that doesn't clearly fit the rows above or below
+- sonnet + high: UI tweaks, single-component change, error-message wording, config flag flip, simple migration, isolated bug fix
+- sonnet + medium: chore / cleanup / spec-only stories with no production behavior change, pure doc/copy edits"
       ;;
     *)
       error "Unknown classifier kind: ${kind}"

@@ -6,14 +6,15 @@ User prefers to keep reasoning effort at `xhigh` (or `high` for truly mechanical
 
 - Reasoning levels are coupled to the model:
   - **Opus** → `xhigh` or `high` (xhigh is the only Opus-only effort tier)
-  - **Sonnet** → `high` or `medium` (xhigh is NOT supported on Sonnet)
+  - **Sonnet** / **opusplan** → `high` or `medium` (xhigh is NOT supported once Sonnet is in play)
   - Never emit `low`.
-- Model tiers in classifier output: only `opus` or `sonnet`. Never `haiku` (haiku stays in the codebase as the *classifier* model and as a manual `--tier haiku` override only).
-- Default routing is `opus + xhigh`. Downgrade rules favor dropping the model to `sonnet` (with `high`) before dropping the effort tier further to `medium`.
+- Model tiers (story implement): `opus`, `opusplan`, or `sonnet`. PR review: `opus` or `sonnet` only (opusplan needs plan mode, which gh-review doesn't use). Never `haiku` (only the classifier itself runs at haiku, and the manual `--tier haiku` override).
+- **Default for story implement is `opusplan + high`**: Opus plans, Sonnet executes via the built-in alias. Upgrade to `opus + xhigh` only when execution itself needs Opus reasoning (state machines, cross-cutting work, novel patterns). Downgrade to `sonnet + high` for well-scoped single-component / UI / migration / bug-fix work.
+- Default for PR review remains `opus + xhigh`.
 
 Why: cost is dominated by the model choice, not the effort level. The user gets more value from full effort on a cheaper model than from a cheaper effort on the heavier model.
 
-How to apply: when editing the classifier prompts in `_classifier_system_prompt` (lib/route.sh), preserve this asymmetry. If you ever add new downgrade triggers, prefer pushing them into the `sonnet + high` bucket before considering `sonnet + medium`.
+How to apply: when editing the classifier prompts in `_classifier_system_prompt` (lib/route.sh), preserve this asymmetry. New downgrade triggers should land in `sonnet + high` before `sonnet + medium`. The bar for `opus + xhigh` is "execution itself needs Opus reasoning" — not just "this is a real feature." Most real features should land at `opusplan + high`.
 
 ## Routing hint is informational only
 
@@ -23,8 +24,6 @@ If you want subagent dispatch to actually honor a tier, the right mechanism is a
 
 ## Opus plans, Sonnet executes — via the `opusplan` alias
 
-For shortcut-implement at opus tier with plan mode on, the launch passes `--model opusplan` instead of the literal Opus model ID. `opusplan` is a built-in Claude Code alias that uses Opus while in plan mode and auto-switches to Sonnet the moment plan mode is exited. This is the actual "Opus plans, Sonnet executes" mechanism — much more reliable than skill-level instructions.
+`opusplan` is a built-in Claude Code model alias: Opus while in plan mode, Sonnet automatically afterward. The story classifier picks it directly for moderate-complexity work (the default tier). Effort is `high` (not `xhigh`) because the launch-time `--effort` flag persists across the mid-session model switch and Sonnet doesn't accept xhigh.
 
-Effort is capped at `high` for opusplan launches because Sonnet doesn't support `xhigh` and the launch-time `--effort` flag persists across the mid-session model switch.
-
-gh-review doesn't use plan mode, so opusplan doesn't apply there — PR reviews stay on a single model throughout.
+gh-review doesn't use plan mode, so opusplan is not a valid PR-review tier — PR reviews stay on a single model throughout.
