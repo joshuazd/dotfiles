@@ -23,15 +23,19 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # Single jq call → tab-separated fields → read into shell vars
-IFS=$'\t' read -r model cwd version cost_usd used_pct vim_mode < <(
+# Delimit with the unit separator (0x1f), not a tab: tab is IFS-whitespace, so
+# `read` collapses runs of it and drops empty fields (e.g. an empty vim.mode
+# would swallow the next field). 0x1f is non-whitespace, so empties survive.
+IFS=$'\037' read -r model cwd version cost_usd used_pct vim_mode effort < <(
   printf '%s' "$input" | jq -r '[
     .model.display_name // "Unknown Model",
     .cwd // .workspace.current_dir // "unknown",
     .version // "unknown",
-    .cost.total_cost_usd // 0,
-    .context_window.used_percentage // "",
-    .vim.mode // ""
-  ] | @tsv'
+    (.cost.total_cost_usd // 0 | tostring),
+    (.context_window.used_percentage // "" | tostring),
+    .vim.mode // "",
+    .effort.level // ""
+  ] | join("")'
 )
 
 # $HOME → ~ via pure shell (avoids sed delimiter issues if HOME has odd chars)
@@ -88,7 +92,7 @@ if [ -n "$used_pct" ]; then
   fi
 
   used_pct_fmt=$(printf '%.0f' "$used_pct")
-  ctx_segment="${DIM}ctx:${RESET}${ctx_color}${bar} ${used_pct_fmt}%${RESET}"
+  ctx_segment="${ctx_color}${bar} ${used_pct_fmt}%${RESET}"
 fi
 
 # Cost: Claude Code provides this pre-computed (handles caching, 1M ctx, model rates)
@@ -96,6 +100,20 @@ cost=$(printf '$%.2f' "$cost_usd")
 if   ge "$cost_usd" 10.00; then cost_color=$RED
 elif ge "$cost_usd"  2.00; then cost_color=$ORANGE
 else                            cost_color=$GREEN
+fi
+
+# Effort indicator (absent from JSON when the model doesn't support effort).
+# Color by level so high-reasoning sessions stand out and cheap ones stay dim.
+effort_segment=""
+if [ -n "$effort" ]; then
+  case "$effort" in
+    max|xhigh) eff_color=$PURPLE ;;
+    high)      eff_color=$CYAN ;;
+    medium)    eff_color=$YELLOW ;;
+    low)       eff_color=$GRAY ;;
+    *)         eff_color=$GRAY ;;
+  esac
+  effort_segment="${eff_color}${effort}${RESET}"
 fi
 
 # Vim mode indicator
@@ -117,5 +135,6 @@ printf '%s%s%s' "$BLUE" "$short_cwd" "$RESET"
 printf '\n%s' "$vim_segment"
 printf '%s%s%s%s%s%s v%s%s%s' \
   "$CYAN" "$BOLD" "$model" "$RESET" "$CYAN" "$DIM" "$version" "$RESET" "$SEP"
+[ -n "$effort_segment" ] && printf '%s%s' "$effort_segment" "$SEP"
 [ -n "$ctx_segment" ] && printf '%s%s' "$ctx_segment" "$SEP"
 printf '%s%s%s' "$cost_color" "$cost" "$RESET"
