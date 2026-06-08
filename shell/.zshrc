@@ -324,3 +324,6 @@ export PYENV_ROOT="$HOME/.pyenv"
 [ -x "$(command -v pyenv)" ] && eval "$(pyenv init - zsh)"
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
 [ -f "$HOME/.hunt-cli/autocomplete_zsh" ] && source "$HOME/.hunt-cli/autocomplete_zsh"
+
+# opencode
+export PATH=/Users/joshua.zink-duda/.opencode/bin:$PATH
