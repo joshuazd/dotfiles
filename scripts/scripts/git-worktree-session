@@ -31,7 +31,7 @@ source "${SCRIPT_DIR}/common.sh"
 #######################################
 usage() {
   cat <<USAGE
-Usage: ${0##*/} [--detached] [--fetch] [--prefix <value>] [--dir-name <name>] [--session-name <name>] <branch-name>
+Usage: ${0##*/} [--detached] [--fetch] [--prefix <value>] [--dir-name <name>] [--session-name <name>] [--pane-command <cmd>] <branch-name>
 
 Create a git worktree and tmux session.
 
@@ -41,6 +41,7 @@ Arguments:
   --prefix value      Prepend value to the directory name (optional)
   --dir-name name     Override the directory name entirely (optional)
   --session-name name Override the tmux session name (default: branch-derived)
+  --pane-command cmd  Command for the split pane (empty string skips the split; default: nit)
   branch-name         Name of the branch to create worktree for
 
 The script will:
@@ -73,6 +74,8 @@ main() {
   local prefix=""
   local dir_name_override=""
   local session_name_override=""
+  local pane_command=""
+  local pane_command_set=false
   local branch_name=""
   local session_name
   local worktree_path
@@ -101,6 +104,11 @@ main() {
         ;;
       --session-name)
         session_name_override="${2}"
+        shift 2
+        ;;
+      --pane-command)
+        pane_command="${2}"
+        pane_command_set=true
         shift 2
         ;;
       -*)
@@ -169,7 +177,11 @@ main() {
     return 1
   fi
 
-  create_tmux_session "${session_name}" "${worktree_path}" "${detached}"
+  if ${pane_command_set}; then
+    create_tmux_session "${session_name}" "${worktree_path}" "${detached}" "${pane_command}"
+  else
+    create_tmux_session "${session_name}" "${worktree_path}" "${detached}"
+  fi
 }
 
 # Check for help flag

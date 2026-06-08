@@ -61,13 +61,15 @@ session_name_from_title() {
 }
 
 #######################################
-# Split the claude window and launch nit in the new pane.
+# Split the claude window and run the given command in the new pane.
 # Uses vertical split when terminal is wide enough, horizontal otherwise.
 # Arguments:
 #   $1 - session name
+#   $2 - command to run in the new pane (e.g. "nit", "review")
 #######################################
-setup_nit_pane() {
+setup_secondary_pane() {
   local session="${1}"
+  local pane_command="${2}"
   local target="=${session}:claude"
   local width
   width="$(tmux display-message -t "${target}" -p '#{window_width}')"
@@ -78,7 +80,7 @@ setup_nit_pane() {
     tmux split-window -t "${target}" -v -c "#{pane_current_path}"
   fi
 
-  tmux send-keys -t "${target}.2" 'nit' Enter
+  tmux send-keys -t "${target}.2" "${pane_command}" Enter
   tmux select-pane -t "${target}.1"
 }
 
@@ -96,6 +98,7 @@ create_tmux_session() {
   local session_name="${1}"
   local session_dir="${2}"
   local detached="${3:-false}"
+  local pane_command="${4-nit}"
 
   # If session already exists, just switch to it
   if tmux has-session -t "=${session_name}" 2>/dev/null; then
@@ -115,7 +118,9 @@ create_tmux_session() {
   # All paths create detached first so we can set up panes before attaching
   tmux new-session -d -s "${session_name}" -n "claude" -c "${session_dir}"
   tmux new-window -t "=${session_name}:2" -n "server" -c "${session_dir}"
-  setup_nit_pane "${session_name}"
+  if [ -n "${pane_command}" ]; then
+    setup_secondary_pane "${session_name}" "${pane_command}"
+  fi
   tmux select-window -t "=${session_name}:1"
 
   if ${detached}; then
@@ -212,6 +217,7 @@ resolve_session_script() {
 #   --dir-name <name>     Override the directory name entirely
 #   --fetch               Fetch from origin and reset to remote HEAD
 #   --session-name <name> Override the tmux session name (default: branch-derived)
+#   --pane-command <cmd>  Command to run in the split pane (empty = no split; default: nit)
 # Positional arguments:
 #   current_dir    — working directory to cd into inside the popup
 #   session_script — absolute path to git-worktree-session
@@ -227,6 +233,8 @@ run_worktree_popup() {
   local dir_name_override=""
   local fetch=false
   local session_name_override=""
+  local pane_command=""
+  local pane_command_set=false
   local -a positionals=()
 
   while [ "${#}" -gt 0 ]; do
@@ -237,6 +245,7 @@ run_worktree_popup() {
       --dir-name)        dir_name_override="${2}";   shift 2 ;;
       --fetch)           fetch=true;                 shift ;;
       --session-name)    session_name_override="${2}"; shift 2 ;;
+      --pane-command)    pane_command="${2}"; pane_command_set=true; shift 2 ;;
       *)                 positionals+=("${1}"); shift ;;
     esac
   done
@@ -258,6 +267,9 @@ run_worktree_popup() {
   fi
   if [ -n "${session_name_override}" ]; then
     session_args+=("--session-name" "${session_name_override}")
+  fi
+  if ${pane_command_set}; then
+    session_args+=("--pane-command" "${pane_command}")
   fi
   session_args+=("${branch_name}")
 
