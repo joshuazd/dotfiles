@@ -38,14 +38,14 @@ info() {
 }
 
 #######################################
-# Print warning message to stdout
+# Print warning message to stderr
 # Arguments:
 #   Warning message
 # Outputs:
-#   Writes warning message to stdout
+#   Writes warning message to stderr
 #######################################
 warn() {
-  printf "${YELLOW}!!! %s${RESET}\\n" "${*}"
+  printf "${YELLOW}!!! %s${RESET}\\n" "${*}" 1>&2
 }
 
 #######################################

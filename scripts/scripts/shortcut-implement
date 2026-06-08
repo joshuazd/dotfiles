@@ -11,7 +11,7 @@
 # Arguments:
 #   --detached, -d      Create session without switching to it (optional)
 #   --non-interactive   Don't wait for user input before closing popup (optional)
-#   --tier T            Force model tier (opus|sonnet|haiku). Skips classifier. (optional)
+#   --tier T            Force model tier (opus|opusplan|sonnet|haiku). Skips classifier. (optional)
 #   --reasoning R       Force reasoning effort (xhigh|high|medium|low). (optional)
 #   story-url-or-id     Shortcut story URL, sc-12345, or numeric ID
 #
@@ -44,7 +44,7 @@ Implement a Shortcut story with Claude.
 Arguments:
   --detached, -d      Create session without switching to it (optional)
   --non-interactive   Don't wait for user input before closing popup (optional)
-  --tier T            Force model tier (opus|sonnet|haiku). Skips classifier. (optional)
+  --tier T            Force model tier (opus|opusplan|sonnet|haiku). Skips classifier. (optional)
   --reasoning R       Force reasoning effort (xhigh|high|medium|low). (optional)
   story-url-or-id     Shortcut story URL, sc-12345, or numeric ID
 
@@ -172,7 +172,7 @@ main() {
   # Route: classify story or honor manual overrides.
   local route_json
   if [ -n "${tier_override}" ]; then
-    route_json="$(manual_route "${tier_override}" "${reasoning_override:-xhigh}")"
+    route_json="$(manual_route "${tier_override}" "${reasoning_override}")"
   else
     info "Classifying story for model routing..."
     route_json="$(classify_story "${story_id}")"
@@ -183,19 +183,14 @@ main() {
 
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
-  local -a popup_args=("--detached" "--dir-name" "${dir_name}" "--session-name" "${session_name}")
+  local -a popup_args=("--detached" "--pane-command" "" "--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${interactive} || popup_args+=("--non-interactive")
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
-  # Plan mode for anything that benefits from a planning step: opus,
-  # opusplan, and sonnet+high. sonnet+medium is mechanical enough to skip it.
-  local -a extra_flags=()
-  case "${route_model}" in
-    opus|opusplan) extra_flags=("--permission-mode" "plan") ;;
-    sonnet)
-      [ "${route_reasoning}" = "high" ] && extra_flags=("--permission-mode" "plan")
-      ;;
-  esac
+  # Stories always start in plan mode: Opus writes the plan for review before
+  # execution, and the opusplan alias requires plan mode to hand off to Sonnet.
+  # Every routed story tier is opus or opusplan, so this is unconditional.
+  local -a extra_flags=("--permission-mode" "plan")
 
   info "Launching Claude in claude window..."
   # The execution-default block survives the plan-accept context clear

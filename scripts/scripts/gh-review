@@ -171,7 +171,7 @@ main() {
   # Route: classify PR or honor manual overrides.
   local route_json
   if [ -n "${tier_override}" ]; then
-    route_json="$(manual_route "${tier_override}" "${reasoning_override:-xhigh}")"
+    route_json="$(manual_route "${tier_override}" "${reasoning_override}")"
   else
     info "Classifying PR for model routing..."
     route_json="$(classify_pr "${pr_number}")"
@@ -183,7 +183,7 @@ main() {
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
   # Pass --fetch so the worktree is always at the latest remote HEAD.
-  local -a popup_args=("--detached" "--fetch" "--dir-name" "${dir_name}" "--session-name" "${session_name}")
+  local -a popup_args=("--detached" "--fetch" "--pane-command" "tuicr pr ${pr_number} --no-update-check" "--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${interactive} || popup_args+=("--non-interactive")
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
