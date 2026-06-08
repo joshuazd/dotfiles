@@ -82,7 +82,7 @@ The body must use the template from `.github/pull_request_template.md` if it exi
 **Description content** (1–2 sentences, facts only):
 - User-facing changes if present (new features, bug fixes, UI); otherwise internal changes (refactors, optimizations)
 - Describe conceptually — never mention filenames
-- If a Shortcut story is linked, include the story link/ID in the appropriate template field (typically a "Story" or "Ticket" field). If no such field exists in the template, append the link to the Description.
+- Do NOT add a Shortcut story link. Branch names use the `sc-NNNNN` convention and GitHub auto-links the story from the branch name — adding the link manually is redundant. Only add one if the user explicitly asks, or if the branch name does not contain `sc-NNNNN`.
 - No customer impact statements, no value props, no marketing language, no "Generated with Claude Code" footer
 
 **Body delivery** (avoid heredoc per global preferences): generate a unique temp path with `mktemp` (never hardcode `/tmp/pr_body.md` — parallel Claude instances will clobber each other), write the body with the Write tool, then pass it via `--body-file`:

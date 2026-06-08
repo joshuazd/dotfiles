@@ -5,6 +5,17 @@ description: Use when creating or modifying Rails database migrations — covers
 
 # Writing Migrations
 
+## Running Migrations
+
+Always use `migrate-clean` instead of `bin/rails db:migrate`. It wraps `db:migrate` and reverts artifact-only diffs to schema dump files and model annotation blocks while preserving real changes from new-on-branch migrations.
+
+```bash
+migrate-clean              # equivalent to bin/rails db:migrate
+migrate-clean VERSION=...  # forwards args
+```
+
+Do not run `bin/rails db:migrate` directly. For single-database namespaced ops (e.g. `db:migrate:down:primary`), `migrate-clean` does not apply — use `bin/rails` directly.
+
 ## Creating Migration Files
 
 Always use the Rails generator — never create migration files manually.

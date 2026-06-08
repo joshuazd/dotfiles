@@ -78,32 +78,52 @@ Go beyond the diff. Read surrounding code, related files, and callers/consumers 
 
 Only flag things that are genuinely missing and would cause problems. Don't flag nice-to-haves.
 
-Format your output as:
+## Output Format
 
+The point of the output is to tell the user **what to comment on in the PR**. Lead with the verdict and a scannable, ranked list of comment-ready findings. Prose goes last and stays tiny.
+
+```
+**Merge:** Yes / No / With fixes
+
+## Comment on these
+(omit this section entirely if verdict is "Yes")
+```
+
+Then one finding per bullet, ranked blocking-first, in this shape:
+
+```
+- `file:line` **[TAG]** Headline — the comment you'd type, ≤15 words.
+  ↳ optional: ONE short clause of context. Skip it unless the headline is genuinely unclear without it.
+```
+
+Tags (use one):
+- **[BLOCK]** — bug, security, data loss, race condition, perf, half-wired state/feature, missing error handling
+- **[DESIGN]** — pattern violation, over-engineering, wrong layer, reinvented wheel (always point to the existing pattern/utility)
+- **[MISSING]** — caller/test/migration/permission/edge case the PR should have included
+
+Rules:
+- The **headline is the comment** — write what you'd actually leave on the PR, not a description of the issue. Punchy, ≤15 words.
+- `file:line` first so it's clickable.
+- Detail is opt-in: at most ONE indented `↳` sub-line, and only when the headline can't stand alone. Most findings have zero. No semicolon-chained clauses, no "but it's safe because…" hedging, no flag-name soup — if you're tempted to explain the whole control flow, you're writing prose. Cut it; the user will ask.
+- Scannability beats completeness. A finding the user can read in 2 seconds and act on beats a complete one they skip.
+
+**Before/after** (real output that was too dense → fixed):
+
+❌ Too dense — a paragraph wearing a bullet's clothes:
+> `signal_aggregator.rb:57` [DESIGN] — reported_recently_resolved_investigation is surfaced ungated, but SignalResolver's close is flag-gated; for EDR (signal_resolver_close_previously_reported_edr_enabled default false) a similar signal aggregated via AggregateSignalJob attaches but never closes → dangles. Mirrors the pre-existing path, and ITDR's close flag defaults on, so it's safe by default — but the EDR rollout runbook must enable the close flag…
+
+✅ Scannable:
+> - `app/models/soc/agentic/signal_aggregator.rb:57` **[DESIGN]** EDR path aggregates the signal but never closes it — close is flag-gated, default off.
+>   ↳ EDR rollout runbook must enable the close flag alongside aggregation.
+
+```
 ## Summary
-Brief explanation of *what* the PR does and *why* (2-3 sentences max). Derive this from the diff, title, and description.
+```
+1-2 sentences, *what* the PR does and *why*. This goes at the bottom — it's context, not the headline.
 
-## Architecture & Design
-(one bullet per finding: `file:line` — what the problem is, and point to the existing pattern/utility that should have been used; or "(none)")
+If the verdict is "Yes" with no findings, output just the verdict line and the Summary. Skip everything else.
 
-Categories to cover:
-- Pattern violations (with pointer to existing pattern)
-- Over-engineering / unnecessary abstractions
-- Wrong layer / tight coupling
-- Reinvented wheels (with pointer to existing utility)
-
-## Blocking Issues
-(one bullet per finding: `file:line` — what's wrong and why it matters; or "(none)")
-Only bugs, security, data loss, race conditions, or significant performance problems.
-
-## What's Missing
-(one bullet per gap: what's missing, where it should be, and why it matters; or "(none)")
-
-**Ready to merge:** Yes / No / With fixes
-
-If there are no issues, skip the sections and just say so with the verdict.
-
-**Conciseness:** Be extremely concise. No filler, no preamble, no summaries. Push back on silly ideas.
+**Conciseness:** Be extremely concise. No filler, no preamble. Push back on silly ideas. If a finding needs more than one line, you're writing prose — stop.
 
 ---
 

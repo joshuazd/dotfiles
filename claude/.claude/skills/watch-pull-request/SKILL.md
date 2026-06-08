@@ -29,7 +29,7 @@ If `gh pr view` fails, abort and tell the user — don't silently fall back.
 
 ### 2. Self-Review
 
-Dispatch a `general-purpose` subagent via the Agent tool to run the `review-pr` skill. The subagent's prompt must instruct it to invoke `Skill review-pr` with the PR number and return the review verbatim. This keeps the review output out of the main context.
+Dispatch a `general-purpose` subagent via the Agent tool to run the `review-pr` skill. **Always pin this subagent to Opus** (`model: opus` in the Agent call) regardless of the session model — the self-review is the quality gate and warrants the strongest model. The subagent's prompt must instruct it to invoke `Skill review-pr` with the PR number and return the review verbatim. This keeps the review output out of the main context.
 
 For each finding, implement the **minimal** fix, commit, and push so Greptile reviews the cleaned-up state in step 3:
 

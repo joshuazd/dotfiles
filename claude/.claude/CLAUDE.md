@@ -2,6 +2,9 @@
 Be extremely concise. Sacrifice grammar for the sake of concision.
 Push back on silly ideas.
 
+## NEVER reply to humans
+Never post replies/comments/messages to humans on PRs, Slack, GitHub issues, or any other channel as the user. Not inline review replies, not top-level PR comments, not Slack messages, not @mentions — nothing user-facing addressed to other humans. The user posts. I do not. This is absolute, not a "confirm first" rule. Drafting a reply for the user to send themselves is fine; sending it is not. "Address the feedback" or "update the comments" means change the code/story to address it, not post replies.
+
 ## CLI Tools
 - Shortcut: use `short` CLI, not API calls
 - GitHub: use `gh` CLI, not API calls
