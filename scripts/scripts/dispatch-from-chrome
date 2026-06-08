@@ -34,6 +34,24 @@ get_tmux_session() {
 }
 
 main() {
+  local repo="portal"
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --repo)
+        repo="${2}"
+        shift 2
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  if [ ! -d "${HOME}/${repo}" ]; then
+    notify "Unknown repo: ${repo}"
+    exit 1
+  fi
+
   # Get current Chrome tab URL
   local url
   url="$(get_chrome_url)"
@@ -68,7 +86,7 @@ main() {
   # git-worktree-session inline rather than opening a nested popup, so the
   # entire flow (fetch + setup + switch) happens inside a single popup.
   local popup_cmd
-  popup_cmd="[ -f ~/.secrets ] && source ~/.secrets; export DISPATCH_IN_POPUP=1; url=\$(cat '${url_file}'); rm -f '${url_file}'; cd ~/portal && '${SCRIPT_DIR}/dispatch' --non-interactive \"\${url}\" || { echo; echo 'Dispatch failed. Press Enter to close...'; read -r; }"
+  popup_cmd="[ -f ~/.secrets ] && source ~/.secrets; export DISPATCH_IN_POPUP=1; url=\$(cat '${url_file}'); rm -f '${url_file}'; cd \"\$HOME/${repo}\" && '${SCRIPT_DIR}/dispatch' --non-interactive \"\${url}\" || { echo; echo 'Dispatch failed. Press Enter to close...'; read -r; }"
 
   # Resolve the full path to tmux — iTerm2 runs `command` strings directly
   # (not via a shell) so bare "tmux" won't be found if it lives in /opt/homebrew/bin.

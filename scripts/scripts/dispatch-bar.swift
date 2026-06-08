@@ -37,9 +37,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem.button?.target = self
     }
 
+    func loadRepos() -> [String] {
+        let configPath = (NSHomeDirectory() as NSString)
+            .appendingPathComponent("scripts/dispatch.repos")
+        guard let contents = try? String(contentsOfFile: configPath, encoding: .utf8) else {
+            return ["portal"]
+        }
+        let repos = contents.split(separator: "\n")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty && !$0.hasPrefix("#") }
+        return repos.isEmpty ? ["portal"] : repos
+    }
+
     @objc func handleClick() {
         if NSApp.currentEvent?.type == .rightMouseUp {
             let menu = NSMenu()
+            for repo in loadRepos() {
+                let item = NSMenuItem(
+                    title: "Dispatch in \(repo)",
+                    action: #selector(dispatchWithRepo(_:)),
+                    keyEquivalent: ""
+                )
+                item.target = self
+                item.representedObject = repo
+                menu.addItem(item)
+            }
+            menu.addItem(NSMenuItem.separator())
             menu.addItem(NSMenuItem(
                 title: "Quit",
                 action: #selector(NSApplication.terminate(_:)),
@@ -58,6 +81,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             .appendingPathComponent("scripts/dispatch-from-chrome")
         let task = Process()
         task.executableURL = URL(fileURLWithPath: scriptPath)
+        try? task.run()
+    }
+
+    @objc func dispatchWithRepo(_ sender: NSMenuItem) {
+        let repo = (sender.representedObject as? String) ?? "portal"
+        let scriptPath = (NSHomeDirectory() as NSString)
+            .appendingPathComponent("scripts/dispatch-from-chrome")
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: scriptPath)
+        task.arguments = ["--repo", repo]
         try? task.run()
     }
 }

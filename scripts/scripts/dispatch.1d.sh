@@ -23,3 +23,10 @@
 echo "⚡"
 echo "---"
 echo "Dispatch current Chrome tab | bash=${HOME}/scripts/dispatch-from-chrome terminal=false"
+echo "---"
+if [[ -f "${HOME}/scripts/dispatch.repos" ]]; then
+  while IFS= read -r repo; do
+    [[ -z "${repo}" || "${repo}" =~ ^# ]] && continue
+    echo "Dispatch in ${repo} | bash=${HOME}/scripts/dispatch-from-chrome param1=--repo param2=${repo} terminal=false"
+  done < "${HOME}/scripts/dispatch.repos"
+fi

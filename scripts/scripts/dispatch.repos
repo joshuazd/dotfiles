@@ -1,0 +1,6 @@
+# Repos the menu bar dispatcher can target.
+# First entry is the default for left-click / no --repo flag.
+portal
+soc-workflows
+infra-k8s
+sigma
