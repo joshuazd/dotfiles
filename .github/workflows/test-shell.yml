@@ -149,7 +149,7 @@ jobs:
           
           # Check for key functions
           type _git_prompt_info > /dev/null 2>&1 || { echo "ERROR: _git_prompt_info not found"; exit 1; }
-          type _ruby_prompt > /dev/null 2>&1 || { echo "ERROR: _ruby_prompt not found"; exit 1; }
+          type _update_runtime_prompt > /dev/null 2>&1 || { echo "ERROR: _update_runtime_prompt not found"; exit 1; }
           type _python_prompt > /dev/null 2>&1 || { echo "ERROR: _python_prompt not found"; exit 1; }
           type parse_git_branch > /dev/null 2>&1 || { echo "ERROR: parse_git_branch not found"; exit 1; }
           
