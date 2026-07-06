@@ -18,11 +18,16 @@ notify() {
   osascript -e "display notification \"${*}\" with title \"Dispatch\""
 }
 
+# Path where get_chrome_url stashes osascript's stderr so main() can surface
+# the real error (e.g. "-1743: not authorized to send Apple events") instead
+# of a generic "could not get URL" message.
+readonly CHROME_ERR="$(mktemp /tmp/dispatch-chrome-err-XXXXXX)"
+
 # Get the URL of the active tab in Google Chrome
 get_chrome_url() {
   osascript -e \
     'tell application "Google Chrome" to return URL of active tab of first window' \
-    2>/dev/null || true
+    2>"${CHROME_ERR}" || true
 }
 
 # Find the name of the most recently active tmux session
@@ -57,14 +62,22 @@ main() {
   url="$(get_chrome_url)"
 
   if [[ -z "${url}" ]]; then
-    notify "Could not get Chrome tab URL — is Chrome running?"
+    local err
+    err="$(cat "${CHROME_ERR}" 2>/dev/null)"
+    rm -f "${CHROME_ERR}"
+    if [[ -n "${err}" ]]; then
+      notify "Could not get Chrome tab URL: ${err}"
+    else
+      notify "Could not get Chrome tab URL — is Chrome running?"
+    fi
     exit 1
   fi
+  rm -f "${CHROME_ERR}"
 
   # Validate the URL looks like something dispatch can handle
   if ! [[ "${url}" =~ app\.shortcut\.com ]] && \
      ! [[ "${url}" =~ github\.com.*/pull/ ]]; then
-    notify "Not a Shortcut story or GitHub PR"
+    notify "Not a Shortcut story or GitHub PR: ${url}"
     exit 0
   fi
 

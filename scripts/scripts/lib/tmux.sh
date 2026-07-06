@@ -88,9 +88,11 @@ setup_secondary_pane() {
 # Create a tmux session with the standard 2-window layout (claude + server)
 # If a session with the given name already exists, switches to it instead.
 # Arguments:
-#   session_name — tmux session name
-#   session_dir  — directory to open in
-#   detached     — "true" to skip switching, "false" to attach/switch
+#   session_name   — tmux session name
+#   session_dir    — directory to open in
+#   detached       — "true" to skip switching, "false" to attach/switch
+#   pane_command   — command for the split pane (empty = no split; default: nit)
+#   claude_command — command to run in the claude window (empty = none; default: none)
 # Returns:
 #   0 on success
 #######################################
@@ -99,6 +101,7 @@ create_tmux_session() {
   local session_dir="${2}"
   local detached="${3:-false}"
   local pane_command="${4-nit}"
+  local claude_command="${5-}"
 
   # If session already exists, just switch to it
   if tmux has-session -t "=${session_name}" 2>/dev/null; then
@@ -121,6 +124,9 @@ create_tmux_session() {
   if [ -n "${pane_command}" ]; then
     setup_secondary_pane "${session_name}" "${pane_command}"
   fi
+  if [ -n "${claude_command}" ]; then
+    tmux send-keys -t "=${session_name}:claude.1" "${claude_command}" Enter
+  fi
   tmux select-window -t "=${session_name}:1"
 
   if ${detached}; then
@@ -137,8 +143,59 @@ create_tmux_session() {
 }
 
 #######################################
+# Print a Shortcut-derived session name if the branch references a story
+# Arguments:
+#   branch_name
+# Outputs:
+#   Writes session name to stdout when resolved
+# Returns:
+#   0 if a name was printed, 1 otherwise
+#######################################
+_resolve_story_name() {
+  local branch_name="${1}"
+  [[ "${branch_name}" =~ [Ss][Cc]-([0-9]+) ]] || return 1
+  local story_id="${BASH_REMATCH[1]}"
+  command -v short > /dev/null 2>&1 || return 1
+
+  local summary story_title
+  summary="$(fetch_story_summary "${story_id}" 2>/dev/null)" || return 1
+  story_title="${summary%%$'\t'*}"
+  [ -n "${story_title}" ] || return 1
+
+  session_name_from_title "SC" "${story_id}" "${story_title}"
+}
+
+#######################################
+# Print a GitHub PR-derived session name if the branch has an open PR
+# gh runs inside the worktree so it resolves the right repo.
+# Arguments:
+#   dir          — absolute path to the worktree
+#   branch_name  — branch to look the PR up by
+# Outputs:
+#   Writes session name to stdout when resolved
+# Returns:
+#   0 if a name was printed, 1 otherwise
+#######################################
+_resolve_pr_name() {
+  local dir="${1}"
+  local branch_name="${2}"
+  command -v gh > /dev/null 2>&1 || return 1
+
+  local pr_json
+  pr_json="$(cd "${dir}" && gh pr view "${branch_name}" --json number,title 2>/dev/null)" || return 1
+
+  local pr_number pr_title
+  pr_number="$(printf "%s" "${pr_json}" | jq -r '.number // empty' 2>/dev/null)"
+  pr_title="$(printf "%s" "${pr_json}" | jq -r '.title // empty' 2>/dev/null)"
+  [ -n "${pr_number}" ] && [ -n "${pr_title}" ] || return 1
+
+  session_name_from_title "PR" "${pr_number}" "${pr_title}"
+}
+
+#######################################
 # Resolve a smart session name for a directory
-# Priority: Shortcut story title > GitHub PR title > prettified branch > dir basename
+# Priority: dir-prefix-aware (pr- → PR first, else Shortcut first) >
+#           prettified branch > dir basename
 # Arguments:
 #   dir — absolute path to the directory
 # Outputs:
@@ -154,33 +211,14 @@ resolve_session_name() {
     return 0
   fi
 
-  # Try Shortcut story title
-  if [[ "${branch_name}" =~ [Ss][Cc]-([0-9]+) ]]; then
-    local story_id="${BASH_REMATCH[1]}"
-    if command -v short > /dev/null 2>&1; then
-      local summary story_title
-      if summary="$(fetch_story_summary "${story_id}" 2>/dev/null)"; then
-        story_title="${summary%%$'\t'*}"
-        if [ -n "${story_title}" ]; then
-          session_name_from_title "SC" "${story_id}" "${story_title}"
-          return 0
-        fi
-      fi
-    fi
-  fi
-
-  # Try GitHub PR title
-  if command -v gh > /dev/null 2>&1; then
-    local pr_json
-    if pr_json="$(gh pr view "${branch_name}" --json number,title 2>/dev/null)"; then
-      local pr_number pr_title
-      pr_number="$(printf "%s" "${pr_json}" | jq -r '.number // empty' 2>/dev/null)"
-      pr_title="$(printf "%s" "${pr_json}" | jq -r '.title // empty' 2>/dev/null)"
-      if [ -n "${pr_number}" ] && [ -n "${pr_title}" ]; then
-        session_name_from_title "PR" "${pr_number}" "${pr_title}"
-        return 0
-      fi
-    fi
+  # PR worktree dirs are prefixed with pr- — prefer the PR title for those,
+  # even if the branch also references a Shortcut story.
+  if [[ "$(basename "${dir}")" == pr-* ]]; then
+    _resolve_pr_name "${dir}" "${branch_name}" && return 0
+    _resolve_story_name "${branch_name}" && return 0
+  else
+    _resolve_story_name "${branch_name}" && return 0
+    _resolve_pr_name "${dir}" "${branch_name}" && return 0
   fi
 
   # Prettified branch name

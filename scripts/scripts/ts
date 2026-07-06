@@ -8,10 +8,10 @@
 # current git repo root (where worktrees typically live).
 #
 # Session naming priority:
-#   1. Shortcut story title (if branch contains SC-<id>)
-#   2. GitHub PR title (if branch has an open PR)
-#   3. Prettified branch name (strip type prefix)
-#   4. Directory basename (if not a git repo)
+#   pr- dirs:  GitHub PR title > Shortcut story title
+#   otherwise: Shortcut story title > GitHub PR title
+#   then:      Prettified branch name (strip type prefix)
+#   then:      Directory basename (if not a git repo)
 
 set -o errexit   # abort on nonzero exitstatus
 set -o nounset   # abort on unbound variable
@@ -37,10 +37,9 @@ Arguments:
   directory        Path to directory (optional — uses fzf if omitted)
 
 Session naming priority:
-  1. Shortcut story title (branch contains SC-<id>)
-  2. GitHub PR title (branch has open PR)
-  3. Prettified branch name
-  4. Directory basename
+  pr- dirs:  GitHub PR title > Shortcut story title
+  otherwise: Shortcut story title > GitHub PR title
+  then:      Prettified branch name, else directory basename
 
 Examples:
   ${0##*/}
@@ -115,7 +114,23 @@ create_session_for_dir() {
   info "Resolving session name for ${dir}..."
   local session_name
   session_name="$(resolve_session_name "${dir}")"
-  create_tmux_session "${session_name}" "${dir}" "${detached_flag}"
+
+  # Pick the secondary-pane command based on what the session represents:
+  #   PR-<number> …  → run the PR review TUI (tuicr pr <number>)
+  #   SC-<id> …      → no secondary pane at all
+  #   otherwise      → nit
+  local pane_command
+  if [[ "${session_name}" =~ ^PR-([0-9]+) ]]; then
+    pane_command="tuicr pr ${BASH_REMATCH[1]}"
+  elif [[ "${session_name}" =~ ^SC- ]]; then
+    pane_command=""
+  else
+    pane_command="nit"
+  fi
+
+  # Resume the most recent conversation in this dir; fall back to a fresh
+  # claude when the worktree has no history yet (e.g. first open).
+  create_tmux_session "${session_name}" "${dir}" "${detached_flag}" "${pane_command}" "claude --continue || claude"
 }
 
 #######################################
