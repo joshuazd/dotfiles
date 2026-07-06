@@ -5,6 +5,13 @@ input="$(cat)"
 file_path="$(echo "${input}" | jq -r '.tool_input.file_path')"
 cwd="$(echo "${input}" | jq -r '.cwd')"
 
+# Skip temp files — don't lint scratch/throwaway files
+case "${file_path}" in
+  /tmp/*|/private/tmp/*|/var/folders/*|*/tmp/*)
+    exit 0
+    ;;
+esac
+
 run_rubocop() {
   local config_args=()
   # View files use a separate rubocop config if it exists

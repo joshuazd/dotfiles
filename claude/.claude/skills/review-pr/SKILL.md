@@ -30,6 +30,8 @@ Review this pull request. Most code you review is Claude-generated — it tends 
 
 Your primary lens is **architecture & design**. Before reporting any finding, verify it against the actual codebase (use `rg` to confirm patterns exist where you claim). Skip formatting, naming, and style preferences. Invoke `superpowers:verification-before-completion` before posting findings.
 
+**You are not CI. Do not re-run the machine checks.** Do not run linters/formatters, build the project, run the test suite, parse/validate config or schema files, or re-execute any check the repo's CI already performs. CI gates the merge; your job is the judgment CI can't make — design, correctness of intent, completeness, pattern fit. If a check would only tell you what a green pipeline already tells you, skip it and spend that effort reading code. The one exception: read-only `rg`/`grep`/file reads to *verify a specific finding* (confirm a pattern exists, a caller is/isn't updated) — that's evidence for a claim, not a CI substitute. When something is genuinely only verifiable by running the repo (registry registration, external schema, live API shape), say so and flag it as "CI/runtime verifies this" — don't reproduce it locally.
+
 ## Architecture & Design (primary focus)
 
 For every changed file, read the surrounding code and related modules to answer:

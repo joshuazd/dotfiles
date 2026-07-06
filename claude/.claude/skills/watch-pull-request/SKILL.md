@@ -117,14 +117,16 @@ gh api graphql -f query='
 - Any Greptile review verdict is `APPROVED` or absent (no `CHANGES_REQUESTED`)
 - No unresolved/non-outdated Greptile review threads remain
 
-**e. Address every concern** (from review body and from threads). Always post a reply so Greptile sees the response on its next review:
+**e. Address every concern** (from review body and from threads):
 
 - If valid: implement the **minimal** fix → commit → push (`git push origin HEAD`, or `--force-with-lease` if you amended).
   - **Thread concerns:** reply to the thread explaining what changed, then resolve the thread.
-  - **Review-body concerns:** post a top-level PR comment (`gh pr comment <PR_NUMBER> --body "..."`) explaining what changed.
-- If invalid:
+  - **Review-body concerns (no thread):** implement the fix silently — no comment needed. The re-triggered review will confirm it.
+- If invalid (pushing back):
   - **Thread concerns:** reply explaining why, then resolve the thread.
-  - **Review-body concerns:** post a top-level PR comment explaining your pushback.
+  - **Review-body concerns (no thread):** post a top-level PR comment (`gh pr comment <PR_NUMBER> --body "..."`) explaining the pushback so Greptile sees it on the next pass.
+
+**Never post a top-level PR comment just to summarize fixes** — only use it when pushing back on a review-body concern that has no thread.
 
 Resolving a review thread requires a GraphQL mutation:
 
@@ -233,6 +235,7 @@ Returns:
 
 ## Notes
 
+- **HARD BAN — never use the reviews submission endpoint.** Do NOT use `gh api .../pulls/{pr}/reviews -X POST` or `gh pr review` to post responses. Submitted GitHub reviews cannot be deleted (not via API, not in UI), and COMMENT-state reviews cannot even be dismissed. This has permanently left undeletable reviews on PRs. For thread replies use the pulls comments replies API; for PR-level comments use `gh pr comment`. Both are deletable.
 - **Never** mark a PR ready for review or change its draft status
 - **Never** reply to human review comments on GitHub — report them to the user instead
 - Always rebase on the PR's base branch before pushing — don't merge

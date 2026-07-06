@@ -97,10 +97,7 @@ fi
 
 # Cost: Claude Code provides this pre-computed (handles caching, 1M ctx, model rates)
 cost=$(printf '$%.2f' "$cost_usd")
-if   ge "$cost_usd" 10.00; then cost_color=$RED
-elif ge "$cost_usd"  2.00; then cost_color=$ORANGE
-else                            cost_color=$GREEN
-fi
+cost_color=$ORANGE
 
 # Effort indicator (absent from JSON when the model doesn't support effort).
 # Color by level so high-reasoning sessions stand out and cheap ones stay dim.

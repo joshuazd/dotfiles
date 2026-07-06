@@ -47,7 +47,7 @@ Write the message to a per-worktree path inside the gitdir, then commit with `-F
    ```
    Short description of the change
 
-   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+   Co-Authored-By: <model info here>
    ```
 
 3. Commit:
