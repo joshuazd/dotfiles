@@ -9,12 +9,17 @@ tmux_interpolation=(
     "\#{username}"
     "\#{hostname}"
 )
+# Route the expensive scripts through tmux_cache.sh so they recompute at most
+# once every 30s instead of every status-interval (1s). Battery and the
+# user/host probes (pmset / ps / ssh -G) are the costly forks; caching them
+# cuts the per-second status-bar cost by ~10x with no visible change.
+_C="$CURRENT_DIR/tmux_cache.sh 30"
 tmux_commands=(
-	"#($CURRENT_DIR/battery_percentage.sh)"
-	"#($CURRENT_DIR/battery_color.sh)"
-    "#($CURRENT_DIR/battery_remain.sh)"
-    "#($CURRENT_DIR/username.sh)"
-    "#($CURRENT_DIR/hostname.sh)"
+	"#($_C $CURRENT_DIR/battery_percentage.sh)"
+	"#($_C $CURRENT_DIR/battery_color.sh)"
+    "#($_C $CURRENT_DIR/battery_remain.sh)"
+    "#($_C $CURRENT_DIR/username.sh #{pane_tty})"
+    "#($_C $CURRENT_DIR/hostname.sh #{pane_tty})"
 )
 
 get_tmux_option() {

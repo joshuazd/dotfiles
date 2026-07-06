@@ -3,6 +3,8 @@
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 percentage=$("$CURRENT_DIR/battery_percentage.sh" | sed 's/%//')
 
+[ -z "$percentage" ] && exit 0
+
 if [ "$percentage" -eq 100 ]; then
     printf '#[fg=green]'
 elif [ "$percentage" -ge 60 ]; then
