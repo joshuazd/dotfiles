@@ -17,21 +17,35 @@ _git_prompt_info() {
   echo -n ']%f'
 }
 
-_ruby_prompt() {
-
-    # [ -x "$(command -v rbenv)" ] && ruby_version=$(rbenv version-name)
-
-    # [[ -z $ruby_version || "${ruby_version}" == "system" ]] && return
-
-    [ -x "$(command -v ruby)" ] && ruby_version=$(ruby --version | awk '{print $2}')
-
-    [ -x "$(command -v ruby)" ] && ruby_bin=$(which ruby)
-
-    [[ -z $ruby_version || "${ruby_bin}" == "/usr/bin/ruby" ]] && return
-
-    [[ "${ruby_version}" =~ ^[0-9].+$ ]] && ruby_version="v${ruby_version}"
-
-    echo -n "%F{red}💎 ${ruby_version}%f "
+# Ruby/node versions only change when the active runtime changes (i.e. on cd),
+# so detect them in a chpwd hook and cache the rendered string. The prompt then
+# echoes the cached vars instead of spawning `ruby`/`node` on every keystroke.
+# Note: if you change versions in-place (e.g. `mise use ruby@x`) without cd'ing,
+# run `_update_runtime_prompt` (or just cd .) to refresh.
+# Default node version to suppress from the prompt: the mise global pin (the
+# version active outside any project). Read from mise's global config — instant,
+# no subprocess. Node shows only when a directory pins something different from
+# this — mirrors the old fnm behavior. Falls back to the homebrew node if mise
+# has no global node pin. Override by setting _NODE_DEFAULT_VERSION beforehand.
+_NODE_DEFAULT_VERSION="${_NODE_DEFAULT_VERSION:-$(awk -F'"' '/^[[:space:]]*node[[:space:]]*=/{print "v"$2; exit}' "${MISE_GLOBAL_CONFIG_FILE:-$HOME/.config/mise/config.toml}" 2>/dev/null)}"
+[[ -z $_NODE_DEFAULT_VERSION && -x /opt/homebrew/bin/node ]] && _NODE_DEFAULT_VERSION="$(/opt/homebrew/bin/node --version 2>/dev/null)"
+_RUBY_PROMPT=""
+_NODE_PROMPT=""
+_update_runtime_prompt() {
+    local v bin
+    _RUBY_PROMPT=""
+    bin=$(command -v ruby)
+    if [[ -n $bin && $bin != /usr/bin/ruby ]]; then
+        v=${${(s: :)"$(ruby --version 2>/dev/null)"}[2]}
+        [[ $v == [0-9]* ]] && _RUBY_PROMPT="%F{red}💎 v${v}%f "
+    fi
+    _NODE_PROMPT=""
+    bin=$(command -v node)
+    if [[ -n $bin ]]; then
+        v=$(node --version 2>/dev/null)
+        # Show only when the active node differs from the default version.
+        [[ -n $v && $v != $_NODE_DEFAULT_VERSION ]] && _NODE_PROMPT="%F{green}⬢ ${v}%f "
+    fi
 }
 
 _python_prompt() {
@@ -63,21 +77,20 @@ _venv_prompt() {
 }
 
 
-_node_prompt() {
-    local node_version
-
-    node_version=$(fnm current 2>/dev/null)
-
-    default_version="v20.15.1"
-
-    [[ $node_version == "system" || $node_version == $default_version || $node_version == "node" || $node_version == "none" ]] && return
-
-    echo -n "%F{green}⬢ ${node_version}%f "
+_LAST_RUNTIME_PWD=""
+_maybe_update_runtime_prompt() {
+    # Cheap guard: only re-detect (spawning ruby/node) when the directory
+    # changed. Runs after mise's own precmd hook, so PATH is already updated.
+    [[ $PWD == $_LAST_RUNTIME_PWD ]] && return
+    _LAST_RUNTIME_PWD=$PWD
+    _update_runtime_prompt
 }
+autoload -U add-zsh-hook
+add-zsh-hook precmd _maybe_update_runtime_prompt
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 # PROMPT=" %F{234}%~%f\$(_git_prompt_info) %F{%(?.234.red)}%(!.#.>)%f "
-PROMPT=" %F{111}%~%f\$(_git_prompt_info) \$(_ruby_prompt)\$(_python_prompt)\$(_venv_prompt)\$(_node_prompt)
+PROMPT=" %F{111}%~%f\$(_git_prompt_info) \${_RUBY_PROMPT}\$(_python_prompt)\$(_venv_prompt)\${_NODE_PROMPT}
 %F{%(?.222.red)}%(!.#.$)%f "
 setopt promptsubst
 
@@ -213,7 +226,8 @@ _fzf_complete_sshrc() {
   )
 }
 
-[ -x "$(command -v rbenv)" ] && eval "$(rbenv init - zsh)"
+# Disabled: mise manages ruby (see .zprofile). Uncomment to switch back to rbenv.
+# [ -x "$(command -v rbenv)" ] && eval "$(rbenv init - zsh)"
 
 # completion settings
 zstyle ':completion:*' auto-description 'specify: %d'
@@ -232,7 +246,13 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 zstyle ':completion:*:(rm|cp|kill|diff|scp):*' ignore-line yes
 # zstyle :compinstall filename '/home/vagrant/.zshrc'
 autoload -Uz compinit
-compinit -i 2>/dev/null
+# Only run the full compinit (with compaudit security scan) once per day;
+# otherwise load the cached dump with -C to skip the audit. Saves ~15ms/shell.
+if [[ -n ${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
+  compinit -i 2>/dev/null
+else
+  compinit -C -i 2>/dev/null
+fi
 # plugins
 if [[ -n "$ZSH_CUSTOM" && -d "$ZSH_CUSTOM" ]]; then
   [[ -d "${ZSH_CUSTOM}/plugins/git" ]] && fpath=($fpath ${ZSH_CUSTOM}/plugins/git)
@@ -299,31 +319,33 @@ alias hp_development='HP_AWS_ACCESS_KEY_ID=`security find-generic-password -w -s
 alias hp_test='HP_AWS_ACCESS_KEY_ID=`security find-generic-password -w -s hushpuppy_test_rw_api_key_id -a jzinkduda` HP_AWS_SECRET_ACCESS_KEY=`security find-generic-password -w -s hushpuppy_test_rw_api_key_secret -a jzinkduda` CONFIG_NAME=Test'
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# FNM (node version management and autoload)
-[ -x "$(command -v fnm)" ] && eval "$(fnm env)"
+# Disabled: mise manages node (see .zprofile). Uncomment to switch back to fnm.
+# # FNM (node version management and autoload)
+# [ -x "$(command -v fnm)" ] && eval "$(fnm env)"
+#
+# FNM_USING_LOCAL_VERSION=0
+# FNM_VERSION_FILE_STRATEGY=recursive
+#
+# autoload -U add-zsh-hook
+# _fnm_autoload_hook () {
+#   if [[ -f .nvmrc && -r .nvmrc || -f .node-version && -r .node-version ]]; then
+#     FNM_USING_LOCAL_VERSION=1
+#     fnm use --install-if-missing >/dev/null
+#   elif [ $FNM_USING_LOCAL_VERSION -eq 1 ]; then
+#     FNM_USING_LOCAL_VERSION=0
+#     fnm use default --install-if-missing >/dev/null
+#   fi
+# }
+#
+# add-zsh-hook chpwd _fnm_autoload_hook \
+#     && _fnm_autoload_hook
 
-FNM_USING_LOCAL_VERSION=0
-FNM_VERSION_FILE_STRATEGY=recursive
-
-autoload -U add-zsh-hook
-_fnm_autoload_hook () {
-  if [[ -f .nvmrc && -r .nvmrc || -f .node-version && -r .node-version ]]; then
-    FNM_USING_LOCAL_VERSION=1
-    fnm use --install-if-missing >/dev/null
-  elif [ $FNM_USING_LOCAL_VERSION -eq 1 ]; then
-    FNM_USING_LOCAL_VERSION=0
-    fnm use default --install-if-missing >/dev/null
-  fi
-}
-
-add-zsh-hook chpwd _fnm_autoload_hook \
-    && _fnm_autoload_hook
-
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-[ -x "$(command -v pyenv)" ] && eval "$(pyenv init - zsh)"
+# Disabled: mise manages python (see .zprofile). Uncomment to switch back to pyenv.
+# export PYENV_ROOT="$HOME/.pyenv"
+# [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+# [ -x "$(command -v pyenv)" ] && eval "$(pyenv init - zsh)"
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
 [ -f "$HOME/.hunt-cli/autocomplete_zsh" ] && source "$HOME/.hunt-cli/autocomplete_zsh"
 
 # opencode
-export PATH=/Users/joshua.zink-duda/.opencode/bin:$PATH
+export PATH=$HOME/.opencode/bin:$PATH

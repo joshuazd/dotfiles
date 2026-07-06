@@ -28,7 +28,7 @@ PATH=$PATH:/snap/bin
 PATH=/Library/TeX/texbin:$PATH
 
 # Python
-PATH=/Users/jzinkduda/Library/Python/3.9/bin:$PATH
+PATH=$HOME/Library/Python/3.9/bin:$PATH
 
 # Ruby
 PATH=$HOME/.rbenv/bin:$PATH
