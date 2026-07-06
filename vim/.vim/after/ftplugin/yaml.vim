@@ -1,8 +1,8 @@
 setlocal commentstring=#%s
 setlocal softtabstop=2
 setlocal shiftwidth=2
-command! -range=% FormatYAML <line1>,<line2>!python -c
-      \"from yaml import dump, load; import sys; print dump(load(sys.stdin.read()),default_flow_style=False)"
+command! -range=% FormatYAML <line1>,<line2>!python3 -c
+      \"import sys, yaml; print(yaml.dump(yaml.safe_load(sys.stdin.read()), default_flow_style=False))"
 augroup YAML
     autocmd!
     if match(getline(1,'$'),'^\(swagger\|oas\)') != -1

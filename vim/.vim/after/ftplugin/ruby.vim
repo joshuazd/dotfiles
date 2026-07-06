@@ -1,4 +1,4 @@
-if executable('solargraph') && exists(':Packadd') && &filetype ==? 'ruby'
+if executable('ruby-lsp') && exists(':Packadd') && &filetype ==? 'ruby'
   silent! nunmap K
   silent! xunmap K
   Packadd vim-lsc
@@ -27,7 +27,7 @@ nnoremap <buffer> <space>se :Eservice<space>
 nnoremap <buffer> <space>st :Eservicetest<space>
 nnoremap <buffer> <space>li :Elib<space>
 
-if match(expand('%:.'), '^\/Users\/jzinkduda\/\.rbenv') != -1
+if expand('%:p') =~# '/\.rbenv/'
   silent! ALEDisableBuffer
 endif
 
