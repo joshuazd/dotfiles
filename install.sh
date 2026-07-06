@@ -16,6 +16,15 @@ else
 fi
 
 "$DOTFILES/shell/.bin/install-tools" core
+
+# install-tools may have just installed Homebrew; make its bin visible to the
+# symlink step (stow lives there) without requiring a new shell.
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 "$DOTFILES/shell/.bin/install-symlinks"
 
 echo "Done. Open a new shell to pick up the changes."
