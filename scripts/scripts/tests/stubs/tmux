@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Test stub. Records argv to $TMUX_STUB_LOG, one invocation per line,
+# arguments joined by the unit separator so embedded spaces stay parseable.
+set -o nounset
+
+if [ -n "${TMUX_STUB_LOG:-}" ]; then
+  printf '%s' "${1:-}" >> "${TMUX_STUB_LOG}"
+  shift || true
+  for arg in "${@}"; do
+    printf '\x1f%s' "${arg}" >> "${TMUX_STUB_LOG}"
+  done
+  printf '\n' >> "${TMUX_STUB_LOG}"
+fi
+
+# Canned responses for the queries lib/tmux.sh makes.
+case "${1:-}" in
+  display-message)
+    printf '%s\n' "${TMUX_STUB_DISPLAY:-/tmp/stub-worktree}"
+    ;;
+  has-session)
+    exit "${TMUX_STUB_HAS_SESSION:-1}"
+    ;;
+esac
+
+exit 0
