@@ -144,6 +144,48 @@ _fake_session_script() {
   [ "${status}" -eq 0 ]
 }
 
+# Drives git-worktree-session itself rather than a stand-in, so the real
+# ordering is exercised: git-worktree-new runs before create_tmux_session and
+# hard-fails on an existing directory, which on a re-dispatch would mask
+# SESSION_EXISTED behind a generic failure and never tell the caller to leave
+# the running Claude alone. The worktree directory is pre-created here because
+# that is what a re-dispatch actually looks like.
+@test "git-worktree-session reports SESSION_EXISTED without creating a worktree" {
+  export TMUX_STUB_HAS_SESSION=0
+
+  local repo="${BATS_TEST_TMPDIR}/repo"
+  mkdir -p "${repo}" "${BATS_TEST_TMPDIR}/wt"
+  git -C "${repo}" init --quiet
+
+  cd "${repo}"
+  run "${BATS_TEST_DIRNAME}/../git-worktree-session" \
+    --detached --dir-name wt --session-name "SC-1 demo" feature/x
+
+  [ "${status}" -eq "${SESSION_EXISTED}" ]
+  [[ "${output}" != *"Creating worktree"* ]]
+  [[ "${output}" != *"Failed to create worktree"* ]]
+  run refute_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+  run refute_tmux_subcommand "new-session"
+  [ "${status}" -eq 0 ]
+}
+
+@test "git-worktree-session still creates a worktree when only the directory exists" {
+  export TMUX_STUB_HAS_SESSION=1
+
+  local repo="${BATS_TEST_TMPDIR}/repo2"
+  mkdir -p "${repo}" "${BATS_TEST_TMPDIR}/wt2"
+  git -C "${repo}" init --quiet
+
+  cd "${repo}"
+  run "${BATS_TEST_DIRNAME}/../git-worktree-session" \
+    --detached --dir-name wt2 --session-name "SC-2 demo" feature/y
+
+  [ "${status}" -ne 0 ]
+  [ "${status}" -ne "${SESSION_EXISTED}" ]
+  [[ "${output}" == *"Creating worktree"* ]]
+}
+
 @test "worktree_prompt_file resolves under the worktree git dir" {
   local wt="${BATS_TEST_TMPDIR}/wt"
   mkdir -p "${wt}"

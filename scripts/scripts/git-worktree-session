@@ -147,34 +147,45 @@ main() {
     session_name="${dir_name}"
   fi
 
-  # Create the worktree directly
-  worktree_script="${SCRIPT_DIR}/git-worktree-new"
+  # An existing session means this is a re-dispatch, and the worktree it runs
+  # in already exists too: git-worktree-new hard-fails on that directory, which
+  # would mask SESSION_EXISTED behind a generic failure and leave the caller
+  # respawning Claude over the one already running there. Skip straight to
+  # create_tmux_session, which reports SESSION_EXISTED itself.
+  #
+  # Deliberately keyed on the session, not the directory: a directory that
+  # exists without its session is a real inconsistency and must still reach
+  # git-worktree-new and fail there, visibly.
+  if ! tmux has-session -t "=${session_name}" 2>/dev/null; then
+    # Create the worktree directly
+    worktree_script="${SCRIPT_DIR}/git-worktree-new"
 
-  if [ ! -x "${worktree_script}" ]; then
-    error "git-worktree-new script not found or not executable: ${worktree_script}"
-    return 1
-  fi
+    if [ ! -x "${worktree_script}" ]; then
+      error "git-worktree-new script not found or not executable: ${worktree_script}"
+      return 1
+    fi
 
-  info "Creating worktree..."
+    info "Creating worktree..."
 
-  local worktree_args=()
-  if [ -n "${dir_name_override}" ]; then
-    worktree_args+=("--dir-name" "${dir_name_override}")
-  elif [ -n "${prefix}" ]; then
-    worktree_args+=("--prefix" "${prefix}")
-  fi
-  ${fetch} && worktree_args+=("--fetch")
-  worktree_args+=("${branch_name}")
+    local worktree_args=()
+    if [ -n "${dir_name_override}" ]; then
+      worktree_args+=("--dir-name" "${dir_name_override}")
+    elif [ -n "${prefix}" ]; then
+      worktree_args+=("--prefix" "${prefix}")
+    fi
+    ${fetch} && worktree_args+=("--fetch")
+    worktree_args+=("${branch_name}")
 
-  if ! "${worktree_script}" "${worktree_args[@]}"; then
-    error "Failed to create worktree"
-    return 1
-  fi
-  
-  # Check if the worktree directory exists
-  if [ ! -d "${worktree_path}" ]; then
-    error "Worktree directory not found: ${worktree_path}"
-    return 1
+    if ! "${worktree_script}" "${worktree_args[@]}"; then
+      error "Failed to create worktree"
+      return 1
+    fi
+
+    # Check if the worktree directory exists
+    if [ ! -d "${worktree_path}" ]; then
+      error "Worktree directory not found: ${worktree_path}"
+      return 1
+    fi
   fi
 
   # errexit would abort on SESSION_EXISTED, so take the status explicitly and
