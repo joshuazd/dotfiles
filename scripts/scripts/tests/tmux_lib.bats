@@ -80,6 +80,70 @@ setup() {
   [ "${status}" -eq 0 ]
 }
 
+@test "create_tmux_session leaves an existing session's claude alone" {
+  export TMUX_STUB_HAS_SESSION=0
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  [ "${status}" -eq "${SESSION_EXISTED}" ]
+  run refute_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+  run refute_tmux_subcommand "new-session"
+  [ "${status}" -eq 0 ]
+}
+
+# A stand-in for git-worktree-session that exits with the status given as $1,
+# so run_worktree_popup's handling of it can be exercised without a worktree.
+_fake_session_script() {
+  local exit_status="${1}"
+  local script="${BATS_TEST_TMPDIR}/fake-session-script"
+  printf '#!/usr/bin/env bash\nexit %s\n' "${exit_status}" > "${script}"
+  chmod +x "${script}"
+  printf '%s' "${script}"
+}
+
+@test "run_worktree_popup carries SESSION_EXISTED out of the popup" {
+  export DISPATCH_IN_POPUP=1
+  local script
+  script="$(_fake_session_script "${SESSION_EXISTED}")"
+
+  run run_worktree_popup --detached --non-interactive \
+    "${BATS_TEST_TMPDIR}" "${script}" "feature/x" "SC-1 demo"
+  [ "${status}" -eq "${SESSION_EXISTED}" ]
+}
+
+@test "run_worktree_popup keeps the status through the interactive prompt" {
+  export DISPATCH_IN_POPUP=1
+  local script
+  script="$(_fake_session_script "${SESSION_EXISTED}")"
+
+  run run_worktree_popup --detached \
+    "${BATS_TEST_TMPDIR}" "${script}" "feature/x" "SC-1 demo" < /dev/null
+  [ "${status}" -eq "${SESSION_EXISTED}" ]
+}
+
+@test "run_worktree_popup still switches to a session that already existed" {
+  export DISPATCH_IN_POPUP=1
+  local script
+  script="$(_fake_session_script "${SESSION_EXISTED}")"
+
+  run run_worktree_popup --non-interactive \
+    "${BATS_TEST_TMPDIR}" "${script}" "feature/x" "SC-1 demo"
+  [ "${status}" -eq "${SESSION_EXISTED}" ]
+  run assert_tmux_subcommand "switch-client"
+  [ "${status}" -eq 0 ]
+}
+
+@test "run_worktree_popup reports a failing popup and does not switch" {
+  export DISPATCH_IN_POPUP=1
+  local script
+  script="$(_fake_session_script 1)"
+
+  run run_worktree_popup --non-interactive \
+    "${BATS_TEST_TMPDIR}" "${script}" "feature/x" "SC-1 demo"
+  [ "${status}" -eq 1 ]
+  run refute_tmux_subcommand "switch-client"
+  [ "${status}" -eq 0 ]
+}
+
 @test "worktree_prompt_file resolves under the worktree git dir" {
   local wt="${BATS_TEST_TMPDIR}/wt"
   mkdir -p "${wt}"

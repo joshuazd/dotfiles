@@ -185,7 +185,21 @@ main() {
   # we switch to :claude ourselves below.
   local -a popup_args=("--detached" "--pane-command" "" "--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${interactive} || popup_args+=("--non-interactive")
-  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
+  local popup_status=0
+  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}" \
+    || popup_status="${?}"
+
+  # Re-dispatching a story that already has a session must not relaunch Claude:
+  # respawn-pane -k would SIGKILL the Claude running there, mid-turn. Switch to
+  # the live session instead.
+  if [ "${popup_status}" -eq "${SESSION_EXISTED}" ]; then
+    warn "Session '${session_name}' already exists, leaving its Claude running"
+    ${detached} || tmux switch-client -t "=${session_name}:claude"
+    return 0
+  fi
+  if [ "${popup_status}" -ne 0 ]; then
+    return "${popup_status}"
+  fi
 
   # Stories always start in plan mode: Opus writes the plan for review before
   # execution, and the opusplan alias requires plan mode to hand off to Sonnet.
@@ -203,7 +217,10 @@ After plan-accept, default to invoking superpowers:subagent-driven-development f
 </execution-default>'
   local launch_cmd session_dir prompt_file
   session_dir="$(tmux display-message -p -t "=${session_name}:claude" '#{pane_current_path}')"
-  prompt_file="$(worktree_prompt_file "${session_name}" || true)"
+  if ! prompt_file="$(worktree_prompt_file "${session_name}")"; then
+    prompt_file=""
+    warn "Could not resolve a prompt file for '${session_name}'; passing the system prompt inline"
+  fi
   # shellcheck disable=SC2034 # read by claude_launch_cmd's command substitution, which forks and inherits it
   CLAUDE_PROMPT_FILE="${prompt_file}" launch_cmd="$(claude_launch_cmd \
     "${route_model}" "${route_reasoning}" "${route_rationale}" \

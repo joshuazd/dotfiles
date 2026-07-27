@@ -155,7 +155,14 @@ main() {
   local -a popup_args=("--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${detached} && popup_args+=("--detached")
   ${interactive} || popup_args+=("--non-interactive")
-  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
+  # An existing session is success here: this script only wants the session to
+  # exist, and run_worktree_popup has already switched to it.
+  local popup_status=0
+  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}" \
+    || popup_status="${?}"
+  if [ "${popup_status}" -ne 0 ] && [ "${popup_status}" -ne "${SESSION_EXISTED}" ]; then
+    return "${popup_status}"
+  fi
 
   return 0
 }

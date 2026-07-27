@@ -185,12 +185,29 @@ main() {
   # Pass --fetch so the worktree is always at the latest remote HEAD.
   local -a popup_args=("--detached" "--fetch" "--pane-command" "tuicr pr ${pr_number} --no-update-check" "--dir-name" "${dir_name}" "--session-name" "${session_name}")
   ${interactive} || popup_args+=("--non-interactive")
-  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
+  local popup_status=0
+  run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}" \
+    || popup_status="${?}"
+
+  # Re-dispatching a PR that already has a session must not relaunch Claude:
+  # respawn-pane -k would SIGKILL the Claude running there, mid-turn. Switch to
+  # the live session instead.
+  if [ "${popup_status}" -eq "${SESSION_EXISTED}" ]; then
+    warn "Session '${session_name}' already exists, leaving its Claude running"
+    ${detached} || tmux switch-client -t "=${session_name}:claude"
+    return 0
+  fi
+  if [ "${popup_status}" -ne 0 ]; then
+    return "${popup_status}"
+  fi
 
   info "Launching Claude in claude window..."
   local launch_cmd session_dir prompt_file
   session_dir="$(tmux display-message -p -t "=${session_name}:claude" '#{pane_current_path}')"
-  prompt_file="$(worktree_prompt_file "${session_name}" || true)"
+  if ! prompt_file="$(worktree_prompt_file "${session_name}")"; then
+    prompt_file=""
+    warn "Could not resolve a prompt file for '${session_name}'; passing the system prompt inline"
+  fi
   # shellcheck disable=SC2034 # read by claude_launch_cmd's command substitution, which forks and inherits it
   CLAUDE_PROMPT_FILE="${prompt_file}" launch_cmd="$(claude_launch_cmd \
     "${route_model}" "${route_reasoning}" "${route_rationale}" \

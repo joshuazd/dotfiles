@@ -71,6 +71,7 @@ pick_directories() {
   fi
 
   local selected
+  # shellcheck disable=SC2016 # the preview script is expanded by fzf, not here
   selected="$(
     find "${search_root}" -maxdepth 1 -mindepth 1 -type d \
       | sort \
@@ -130,7 +131,15 @@ create_session_for_dir() {
 
   # Resume the most recent conversation in this dir; fall back to a fresh
   # claude when the worktree has no history yet (e.g. first open).
-  create_tmux_session "${session_name}" "${dir}" "${detached_flag}" "${pane_command}" "claude --continue || claude"
+  #
+  # An existing session is success here: create_tmux_session has already
+  # switched to it and left its running Claude alone.
+  local session_status=0
+  create_tmux_session "${session_name}" "${dir}" "${detached_flag}" "${pane_command}" \
+    "claude --continue || claude" || session_status="${?}"
+  if [ "${session_status}" -ne 0 ] && [ "${session_status}" -ne "${SESSION_EXISTED}" ]; then
+    return "${session_status}"
+  fi
 }
 
 #######################################

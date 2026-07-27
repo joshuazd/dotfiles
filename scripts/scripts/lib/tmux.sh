@@ -14,6 +14,12 @@ source "${_lib_dir}/git.sh"
 source "${_lib_dir}/shortcut.sh"
 unset _lib_dir
 
+# Exit status meaning "the tmux session was already there". create_tmux_session
+# reports it, git-worktree-session and run_worktree_popup carry it out through
+# the popup, and callers use it to skip launching Claude: respawn-pane -k would
+# SIGKILL the Claude already running in that pane, mid-turn.
+readonly SESSION_EXISTED=3
+
 #######################################
 # Check if running inside tmux
 # Returns:
@@ -113,7 +119,7 @@ setup_secondary_pane() {
 #   pane_command   — command for the split pane (empty = no split; default: nit)
 #   claude_command — command to run in the claude window (empty = none; default: none)
 # Returns:
-#   0 on success
+#   0 on success, SESSION_EXISTED if the session was already there
 #######################################
 create_tmux_session() {
   local session_name="${1}"
@@ -132,7 +138,7 @@ create_tmux_session() {
         tmux attach-session -t "=${session_name}"
       fi
     fi
-    return 0
+    return "${SESSION_EXISTED}"
   fi
 
   info "Creating tmux session '${session_name}' in ${session_dir}"
@@ -281,7 +287,8 @@ resolve_session_script() {
 #   branch_name    — branch to pass to git-worktree-session
 #   session_name   — tmux session name to switch to afterwards
 # Returns:
-#   0 on success
+#   0 on success, SESSION_EXISTED if the session was already there (the switch
+#   still happens), otherwise the popup command's own failing status
 #######################################
 run_worktree_popup() {
   local detached=false
@@ -343,20 +350,33 @@ run_worktree_popup() {
     popup_command+=" $(printf '%q' "${arg}")"
   done
 
+  # The prompt must not swallow git-worktree-session's exit status: the caller
+  # needs it to tell "session created" from SESSION_EXISTED.
   if ${interactive}; then
+    popup_command+="; __popup_status=\${?}"
     popup_command+="; printf '\\n${BLUE}Press Enter to close...${RESET}'; read -r"
+    popup_command+="; exit \"\${__popup_status}\""
   fi
 
+  # tmux display-popup -E exits with the popup command's status, so the status
+  # survives the popup boundary on both paths.
+  local popup_status=0
   if [ "${DISPATCH_IN_POPUP:-}" = "1" ]; then
-    bash -c "${popup_command}"
+    bash -c "${popup_command}" || popup_status="${?}"
   else
-    tmux display-popup -E -w 80% -h 60% "${popup_command}"
+    tmux display-popup -E -w 80% -h 60% "${popup_command}" || popup_status="${?}"
+  fi
+
+  if [ "${popup_status}" -ne 0 ] && [ "${popup_status}" -ne "${SESSION_EXISTED}" ]; then
+    return "${popup_status}"
   fi
 
   if ! ${detached}; then
     info "Switching to session '${session_name}'"
     tmux switch-client -t "=${session_name}"
   fi
+
+  return "${popup_status}"
 }
 
 #######################################

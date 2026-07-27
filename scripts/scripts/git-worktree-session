@@ -177,11 +177,18 @@ main() {
     return 1
   fi
 
+  # errexit would abort on SESSION_EXISTED, so take the status explicitly and
+  # hand it to the caller: it is how run_worktree_popup's caller learns not to
+  # respawn Claude over the one already running in that session.
+  local session_status=0
   if ${pane_command_set}; then
-    create_tmux_session "${session_name}" "${worktree_path}" "${detached}" "${pane_command}"
+    create_tmux_session "${session_name}" "${worktree_path}" "${detached}" "${pane_command}" \
+      || session_status="${?}"
   else
-    create_tmux_session "${session_name}" "${worktree_path}" "${detached}"
+    create_tmux_session "${session_name}" "${worktree_path}" "${detached}" \
+      || session_status="${?}"
   fi
+  return "${session_status}"
 }
 
 # Check for help flag
