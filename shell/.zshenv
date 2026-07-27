@@ -23,7 +23,7 @@ fi
 # means a login shell (or an outer zsh -c) already assembled PATH.
 case ":${PATH}:" in
   *":${HOME}/.bin:"*) ;;
-  *) . "${HOME}/.profile" ;;
+  *) [ -f "${HOME}/.profile" ] && . "${HOME}/.profile" ;;
 esac
 
 # HOMEBREW_PREFIX is brew shellenv's own marker, so it doubles as the guard.
