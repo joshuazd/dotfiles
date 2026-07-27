@@ -94,6 +94,8 @@ stow -D vim  # Removes vim symlinks
 
 **Note:** Stow creates symlinks from `~/dotfiles/<package>/<file>` to `~/<file>`.
 
+**Note:** `shell/.zshenv` is new. If you already have a hand-written `~/.zshenv`, stow will refuse to overwrite it: move its contents to `~/.zshenv.local`, which `shell/.zshenv` sources when present and which stays out of the repo, then delete `~/.zshenv` and stow again.
+
 ### Post-Installation
 
 **Vim plugins:**
@@ -140,6 +142,7 @@ dotfiles/
 │   ├── .zshrc           # Zsh configuration
 │   ├── .shrc            # Shared shell config
 │   ├── .profile         # Login shell config
+│   ├── .zshenv          # Environment for non-interactive zsh (`zsh -c`)
 │   ├── .functions       # Shared functions
 │   ├── .aliases         # Shared aliases
 │   └── .bin/            # Utility scripts (30+)

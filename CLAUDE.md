@@ -38,7 +38,8 @@ After installing vim, run `:PackUpdate` to install remote plugins.
 - `.shrc` and `.profile` are shared between bash and zsh — shell-agnostic config lives here
 - `.bashrc` / `.zshrc` source `.shrc` and add shell-specific settings
 - `.functions` and `.aliases` are sourced by `.bashrc` and `.zshrc` individually
-- Optional files (`.fzf.bash`, `.fzf.zsh`, `.secrets`, `~/.ripgrep`) are sourced only if they exist
+- Optional files (`.fzf.bash`, `.fzf.zsh`, `.secrets`, `~/.ripgrep`, `~/.zshenv.local`) are sourced only if they exist
+- `.zshenv` is for non-interactive, non-login zsh only (`zsh -c ...`, which is what `tmux respawn-pane` runs): it returns immediately for login and interactive shells, which keep getting their environment from `.zprofile` and `.zshrc`. It assembles PATH from `.profile` (guarded, since `.profile` prepends), applies brew shellenv, and puts mise's *shims* on PATH rather than running `mise activate`, whose precmd hook never fires without a prompt
 
 ### Vim
 

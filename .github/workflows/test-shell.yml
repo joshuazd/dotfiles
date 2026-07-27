@@ -37,6 +37,7 @@ jobs:
         ln -sf "$GITHUB_WORKSPACE/shell/.bash_profile" ~/.bash_profile
         ln -sf "$GITHUB_WORKSPACE/shell/.zshrc" ~/.zshrc
         ln -sf "$GITHUB_WORKSPACE/shell/.zprofile" ~/.zprofile
+        ln -sf "$GITHUB_WORKSPACE/shell/.zshenv" ~/.zshenv
         ln -sf "$GITHUB_WORKSPACE/config/.dir_colors" ~/.dir_colors
         ln -sf "$GITHUB_WORKSPACE/shell/.zsh_custom" ~/.zsh_custom
         
@@ -121,9 +122,46 @@ jobs:
         echo "Checking zsh syntax..."
         zsh -n ~/.zshrc
         zsh -n ~/.zprofile
+        zsh -n ~/.zshenv
         # .shrc and .functions might not be pure zsh, so skip strict syntax check
         echo "✓ Zsh syntax is valid"
-    
+
+    - name: Non-interactive zsh gets a real environment (zsh)
+      if: matrix.shell == 'zsh'
+      run: |
+        echo "Testing .zshenv..."
+        # `tmux respawn-pane` runs its command under `zsh -c`, which sources
+        # .zshenv and nothing else.
+        path="$(env -i HOME="$HOME" PATH=/usr/bin:/bin zsh -c 'printf %s "$PATH"')"
+        case ":$path:" in
+          *":$HOME/.bin:"*) ;;
+          *) echo "ERROR: zsh -c did not get PATH assembled: $path"; exit 1 ;;
+        esac
+
+        # .profile prepends to PATH and appends to HISTCONTROL, so sourcing it
+        # twice is visible. HISTCONTROL is the marker rather than PATH because
+        # macOS's /etc/zprofile runs path_helper, which deduplicates PATH and
+        # would hide it there.
+        nested="$(env -i HOME="$HOME" PATH=/usr/bin:/bin zsh -c 'zsh -c "printf %s \$HISTCONTROL"')"
+        if [ "$nested" != "ignoredups" ]; then
+          echo "ERROR: nested zsh -c applied .profile more than once: HISTCONTROL=$nested"
+          exit 1
+        fi
+
+        # A login shell already gets its environment from .zprofile ->
+        # .profile, so .zshenv must return before touching it.
+        login="$(env -i HOME="$HOME" PATH=/usr/bin:/bin zsh -l -c 'printf %s "$HISTCONTROL"')"
+        if [ "$login" != "ignoredups" ]; then
+          echo "ERROR: login shell applied .profile more than once: HISTCONTROL=$login"
+          exit 1
+        fi
+
+        # .profile's other exports must arrive too, not just PATH.
+        env -i HOME="$HOME" PATH=/usr/bin:/bin zsh -c 'printf %s "$LANG"' | grep -q 'UTF-8'
+
+        echo "✓ Non-interactive zsh environment is assembled once"
+
+
     - name: Verify key functions exist (bash)
       if: matrix.shell == 'bash'
       run: |
