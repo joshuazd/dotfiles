@@ -519,8 +519,15 @@ rationale: ${rationale}
     hint+=$'\n\n'"${extra_system_block}"
   fi
 
-  local hint_quoted
-  hint_quoted="$(printf '%q' "${hint}")"
+  # A multi-line prompt quoted into the command string has to survive tmux
+  # argument parsing. Writing it to a file keeps it out of the command line.
+  local system_prompt_arg
+  if [ -n "${CLAUDE_PROMPT_FILE:-}" ]; then
+    printf '%s' "${hint}" > "${CLAUDE_PROMPT_FILE}"
+    system_prompt_arg="\"\$(cat $(printf '%q' "${CLAUDE_PROMPT_FILE}"))\""
+  else
+    system_prompt_arg="$(printf '%q' "${hint}")"
+  fi
 
   # Quote the model arg: ID may contain [1m] which is a bash glob pattern.
   local cmd="claude --model $(printf '%q' "${model}") --effort ${reasoning}"
@@ -528,7 +535,7 @@ rationale: ${rationale}
   for flag in "${extra_flags[@]}"; do
     cmd+=" $(printf '%q' "${flag}")"
   done
-  cmd+=" --append-system-prompt ${hint_quoted} -- $(printf '%q' "${slash_command}")"
+  cmd+=" --append-system-prompt ${system_prompt_arg} -- $(printf '%q' "${slash_command}")"
 
   printf '%s' "${cmd}"
 }
