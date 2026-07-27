@@ -9,6 +9,7 @@ setup_tmux_stub() {
   : > "${TMUX_STUB_LOG}"
   export PATH="${BATS_TEST_DIRNAME}/stubs:${PATH}"
   export TMUX="fake-socket,0,0"
+  export TMUX_STUB_HAS_SESSION=1
 }
 
 tmux_calls() {

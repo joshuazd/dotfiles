@@ -61,6 +61,25 @@ session_name_from_title() {
 }
 
 #######################################
+# Replace the claude pane's process with the given command.
+# Uses respawn-pane rather than send-keys so there is no shell-readiness race
+# and the command never passes through a shell prompt. Appends an exec of the
+# login shell so exiting Claude leaves a usable pane instead of collapsing it.
+# Arguments:
+#   session_name - tmux session name
+#   session_dir  - working directory for the pane
+#   command      - command to run
+#######################################
+launch_claude_in_pane() {
+  local session_name="${1}"
+  local session_dir="${2}"
+  local command="${3}"
+
+  tmux respawn-pane -k -t "=${session_name}:claude.1" -c "${session_dir}" \
+    "${command}; exec \"\${SHELL}\""
+}
+
+#######################################
 # Split the claude window and run the given command in the new pane.
 # Uses vertical split when terminal is wide enough, horizontal otherwise.
 # Arguments:
@@ -125,7 +144,7 @@ create_tmux_session() {
     setup_secondary_pane "${session_name}" "${pane_command}"
   fi
   if [ -n "${claude_command}" ]; then
-    tmux send-keys -t "=${session_name}:claude.1" "${claude_command}" Enter
+    launch_claude_in_pane "${session_name}" "${session_dir}" "${claude_command}"
   fi
   tmux select-window -t "=${session_name}:1"
 

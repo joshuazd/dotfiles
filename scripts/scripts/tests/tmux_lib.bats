@@ -47,3 +47,35 @@ setup() {
   [[ "${output}" == *"claude --model opus"* ]]
   [ "$(printf '%s' "${output}" | grep -c .)" -eq 5 ]
 }
+
+@test "launch_claude_in_pane respawns the pane instead of sending keys" {
+  launch_claude_in_pane "SC-1 demo" "/tmp/wt" "claude --model opus"
+  run refute_tmux_subcommand "send-keys"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "respawn-pane"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"-k"* ]]
+  [[ "${output}" == *"=SC-1 demo:claude.1"* ]]
+  [[ "${output}" == *"/tmp/wt"* ]]
+}
+
+@test "launch_claude_in_pane keeps a shell alive after claude exits" {
+  launch_claude_in_pane "SC-1 demo" "/tmp/wt" "claude --model opus"
+  run tmux_call_args "respawn-pane"
+  [[ "${output}" == *"claude --model opus; exec "* ]]
+}
+
+@test "create_tmux_session launches claude without send-keys" {
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  run refute_tmux_subcommand "send-keys"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "respawn-pane"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"claude --model opus"* ]]
+}
+
+@test "create_tmux_session with no claude command does not respawn" {
+  create_tmux_session "SC-1 demo" "/tmp/wt" true ""
+  run refute_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+}

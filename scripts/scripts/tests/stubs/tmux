@@ -3,15 +3,6 @@
 # arguments joined by the unit separator so embedded spaces stay parseable.
 set -o nounset
 
-if [ -n "${TMUX_STUB_LOG:-}" ]; then
-  printf '%s' "${1:-}" >> "${TMUX_STUB_LOG}"
-  shift || true
-  for arg in "${@}"; do
-    printf '\x1f%s' "${arg}" >> "${TMUX_STUB_LOG}"
-  done
-  printf '\n' >> "${TMUX_STUB_LOG}"
-fi
-
 # Canned responses for the queries lib/tmux.sh makes.
 case "${1:-}" in
   display-message)
@@ -21,5 +12,14 @@ case "${1:-}" in
     exit "${TMUX_STUB_HAS_SESSION:-1}"
     ;;
 esac
+
+if [ -n "${TMUX_STUB_LOG:-}" ]; then
+  printf '%s' "${1:-}" >> "${TMUX_STUB_LOG}"
+  shift || true
+  for arg in "${@}"; do
+    printf '\x1f%s' "${arg}" >> "${TMUX_STUB_LOG}"
+  done
+  printf '\n' >> "${TMUX_STUB_LOG}"
+fi
 
 exit 0
