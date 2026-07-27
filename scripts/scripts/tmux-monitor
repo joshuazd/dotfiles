@@ -251,6 +251,7 @@ start_pr_worker() {
         local unresolved=0
         if [[ "${state}" == "OPEN" ]]; then
           local threads_json
+          # shellcheck disable=SC2016 # the GraphQL query's $vars are gh's, not the shell's
           threads_json="$(cd "${repo_path}" && gh api graphql -f query='
             query($owner: String!, $repo: String!, $number: Int!) {
               repository(owner: $owner, name: $repo) {

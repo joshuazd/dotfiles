@@ -12,6 +12,7 @@ readonly __LIB_OUTPUT_LOADED=1
 readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
 readonly YELLOW='\033[1;33m'
+# shellcheck disable=SC2034 # used by lib/tmux.sh's popup prompt
 readonly BLUE='\033[0;34m'
 readonly RESET='\033[0m'
 

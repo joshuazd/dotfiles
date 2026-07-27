@@ -19,13 +19,36 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Install bats
+      # Pinned, and from npm rather than the distro packages: the tests use
+      # BATS_TEST_TMPDIR (bats >= 1.4) and the apt/brew versions drift per
+      # runner image. Too old a bats fails every test inside setup_tmux_stub
+      # with a confusing permission error rather than a version error.
+      run: npm install -g bats@1.13.0
+
+    - name: Check bats version
+      run: |
+        version="$(bats --version | awk '{print $2}')"
+        major="${version%%.*}"
+        rest="${version#*.}"
+        minor="${rest%%.*}"
+        if [ "$major" -lt 1 ] || { [ "$major" -eq 1 ] && [ "$minor" -lt 4 ]; }; then
+          echo "bats ${version} is too old: the tests need BATS_TEST_TMPDIR (bats >= 1.4)"
+          exit 1
+        fi
+        echo "bats ${version}"
+
+    - name: Install shellcheck
       run: |
         if [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt-get update && sudo apt-get install -y bats
+          sudo apt-get update && sudo apt-get install -y shellcheck
         else
-          brew install bats-core
+          brew install shellcheck
         fi
+
+    - name: Lint scripts
+      working-directory: scripts/scripts
+      run: make lint
 
     - name: Run tests
       working-directory: scripts/scripts
-      run: bats tests/
+      run: make test
