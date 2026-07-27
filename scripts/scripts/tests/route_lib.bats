@@ -41,5 +41,5 @@ line
   export CLAUDE_PROMPT_FILE="${BATS_TEST_TMPDIR}/prompt.txt"
   run claude_launch_cmd "opus" "high" "because" "/implement 1" ""
   [[ "${output}" == *"--effort high"* ]]
-  [[ "${output}" == */implement* ]]
+  [[ "${output}" == *'-- /implement\ 1'* ]]
 }
