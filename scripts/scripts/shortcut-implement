@@ -201,11 +201,14 @@ main() {
   local execution_default='<execution-default>
 After plan-accept, default to invoking superpowers:subagent-driven-development for execution. Each task runs in a fresh subagent with its own context budget and two-stage review (spec then code-quality). Fall back to superpowers:executing-plans only when plan tasks are tightly coupled (e.g., a single migration + model change that must ship together) or the work is so small (1-2 tasks) that subagent overhead outweighs the benefit.
 </execution-default>'
-  local launch_cmd
-  launch_cmd="$(claude_launch_cmd \
+  local launch_cmd session_dir prompt_file
+  session_dir="$(tmux display-message -p -t "=${session_name}:claude" '#{pane_current_path}')"
+  prompt_file="$(worktree_prompt_file "${session_name}" || true)"
+  # shellcheck disable=SC2034 # read by claude_launch_cmd's command substitution, which forks and inherits it
+  CLAUDE_PROMPT_FILE="${prompt_file}" launch_cmd="$(claude_launch_cmd \
     "${route_model}" "${route_reasoning}" "${route_rationale}" \
     "/implement ${story_id}" "${execution_default}" "${extra_flags[@]}")"
-  tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
+  launch_claude_in_pane "${session_name}" "${session_dir}" "${launch_cmd}"
 
   if ! ${detached}; then
     tmux switch-client -t "=${session_name}:claude"

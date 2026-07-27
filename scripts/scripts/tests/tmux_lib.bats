@@ -79,3 +79,36 @@ setup() {
   run refute_tmux_subcommand "respawn-pane"
   [ "${status}" -eq 0 ]
 }
+
+@test "worktree_prompt_file resolves under the worktree git dir" {
+  local wt="${BATS_TEST_TMPDIR}/wt"
+  mkdir -p "${wt}"
+  git -C "${wt}" init --quiet
+  export TMUX_STUB_DISPLAY="${wt}"
+
+  run worktree_prompt_file "SC-1 demo"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"/vigil-launch-prompt.txt" ]]
+  [ -d "$(dirname "${output}")" ]
+}
+
+@test "worktree_prompt_file fails when the pane path is not a git dir" {
+  export TMUX_STUB_DISPLAY="${BATS_TEST_TMPDIR}/not-a-repo"
+  mkdir -p "${TMUX_STUB_DISPLAY}"
+
+  run worktree_prompt_file "SC-1 demo"
+  [ "${status}" -ne 0 ]
+  [ -z "${output}" ]
+}
+
+@test "worktree_prompt_file queries the claude window pane path" {
+  local wt="${BATS_TEST_TMPDIR}/wt2"
+  mkdir -p "${wt}"
+  git -C "${wt}" init --quiet
+  export TMUX_STUB_DISPLAY="${wt}"
+
+  worktree_prompt_file "SC-1 demo"
+  run tmux_call_args "display-message"
+  [[ "${output}" == *"=SC-1 demo:claude"* ]]
+  [[ "${output}" == *"pane_current_path"* ]]
+}

@@ -188,11 +188,14 @@ main() {
   run_worktree_popup "${popup_args[@]}" "${current_dir}" "${session_script}" "${branch_name}" "${session_name}"
 
   info "Launching Claude in claude window..."
-  local launch_cmd
-  launch_cmd="$(claude_launch_cmd \
+  local launch_cmd session_dir prompt_file
+  session_dir="$(tmux display-message -p -t "=${session_name}:claude" '#{pane_current_path}')"
+  prompt_file="$(worktree_prompt_file "${session_name}" || true)"
+  # shellcheck disable=SC2034 # read by claude_launch_cmd's command substitution, which forks and inherits it
+  CLAUDE_PROMPT_FILE="${prompt_file}" launch_cmd="$(claude_launch_cmd \
     "${route_model}" "${route_reasoning}" "${route_rationale}" \
     "/review-pr ${pr_input}" "")"
-  tmux send-keys -t "=${session_name}:claude" "${launch_cmd}" Enter
+  launch_claude_in_pane "${session_name}" "${session_dir}" "${launch_cmd}"
 
   if ! ${detached}; then
     tmux switch-client -t "=${session_name}:claude"

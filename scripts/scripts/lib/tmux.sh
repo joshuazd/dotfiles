@@ -358,3 +358,28 @@ run_worktree_popup() {
     tmux switch-client -t "=${session_name}"
   fi
 }
+
+#######################################
+# Print the path to a session's Claude launch-prompt file.
+# Lives in the worktree's private git directory so it never shows up in
+# git status, cannot be committed, and is removed with the worktree.
+# Arguments:
+#   session_name - tmux session name
+# Outputs:
+#   Writes the absolute file path to stdout
+# Returns:
+#   0 on success, 1 if the session or its git dir cannot be resolved
+#######################################
+worktree_prompt_file() {
+  local session_name="${1}"
+  local pane_path git_dir
+
+  pane_path="$(tmux display-message -p -t "=${session_name}:claude" \
+    '#{pane_current_path}' 2>/dev/null)" || return 1
+  [ -n "${pane_path}" ] || return 1
+
+  git_dir="$(git -C "${pane_path}" rev-parse --absolute-git-dir 2>/dev/null)" || return 1
+  [ -n "${git_dir}" ] || return 1
+
+  printf '%s/vigil-launch-prompt.txt' "${git_dir}"
+}
