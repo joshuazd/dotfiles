@@ -32,7 +32,12 @@ A personal workflow automation suite that integrates git worktrees, tmux session
 swiftc dispatch-bar.swift -o dispatch-bar
 ```
 
-There are no build, lint, or test systems for this repo — scripts are run directly and tested manually.
+```bash
+make test   # bats tests/ (tmux interactions run against a stub that records argv)
+make lint   # shellcheck over every bash script in the package
+```
+
+Both run in CI (`.github/workflows/test-scripts.yml`) on Ubuntu and macOS.
 
 ## Architecture
 
@@ -43,7 +48,7 @@ Functions are organized into focused libraries under `lib/`. All scripts source 
 - **`lib/output.sh`** — `error` / `info` / `warn`, color codes, `help_wanted`
 - **`lib/git.sh`** — `is_git_repo`, `get_name_from_branch`, `extract_story_id`, `normalize_pr_input`
 - **`lib/shortcut.sh`** — `fetch_story_summary` (returns tab-delimited `title\tbranch` via `short --format`, no JSON parsing)
-- **`lib/tmux.sh`** — `is_in_tmux`, `session_name_from_title`, `setup_secondary_pane`, `create_tmux_session`, `resolve_session_name`, `resolve_session_script`, `run_worktree_popup`
+- **`lib/tmux.sh`** — `is_in_tmux`, `session_name_from_title`, `setup_secondary_pane`, `create_tmux_session`, `launch_claude_in_pane`, `worktree_prompt_file`, `resolve_session_name`, `resolve_session_script`, `run_worktree_popup`, the `SESSION_EXISTED` status
 
 Each lib uses a source guard to prevent double-loading. `common.sh` is a thin shim that sources all four.
 
@@ -77,7 +82,13 @@ Worktrees are created one level up from the main repo root: `../branch-name`. Th
 
 ### Claude Integration
 
-`shortcut-implement` and `gh-review` build a prompt from the story/PR context and send it to the `:claude` tmux window via `tmux send-keys`. The `claude-trust` script modifies `~/.claude.json` to pre-trust new worktree directories so Claude doesn't prompt for confirmation.
+`shortcut-implement` and `gh-review` build a `claude` command from the story/PR context and make it the `:claude` pane's own process with `tmux respawn-pane -k` (`launch_claude_in_pane`), not text typed in with `send-keys`: there is no shell-readiness race and the command never passes through a shell prompt. The command appends `; exec "${SHELL}"` so exiting Claude leaves a usable pane.
+
+The multi-line system prompt travels via a file rather than the command line: `worktree_prompt_file` puts it at `vigil-launch-prompt.txt` inside the worktree's private git dir (so it never shows in `git status` and goes away with the worktree), and the command reads it back with `--append-system-prompt "$(cat <file>)"`.
+
+Re-dispatching a story or PR that already has a session must not relaunch Claude - `respawn-pane -k` would SIGKILL the Claude running there. `create_tmux_session` returns `SESSION_EXISTED`, `git-worktree-session` and `run_worktree_popup` carry that status out through the popup, and both callers skip the launch and just switch to the live session.
+
+The `claude-trust` script modifies `~/.claude.json` to pre-trust new worktree directories so Claude doesn't prompt for confirmation.
 
 ### dispatch-from-chrome
 

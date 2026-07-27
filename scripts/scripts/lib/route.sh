@@ -481,7 +481,8 @@ classify_story() {
 }
 
 #######################################
-# Build the `claude` invocation string for tmux send-keys.
+# Build the `claude` invocation string for launch_claude_in_pane, which makes
+# it the claude pane's own process via tmux respawn-pane -k.
 # Embeds a <routing-hint> block (plus an optional caller-provided extra
 # block) via --append-system-prompt so the in-session model can see them.
 # The system-prompt content survives Claude Code's plan-accept context
