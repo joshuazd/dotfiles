@@ -100,8 +100,15 @@ setup() {
 
 @test "create_tmux_session marks the claude pane" {
   create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
-  run tmux_calls
-  [[ "${output}" == *"@vigil_claude"* ]]
+  run tmux_call_args_matching "set-option" "@vigil_claude"
+  # Exact-line matches, not substrings: the target check must not be
+  # satisfiable by a differently-scoped or differently-windowed set-option
+  # call, and the value check must land on the actual last argument rather
+  # than an incidental "1" elsewhere in the line (e.g. inside "SC-1").
+  printf '%s\n' "${output}" | grep -Fxq -- "-p"
+  printf '%s\n' "${output}" | grep -Fxq -- "=SC-1 demo:claude"
+  printf '%s\n' "${output}" | grep -Fxq -- "@vigil_claude"
+  [ "$(printf '%s\n' "${output}" | tail -n1)" = "1" ]
 }
 
 @test "create_tmux_session launches claude without send-keys" {
