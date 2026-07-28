@@ -67,6 +67,30 @@ session_name_from_title() {
 }
 
 #######################################
+# Print a tmux target for a session's claude pane.
+# Resolved by the @vigil_claude marker rather than by position: panels are
+# inserted with split-window -b, before the existing pane, and tmux pane
+# indexes are positional, so .1 stops meaning "the claude pane" the moment a
+# window gains a panel. Falls back to the positional target for sessions
+# created before the marker existed.
+# Arguments:
+#   session_name
+# Outputs:
+#   a pane id (e.g. %5) or "=<session>:claude.1"
+#######################################
+claude_pane_target() {
+  local session_name="${1}"
+  local pane
+  pane="$(tmux list-panes -t "=${session_name}:claude" -F '#{pane_id} #{@vigil_claude}' 2>/dev/null \
+    | awk '$2 == "1" { print $1; exit }')" || pane=""
+  if [ -n "${pane}" ]; then
+    printf '%s' "${pane}"
+    return 0
+  fi
+  printf '%s' "=${session_name}:claude.1"
+}
+
+#######################################
 # Replace the claude pane's process with the given command.
 # Uses respawn-pane rather than send-keys so there is no shell-readiness race
 # and the command never passes through a shell prompt. Appends an exec of the
@@ -80,8 +104,10 @@ launch_claude_in_pane() {
   local session_name="${1}"
   local session_dir="${2}"
   local command="${3}"
+  local target
+  target="$(claude_pane_target "${session_name}")"
 
-  tmux respawn-pane -k -t "=${session_name}:claude.1" -c "${session_dir}" \
+  tmux respawn-pane -k -t "${target}" -c "${session_dir}" \
     "${command}; exec \"\${SHELL}\""
 }
 
@@ -95,18 +121,19 @@ launch_claude_in_pane() {
 setup_secondary_pane() {
   local session="${1}"
   local pane_command="${2}"
-  local target="=${session}:claude"
-  local width
-  width="$(tmux display-message -t "${target}" -p '#{window_width}')"
+  local claude_pane width split new_pane
+  claude_pane="$(claude_pane_target "${session}")"
+  width="$(tmux display-message -t "=${session}:claude" -p '#{window_width}')"
 
   if [ "${width}" -ge 200 ]; then
-    tmux split-window -t "${target}" -h -c "#{pane_current_path}"
+    split='-h'
   else
-    tmux split-window -t "${target}" -v -c "#{pane_current_path}"
+    split='-v'
   fi
 
-  tmux send-keys -t "${target}.2" "${pane_command}" Enter
-  tmux select-pane -t "${target}.1"
+  new_pane="$(tmux split-window -t "${claude_pane}" "${split}" -c '#{pane_current_path}' -P -F '#{pane_id}')"
+  tmux send-keys -t "${new_pane}" "${pane_command}" Enter
+  tmux select-pane -t "${claude_pane}"
 }
 
 #######################################
@@ -145,6 +172,9 @@ create_tmux_session() {
 
   # All paths create detached first so we can set up panes before attaching
   tmux new-session -d -s "${session_name}" -n "claude" -c "${session_dir}"
+  # Mark the pane so later targeting does not depend on its index, which
+  # shifts when a panel is inserted before it.
+  tmux set-option -p -t "=${session_name}:claude" @vigil_claude 1
   tmux new-window -t "=${session_name}:2" -n "server" -c "${session_dir}"
   if [ -n "${pane_command}" ]; then
     setup_secondary_pane "${session_name}" "${pane_command}"
