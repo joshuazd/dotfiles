@@ -34,3 +34,14 @@ tmux_call_args() {
   local subcommand="${1}"
   grep -m1 "^${subcommand}${TMUX_STUB_SEP}" "${TMUX_STUB_LOG}" | tr '\037' '\n'
 }
+
+# Like tmux_call_args, but narrowed to the first invocation of the given
+# subcommand whose argv also contains the given substring. Needed when a
+# subcommand is called more than once with different arguments (e.g. two
+# set-option calls) and an assertion must land on the right one rather than
+# on whichever call happens to appear first in the log.
+tmux_call_args_matching() {
+  local subcommand="${1}"
+  local pattern="${2}"
+  grep -m1 "^${subcommand}${TMUX_STUB_SEP}.*${pattern}" "${TMUX_STUB_LOG}" | tr '\037' '\n'
+}

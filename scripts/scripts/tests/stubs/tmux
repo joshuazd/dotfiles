@@ -3,13 +3,37 @@
 # arguments joined by the unit separator so embedded spaces stay parseable.
 set -o nounset
 
-# Canned responses for the queries lib/tmux.sh makes.
+# Canned responses for the queries lib/tmux.sh and vigil-panel make.
 case "${1:-}" in
   display-message)
     printf '%s\n' "${TMUX_STUB_DISPLAY:-/tmp/stub-worktree}"
     ;;
   has-session)
     exit "${TMUX_STUB_HAS_SESSION:-1}"
+    ;;
+  list-panes)
+    if [ -n "${TMUX_STUB_LIST_PANES:-}" ]; then
+      printf '%s\n' "${TMUX_STUB_LIST_PANES}"
+    fi
+    ;;
+  show-options)
+    # Keyed by option name: the toggle asks for two different options and a
+    # single canned value would feed an orientation into the size.
+    for arg in "${@}"; do
+      case "${arg}" in
+        @vigil_panel_orientation) printf '%s\n' "${TMUX_STUB_PANEL_ORIENTATION:-}" ;;
+        @vigil_panel_size) printf '%s\n' "${TMUX_STUB_PANEL_SIZE:-}" ;;
+      esac
+    done
+    ;;
+  split-window)
+    # Only -P asks for the new pane id back.
+    for arg in "${@}"; do
+      if [ "${arg}" = "-P" ]; then
+        printf '%s\n' "${TMUX_STUB_SPLIT_PANE:-%9}"
+        break
+      fi
+    done
     ;;
 esac
 
