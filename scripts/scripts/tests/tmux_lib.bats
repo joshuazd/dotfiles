@@ -65,6 +65,45 @@ setup() {
   [[ "${output}" == *"claude --model opus; exec "* ]]
 }
 
+@test "launch_claude_in_pane targets the marked pane by id" {
+  export TMUX_STUB_LIST_PANES="%4 0
+%5 1"
+  launch_claude_in_pane "SC-1 demo" "/tmp/wt" "claude --model opus"
+  run tmux_call_args "respawn-pane"
+  [[ "${output}" == *"%5"* ]]
+  [[ "${output}" != *":claude.1"* ]]
+}
+
+@test "launch_claude_in_pane falls back to the positional target for older sessions" {
+  export TMUX_STUB_LIST_PANES=""
+  launch_claude_in_pane "SC-1 demo" "/tmp/wt" "claude --model opus"
+  run tmux_call_args "respawn-pane"
+  [[ "${output}" == *"=SC-1 demo:claude.1"* ]]
+}
+
+@test "setup_secondary_pane sends its command to the pane it just made" {
+  export TMUX_STUB_DISPLAY="120"
+  export TMUX_STUB_SPLIT_PANE="%8"
+  setup_secondary_pane "SC-1 demo" "nit"
+  run tmux_call_args "send-keys"
+  [[ "${output}" == *"%8"* ]]
+  [[ "${output}" != *":claude.2"* ]]
+}
+
+@test "setup_secondary_pane returns focus to the claude pane by id" {
+  export TMUX_STUB_DISPLAY="120"
+  export TMUX_STUB_LIST_PANES="%4 1"
+  setup_secondary_pane "SC-1 demo" "nit"
+  run tmux_call_args "select-pane"
+  [[ "${output}" == *"%4"* ]]
+}
+
+@test "create_tmux_session marks the claude pane" {
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_calls
+  [[ "${output}" == *"@vigil_claude"* ]]
+}
+
 @test "create_tmux_session launches claude without send-keys" {
   create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
   run refute_tmux_subcommand "send-keys"
