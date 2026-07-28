@@ -13,7 +13,9 @@ setup() {
   [ "${status}" -eq 0 ]
   run tmux_call_args "split-window"
   [[ "${output}" == *"-vb"* ]]
-  [[ "${output}" == *"10"* ]]
+  # The size must be the argument after -l, not merely present: without -l
+  # tmux takes it as the pane command and the panel never starts.
+  printf '%s\n' "${output}" | assert_arg_after "-l" "10"
 }
 
 @test "a landscape client gets a column on the left" {
@@ -22,7 +24,7 @@ setup() {
   [ "${status}" -eq 0 ]
   run tmux_call_args "split-window"
   [[ "${output}" == *"-hb"* ]]
-  [[ "${output}" == *"40"* ]]
+  printf '%s\n' "${output}" | assert_arg_after "-l" "40"
 }
 
 @test "the boundary case counts as landscape" {
@@ -46,8 +48,11 @@ setup() {
   export TMUX_STUB_PANEL_SIZE="60"
   run "${PANEL}"
   run tmux_call_args "split-window"
-  [[ "${output}" == *"60"* ]]
-  [[ "${output}" != *$'\x1f'"40"* ]]
+  printf '%s\n' "${output}" | assert_arg_after "-l" "60"
+  # And the default it overrode is nowhere in argv. An exact-line match:
+  # tmux_call_args has already split argv onto one line per argument, so the
+  # separator-anchored substring check this replaces could never match.
+  ! printf '%s\n' "${output}" | grep -Fxq -- "40"
 }
 
 @test "the panel runs vigil in panel mode" {
@@ -66,13 +71,23 @@ setup() {
   # Assert on the specific set-option call rather than the flattened log: the
   # marker and the pane id must land on the same invocation, not merely both
   # appear somewhere in the run.
+  #
+  # Exact-line matches, not substrings, and -p above all. Without -p tmux sets
+  # a *session* option; #{@vigil_panel} then inherits pane to window to
+  # session, panel_pane's `$2 == "1"` matches the first pane in the window -
+  # the Claude pane - and the next `prefix p` runs kill-pane on that instead
+  # of on the panel.
   run tmux_call_args_matching "set-option" "@vigil_panel"
-  [[ "${output}" == *"%7"* ]]
-  [[ "${output}" == *"@vigil_panel"* ]]
+  printf '%s\n' "${output}" | grep -Fxq -- "-p"
+  printf '%s\n' "${output}" | grep -Fxq -- "%7"
+  printf '%s\n' "${output}" | grep -Fxq -- "@vigil_panel"
+  [ "$(printf '%s\n' "${output}" | tail -n1)" = "1" ]
 
   run tmux_call_args_matching "set-option" "remain-on-exit"
-  [[ "${output}" == *"%7"* ]]
-  [[ "${output}" == *"remain-on-exit"* ]]
+  printf '%s\n' "${output}" | grep -Fxq -- "-p"
+  printf '%s\n' "${output}" | grep -Fxq -- "%7"
+  printf '%s\n' "${output}" | grep -Fxq -- "remain-on-exit"
+  [ "$(printf '%s\n' "${output}" | tail -n1)" = "off" ]
 }
 
 @test "the split leaves focus where it was" {
