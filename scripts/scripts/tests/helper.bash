@@ -65,3 +65,23 @@ tmux_call_args_matching() {
   local pattern="${2}"
   grep -m1 "^${subcommand}${TMUX_STUB_SEP}.*${pattern}" "${TMUX_STUB_LOG}" | tr '\037' '\n'
 }
+
+# Print the 1-based log line number of the first invocation matching both the
+# subcommand and the pattern. Every other helper throws position away, and
+# ordering between two calls of the same subcommand cannot be asserted
+# without it.
+tmux_call_index() {
+  local subcommand="${1}"
+  local pattern="${2}"
+  grep -n -m1 -e "^${subcommand}${TMUX_STUB_SEP}.*${pattern}" "${TMUX_STUB_LOG}" \
+    | cut -d: -f1
+}
+
+# Assert that no invocation of the subcommand also matched the pattern.
+# refute_tmux_subcommand is too coarse when a subcommand is used for several
+# different queries in one run.
+refute_tmux_subcommand_matching() {
+  local subcommand="${1}"
+  local pattern="${2}"
+  ! grep -q -e "^${subcommand}${TMUX_STUB_SEP}.*${pattern}" "${TMUX_STUB_LOG}"
+}

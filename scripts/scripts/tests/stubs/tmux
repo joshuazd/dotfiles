@@ -6,7 +6,26 @@ set -o nounset
 # Canned responses for the queries lib/tmux.sh and vigil-panel make.
 case "${1:-}" in
   display-message)
-    printf '%s\n' "${TMUX_STUB_DISPLAY:-/tmp/stub-worktree}"
+    # Keyed on the requested format. One canned answer for every
+    # display-message would feed client dimensions into a pane-width query,
+    # so a mutant asking the wrong question would still get the right answer.
+    #
+    # The client branch uses ${VAR-default}, not ${VAR:-default}: an
+    # explicitly empty value is the no-client case and must survive.
+    case "${*}" in
+      *client_height*|*client_width*)
+        printf '%s\n' "${TMUX_STUB_DISPLAY-40 200}"
+        ;;
+      *pane_width*)
+        printf '%s\n' "${TMUX_STUB_PANE_WIDTH:-200}"
+        ;;
+      *window_id*)
+        printf '%s\n' "${TMUX_STUB_WINDOW_ID:-@3}"
+        ;;
+      *)
+        printf '%s\n' "${TMUX_STUB_DISPLAY:-/tmp/stub-worktree}"
+        ;;
+    esac
     ;;
   has-session)
     exit "${TMUX_STUB_HAS_SESSION:-1}"
@@ -27,6 +46,14 @@ case "${1:-}" in
     done
     ;;
   split-window)
+    if [ -n "${TMUX_STUB_SPLIT_FAILS:-}" ]; then
+      # Log it before bailing: a test asserting nothing followed the failure
+      # still needs to see that the split was attempted.
+      if [ -n "${TMUX_STUB_LOG:-}" ]; then
+        printf 'split-window\n' >> "${TMUX_STUB_LOG}"
+      fi
+      exit 1
+    fi
     # Only -P asks for the new pane id back.
     for arg in "${@}"; do
       if [ "${arg}" = "-P" ]; then

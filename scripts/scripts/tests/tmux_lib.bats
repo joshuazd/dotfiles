@@ -264,3 +264,303 @@ _fake_session_script() {
   [[ "${output}" == *"=SC-1 demo:claude"* ]]
   [[ "${output}" == *"pane_current_path"* ]]
 }
+
+@test "the stub answers pane_width separately from the client size" {
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_PANE_WIDTH="160"
+  run tmux display-message -p '#{pane_width}'
+  [ "${output}" = "160" ]
+  run tmux display-message -p '#{client_height} #{client_width}'
+  [ "${output}" = "40 200" ]
+}
+
+@test "an explicitly empty client size stays empty" {
+  # The no-client case. A :- default would silently substitute dimensions and
+  # the fallback branch could never be reached from a test.
+  export TMUX_STUB_DISPLAY=""
+  run tmux display-message -p '#{client_height} #{client_width}'
+  [ "${output}" = "" ]
+}
+
+@test "tmux_call_index reports call order" {
+  tmux split-window -t first
+  tmux respawn-pane -t second
+  first_index="$(tmux_call_index "split-window" "first")"
+  second_index="$(tmux_call_index "respawn-pane" "second")"
+  [ "${first_index}" -lt "${second_index}" ]
+}
+
+@test "tmux_call_index is empty for a call that never happened" {
+  run tmux_call_index "kill-pane" "anything"
+  [ "${output}" = "" ]
+}
+
+@test "panel_geometry falls back to a left column with no client" {
+  # A session created detached has no client to measure. The arithmetic in
+  # the auto branch is an error on an empty string under errexit, so this is
+  # a crash, not a wrong answer.
+  export TMUX_STUB_DISPLAY=""
+  run panel_geometry
+  [ "${status}" -eq 0 ]
+  [ "${output}" = "-hb 40" ]
+}
+
+@test "panel_geometry measures a portrait client" {
+  export TMUX_STUB_DISPLAY="40 60"
+  run panel_geometry
+  [ "${output}" = "-vb 10" ]
+}
+
+@test "panel_geometry measures a landscape client" {
+  export TMUX_STUB_DISPLAY="40 200"
+  run panel_geometry
+  [ "${output}" = "-hb 40" ]
+}
+
+@test "add_vigil_panel splits the window it is given" {
+  export TMUX_STUB_DISPLAY="40 200"
+  run add_vigil_panel "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "split-window"
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
+  printf '%s\n' "${output}" | assert_arg_after "-l" "40"
+  [[ "${output}" == *"vigil --panel"* ]]
+}
+
+@test "add_vigil_panel marks the pane it created" {
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_SPLIT_PANE="%7"
+  add_vigil_panel "=SC-1 demo:claude"
+
+  run tmux_call_args_matching "set-option" "@vigil_panel"
+  printf '%s\n' "${output}" | grep -Fxq -- "-p"
+  printf '%s\n' "${output}" | grep -Fxq -- "%7"
+  [ "$(printf '%s\n' "${output}" | tail -n1)" = "1" ]
+
+  run tmux_call_args_matching "set-option" "remain-on-exit"
+  printf '%s\n' "${output}" | grep -Fxq -- "-p"
+  printf '%s\n' "${output}" | grep -Fxq -- "%7"
+  [ "$(printf '%s\n' "${output}" | tail -n1)" = "off" ]
+}
+
+@test "add_vigil_panel reports a failed split instead of marking nothing" {
+  # errexit is disabled for the whole function when it is called on the left
+  # of ||, which every caller does. Without an explicit check the failure
+  # falls through and set-option runs against an empty target.
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_SPLIT_FAILS=1
+  run add_vigil_panel "=SC-1 demo:claude"
+  [ "${status}" -ne 0 ]
+  run refute_tmux_subcommand "set-option"
+  [ "${status}" -eq 0 ]
+}
+
+@test "setup_secondary_pane measures the pane it is about to split" {
+  # window_width does not shrink when a 40-column panel appears, but the pane
+  # being split does. Measuring the window picks -h for a pane that is really
+  # 160 wide.
+  export TMUX_STUB_PANE_WIDTH="160"
+  setup_secondary_pane "SC-1 demo" "nit"
+  run tmux_call_args_matching "display-message" "pane_width"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"pane_width"* ]]
+  run refute_tmux_subcommand_matching "display-message" "window_width"
+  [ "${status}" -eq 0 ]
+}
+
+@test "a narrow claude pane splits vertically" {
+  # TMUX_STUB_DISPLAY is set wide on purpose: if setup_secondary_pane ever
+  # regresses back to querying window_width, the stub answers from this var
+  # and the split comes out -h, so this test actually catches that mistake
+  # instead of passing by accident.
+  export TMUX_STUB_PANE_WIDTH="160"
+  export TMUX_STUB_DISPLAY="300"
+  setup_secondary_pane "SC-1 demo" "nit"
+  run tmux_call_args "split-window"
+  [[ "${output}" == *"-v"* ]]
+}
+
+@test "a wide claude pane still splits horizontally" {
+  export TMUX_STUB_PANE_WIDTH="200"
+  setup_secondary_pane "SC-1 demo" "nit"
+  run tmux_call_args "split-window"
+  [[ "${output}" == *"-h"* ]]
+}
+
+@test "a new session gets a panel in its claude window" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args_matching "split-window" "vigil --panel"
+  [ "${status}" -eq 0 ]
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
+}
+
+@test "panel_auto false leaves the session unpanelled" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  export VIGIL_STUB_PANEL_AUTO="false"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run refute_tmux_subcommand_matching "split-window" "vigil --panel"
+  [ "${status}" -eq 0 ]
+}
+
+@test "a missing vigil leaves the session unpanelled and working" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  # A prefix strip of the stub dir is not enough: everything else on the
+  # inherited PATH survives, including ~/.local/bin, which on a dev machine
+  # holds a real installed vigil. Replace PATH wholesale instead, so vigil is
+  # genuinely absent rather than merely not the stub.
+  mkdir -p "${BATS_TEST_TMPDIR}/tmuxonly"
+  ln -sf "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/tmuxonly/tmux"
+  export PATH="${BATS_TEST_TMPDIR}/tmuxonly:/usr/bin:/bin"
+  run command -v vigil
+  [ "${status}" -ne 0 ]
+
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  [ "${status}" -eq 0 ]
+  run refute_tmux_subcommand_matching "split-window" "vigil --panel"
+  [ "${status}" -eq 0 ]
+  run assert_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+}
+
+@test "a failed panel does not abort session creation" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_SPLIT_FAILS=1
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  [ "${status}" -eq 0 ]
+  run assert_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+}
+
+@test "the panel is created before the nit split" {
+  # Order is the point: setup_secondary_pane measures the claude pane, so the
+  # panel's 40 columns must already be gone when it looks. Panel second would
+  # leave it reading full width, which is the bug the pane_width change
+  # exists to remove.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "nit" "claude --model opus"
+  panel_at="$(tmux_call_index "split-window" "vigil --panel")"
+  # "nit" itself never appears in the split-window argv - setup_secondary_pane
+  # sends the pane_command via a later send-keys, not as a split-window
+  # argument. pane_current_path is the -c flag unique to that split, so it is
+  # what actually identifies the nit split's position in the log.
+  nit_at="$(tmux_call_index "split-window" "pane_current_path")"
+  claude_at="$(tmux_call_index "respawn-pane" "claude --model opus")"
+  [ -n "${panel_at}" ]
+  [ -n "${nit_at}" ]
+  [ "${panel_at}" -lt "${nit_at}" ]
+  [ "${nit_at}" -lt "${claude_at}" ]
+}
+
+@test "a new session is created at the calling client's size" {
+  # tmux sizes a detached session's window to default-size, 80x24. The panel
+  # is split at an absolute 40 columns, so in an 80-column window it takes
+  # half, and tmux redistributes proportionally on attach: measured at 175
+  # columns on a real 350-column client before this fix.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="90 350"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args "new-session"
+  [ "${status}" -eq 0 ]
+  # Adjacency, not mere presence: tmux reads the value from the argument
+  # after the flag, and 350 appears elsewhere in argv the moment anything
+  # else carries it.
+  printf '%s\n' "${output}" | assert_arg_after "-x" "350"
+  printf '%s\n' "${output}" | assert_arg_after "-y" "90"
+}
+
+@test "a new session with no client omits the size flags" {
+  # A cron or Chrome dispatch from outside tmux has no client to measure.
+  # Passing -x/-y with empty values would be a tmux usage error and would
+  # cost the user a working session, so the flags have to be absent.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY=""
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args "new-session"
+  [ "${status}" -eq 0 ]
+  # Counted rather than negated. A bare `! ... | grep` here would be a
+  # middle statement, which bash exempts from errexit and whose status bats
+  # then discards, so it could never fail the test.
+  [ "$(printf '%s\n' "${output}" | grep -cFx -e "-x" -e "-y")" -eq 0 ]
+}
+
+@test "the session size and the panel size come from one query" {
+  # panel_geometry sizes the panel against the client and create_tmux_session
+  # sizes the window against the client. Two separate queries could disagree
+  # about what "no client" means, so both go through client_dimensions.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="90 350"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args "new-session"
+  printf '%s\n' "${output}" | assert_arg_after "-x" "350"
+  # 350 wide and 90 tall is landscape, so the panel is a 40-column strip
+  # inside a window that is now genuinely 350 wide.
+  run tmux_call_args_matching "split-window" "vigil --panel"
+  printf '%s\n' "${output}" | assert_arg_after "-l" "40"
+}
+
+@test "a present but broken vigil warns instead of failing silently" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  export VIGIL_STUB_FAILS=1
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"vigil config get panel_auto failed"* ]]
+  run refute_tmux_subcommand_matching "split-window" "vigil --panel"
+  [ "${status}" -eq 0 ]
+  run assert_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+}
+
+@test "an absent vigil says nothing" {
+  # The other half of the pair above: absent is not an error condition, so it
+  # must not produce a warning. Without the command -v guard both cases look
+  # the same to the user.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  mkdir -p "${BATS_TEST_TMPDIR}/tmuxonly"
+  ln -sf "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/tmuxonly/tmux"
+  export PATH="${BATS_TEST_TMPDIR}/tmuxonly:/usr/bin:/bin"
+  run command -v vigil
+  [ "${status}" -ne 0 ]
+
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"vigil config get panel_auto failed"* ]]
+}
+
+@test "the panel gate honours VIGIL_BIN" {
+  # add_vigil_panel launches ${VIGIL_BIN:-vigil}. A gate that asks bare vigil
+  # decides with a different binary than it runs, and with no vigil on PATH
+  # the override is silently inert on the create path while prefix p still
+  # honours it.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  mkdir -p "${BATS_TEST_TMPDIR}/tmuxonly"
+  ln -sf "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/tmuxonly/tmux"
+  export PATH="${BATS_TEST_TMPDIR}/tmuxonly:/usr/bin:/bin"
+  run command -v vigil
+  [ "${status}" -ne 0 ]
+
+  export VIGIL_BIN="${BATS_TEST_DIRNAME}/stubs/vigil"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args "split-window"
+  # An exact-line match on the output, not the helper's exit status:
+  # tmux_call_args ends in a pipe to tr, so its status is tr's and is 0 even
+  # when the grep found nothing. Asserting on that status is vacuous.
+  printf '%s\n' "${output}" | grep -Fxq -- "${VIGIL_BIN} --panel"
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
+}
+
+@test "an existing session is not panelled again" {
+  export TMUX_STUB_HAS_SESSION=0
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  [ "${status}" -eq 3 ]
+  run refute_tmux_subcommand "split-window"
+  [ "${status}" -eq 0 ]
+}

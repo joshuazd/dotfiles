@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Test stub for the vigil binary. Only the config reads create_tmux_session
+# makes are answered; anything else is an error, so a new call site cannot
+# silently succeed against a canned value.
+set -o nounset
+
+# A vigil that is on PATH but broken - mid-upgrade, or built against a
+# different config schema. Distinct from an absent vigil, which the caller
+# must handle silently.
+if [ -n "${VIGIL_STUB_FAILS:-}" ]; then
+  printf 'vigil: something is wrong\n' >&2
+  exit 1
+fi
+
+if [ "${1:-}" = "config" ] && [ "${2:-}" = "get" ]; then
+  case "${3:-}" in
+    panel_auto)
+      printf '%s\n' "${VIGIL_STUB_PANEL_AUTO-true}"
+      exit 0
+      ;;
+  esac
+fi
+exit 1
