@@ -408,11 +408,14 @@ _fake_session_script() {
 @test "a missing vigil leaves the session unpanelled and working" {
   export TMUX_STUB_HAS_SESSION=1
   export TMUX_STUB_DISPLAY="40 200"
-  # Drop the stub directory from PATH so vigil is genuinely absent.
-  export PATH="${PATH#"${BATS_TEST_DIRNAME}/stubs:"}"
-  export PATH="${BATS_TEST_TMPDIR}/tmuxonly:${PATH}"
+  # A prefix strip of the stub dir is not enough: everything else on the
+  # inherited PATH survives, including ~/.local/bin, which on a dev machine
+  # holds a real installed vigil. Replace PATH wholesale instead, so vigil is
+  # genuinely absent rather than merely not the stub.
   mkdir -p "${BATS_TEST_TMPDIR}/tmuxonly"
   ln -sf "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/tmuxonly/tmux"
+  export PATH="${BATS_TEST_TMPDIR}/tmuxonly:/usr/bin:/bin"
+  ! command -v vigil
 
   run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
   [ "${status}" -eq 0 ]
