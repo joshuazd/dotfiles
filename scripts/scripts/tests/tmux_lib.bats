@@ -549,8 +549,12 @@ _fake_session_script() {
 
   export VIGIL_BIN="${BATS_TEST_DIRNAME}/stubs/vigil"
   create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
-  run tmux_call_args_matching "split-window" "${VIGIL_BIN} --panel"
-  [ "${status}" -eq 0 ]
+  run tmux_call_args "split-window"
+  # An exact-line match on the output, not the helper's exit status:
+  # tmux_call_args ends in a pipe to tr, so its status is tr's and is 0 even
+  # when the grep found nothing. Asserting on that status is vacuous.
+  printf '%s\n' "${output}" | grep -Fxq -- "${VIGIL_BIN} --panel"
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
 }
 
 @test "an existing session is not panelled again" {
