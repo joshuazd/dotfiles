@@ -457,6 +457,102 @@ _fake_session_script() {
   [ "${nit_at}" -lt "${claude_at}" ]
 }
 
+@test "a new session is created at the calling client's size" {
+  # tmux sizes a detached session's window to default-size, 80x24. The panel
+  # is split at an absolute 40 columns, so in an 80-column window it takes
+  # half, and tmux redistributes proportionally on attach: measured at 175
+  # columns on a real 350-column client before this fix.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="90 350"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args "new-session"
+  [ "${status}" -eq 0 ]
+  # Adjacency, not mere presence: tmux reads the value from the argument
+  # after the flag, and 350 appears elsewhere in argv the moment anything
+  # else carries it.
+  printf '%s\n' "${output}" | assert_arg_after "-x" "350"
+  printf '%s\n' "${output}" | assert_arg_after "-y" "90"
+}
+
+@test "a new session with no client omits the size flags" {
+  # A cron or Chrome dispatch from outside tmux has no client to measure.
+  # Passing -x/-y with empty values would be a tmux usage error and would
+  # cost the user a working session, so the flags have to be absent.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY=""
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args "new-session"
+  [ "${status}" -eq 0 ]
+  # Counted rather than negated. A bare `! ... | grep` here would be a
+  # middle statement, which bash exempts from errexit and whose status bats
+  # then discards, so it could never fail the test.
+  [ "$(printf '%s\n' "${output}" | grep -cFx -e "-x" -e "-y")" -eq 0 ]
+}
+
+@test "the session size and the panel size come from one query" {
+  # panel_geometry sizes the panel against the client and create_tmux_session
+  # sizes the window against the client. Two separate queries could disagree
+  # about what "no client" means, so both go through client_dimensions.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="90 350"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args "new-session"
+  printf '%s\n' "${output}" | assert_arg_after "-x" "350"
+  # 350 wide and 90 tall is landscape, so the panel is a 40-column strip
+  # inside a window that is now genuinely 350 wide.
+  run tmux_call_args_matching "split-window" "vigil --panel"
+  printf '%s\n' "${output}" | assert_arg_after "-l" "40"
+}
+
+@test "a present but broken vigil warns instead of failing silently" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  export VIGIL_STUB_FAILS=1
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"vigil config get panel_auto failed"* ]]
+  run refute_tmux_subcommand_matching "split-window" "vigil --panel"
+  [ "${status}" -eq 0 ]
+  run assert_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+}
+
+@test "an absent vigil says nothing" {
+  # The other half of the pair above: absent is not an error condition, so it
+  # must not produce a warning. Without the command -v guard both cases look
+  # the same to the user.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  mkdir -p "${BATS_TEST_TMPDIR}/tmuxonly"
+  ln -sf "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/tmuxonly/tmux"
+  export PATH="${BATS_TEST_TMPDIR}/tmuxonly:/usr/bin:/bin"
+  run command -v vigil
+  [ "${status}" -ne 0 ]
+
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"vigil config get panel_auto failed"* ]]
+}
+
+@test "the panel gate honours VIGIL_BIN" {
+  # add_vigil_panel launches ${VIGIL_BIN:-vigil}. A gate that asks bare vigil
+  # decides with a different binary than it runs, and with no vigil on PATH
+  # the override is silently inert on the create path while prefix p still
+  # honours it.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  mkdir -p "${BATS_TEST_TMPDIR}/tmuxonly"
+  ln -sf "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/tmuxonly/tmux"
+  export PATH="${BATS_TEST_TMPDIR}/tmuxonly:/usr/bin:/bin"
+  run command -v vigil
+  [ "${status}" -ne 0 ]
+
+  export VIGIL_BIN="${BATS_TEST_DIRNAME}/stubs/vigil"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args_matching "split-window" "${VIGIL_BIN} --panel"
+  [ "${status}" -eq 0 ]
+}
+
 @test "an existing session is not panelled again" {
   export TMUX_STUB_HAS_SESSION=0
   run create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""

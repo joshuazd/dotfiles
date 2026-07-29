@@ -93,6 +93,24 @@ claude_pane_target() {
 readonly VIGIL_PANEL_FLAG='@vigil_panel'
 
 #######################################
+# Print the calling client's "<height> <width>", or "<space>" when no client
+# is attached — tmux answers both formats with an empty string outside a
+# client, which is the headless dispatch case.
+#
+# Factored out because two callers depend on it agreeing with itself:
+# panel_geometry sizes the panel against the client, and create_tmux_session
+# sizes the window it will be split into against the same client. Two copies
+# of the query could disagree about what "no client" looks like, and a panel
+# sized for one window and split into another is exactly the bug this
+# guards.
+# Outputs:
+#   e.g. "90 350", or " " with no client
+#######################################
+client_dimensions() {
+  tmux display-message -p '#{client_height} #{client_width}'
+}
+
+#######################################
 # Print the split flag and size for the current client.
 # Portrait (a vertical monitor) gets a wide strip across the top; anything
 # else gets a narrow column on the left.
@@ -108,7 +126,7 @@ panel_geometry() {
   local orientation size height width
   orientation="$(tmux show-options -gqv "@vigil_panel_orientation")"
   size="$(tmux show-options -gqv "@vigil_panel_size")"
-  read -r height width <<< "$(tmux display-message -p '#{client_height} #{client_width}')"
+  read -r height width <<< "$(client_dimensions)"
 
   if [ -z "${orientation}" ] || [ "${orientation}" = "auto" ]; then
     if [ -z "${height:-}" ] || [ -z "${width:-}" ]; then
@@ -235,17 +253,49 @@ create_tmux_session() {
 
   info "Creating tmux session '${session_name}' in ${session_dir}"
 
-  # All paths create detached first so we can set up panes before attaching
-  tmux new-session -d -s "${session_name}" -n "claude" -c "${session_dir}"
+  # All paths create detached first so we can set up panes before attaching.
+  # A detached session has no client, so tmux sizes its windows to
+  # default-size (80x24) and then redistributes panes proportionally when a
+  # client finally lands on it. Panels are split at an absolute column count,
+  # so a 40-column panel in an 80-column window is half of it, and arrives at
+  # ~175 columns on a 350-column client. Creating the window at the calling
+  # client's size makes the split land where panel_geometry meant it to.
+  #
+  # The flags are omitted entirely when there is no client to measure — a
+  # cron or Chrome dispatch from outside tmux — which leaves session creation
+  # exactly as it was.
+  local -a size_flags=()
+  local client_height client_width
+  read -r client_height client_width <<< "$(client_dimensions)"
+  if [ -n "${client_height}" ] && [ -n "${client_width}" ]; then
+    size_flags=(-x "${client_width}" -y "${client_height}")
+  fi
+  tmux new-session -d -s "${session_name}" -n "claude" -c "${session_dir}" \
+    ${size_flags[@]+"${size_flags[@]}"}
   # Mark the pane so later targeting does not depend on its index, which
   # shifts when a panel is inserted before it.
   tmux set-option -p -t "=${session_name}:claude" @vigil_claude 1
   tmux new-window -t "=${session_name}:2" -n "server" -c "${session_dir}"
-  if [ "$(vigil config get panel_auto 2> /dev/null)" = "true" ]; then
-    # Before setup_secondary_pane, so that split measures a pane the panel
-    # has already narrowed. Fail-soft: a panel that cannot be created must
-    # never take the session with it.
-    add_vigil_panel "=${session_name}:claude" || warn "vigil panel failed"
+  # ${VIGIL_BIN:-vigil}, matching add_vigil_panel: a dev build pointed at by
+  # VIGIL_BIN must gate the same binary it launches.
+  #
+  # command -v first, so an absent vigil is silent (no panel, nothing to say)
+  # while a present one that errors is warned about. Folding the two together
+  # under 2>/dev/null left a user mid-upgrade with no panel and no
+  # explanation, which is indistinguishable from panel_auto = false.
+  local vigil_bin panel_auto
+  vigil_bin="${VIGIL_BIN:-vigil}"
+  if command -v "${vigil_bin}" > /dev/null 2>&1; then
+    if ! panel_auto="$("${vigil_bin}" config get panel_auto)"; then
+      warn "vigil config get panel_auto failed"
+      panel_auto=""
+    fi
+    if [ "${panel_auto}" = "true" ]; then
+      # Before setup_secondary_pane, so that split measures a pane the panel
+      # has already narrowed. Fail-soft: a panel that cannot be created must
+      # never take the session with it.
+      add_vigil_panel "=${session_name}:claude" || warn "vigil panel failed"
+    fi
   fi
   if [ -n "${pane_command}" ]; then
     setup_secondary_pane "${session_name}" "${pane_command}"
