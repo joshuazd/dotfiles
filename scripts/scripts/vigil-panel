@@ -5,17 +5,16 @@
 # tmux decides where the panel goes; vigil renders to fit whatever pane it
 # lands in. Bound to prefix p / prefix C-p.
 #
-# Geometry is configured with tmux user options rather than vigil's config,
-# because placement is tmux's concern and this script is the only reader:
-#   @vigil_panel_orientation  auto (default) | top | left
-#   @vigil_panel_size         rows for top (default 10), columns for left (40)
+# The split itself lives in lib/tmux.sh as add_vigil_panel, because
+# create_tmux_session panels new sessions with the same code.
 
 set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly PANEL_FLAG='@vigil_panel'
-readonly VIGIL="${VIGIL_BIN:-vigil}"
+_script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${_script_dir}/lib/tmux.sh"
+unset _script_dir
 
 #######################################
 # Print the pane id of this window's panel, if it has one.
@@ -24,35 +23,8 @@ readonly VIGIL="${VIGIL_BIN:-vigil}"
 # window shifts when a panel opens.
 #######################################
 panel_pane() {
-  tmux list-panes -F "#{pane_id} #{${PANEL_FLAG}}" \
+  tmux list-panes -F "#{pane_id} #{${VIGIL_PANEL_FLAG}}" \
     | awk '$2 == "1" { print $1; exit }'
-}
-
-#######################################
-# Print the split flag and size for the current client.
-# Portrait (a vertical monitor) gets a wide strip across the top; anything
-# else gets a narrow column on the left.
-# Outputs:
-#   e.g. "-hb 40"
-#######################################
-panel_geometry() {
-  local orientation size height width
-  orientation="$(tmux show-options -gqv "@vigil_panel_orientation")"
-  size="$(tmux show-options -gqv "@vigil_panel_size")"
-  read -r height width <<< "$(tmux display-message -p '#{client_height} #{client_width}')"
-
-  if [ -z "${orientation}" ] || [ "${orientation}" = "auto" ]; then
-    if [ "$((height * 2))" -gt "${width}" ]; then
-      orientation="top"
-    else
-      orientation="left"
-    fi
-  fi
-
-  case "${orientation}" in
-    top) printf '%s %s\n' '-vb' "${size:-10}" ;;
-    *)   printf '%s %s\n' '-hb' "${size:-40}" ;;
-  esac
 }
 
 main() {
@@ -62,14 +34,7 @@ main() {
     tmux kill-pane -t "${existing}"
     return 0
   fi
-
-  local split size pane
-  read -r split size <<< "$(panel_geometry)"
-  # -d keeps focus in the pane the binding was pressed in.
-  pane="$(tmux split-window "${split}" -l "${size}" -d -P -F '#{pane_id}' "${VIGIL} --panel")"
-  tmux set-option -p -t "${pane}" "${PANEL_FLAG}" 1
-  # So a dead panel closes its pane instead of leaving a corpse in the layout.
-  tmux set-option -p -t "${pane}" remain-on-exit off
+  add_vigil_panel "$(tmux display-message -p '#{window_id}')"
 }
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then

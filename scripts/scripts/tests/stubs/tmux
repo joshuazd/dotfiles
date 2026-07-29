@@ -19,6 +19,9 @@ case "${1:-}" in
       *pane_width*)
         printf '%s\n' "${TMUX_STUB_PANE_WIDTH:-200}"
         ;;
+      *window_id*)
+        printf '%s\n' "${TMUX_STUB_WINDOW_ID:-@3}"
+        ;;
       *)
         printf '%s\n' "${TMUX_STUB_DISPLAY:-/tmp/stub-worktree}"
         ;;
@@ -43,6 +46,14 @@ case "${1:-}" in
     done
     ;;
   split-window)
+    if [ -n "${TMUX_STUB_SPLIT_FAILS:-}" ]; then
+      # Log it before bailing: a test asserting nothing followed the failure
+      # still needs to see that the split was attempted.
+      if [ -n "${TMUX_STUB_LOG:-}" ]; then
+        printf 'split-window\n' >> "${TMUX_STUB_LOG}"
+      fi
+      exit 1
+    fi
     # Only -P asks for the new pane id back.
     for arg in "${@}"; do
       if [ "${arg}" = "-P" ]; then

@@ -90,6 +90,69 @@ claude_pane_target() {
   printf '%s' "=${session_name}:claude.1"
 }
 
+readonly VIGIL_PANEL_FLAG='@vigil_panel'
+
+#######################################
+# Print the split flag and size for the current client.
+# Portrait (a vertical monitor) gets a wide strip across the top; anything
+# else gets a narrow column on the left.
+#
+# Geometry is configured with tmux user options rather than vigil's config,
+# because placement is tmux's concern and these functions are its only reader:
+#   @vigil_panel_orientation  auto (default) | top | left
+#   @vigil_panel_size         rows for top (default 10), columns for left (40)
+# Outputs:
+#   e.g. "-hb 40"
+#######################################
+panel_geometry() {
+  local orientation size height width
+  orientation="$(tmux show-options -gqv "@vigil_panel_orientation")"
+  size="$(tmux show-options -gqv "@vigil_panel_size")"
+  read -r height width <<< "$(tmux display-message -p '#{client_height} #{client_width}')"
+
+  if [ -z "${orientation}" ] || [ "${orientation}" = "auto" ]; then
+    if [ -z "${height:-}" ] || [ -z "${width:-}" ]; then
+      # No client attached, which is every session created detached. The
+      # arithmetic below is a fatal error on an empty string, not a wrong
+      # answer, so this branch has to come first.
+      orientation="left"
+    elif [ "$((height * 2))" -gt "${width}" ]; then
+      orientation="top"
+    else
+      orientation="left"
+    fi
+  fi
+
+  case "${orientation}" in
+    top) printf '%s %s\n' '-vb' "${size:-10}" ;;
+    *)   printf '%s %s\n' '-hb' "${size:-40}" ;;
+  esac
+}
+
+#######################################
+# Split a vigil panel into the given window and mark the new pane.
+# Arguments:
+#   window_target — e.g. "=SC-1 demo:claude"
+# Returns:
+#   0 on success, 1 if the split failed
+#######################################
+add_vigil_panel() {
+  local window_target="${1}"
+  local split size pane
+  read -r split size <<< "$(panel_geometry)"
+
+  # Checked explicitly rather than left to errexit: callers invoke this on the
+  # left of ||, which disables errexit for the whole function, and a fallen
+  # through failure would run set-option against an empty pane id.
+  pane="$(tmux split-window -t "${window_target}" "${split}" -l "${size}" \
+    -d -P -F '#{pane_id}' "${VIGIL_BIN:-vigil} --panel")" || return 1
+  [ -n "${pane}" ] || return 1
+
+  tmux set-option -p -t "${pane}" "${VIGIL_PANEL_FLAG}" 1
+  # So a dead panel closes its pane instead of leaving a corpse in the layout.
+  tmux set-option -p -t "${pane}" remain-on-exit off
+}
+
 #######################################
 # Replace the claude pane's process with the given command.
 # Uses respawn-pane rather than send-keys so there is no shell-readiness race

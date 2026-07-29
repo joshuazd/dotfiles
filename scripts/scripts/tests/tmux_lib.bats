@@ -294,3 +294,63 @@ _fake_session_script() {
   run tmux_call_index "kill-pane" "anything"
   [ "${output}" = "" ]
 }
+
+@test "panel_geometry falls back to a left column with no client" {
+  # A session created detached has no client to measure. The arithmetic in
+  # the auto branch is an error on an empty string under errexit, so this is
+  # a crash, not a wrong answer.
+  export TMUX_STUB_DISPLAY=""
+  run panel_geometry
+  [ "${status}" -eq 0 ]
+  [ "${output}" = "-hb 40" ]
+}
+
+@test "panel_geometry measures a portrait client" {
+  export TMUX_STUB_DISPLAY="40 60"
+  run panel_geometry
+  [ "${output}" = "-vb 10" ]
+}
+
+@test "panel_geometry measures a landscape client" {
+  export TMUX_STUB_DISPLAY="40 200"
+  run panel_geometry
+  [ "${output}" = "-hb 40" ]
+}
+
+@test "add_vigil_panel splits the window it is given" {
+  export TMUX_STUB_DISPLAY="40 200"
+  run add_vigil_panel "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "split-window"
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
+  printf '%s\n' "${output}" | assert_arg_after "-l" "40"
+  [[ "${output}" == *"vigil --panel"* ]]
+}
+
+@test "add_vigil_panel marks the pane it created" {
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_SPLIT_PANE="%7"
+  add_vigil_panel "=SC-1 demo:claude"
+
+  run tmux_call_args_matching "set-option" "@vigil_panel"
+  printf '%s\n' "${output}" | grep -Fxq -- "-p"
+  printf '%s\n' "${output}" | grep -Fxq -- "%7"
+  [ "$(printf '%s\n' "${output}" | tail -n1)" = "1" ]
+
+  run tmux_call_args_matching "set-option" "remain-on-exit"
+  printf '%s\n' "${output}" | grep -Fxq -- "-p"
+  printf '%s\n' "${output}" | grep -Fxq -- "%7"
+  [ "$(printf '%s\n' "${output}" | tail -n1)" = "off" ]
+}
+
+@test "add_vigil_panel reports a failed split instead of marking nothing" {
+  # errexit is disabled for the whole function when it is called on the left
+  # of ||, which every caller does. Without an explicit check the failure
+  # falls through and set-option runs against an empty target.
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_SPLIT_FAILS=1
+  run add_vigil_panel "=SC-1 demo:claude"
+  [ "${status}" -ne 0 ]
+  run refute_tmux_subcommand "set-option"
+  [ "${status}" -eq 0 ]
+}
