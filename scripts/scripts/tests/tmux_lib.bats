@@ -354,3 +354,35 @@ _fake_session_script() {
   run refute_tmux_subcommand "set-option"
   [ "${status}" -eq 0 ]
 }
+
+@test "setup_secondary_pane measures the pane it is about to split" {
+  # window_width does not shrink when a 40-column panel appears, but the pane
+  # being split does. Measuring the window picks -h for a pane that is really
+  # 160 wide.
+  export TMUX_STUB_PANE_WIDTH="160"
+  setup_secondary_pane "SC-1 demo" "nit"
+  run tmux_call_args_matching "display-message" "pane_width"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"pane_width"* ]]
+  run refute_tmux_subcommand_matching "display-message" "window_width"
+  [ "${status}" -eq 0 ]
+}
+
+@test "a narrow claude pane splits vertically" {
+  # TMUX_STUB_DISPLAY is set wide on purpose: if setup_secondary_pane ever
+  # regresses back to querying window_width, the stub answers from this var
+  # and the split comes out -h, so this test actually catches that mistake
+  # instead of passing by accident.
+  export TMUX_STUB_PANE_WIDTH="160"
+  export TMUX_STUB_DISPLAY="300"
+  setup_secondary_pane "SC-1 demo" "nit"
+  run tmux_call_args "split-window"
+  [[ "${output}" == *"-v"* ]]
+}
+
+@test "a wide claude pane still splits horizontally" {
+  export TMUX_STUB_PANE_WIDTH="200"
+  setup_secondary_pane "SC-1 demo" "nit"
+  run tmux_call_args "split-window"
+  [[ "${output}" == *"-h"* ]]
+}

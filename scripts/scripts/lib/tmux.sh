@@ -176,7 +176,9 @@ launch_claude_in_pane() {
 
 #######################################
 # Split the claude window and run the given command in the new pane.
-# Uses vertical split when terminal is wide enough, horizontal otherwise.
+# Splits horizontally when the claude pane itself is at least 200 columns,
+# vertically otherwise. The pane, not the window: a vigil panel takes 40
+# columns off the pane without changing window_width.
 # Arguments:
 #   $1 - session name
 #   $2 - command to run in the new pane (e.g. "nit", "review")
@@ -186,7 +188,7 @@ setup_secondary_pane() {
   local pane_command="${2}"
   local claude_pane width split new_pane
   claude_pane="$(claude_pane_target "${session}")"
-  width="$(tmux display-message -t "=${session}:claude" -p '#{window_width}')"
+  width="$(tmux display-message -t "${claude_pane}" -p '#{pane_width}')"
 
   if [ "${width}" -ge 200 ]; then
     split='-h'
