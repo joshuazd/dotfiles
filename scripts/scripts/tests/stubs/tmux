@@ -6,7 +6,23 @@ set -o nounset
 # Canned responses for the queries lib/tmux.sh and vigil-panel make.
 case "${1:-}" in
   display-message)
-    printf '%s\n' "${TMUX_STUB_DISPLAY:-/tmp/stub-worktree}"
+    # Keyed on the requested format. One canned answer for every
+    # display-message would feed client dimensions into a pane-width query,
+    # so a mutant asking the wrong question would still get the right answer.
+    #
+    # The client branch uses ${VAR-default}, not ${VAR:-default}: an
+    # explicitly empty value is the no-client case and must survive.
+    case "${*}" in
+      *client_height*|*client_width*)
+        printf '%s\n' "${TMUX_STUB_DISPLAY-40 200}"
+        ;;
+      *pane_width*)
+        printf '%s\n' "${TMUX_STUB_PANE_WIDTH:-200}"
+        ;;
+      *)
+        printf '%s\n' "${TMUX_STUB_DISPLAY:-/tmp/stub-worktree}"
+        ;;
+    esac
     ;;
   has-session)
     exit "${TMUX_STUB_HAS_SESSION:-1}"

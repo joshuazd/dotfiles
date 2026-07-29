@@ -264,3 +264,33 @@ _fake_session_script() {
   [[ "${output}" == *"=SC-1 demo:claude"* ]]
   [[ "${output}" == *"pane_current_path"* ]]
 }
+
+@test "the stub answers pane_width separately from the client size" {
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_PANE_WIDTH="160"
+  run tmux display-message -p '#{pane_width}'
+  [ "${output}" = "160" ]
+  run tmux display-message -p '#{client_height} #{client_width}'
+  [ "${output}" = "40 200" ]
+}
+
+@test "an explicitly empty client size stays empty" {
+  # The no-client case. A :- default would silently substitute dimensions and
+  # the fallback branch could never be reached from a test.
+  export TMUX_STUB_DISPLAY=""
+  run tmux display-message -p '#{client_height} #{client_width}'
+  [ "${output}" = "" ]
+}
+
+@test "tmux_call_index reports call order" {
+  tmux split-window -t first
+  tmux respawn-pane -t second
+  first_index="$(tmux_call_index "split-window" "first")"
+  second_index="$(tmux_call_index "respawn-pane" "second")"
+  [ "${first_index}" -lt "${second_index}" ]
+}
+
+@test "tmux_call_index is empty for a call that never happened" {
+  run tmux_call_index "kill-pane" "anything"
+  [ "${output}" = "" ]
+}
