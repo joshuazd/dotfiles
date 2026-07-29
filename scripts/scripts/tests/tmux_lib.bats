@@ -415,7 +415,8 @@ _fake_session_script() {
   mkdir -p "${BATS_TEST_TMPDIR}/tmuxonly"
   ln -sf "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/tmuxonly/tmux"
   export PATH="${BATS_TEST_TMPDIR}/tmuxonly:/usr/bin:/bin"
-  ! command -v vigil
+  run command -v vigil
+  [ "${status}" -ne 0 ]
 
   run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
   [ "${status}" -eq 0 ]
