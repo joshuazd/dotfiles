@@ -241,6 +241,12 @@ create_tmux_session() {
   # shifts when a panel is inserted before it.
   tmux set-option -p -t "=${session_name}:claude" @vigil_claude 1
   tmux new-window -t "=${session_name}:2" -n "server" -c "${session_dir}"
+  if [ "$(vigil config get panel_auto 2> /dev/null)" = "true" ]; then
+    # Before setup_secondary_pane, so that split measures a pane the panel
+    # has already narrowed. Fail-soft: a panel that cannot be created must
+    # never take the session with it.
+    add_vigil_panel "=${session_name}:claude" || warn "vigil panel failed"
+  fi
   if [ -n "${pane_command}" ]; then
     setup_secondary_pane "${session_name}" "${pane_command}"
   fi

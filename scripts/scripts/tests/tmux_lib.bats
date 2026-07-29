@@ -386,3 +386,77 @@ _fake_session_script() {
   run tmux_call_args "split-window"
   [[ "${output}" == *"-h"* ]]
 }
+
+@test "a new session gets a panel in its claude window" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args_matching "split-window" "vigil --panel"
+  [ "${status}" -eq 0 ]
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
+}
+
+@test "panel_auto false leaves the session unpanelled" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  export VIGIL_STUB_PANEL_AUTO="false"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run refute_tmux_subcommand_matching "split-window" "vigil --panel"
+  [ "${status}" -eq 0 ]
+}
+
+@test "a missing vigil leaves the session unpanelled and working" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  # Drop the stub directory from PATH so vigil is genuinely absent.
+  export PATH="${PATH#"${BATS_TEST_DIRNAME}/stubs:"}"
+  export PATH="${BATS_TEST_TMPDIR}/tmuxonly:${PATH}"
+  mkdir -p "${BATS_TEST_TMPDIR}/tmuxonly"
+  ln -sf "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/tmuxonly/tmux"
+
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  [ "${status}" -eq 0 ]
+  run refute_tmux_subcommand_matching "split-window" "vigil --panel"
+  [ "${status}" -eq 0 ]
+  run assert_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+}
+
+@test "a failed panel does not abort session creation" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_SPLIT_FAILS=1
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  [ "${status}" -eq 0 ]
+  run assert_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+}
+
+@test "the panel is created before the nit split" {
+  # Order is the point: setup_secondary_pane measures the claude pane, so the
+  # panel's 40 columns must already be gone when it looks. Panel second would
+  # leave it reading full width, which is the bug the pane_width change
+  # exists to remove.
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_DISPLAY="40 200"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "nit" "claude --model opus"
+  panel_at="$(tmux_call_index "split-window" "vigil --panel")"
+  # "nit" itself never appears in the split-window argv - setup_secondary_pane
+  # sends the pane_command via a later send-keys, not as a split-window
+  # argument. pane_current_path is the -c flag unique to that split, so it is
+  # what actually identifies the nit split's position in the log.
+  nit_at="$(tmux_call_index "split-window" "pane_current_path")"
+  claude_at="$(tmux_call_index "respawn-pane" "claude --model opus")"
+  [ -n "${panel_at}" ]
+  [ -n "${nit_at}" ]
+  [ "${panel_at}" -lt "${nit_at}" ]
+  [ "${nit_at}" -lt "${claude_at}" ]
+}
+
+@test "an existing session is not panelled again" {
+  export TMUX_STUB_HAS_SESSION=0
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  [ "${status}" -eq 3 ]
+  run refute_tmux_subcommand "split-window"
+  [ "${status}" -eq 0 ]
+}
