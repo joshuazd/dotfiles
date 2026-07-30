@@ -147,7 +147,7 @@ _fake_session_script() {
 }
 
 @test "run_worktree_popup carries SESSION_EXISTED out of the popup" {
-  export DISPATCH_IN_POPUP=1
+  export DISPATCH_INLINE=1
   local script
   script="$(_fake_session_script "${SESSION_EXISTED}")"
 
@@ -157,7 +157,7 @@ _fake_session_script() {
 }
 
 @test "run_worktree_popup keeps the status through the interactive prompt" {
-  export DISPATCH_IN_POPUP=1
+  export DISPATCH_INLINE=1
   local script
   script="$(_fake_session_script "${SESSION_EXISTED}")"
 
@@ -167,7 +167,7 @@ _fake_session_script() {
 }
 
 @test "run_worktree_popup still switches to a session that already existed" {
-  export DISPATCH_IN_POPUP=1
+  export DISPATCH_INLINE=1
   local script
   script="$(_fake_session_script "${SESSION_EXISTED}")"
 
@@ -179,7 +179,7 @@ _fake_session_script() {
 }
 
 @test "run_worktree_popup reports a failing popup and does not switch" {
-  export DISPATCH_IN_POPUP=1
+  export DISPATCH_INLINE=1
   local script
   script="$(_fake_session_script 1)"
 
@@ -599,4 +599,193 @@ _fake_session_script() {
   [ "${status}" -eq 3 ]
   run refute_tmux_subcommand "split-window"
   [ "${status}" -eq 0 ]
+}
+
+@test "client_dimensions targets VIGIL_CLIENT when it is set" {
+  export VIGIL_CLIENT="/dev/ttys009"
+  run client_dimensions
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "display-message"
+  [ -n "${output}" ]
+  printf '%s\n' "${output}" | assert_arg_after "-c" "/dev/ttys009"
+}
+
+# tmux_call_args_matching/tmux_call_args split argv one-per-line (tr
+# '\037' '\n'), so a flag and its value never share a line - a single-string
+# grep for "-c /dev/ttys009" can never match, pass or fail. Adjacency checks
+# below use assert_arg_after, the helper the rest of this file already uses
+# for exactly this. Absence checks anchor the grep to a whole line (-x):
+# unanchored "-c" also matches inside the literal argument "switch-client".
+@test "client_dimensions targets no client when VIGIL_CLIENT is empty" {
+  export VIGIL_CLIENT=""
+  run client_dimensions
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "display-message"
+  [ -n "${output}" ]
+  [ "$(printf '%s\n' "${output}" | grep -x -c -- '-c')" -eq 0 ]
+}
+
+# The size flags come from the named client, not from whoever is calling. The
+# stub answers a -c query and a bare one differently so this can tell them
+# apart: a create path that measured the calling client would size the window
+# 350 wide here and pass a weaker assertion.
+@test "a new session takes its size from VIGIL_CLIENT" {
+  export TMUX_STUB_HAS_SESSION=1
+  export VIGIL_CLIENT="/dev/ttys009"
+  export TMUX_STUB_CLIENT_DISPLAY="70 300"
+  export TMUX_STUB_DISPLAY="90 350"
+  create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  run tmux_call_args "new-session"
+  [ "${status}" -eq 0 ]
+  printf '%s\n' "${output}" | assert_arg_after "-x" "300"
+  printf '%s\n' "${output}" | assert_arg_after "-y" "70"
+}
+
+# A VIGIL_CLIENT that cannot be measured used to yield nothing at all, so
+# create_tmux_session omitted -x/-y, tmux fell back to default-size 80x24, and
+# the 40-column panel arrived at ~175 columns on a real client - the balloon
+# the previous phase closed, reinstated silently. An unmeasurable named client
+# must fall back to measuring whatever client is available, and say so.
+@test "a new session still gets sized when VIGIL_CLIENT cannot be measured" {
+  export TMUX_STUB_HAS_SESSION=1
+  export VIGIL_CLIENT="/dev/ttys009"
+  export TMUX_STUB_CLIENT_DISPLAY_FAILS=1
+  export TMUX_STUB_DISPLAY="90 350"
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" ""
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"Could not measure tmux client"* ]]
+  run tmux_call_args "new-session"
+  printf '%s\n' "${output}" | assert_arg_after "-x" "350"
+  printf '%s\n' "${output}" | assert_arg_after "-y" "90"
+}
+
+@test "client_dimensions falls back to the current client and warns" {
+  export VIGIL_CLIENT="/dev/ttys009"
+  export TMUX_STUB_CLIENT_DISPLAY_FAILS=1
+  export TMUX_STUB_DISPLAY="90 350"
+  run client_dimensions
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"90 350"* ]]
+  [[ "${output}" == *"Could not measure tmux client"* ]]
+}
+
+# A client tmux can name but not size answers with a bare space rather than
+# failing, and " " read into height and width is two empty fields - the same
+# nothing an error yields, and just as unusable.
+@test "client_dimensions treats a blank answer as unmeasurable" {
+  export VIGIL_CLIENT="/dev/ttys009"
+  export TMUX_STUB_CLIENT_DISPLAY=" "
+  export TMUX_STUB_DISPLAY="90 350"
+  run client_dimensions
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"90 350"* ]]
+}
+
+@test "switch_client_to names the client when VIGIL_CLIENT is set" {
+  export VIGIL_CLIENT="/dev/ttys009"
+  run switch_client_to "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "switch-client"
+  [ -n "${output}" ]
+  printf '%s\n' "${output}" | assert_arg_after "-c" "/dev/ttys009"
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
+}
+
+@test "switch_client_to omits -c when VIGIL_CLIENT is empty" {
+  export VIGIL_CLIENT=""
+  run switch_client_to "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "switch-client"
+  [ -n "${output}" ]
+  [ "$(printf '%s\n' "${output}" | grep -x -c -- '-c')" -eq 0 ]
+}
+
+@test "switch_client_to never attaches" {
+  export VIGIL_CLIENT=""
+  unset TMUX
+  run switch_client_to "=SC-1 demo:claude"
+  [ "$(tmux_call_args_matching 'attach-session' | grep -c .)" -eq 0 ]
+}
+
+# The teleport is the last step of a dispatch, after the worktree, the session
+# and Claude all exist. Under errexit a bare switch_client_to aborted the
+# workflow script there, and vigild recorded a fully successful dispatch as
+# failed with a stale reason. The `; echo REACHED` is the assertion: it is the
+# statement the abort used to eat.
+@test "a failed teleport does not abort a caller under errexit" {
+  export TMUX_STUB_SWITCH_FAILS=1
+  run bash -c "set -o errexit
+                source '${BATS_TEST_DIRNAME}/../lib/tmux.sh'
+                teleport_client_to '=SC-1 demo:claude'
+                echo REACHED"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"REACHED"* ]]
+  [[ "${output}" == *"Could not switch to"* ]]
+}
+
+@test "a successful teleport is silent" {
+  run teleport_client_to "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"Could not switch to"* ]]
+  [ -n "$(tmux_call_args_matching 'switch-client')" ]
+}
+
+# The helper only helps where it is used. Every teleport in a script that runs
+# under errexit has to go through it, and a bare switch_client_to reintroduces
+# the abort at that one site with nothing else to catch it.
+@test "the workflow scripts teleport through the fail-soft helper" {
+  local script
+  for script in shortcut-implement gh-review; do
+    run grep -c -E '^[[:space:]]*(\$\{detached\} \|\| )?switch_client_to' \
+      "${BATS_TEST_DIRNAME}/../${script}"
+    [ "${output}" = "0" ]
+    run grep -c 'teleport_client_to' "${BATS_TEST_DIRNAME}/../${script}"
+    [ "${output}" -ge 2 ]
+  done
+}
+
+@test "create_tmux_session switches rather than attaching with no TMUX" {
+  unset TMUX
+  export VIGIL_CLIENT="/dev/ttys009"
+  run create_tmux_session "SC-1 demo" "/tmp/wt" false "" ""
+  [ "$(tmux_call_args_matching 'attach-session' | grep -c .)" -eq 0 ]
+  [ -n "$(tmux_call_args_matching 'switch-client')" ]
+}
+
+# The brief for this test named a fixed stub script at
+# tests/stubs/session-script, which does not exist in this repo; every other
+# run_worktree_popup test builds its stand-in with _fake_session_script, so
+# this one does the same rather than adding a second, redundant fixture.
+@test "run_worktree_popup runs inline when DISPATCH_INLINE is set" {
+  export DISPATCH_INLINE=1
+  local script
+  script="$(_fake_session_script 0)"
+
+  run run_worktree_popup --detached --session-name "SC-1 demo" \
+    "${BATS_TEST_TMPDIR}" "${script}" "branch" "SC-1 demo"
+  [ "$(tmux_call_args_matching 'display-popup' | grep -c .)" -eq 0 ]
+}
+
+@test "tmux_reachable succeeds when tmux is on PATH and the server starts" {
+  run tmux_reachable
+  [ "${status}" -eq 0 ]
+  # assert_tmux_subcommand's pattern requires the unit separator that follows
+  # a subcommand's first argument; "tmux start-server" is called with no
+  # arguments at all, so it never appears and the helper can't be used here.
+  # The stub logs a bare "start-server" line for this call, so match that
+  # exactly instead.
+  [ "$(grep -cx 'start-server' "${TMUX_STUB_LOG}")" -eq 1 ]
+}
+
+@test "tmux_reachable fails when tmux is not on PATH" {
+  mkdir -p "${BATS_TEST_TMPDIR}/empty-path"
+  PATH="${BATS_TEST_TMPDIR}/empty-path" run tmux_reachable
+  [ "${status}" -eq 1 ]
+}
+
+@test "tmux_reachable fails when the tmux server cannot start" {
+  export TMUX_STUB_START_SERVER_FAILS=1
+  run tmux_reachable
+  [ "${status}" -eq 1 ]
+  [ "$(grep -cx 'start-server' "${TMUX_STUB_LOG}")" -eq 1 ]
 }

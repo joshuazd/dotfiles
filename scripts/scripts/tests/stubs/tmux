@@ -3,6 +3,22 @@
 # arguments joined by the unit separator so embedded spaces stay parseable.
 set -o nounset
 
+# Exit status for the whole invocation. A branch that wants to fail sets this
+# rather than exiting, so the call is still recorded with its full argv - a
+# test asserting what was asked needs the failed query in the log too.
+stub_status=0
+
+# Whether this invocation names a client with -c. Matched as a whole argument:
+# a substring test against "${*}" also matches "switch-client" and any client
+# name containing "-c".
+stub_has_client=""
+for stub_arg in "${@}"; do
+  if [ "${stub_arg}" = "-c" ]; then
+    stub_has_client=1
+    break
+  fi
+done
+
 # Canned responses for the queries lib/tmux.sh and vigil-panel make.
 case "${1:-}" in
   display-message)
@@ -14,7 +30,19 @@ case "${1:-}" in
     # explicitly empty value is the no-client case and must survive.
     case "${*}" in
       *client_height*|*client_width*)
-        printf '%s\n' "${TMUX_STUB_DISPLAY-40 200}"
+        # A -c query measures a named client; without it tmux measures the
+        # calling client. The two have to be answerable separately, or no test
+        # can tell "the named client answered" from "some client answered" -
+        # which is the whole of the fallback under test.
+        if [ -n "${stub_has_client}" ]; then
+          if [ -n "${TMUX_STUB_CLIENT_DISPLAY_FAILS:-}" ]; then
+            stub_status=1
+          else
+            printf '%s\n' "${TMUX_STUB_CLIENT_DISPLAY-${TMUX_STUB_DISPLAY-40 200}}"
+          fi
+        else
+          printf '%s\n' "${TMUX_STUB_DISPLAY-40 200}"
+        fi
         ;;
       *pane_width*)
         printf '%s\n' "${TMUX_STUB_PANE_WIDTH:-200}"
@@ -36,6 +64,33 @@ case "${1:-}" in
   has-session)
     exit "${TMUX_STUB_HAS_SESSION:-1}"
     ;;
+  switch-client)
+    # A client that detached during the job, or a window that is gone: tmux
+    # refuses and the caller must survive it.
+    if [ -n "${TMUX_STUB_SWITCH_FAILS:-}" ]; then
+      stub_status=1
+    fi
+    ;;
+  list-clients)
+    if [ -n "${TMUX_STUB_LIST_CLIENTS:-}" ]; then
+      printf '%s\n' "${TMUX_STUB_LIST_CLIENTS}"
+    fi
+    ;;
+  list-sessions)
+    # TMUX_STUB_LIST_SESSIONS_FAILS simulates no server being reachable at
+    # all - `tmux list-sessions` itself fails, distinct from a server that is
+    # up but has no sessions (which is the unset-TMUX_STUB_LIST_SESSIONS
+    # default: exit 0, no output).
+    if [ -n "${TMUX_STUB_LIST_SESSIONS_FAILS:-}" ]; then
+      if [ -n "${TMUX_STUB_LOG:-}" ]; then
+        printf 'list-sessions\n' >> "${TMUX_STUB_LOG}"
+      fi
+      exit 1
+    fi
+    if [ -n "${TMUX_STUB_LIST_SESSIONS:-}" ]; then
+      printf '%s\n' "${TMUX_STUB_LIST_SESSIONS}"
+    fi
+    ;;
   list-panes)
     if [ -n "${TMUX_STUB_LIST_PANES:-}" ]; then
       printf '%s\n' "${TMUX_STUB_LIST_PANES}"
@@ -50,6 +105,14 @@ case "${1:-}" in
         @vigil_panel_size) printf '%s\n' "${TMUX_STUB_PANEL_SIZE:-}" ;;
       esac
     done
+    ;;
+  start-server)
+    if [ -n "${TMUX_STUB_START_SERVER_FAILS:-}" ]; then
+      if [ -n "${TMUX_STUB_LOG:-}" ]; then
+        printf 'start-server\n' >> "${TMUX_STUB_LOG}"
+      fi
+      exit 1
+    fi
     ;;
   split-window)
     if [ -n "${TMUX_STUB_SPLIT_FAILS:-}" ]; then
@@ -79,4 +142,4 @@ if [ -n "${TMUX_STUB_LOG:-}" ]; then
   printf '\n' >> "${TMUX_STUB_LOG}"
 fi
 
-exit 0
+exit "${stub_status}"

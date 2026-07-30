@@ -156,7 +156,7 @@ poll_repo() {
     fi
 
     info "Dispatching review for ${key}"
-    if DISPATCH_IN_POPUP=1 "${SCRIPT_DIR}/gh-review" --detached --non-interactive "${url}"; then
+    if DISPATCH_INLINE=1 "${SCRIPT_DIR}/gh-review" --detached --non-interactive "${url}"; then
       mark_seen "${key}"
       info "Successfully dispatched ${key}"
     else
