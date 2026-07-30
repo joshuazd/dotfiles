@@ -4,14 +4,13 @@
 #
 # Intended to be invoked by the SwiftBar dispatch plugin (terminal=false).
 # Gets the active tab URL from Google Chrome, validates it looks like a
-# Shortcut story or GitHub PR, then runs dispatch inside the most recently
-# active tmux session and brings iTerm2 to the front attached to that session.
+# Shortcut story or GitHub PR, brings a tmux client to the front (so the
+# job's closing switch-client has somewhere to land), and hands the URL to
+# `vigil dispatch`, which submits it to vigild. No popup is opened here.
 
 set -o errexit
 set -o nounset
 set -o pipefail
-
-readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Send a macOS notification
 notify() {
@@ -57,7 +56,6 @@ main() {
     exit 1
   fi
 
-  # Get current Chrome tab URL
   local url
   url="$(get_chrome_url)"
 
@@ -68,53 +66,51 @@ main() {
     if [[ -n "${err}" ]]; then
       notify "Could not get Chrome tab URL: ${err}"
     else
-      notify "Could not get Chrome tab URL — is Chrome running?"
+      notify "Could not get Chrome tab URL - is Chrome running?"
     fi
     exit 1
   fi
   rm -f "${CHROME_ERR}"
 
-  # Validate the URL looks like something dispatch can handle
   if ! [[ "${url}" =~ app\.shortcut\.com ]] && \
      ! [[ "${url}" =~ github\.com.*/pull/ ]]; then
     notify "Not a Shortcut story or GitHub PR: ${url}"
     exit 0
   fi
 
-  # Find the most recently used tmux session
-  local tmux_session
-  tmux_session="$(get_tmux_session)"
+  # Bring a client to the front before submitting. The job ends with a
+  # switch-client, and vigild resolves the most recently active client to
+  # switch: with nothing attached anywhere there is nothing for the teleport
+  # to land on, so attach a window first.
+  ensure_client
 
-  if [[ -z "${tmux_session}" ]]; then
-    notify "No active tmux session found — start tmux first"
+  if ! vigil dispatch --cwd "${HOME}/${repo}" "${url}"; then
+    notify "Dispatch failed - see the vigil panel or vigild.log"
     exit 1
   fi
+}
 
-  # Write the URL to a temp file to avoid shell-quoting issues with the URL
-  local url_file
-  url_file="$(mktemp /tmp/dispatch-url-XXXXXX)"
-  printf "%s" "${url}" > "${url_file}"
+#######################################
+# Make sure some tmux client exists and iTerm2 is in front, so the job's
+# closing switch-client has a client to act on.
+#######################################
+ensure_client() {
+  local tmux_session tmux_path
+  tmux_session="$(get_tmux_session)"
 
-  # DISPATCH_IN_POPUP=1 tells run_worktree_popup in common.sh to run
-  # git-worktree-session inline rather than opening a nested popup, so the
-  # entire flow (fetch + setup + switch) happens inside a single popup.
-  local popup_cmd
-  popup_cmd="[ -f ~/.secrets ] && source ~/.secrets; export DISPATCH_IN_POPUP=1; url=\$(cat '${url_file}'); rm -f '${url_file}'; cd \"\$HOME/${repo}\" && '${SCRIPT_DIR}/dispatch' --non-interactive \"\${url}\" || { echo; echo 'Dispatch failed. Press Enter to close...'; read -r; }"
-
-  # Resolve the full path to tmux — iTerm2 runs `command` strings directly
-  # (not via a shell) so bare "tmux" won't be found if it lives in /opt/homebrew/bin.
-  local tmux_path
-  tmux_path="$(command -v tmux)"
-
-  if tmux list-clients -t "${tmux_session}" 2>/dev/null | grep -q .; then
-    # Session already has an attached client — bring iTerm2 to front and open
-    # a popup in the current window.
+  if [[ -n "${tmux_session}" ]] && \
+     tmux list-clients -t "${tmux_session}" 2>/dev/null | grep -q .; then
     osascript -e 'tell application "iTerm2" to activate'
-    tmux display-popup -t "${tmux_session}" -E -w 80% -h 60% "${popup_cmd}"
-  else
-    # Session is detached — open iTerm2 and attach to the session to get a
-    # client, then show the popup once the client is ready.
-    osascript <<APPLESCRIPT
+    return 0
+  fi
+
+  if [[ -z "${tmux_session}" ]]; then
+    osascript -e 'tell application "iTerm2" to activate'
+    return 0
+  fi
+
+  tmux_path="$(command -v tmux)"
+  osascript <<APPLESCRIPT
 tell application "iTerm2"
   activate
   if (count of windows) = 0 then
@@ -127,19 +123,14 @@ tell application "iTerm2"
 end tell
 APPLESCRIPT
 
-    # Wait for the client to attach (up to 5 seconds)
-    local deadline=$(( SECONDS + 5 ))
-    while ! tmux list-clients -t "${tmux_session}" 2>/dev/null | grep -q .; do
-      if [ "${SECONDS}" -ge "${deadline}" ]; then
-        notify "Timed out waiting for tmux client to attach"
-        rm -f "${url_file}"
-        exit 1
-      fi
-      sleep 0.1
-    done
-
-    tmux display-popup -t "${tmux_session}" -E -w 80% -h 60% "${popup_cmd}"
-  fi
+  local deadline=$(( SECONDS + 5 ))
+  while ! tmux list-clients -t "${tmux_session}" 2>/dev/null | grep -q .; do
+    if [ "${SECONDS}" -ge "${deadline}" ]; then
+      notify "Timed out waiting for a tmux client to attach"
+      return 0
+    fi
+    sleep 0.1
+  done
 }
 
 main "$@"

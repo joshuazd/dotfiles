@@ -92,7 +92,7 @@ The `claude-trust` script modifies `~/.claude.json` to pre-trust new worktree di
 
 ### dispatch-from-chrome
 
-Gets the active Chrome tab URL via osascript, finds the most recent tmux session, and runs `dispatch` inside a popup with `DISPATCH_IN_POPUP=1`. This prevents nested popups and brings iTerm2 to the foreground after dispatch completes.
+Gets the active Chrome tab URL via osascript, validates it looks like a Shortcut story or GitHub PR, brings a tmux client to the front (attaching one via iTerm2 if none exists, so the job's closing `switch-client` has somewhere to land), then hands the URL straight to `vigil dispatch`, which submits it to vigild. No popup is opened here.
 
 ### Script Conventions
 

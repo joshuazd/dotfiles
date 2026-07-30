@@ -51,6 +51,14 @@ case "${1:-}" in
       esac
     done
     ;;
+  start-server)
+    if [ -n "${TMUX_STUB_START_SERVER_FAILS:-}" ]; then
+      if [ -n "${TMUX_STUB_LOG:-}" ]; then
+        printf 'start-server\n' >> "${TMUX_STUB_LOG}"
+      fi
+      exit 1
+    fi
+    ;;
   split-window)
     if [ -n "${TMUX_STUB_SPLIT_FAILS:-}" ]; then
       # Log it before bailing: a test asserting nothing followed the failure

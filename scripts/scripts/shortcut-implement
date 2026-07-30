@@ -131,10 +131,9 @@ main() {
     return 1
   fi
 
-  # Check if we're in tmux
-  if ! is_in_tmux; then
-    error "Not running in tmux"
-    error "This script requires tmux to be running"
+  if ! tmux_reachable; then
+    error "tmux is not available"
+    error "This script needs a reachable tmux server"
     return 1
   fi
 
@@ -179,7 +178,7 @@ main() {
   fi
   local route_model route_reasoning route_rationale
   IFS=$'\t' read -r route_model route_reasoning route_rationale <<<"$(parse_route "${route_json}")"
-  info "Routing: ${route_model} / ${route_reasoning} — ${route_rationale}"
+  info "Routing: ${route_model} / ${route_reasoning} - ${route_rationale}"
 
   # Pass --detached so run_worktree_popup skips switch-client;
   # we switch to :claude ourselves below.
@@ -194,7 +193,7 @@ main() {
   # the live session instead.
   if [ "${popup_status}" -eq "${SESSION_EXISTED}" ]; then
     warn "Session '${session_name}' already exists, leaving its Claude running"
-    ${detached} || tmux switch-client -t "=${session_name}:claude"
+    ${detached} || switch_client_to "=${session_name}:claude"
     return 0
   fi
   if [ "${popup_status}" -ne 0 ]; then
@@ -228,7 +227,7 @@ After plan-accept, default to invoking superpowers:subagent-driven-development f
   launch_claude_in_pane "${session_name}" "${session_dir}" "${launch_cmd}"
 
   if ! ${detached}; then
-    tmux switch-client -t "=${session_name}:claude"
+    switch_client_to "=${session_name}:claude"
   fi
 
   return 0

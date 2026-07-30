@@ -672,3 +672,27 @@ _fake_session_script() {
     "${BATS_TEST_TMPDIR}" "${script}" "branch" "SC-1 demo"
   [ "$(tmux_call_args_matching 'display-popup' | grep -c .)" -eq 0 ]
 }
+
+@test "tmux_reachable succeeds when tmux is on PATH and the server starts" {
+  run tmux_reachable
+  [ "${status}" -eq 0 ]
+  # assert_tmux_subcommand's pattern requires the unit separator that follows
+  # a subcommand's first argument; "tmux start-server" is called with no
+  # arguments at all, so it never appears and the helper can't be used here.
+  # The stub logs a bare "start-server" line for this call, so match that
+  # exactly instead.
+  [ "$(grep -cx 'start-server' "${TMUX_STUB_LOG}")" -eq 1 ]
+}
+
+@test "tmux_reachable fails when tmux is not on PATH" {
+  mkdir -p "${BATS_TEST_TMPDIR}/empty-path"
+  PATH="${BATS_TEST_TMPDIR}/empty-path" run tmux_reachable
+  [ "${status}" -eq 1 ]
+}
+
+@test "tmux_reachable fails when the tmux server cannot start" {
+  export TMUX_STUB_START_SERVER_FAILS=1
+  run tmux_reachable
+  [ "${status}" -eq 1 ]
+  [ "$(grep -cx 'start-server' "${TMUX_STUB_LOG}")" -eq 1 ]
+}
