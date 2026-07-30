@@ -5,8 +5,22 @@ load helper
 setup() {
   setup_tmux_stub
   export STUB_LOG="${BATS_TEST_TMPDIR}/calls.log"
-  export PATH="${BATS_TEST_TMPDIR}/bin:${PATH}"
+  # One directory this file owns, plus the system directories, and deliberately
+  # NOT the inherited PATH and NOT the shared stubs directory.
+  #
+  # Prepending to ${PATH} would leave ~/.local/bin on it, so `command -v vigil`
+  # finds the developer's real binary and a test that means to remove the stub
+  # silently runs the real thing against the real daemon instead. That happened
+  # while writing these tests.
+  #
+  # The shared ${BATS_TEST_DIRNAME}/stubs is excluded for the same reason: it
+  # contains a vigil stub of its own, so leaving it on PATH makes "no vigil
+  # anywhere" untestable. Its tmux stub is copied in instead, so tmux still
+  # resolves - without it, ensure_client takes its no-session branch and these
+  # tests quietly stop testing what they are about.
   mkdir -p "${BATS_TEST_TMPDIR}/bin"
+  cp "${BATS_TEST_DIRNAME}/stubs/tmux" "${BATS_TEST_TMPDIR}/bin/tmux"
+  export PATH="${BATS_TEST_TMPDIR}/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
   # osascript stub: report a Shortcut URL, record activations. ensure_client's
   # AppleScript calls (the "activate" one-liner and the create-window/tab
@@ -35,6 +49,38 @@ STUB
 
   export HOME="${BATS_TEST_TMPDIR}/home"
   mkdir -p "${HOME}/portal"
+}
+
+# The menu bar app runs this script with a GUI PATH - homebrew plus the system
+# directories - which does not include ~/.local/bin, where make install puts
+# vigil. The popup this replaced never needed vigil on PATH: it invoked
+# ${SCRIPT_DIR}/dispatch by absolute path inside a login shell. A bare `vigil`
+# therefore exits 127 and the user sees only "Dispatch failed", which says
+# nothing about what to do.
+@test "dispatch-from-chrome finds vigil outside PATH via ~/.local/bin" {
+  mkdir -p "${HOME}/.local/bin"
+  mv "${BATS_TEST_TMPDIR}/bin/vigil" "${HOME}/.local/bin/vigil"
+  run "${BATS_TEST_DIRNAME}/../dispatch-from-chrome"
+  [ "${status}" -eq 0 ]
+  [ "$(grep -c 'vigil dispatch' "${STUB_LOG}")" -eq 1 ]
+}
+
+@test "dispatch-from-chrome honours VIGIL_BIN" {
+  mv "${BATS_TEST_TMPDIR}/bin/vigil" "${BATS_TEST_TMPDIR}/vigil-elsewhere"
+  VIGIL_BIN="${BATS_TEST_TMPDIR}/vigil-elsewhere" \
+    run "${BATS_TEST_DIRNAME}/../dispatch-from-chrome"
+  [ "${status}" -eq 0 ]
+  [ "$(grep -c 'vigil dispatch' "${STUB_LOG}")" -eq 1 ]
+}
+
+# A missing vigil must say so. The generic failure message is what made this
+# opaque the first time it happened on a real machine.
+@test "dispatch-from-chrome names vigil when it cannot be found" {
+  rm -f "${BATS_TEST_TMPDIR}/bin/vigil"
+  run "${BATS_TEST_DIRNAME}/../dispatch-from-chrome"
+  [ "${status}" -ne 0 ]
+  [ "$(grep -c 'vigil dispatch' "${STUB_LOG}")" -eq 0 ]
+  [ "$(grep -ci 'vigil not found' "${STUB_LOG}")" -ge 1 ]
 }
 
 @test "dispatch-from-chrome submits the Chrome URL to vigil dispatch" {

@@ -82,12 +82,50 @@ main() {
   # switch-client, and vigild resolves the most recently active client to
   # switch: with nothing attached anywhere there is nothing for the teleport
   # to land on, so attach a window first.
+  local vigil_bin
+  if ! vigil_bin="$(resolve_vigil)"; then
+    notify "vigil not found - run 'make install' in the vigil repo"
+    exit 1
+  fi
+
   ensure_client
 
-  if ! vigil dispatch --cwd "${HOME}/${repo}" "${url}"; then
+  if ! "${vigil_bin}" dispatch --cwd "${HOME}/${repo}" "${url}"; then
     notify "Dispatch failed - see the vigil panel or vigild.log"
     exit 1
   fi
+}
+
+#######################################
+# Print the path to the vigil binary.
+#
+# The menu bar app runs this script with a GUI PATH - homebrew plus the system
+# directories - which does not include ~/.local/bin, where 'make install' puts
+# vigil. The popup this script replaced never needed vigil on PATH at all: it
+# invoked ${SCRIPT_DIR}/dispatch by absolute path inside a login shell. A bare
+# 'vigil' therefore exits 127 here and the user sees only "Dispatch failed",
+# which says nothing about what to do.
+#
+# ${VIGIL_BIN:-} first, matching lib/tmux.sh's panel gate, so a dev build can
+# be pointed at without editing this.
+# Returns:
+#   0 and the path on stdout, 1 if vigil cannot be found
+#######################################
+resolve_vigil() {
+  if [ -n "${VIGIL_BIN:-}" ]; then
+    printf '%s\n' "${VIGIL_BIN}"
+    return 0
+  fi
+  local found
+  if found="$(command -v vigil 2>/dev/null)" && [ -n "${found}" ]; then
+    printf '%s\n' "${found}"
+    return 0
+  fi
+  if [ -x "${HOME}/.local/bin/vigil" ]; then
+    printf '%s\n' "${HOME}/.local/bin/vigil"
+    return 0
+  fi
+  return 1
 }
 
 #######################################
