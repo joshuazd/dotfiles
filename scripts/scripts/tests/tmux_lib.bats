@@ -147,7 +147,7 @@ _fake_session_script() {
 }
 
 @test "run_worktree_popup carries SESSION_EXISTED out of the popup" {
-  export DISPATCH_IN_POPUP=1
+  export DISPATCH_INLINE=1
   local script
   script="$(_fake_session_script "${SESSION_EXISTED}")"
 
@@ -157,7 +157,7 @@ _fake_session_script() {
 }
 
 @test "run_worktree_popup keeps the status through the interactive prompt" {
-  export DISPATCH_IN_POPUP=1
+  export DISPATCH_INLINE=1
   local script
   script="$(_fake_session_script "${SESSION_EXISTED}")"
 
@@ -167,7 +167,7 @@ _fake_session_script() {
 }
 
 @test "run_worktree_popup still switches to a session that already existed" {
-  export DISPATCH_IN_POPUP=1
+  export DISPATCH_INLINE=1
   local script
   script="$(_fake_session_script "${SESSION_EXISTED}")"
 
@@ -179,7 +179,7 @@ _fake_session_script() {
 }
 
 @test "run_worktree_popup reports a failing popup and does not switch" {
-  export DISPATCH_IN_POPUP=1
+  export DISPATCH_INLINE=1
   local script
   script="$(_fake_session_script 1)"
 
@@ -599,4 +599,76 @@ _fake_session_script() {
   [ "${status}" -eq 3 ]
   run refute_tmux_subcommand "split-window"
   [ "${status}" -eq 0 ]
+}
+
+@test "client_dimensions targets VIGIL_CLIENT when it is set" {
+  export VIGIL_CLIENT="/dev/ttys009"
+  run client_dimensions
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "display-message"
+  [ -n "${output}" ]
+  printf '%s\n' "${output}" | assert_arg_after "-c" "/dev/ttys009"
+}
+
+# tmux_call_args_matching/tmux_call_args split argv one-per-line (tr
+# '\037' '\n'), so a flag and its value never share a line - a single-string
+# grep for "-c /dev/ttys009" can never match, pass or fail. Adjacency checks
+# below use assert_arg_after, the helper the rest of this file already uses
+# for exactly this. Absence checks anchor the grep to a whole line (-x):
+# unanchored "-c" also matches inside the literal argument "switch-client".
+@test "client_dimensions targets no client when VIGIL_CLIENT is empty" {
+  export VIGIL_CLIENT=""
+  run client_dimensions
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "display-message"
+  [ -n "${output}" ]
+  [ "$(printf '%s\n' "${output}" | grep -x -c -- '-c')" -eq 0 ]
+}
+
+@test "switch_client_to names the client when VIGIL_CLIENT is set" {
+  export VIGIL_CLIENT="/dev/ttys009"
+  run switch_client_to "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "switch-client"
+  [ -n "${output}" ]
+  printf '%s\n' "${output}" | assert_arg_after "-c" "/dev/ttys009"
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
+}
+
+@test "switch_client_to omits -c when VIGIL_CLIENT is empty" {
+  export VIGIL_CLIENT=""
+  run switch_client_to "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "switch-client"
+  [ -n "${output}" ]
+  [ "$(printf '%s\n' "${output}" | grep -x -c -- '-c')" -eq 0 ]
+}
+
+@test "switch_client_to never attaches" {
+  export VIGIL_CLIENT=""
+  unset TMUX
+  run switch_client_to "=SC-1 demo:claude"
+  [ "$(tmux_call_args_matching 'attach-session' | grep -c .)" -eq 0 ]
+}
+
+@test "create_tmux_session switches rather than attaching with no TMUX" {
+  unset TMUX
+  export VIGIL_CLIENT="/dev/ttys009"
+  run create_tmux_session "SC-1 demo" "/tmp/wt" false "" ""
+  [ "$(tmux_call_args_matching 'attach-session' | grep -c .)" -eq 0 ]
+  [ -n "$(tmux_call_args_matching 'switch-client')" ]
+}
+
+# The brief for this test named a fixed stub script at
+# tests/stubs/session-script, which does not exist in this repo; every other
+# run_worktree_popup test builds its stand-in with _fake_session_script, so
+# this one does the same rather than adding a second, redundant fixture.
+@test "run_worktree_popup runs inline when DISPATCH_INLINE is set" {
+  export DISPATCH_INLINE=1
+  local script
+  script="$(_fake_session_script 0)"
+
+  run run_worktree_popup --detached --session-name "SC-1 demo" \
+    "${BATS_TEST_TMPDIR}" "${script}" "branch" "SC-1 demo"
+  [ "$(tmux_call_args_matching 'display-popup' | grep -c .)" -eq 0 ]
 }

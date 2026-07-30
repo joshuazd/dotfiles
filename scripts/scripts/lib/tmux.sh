@@ -30,6 +30,40 @@ is_in_tmux() {
 }
 
 #######################################
+# Report whether a tmux server can be reached, starting one if needed.
+#
+# Distinct from is_in_tmux, which asks whether *this process* is inside a tmux
+# client. A daemon-run dispatch is not, and has no business being refused for
+# it: it creates sessions through tmux commands, which need a server, not a
+# $TMUX.
+# Returns:
+#   0 if tmux is usable, 1 otherwise
+#######################################
+tmux_reachable() {
+  command -v tmux > /dev/null 2>&1 || return 1
+  tmux start-server > /dev/null 2>&1
+}
+
+#######################################
+# Switch a client to a target, naming the client when one was given.
+#
+# Never attaches. A daemon-run job has no terminal, and tmux attach-session
+# from one would block until the job's timeout rather than failing.
+# Arguments:
+#   target - a tmux target, e.g. "=SC-1 demo:claude"
+# Returns:
+#   0 on success, non-zero if tmux refused
+#######################################
+switch_client_to() {
+  local target="${1}"
+  if [ -n "${VIGIL_CLIENT:-}" ]; then
+    tmux switch-client -c "${VIGIL_CLIENT}" -t "${target}"
+    return "${?}"
+  fi
+  tmux switch-client -t "${target}"
+}
+
+#######################################
 # Build a tmux-safe session name from a prefix, ID, and title
 # Strips colons and periods (break tmux targeting), truncates to ~50 chars
 # at a word boundary.
@@ -93,21 +127,29 @@ claude_pane_target() {
 readonly VIGIL_PANEL_FLAG='@vigil_panel'
 
 #######################################
-# Print the calling client's "<height> <width>", or "<space>" when no client
-# is attached — tmux answers both formats with an empty string outside a
-# client, which is the headless dispatch case.
+# Print the height and width of a tmux client.
 #
-# Factored out because two callers depend on it agreeing with itself:
-# panel_geometry sizes the panel against the client, and create_tmux_session
-# sizes the window it will be split into against the same client. Two copies
-# of the query could disagree about what "no client" looks like, and a panel
-# sized for one window and split into another is exactly the bug this
+# Factored out because three callers depend on it agreeing with itself:
+# panel_geometry sizes the panel against the client, create_tmux_session sizes
+# the window it will be split into against the same client, and a daemon-run
+# dispatch has no client of its own and must be told which one to measure.
+# Two copies of the query could disagree about what "no client" looks like, and
+# a panel sized for one window and split into another is exactly the bug this
 # guards.
+#
+# Arguments:
+#   client - optional client name; defaults to ${VIGIL_CLIENT}, then to the
+#            calling client
 # Outputs:
 #   e.g. "90 350", or " " with no client
 #######################################
 client_dimensions() {
-  tmux display-message -p '#{client_height} #{client_width}'
+  local client="${1:-${VIGIL_CLIENT:-}}"
+  if [ -n "${client}" ]; then
+    tmux display-message -c "${client}" -p '#{client_height} #{client_width}' 2>/dev/null
+    return 0
+  fi
+  tmux display-message -p '#{client_height} #{client_width}' 2>/dev/null
 }
 
 #######################################
@@ -252,11 +294,7 @@ create_tmux_session() {
   if tmux has-session -t "=${session_name}" 2>/dev/null; then
     info "Session '${session_name}' already exists"
     if ! ${detached}; then
-      if is_in_tmux; then
-        tmux switch-client -t "=${session_name}"
-      else
-        tmux attach-session -t "=${session_name}"
-      fi
+      switch_client_to "=${session_name}"
     fi
     return "${SESSION_EXISTED}"
   fi
@@ -318,11 +356,9 @@ create_tmux_session() {
   if ${detached}; then
     info "Detached session '${session_name}' created"
     info "To attach: tmux attach-session -t '=${session_name}'"
-  elif is_in_tmux; then
-    info "Switching to session '${session_name}'"
-    tmux switch-client -t "=${session_name}"
   else
-    tmux attach-session -t "=${session_name}"
+    info "Switching to session '${session_name}'"
+    switch_client_to "=${session_name}"
   fi
 
   return 0
@@ -522,7 +558,11 @@ run_worktree_popup() {
   # tmux display-popup -E exits with the popup command's status, so the status
   # survives the popup boundary on both paths.
   local popup_status=0
-  if [ "${DISPATCH_IN_POPUP:-}" = "1" ]; then
+  # DISPATCH_INLINE means "do not open a popup, run it here". Set by
+  # dispatch-from-chrome's popup ancestor historically, and by a vigild job
+  # today - a daemon is not a popup, which is why this is no longer called
+  # DISPATCH_IN_POPUP.
+  if [ "${DISPATCH_INLINE:-}" = "1" ]; then
     bash -c "${popup_command}" || popup_status="${?}"
   else
     tmux display-popup -E -w 80% -h 60% "${popup_command}" || popup_status="${?}"
@@ -534,7 +574,7 @@ run_worktree_popup() {
 
   if ! ${detached}; then
     info "Switching to session '${session_name}'"
-    tmux switch-client -t "=${session_name}"
+    switch_client_to "=${session_name}"
   fi
 
   return "${popup_status}"
