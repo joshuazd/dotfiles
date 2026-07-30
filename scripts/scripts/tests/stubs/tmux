@@ -36,6 +36,26 @@ case "${1:-}" in
   has-session)
     exit "${TMUX_STUB_HAS_SESSION:-1}"
     ;;
+  list-clients)
+    if [ -n "${TMUX_STUB_LIST_CLIENTS:-}" ]; then
+      printf '%s\n' "${TMUX_STUB_LIST_CLIENTS}"
+    fi
+    ;;
+  list-sessions)
+    # TMUX_STUB_LIST_SESSIONS_FAILS simulates no server being reachable at
+    # all - `tmux list-sessions` itself fails, distinct from a server that is
+    # up but has no sessions (which is the unset-TMUX_STUB_LIST_SESSIONS
+    # default: exit 0, no output).
+    if [ -n "${TMUX_STUB_LIST_SESSIONS_FAILS:-}" ]; then
+      if [ -n "${TMUX_STUB_LOG:-}" ]; then
+        printf 'list-sessions\n' >> "${TMUX_STUB_LOG}"
+      fi
+      exit 1
+    fi
+    if [ -n "${TMUX_STUB_LIST_SESSIONS:-}" ]; then
+      printf '%s\n' "${TMUX_STUB_LIST_SESSIONS}"
+    fi
+    ;;
   list-panes)
     if [ -n "${TMUX_STUB_LIST_PANES:-}" ]; then
       printf '%s\n' "${TMUX_STUB_LIST_PANES}"

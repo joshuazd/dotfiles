@@ -96,21 +96,28 @@ main() {
 #######################################
 ensure_client() {
   local tmux_session tmux_path
-  tmux_session="$(get_tmux_session)"
+  # get_tmux_session's pipeline starts with `tmux list-sessions`, which fails
+  # outright when no server is running at all - the exact no-client-anywhere
+  # case this function exists to handle. Under errexit that failure would
+  # abort the script here, before vigil dispatch ever runs, so it is guarded
+  # to yield an empty tmux_session instead.
+  tmux_session="$(get_tmux_session)" || true
 
   if [[ -n "${tmux_session}" ]] && \
      tmux list-clients -t "${tmux_session}" 2>/dev/null | grep -q .; then
-    osascript -e 'tell application "iTerm2" to activate'
+    # Fail soft: a denied Apple-events grant (-1743) must not take the
+    # dispatch down with it.
+    osascript -e 'tell application "iTerm2" to activate' || true
     return 0
   fi
 
   if [[ -z "${tmux_session}" ]]; then
-    osascript -e 'tell application "iTerm2" to activate'
+    osascript -e 'tell application "iTerm2" to activate' || true
     return 0
   fi
 
   tmux_path="$(command -v tmux)"
-  osascript <<APPLESCRIPT
+  osascript <<APPLESCRIPT || true
 tell application "iTerm2"
   activate
   if (count of windows) = 0 then
