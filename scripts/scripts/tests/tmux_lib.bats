@@ -236,7 +236,7 @@ _fake_session_script() {
   local wt="${BATS_TEST_TMPDIR}/wt"
   mkdir -p "${wt}"
   git -C "${wt}" init --quiet
-  export TMUX_STUB_DISPLAY="${wt}"
+  export TMUX_STUB_PANE_PATH="${wt}"
 
   run worktree_prompt_file "SC-1 demo"
   [ "${status}" -eq 0 ]
@@ -245,8 +245,8 @@ _fake_session_script() {
 }
 
 @test "worktree_prompt_file fails when the pane path is not a git dir" {
-  export TMUX_STUB_DISPLAY="${BATS_TEST_TMPDIR}/not-a-repo"
-  mkdir -p "${TMUX_STUB_DISPLAY}"
+  export TMUX_STUB_PANE_PATH="${BATS_TEST_TMPDIR}/not-a-repo"
+  mkdir -p "${TMUX_STUB_PANE_PATH}"
 
   run worktree_prompt_file "SC-1 demo"
   [ "${status}" -ne 0 ]
@@ -257,7 +257,7 @@ _fake_session_script() {
   local wt="${BATS_TEST_TMPDIR}/wt2"
   mkdir -p "${wt}"
   git -C "${wt}" init --quiet
-  export TMUX_STUB_DISPLAY="${wt}"
+  export TMUX_STUB_PANE_PATH="${wt}"
 
   worktree_prompt_file "SC-1 demo"
   run tmux_call_args "display-message"
@@ -325,6 +325,42 @@ _fake_session_script() {
   printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
   printf '%s\n' "${output}" | assert_arg_after "-l" "40"
   [[ "${output}" == *"vigil --panel"* ]]
+}
+
+# split-window with no -c inherits the calling client's working directory, not
+# the target window's. A panel created through the dispatch popup, whose cwd is
+# the main repository, therefore landed in the main repository while the
+# session's work sat in a worktree - and vigil then read git state from it.
+@test "add_vigil_panel splits into the target window's directory" {
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_PANE_PATH="/Users/x/sc-198799"
+  run add_vigil_panel "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "split-window"
+  printf '%s\n' "${output}" | assert_arg_after "-c" "/Users/x/sc-198799"
+}
+
+# The directory is read from the window being split, not from anywhere else.
+@test "add_vigil_panel asks the target window for its directory" {
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_PANE_PATH="/Users/x/sc-198799"
+  add_vigil_panel "=SC-1 demo:claude"
+  run tmux_call_args_matching "display-message" "pane_current_path"
+  [ -n "${output}" ]
+  printf '%s\n' "${output}" | assert_arg_after "-t" "=SC-1 demo:claude"
+}
+
+# Fail soft: a window that cannot be queried still gets a panel, just without
+# an explicit directory. Losing the panel entirely would be worse than losing
+# its cwd, and this is the path a stale tmux or a vanished window takes.
+@test "add_vigil_panel still splits when the directory cannot be resolved" {
+  export TMUX_STUB_DISPLAY="40 200"
+  export TMUX_STUB_PANE_PATH=""
+  run add_vigil_panel "=SC-1 demo:claude"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "split-window"
+  [ -n "${output}" ]
+  [ "$(printf '%s\n' "${output}" | grep -cFx -- '-c')" -eq 0 ]
 }
 
 @test "add_vigil_panel marks the pane it created" {

@@ -156,13 +156,23 @@ panel_geometry() {
 #######################################
 add_vigil_panel() {
   local window_target="${1}"
-  local split size pane
+  local split size pane dir
   read -r split size <<< "$(panel_geometry)"
+
+  # split-window with no -c inherits the *calling client's* working directory,
+  # not the target window's. create_tmux_session runs inside the dispatch popup,
+  # whose cwd is the main repository, so the panel landed there while the
+  # session's work sat in a worktree. vigil then read git state from the panel's
+  # directory and asked gh for the main branch's PR, which does not exist.
+  #
+  # Fail soft: a window that cannot be queried still gets a panel, just without
+  # an explicit directory. Losing the panel would be worse than losing its cwd.
+  dir="$(tmux display-message -p -t "${window_target}" '#{pane_current_path}' 2>/dev/null)" || dir=""
 
   # Checked explicitly rather than left to errexit: callers invoke this on the
   # left of ||, which disables errexit for the whole function, and a fallen
   # through failure would run set-option against an empty pane id.
-  pane="$(tmux split-window -t "${window_target}" "${split}" -l "${size}" \
+  pane="$(tmux split-window -t "${window_target}" ${dir:+-c "${dir}"} "${split}" -l "${size}" \
     -d -P -F '#{pane_id}' "${VIGIL_BIN:-vigil} --panel")" || return 1
   [ -n "${pane}" ] || return 1
 

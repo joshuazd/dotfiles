@@ -22,6 +22,12 @@ case "${1:-}" in
       *window_id*)
         printf '%s\n' "${TMUX_STUB_WINDOW_ID:-@3}"
         ;;
+      *pane_current_path*)
+        # ${VAR-default}, not ${VAR:-default}: an explicitly empty value is the
+        # "cannot resolve the directory" case and must survive, the same way the
+        # no-client case does above.
+        printf '%s\n' "${TMUX_STUB_PANE_PATH-/tmp/stub-worktree}"
+        ;;
       *)
         printf '%s\n' "${TMUX_STUB_DISPLAY:-/tmp/stub-worktree}"
         ;;
