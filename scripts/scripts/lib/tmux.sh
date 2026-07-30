@@ -64,6 +64,33 @@ switch_client_to() {
 }
 
 #######################################
+# Switch a client to a target, warning instead of failing when it cannot.
+#
+# Every workflow script runs under `set -o errexit` and calls this at the very
+# end, once the worktree, the session and Claude all exist. A bare
+# switch-client there aborts the script on failure, and a daemon-run job is
+# then recorded as failed with whatever stale line it last printed - reporting
+# a completely successful dispatch as a failure. It used to be unreachable: the
+# switch ran inside a popup, which by definition has a current client. A
+# daemon-run job does not: VIGIL_CLIENT is resolved when the job starts and
+# names a client that can detach during the minute the job takes, and the
+# target window can be gone by then too.
+#
+# Fails soft the way add_vigil_panel already does. The session is created
+# either way, and the user can reach it themselves.
+# Arguments:
+#   target - a tmux target, e.g. "=SC-1 demo:claude"
+# Returns:
+#   0 always
+#######################################
+teleport_client_to() {
+  local target="${1}"
+  switch_client_to "${target}" \
+    || warn "Could not switch to '${target}'; it was created and is waiting"
+  return 0
+}
+
+#######################################
 # Build a tmux-safe session name from a prefix, ID, and title
 # Strips colons and periods (break tmux targeting), truncates to ~50 chars
 # at a word boundary.
@@ -137,17 +164,33 @@ readonly VIGIL_PANEL_FLAG='@vigil_panel'
 # a panel sized for one window and split into another is exactly the bug this
 # guards.
 #
+# A named client that cannot be measured falls back to measuring whatever
+# client is available, and warns. Yielding nothing instead is the failure this
+# guards: create_tmux_session then omits -x/-y, tmux sizes the window to
+# default-size 80x24, and a 40-column panel is half of it - arriving at ~175
+# columns when a 350-column client attaches. That is verbatim the balloon the
+# previous phase closed, and a silent -c failure reinstated it with no signal
+# at all. VIGIL_CLIENT is resolved when a job starts and the client can detach
+# before the job's last line, so this is reachable in ordinary use.
+#
 # Arguments:
 #   client - optional client name; defaults to ${VIGIL_CLIENT}, then to the
 #            calling client
 # Outputs:
-#   e.g. "90 350", or " " with no client
+#   e.g. "90 350", or " " with no client at all
 #######################################
 client_dimensions() {
   local client="${1:-${VIGIL_CLIENT:-}}"
+  local dims=""
   if [ -n "${client}" ]; then
-    tmux display-message -c "${client}" -p '#{client_height} #{client_width}' 2>/dev/null
-    return 0
+    dims="$(tmux display-message -c "${client}" -p '#{client_height} #{client_width}' 2>/dev/null)" || dims=""
+    # Whitespace-stripped: tmux answers a client it cannot size with a bare
+    # space, which read splits into two empty fields exactly as an error does.
+    if [ -n "${dims// /}" ]; then
+      printf '%s\n' "${dims}"
+      return 0
+    fi
+    warn "Could not measure tmux client '${client}'; falling back to the current client"
   fi
   tmux display-message -p '#{client_height} #{client_width}' 2>/dev/null
 }
@@ -294,7 +337,7 @@ create_tmux_session() {
   if tmux has-session -t "=${session_name}" 2>/dev/null; then
     info "Session '${session_name}' already exists"
     if ! ${detached}; then
-      switch_client_to "=${session_name}"
+      teleport_client_to "=${session_name}"
     fi
     return "${SESSION_EXISTED}"
   fi
@@ -358,7 +401,7 @@ create_tmux_session() {
     info "To attach: tmux attach-session -t '=${session_name}'"
   else
     info "Switching to session '${session_name}'"
-    switch_client_to "=${session_name}"
+    teleport_client_to "=${session_name}"
   fi
 
   return 0
@@ -574,7 +617,7 @@ run_worktree_popup() {
 
   if ! ${detached}; then
     info "Switching to session '${session_name}'"
-    switch_client_to "=${session_name}"
+    teleport_client_to "=${session_name}"
   fi
 
   return "${popup_status}"
