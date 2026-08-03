@@ -20,8 +20,10 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
 # TEMPORARY - diagnostic instrumentation for vigil's session-removal latency.
-# Remove once docs/superpowers/specs/2026-08-03-session-hopping-design.md part C
-# has a timeline. See that spec before deleting, in case it is still open.
+# Remove once vigil/docs/superpowers/specs/2026-08-03-session-hopping-design.md
+# part C has a timeline. That path is in the VIGIL repo, not this one; read it
+# and vigil/docs/superpowers/2026-08-03-session-hopping-handoff.md before
+# deleting, in case it is still open.
 readonly HOP_TIMING_LOG="/tmp/vigil-hop-timing.log"
 stamp() {
   printf '%s %s\n' \
