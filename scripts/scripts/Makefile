@@ -4,7 +4,7 @@
 # migrate-clean is ruby, so both stay out.
 SHELL_SCRIPTS := common.sh $(wildcard lib/*.sh) \
 	claude-trust dispatch dispatch-from-chrome \
-	gh-review gh-review-poll gh-worktree \
+	gh-review gh-worktree \
 	git-worktree-cleanup git-worktree-done git-worktree-new git-worktree-session \
 	portal-open short-story-md shortcut-claim shortcut-implement shortcut-worktree \
 	ts vigil-panel
