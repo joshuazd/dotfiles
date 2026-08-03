@@ -3,11 +3,11 @@
 # Every bash script in the package. dispatch-bar is a compiled binary and
 # migrate-clean is ruby, so both stay out.
 SHELL_SCRIPTS := common.sh $(wildcard lib/*.sh) \
-	claude-trust dispatch dispatch-from-chrome dispatch.1d.sh \
-	gh-review gh-review-poll gh-worktree \
+	claude-trust dispatch dispatch-from-chrome \
+	gh-review gh-worktree \
 	git-worktree-cleanup git-worktree-done git-worktree-new git-worktree-session \
 	portal-open short-story-md shortcut-claim shortcut-implement shortcut-worktree \
-	tmux-monitor ts vigil-panel worktree-status
+	ts vigil-panel
 
 # -x plus the source paths lets shellcheck follow the lib/ sources instead of
 # reporting SC1091 on every one. SC2155 is excluded because the
