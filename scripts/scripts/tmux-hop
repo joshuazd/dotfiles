@@ -66,7 +66,10 @@ ordered_sessions() {
 neighbour() {
   local delta="${1}"
   local current
-  current="$(tmux display-message -p '#{session_name}')"
+  if ! current="$(tmux display-message -p '#{session_name}' 2>/dev/null)"; then
+    error "No current tmux client - is this running inside tmux?"
+    return 1
+  fi
 
   ordered_sessions | awk -v cur="${current}" -v delta="${delta}" '
     { n++; name[n] = $0; if ($0 == cur) idx = n }
@@ -90,7 +93,11 @@ neighbour() {
 #######################################
 nth() {
   local n="${1}"
-  ordered_sessions | sed -n "$((n + 1))p"
+  # 10#$n forces base-10 interpretation so a leading zero (08, 09) is not
+  # read as an invalid octal digit - bash's arithmetic otherwise treats a
+  # leading-zero numeral as octal and aborts on 08/09 with a raw
+  # "value too great for base" error.
+  ordered_sessions | sed -n "$((10#${n} + 1))p"
 }
 
 main() {
