@@ -71,8 +71,13 @@ neighbour() {
     return 1
   fi
 
+  # $0 "" and cur "" force a string comparison. Both operands are awk strnums,
+  # and awk compares two strnums NUMERICALLY when both look like numbers - so a
+  # session named 7 matches one named 007, and 1 matches 1.0, +1 and " 1".
+  # Concatenating the empty string strips the numeric attribute, which is the
+  # only way to get an exact comparison here; == alone does not give one.
   ordered_sessions | awk -v cur="${current}" -v delta="${delta}" '
-    { n++; name[n] = $0; if ($0 == cur) idx = n }
+    { n++; name[n] = $0; if ($0 "" == cur "") idx = n }
     END {
       if (n == 0) { exit 1 }
       if (idx == 0) { print name[1]; exit 0 }
