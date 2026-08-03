@@ -23,6 +23,18 @@ set -o pipefail  # don't hide errors within pipes
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/common.sh"
 
+# TEMPORARY - diagnostic instrumentation for vigil's session-removal latency.
+# Remove once vigil/docs/superpowers/specs/2026-08-03-session-hopping-design.md
+# part C has a timeline. That path is in the VIGIL repo, not this one; read it
+# and vigil/docs/superpowers/2026-08-03-session-hopping-handoff.md before
+# deleting, in case it is still open.
+readonly HOP_TIMING_LOG="/tmp/vigil-hop-timing.log"
+stamp() {
+  printf '%s %s\n' \
+    "$(perl -MTime::HiRes -e 'printf "%.3f", Time::HiRes::time')" \
+    "${1}" >> "${HOP_TIMING_LOG}" || true
+}
+
 #######################################
 # Print usage information
 # Outputs:
@@ -170,6 +182,8 @@ cleanup_mise_tracked_configs() {
 #   0 on success, 1 on failure
 #######################################
 main() {
+  stamp 'cleanup: main entry'
+
   local target_dir=""
   local session_name=""
   local absolute_path
@@ -204,18 +218,21 @@ main() {
 
   # Kill corresponding tmux session if it exists (do this early so it always runs)
   kill_tmux_session "${session_name}"
+  stamp 'cleanup: kill-session returned'
 
   # If directory is already gone, clean up mise entries and exit
   if [[ ! -d "${absolute_path}" ]]; then
     info "Directory already removed: ${absolute_path}"
     cleanup_mise_tracked_configs "${absolute_path}"
     info "Cleanup complete!"
+    stamp 'cleanup: finished'
     return 0
   fi
 
   # Check if it's a git repository
   if ! (cd "${absolute_path}" && is_git_repo); then
     error "Not a git repository: ${absolute_path}"
+    stamp 'cleanup: error exit (not a git repo)'
     return 1
   fi
 
@@ -223,6 +240,7 @@ main() {
   if ! is_worktree "${absolute_path}"; then
     error "Not a worktree: ${absolute_path}"
     error "This appears to be the main repository. Only worktrees can be cleaned up with this script."
+    stamp 'cleanup: error exit (not a worktree)'
     return 1
   fi
 
@@ -239,6 +257,7 @@ main() {
   info "Navigating to main repository..."
   cd "${main_repo_path}" || {
     error "Failed to navigate to main repository"
+    stamp 'cleanup: error exit (nav to main repo failed)'
     return 1
   }
   
@@ -260,12 +279,14 @@ main() {
     info "Worktree removed successfully"
   else
     error "Failed to remove worktree"
+    stamp 'cleanup: error exit (worktree removal failed)'
     return 1
   fi
 
   info "Cleanup complete!"
   info "Current directory: $(pwd)"
-  
+
+  stamp 'cleanup: finished'
   return 0
 }
 

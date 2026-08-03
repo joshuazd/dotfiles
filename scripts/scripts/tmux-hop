@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+#
+# tmux-hop - Switch tmux sessions by position in a stable, vigil-independent order
+#
+# Usage: tmux-hop next|prev|<n>
+#
+# Sessions are ordered by #{session_id} numerically. tmux issues session ids in
+# increasing order and never reuses one, so this is a total order equal to
+# creation order with no ties - which is why it needs no tie-break rule and
+# cannot drift from what vigil's session table draws. vigil sorts by
+# (session_created, session_id) for the same reason; see
+# vigil/docs/superpowers/specs/2026-08-03-session-hopping-design.md.
+#
+# This script must never depend on vigil. tmux navigation has to work on a
+# machine where vigil is not installed and no daemon is running.
+#
+# Examples:
+#   tmux-hop next   # following session, wrapping at the end
+#   tmux-hop prev   # preceding session, wrapping at the start
+#   tmux-hop 0      # first session (indices are 0-based, matching vigil's
+#                   # index column)
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/common.sh"
+
+usage() {
+  cat <<'USAGE'
+Usage: tmux-hop next|prev|<n>
+
+Switch to another tmux session by position in session-id order.
+
+Arguments:
+  next    The following session, wrapping at the end
+  prev    The preceding session, wrapping at the start
+  <n>     The n-th session, 0-based
+
+Examples:
+  tmux-hop next
+  tmux-hop 3
+USAGE
+}
+
+#######################################
+# List session names in session-id order, one per line
+# Outputs:
+#   Session names to stdout, ordered
+#######################################
+ordered_sessions() {
+  tmux list-sessions -F '#{session_id}|#{session_name}' \
+    | sed 's/^\$//' \
+    | sort -t'|' -k1,1n \
+    | cut -d'|' -f2-
+}
+
+#######################################
+# Resolve the session offset delta positions from the current one, wrapping
+# Arguments:
+#   Delta: 1 for next, -1 for prev
+# Outputs:
+#   The target session name to stdout
+#######################################
+neighbour() {
+  local delta="${1}"
+  local current
+  if ! current="$(tmux display-message -p '#{session_name}' 2>/dev/null)"; then
+    error "No current tmux client - is this running inside tmux?"
+    return 1
+  fi
+
+  # $0 "" and cur "" force a string comparison. Both operands are awk strnums,
+  # and awk compares two strnums NUMERICALLY when both look like numbers - so a
+  # session named 7 matches one named 007, and 1 matches 1.0, +1 and " 1".
+  # Concatenating the empty string strips the numeric attribute, which is the
+  # only way to get an exact comparison here; == alone does not give one.
+  ordered_sessions | awk -v cur="${current}" -v delta="${delta}" '
+    { n++; name[n] = $0; if ($0 "" == cur "") idx = n }
+    END {
+      if (n == 0) { exit 1 }
+      if (idx == 0) { print name[1]; exit 0 }
+      t = idx + delta
+      if (t > n) { t = 1 }
+      if (t < 1) { t = n }
+      print name[t]
+    }
+  '
+}
+
+#######################################
+# Resolve the n-th session, 0-based
+# Arguments:
+#   Index
+# Outputs:
+#   The target session name to stdout, empty if out of range
+#######################################
+nth() {
+  local n="${1}"
+  # 10#$n forces base-10 interpretation so a leading zero (08, 09) is not
+  # read as an invalid octal digit - bash's arithmetic otherwise treats a
+  # leading-zero numeral as octal and aborts on 08/09 with a raw
+  # "value too great for base" error.
+  ordered_sessions | sed -n "$((10#${n} + 1))p"
+}
+
+main() {
+  if [[ "${#}" -ne 1 ]]; then
+    usage >&2
+    return 1
+  fi
+
+  local target
+  case "${1}" in
+    next) target="$(neighbour 1)" ;;
+    prev) target="$(neighbour -1)" ;;
+    *[!0-9]* | '')
+      error "Not next, prev, or a non-negative integer: ${1}"
+      return 1
+      ;;
+    *) target="$(nth "${1}")" ;;
+  esac
+
+  if [[ -z "${target}" ]]; then
+    return 0
+  fi
+
+  # "=" makes this an exact match. Without it tmux may resolve SC-223477
+  # against SC-2234770 - the same prefix hazard vigil documents for
+  # QueueItem.SessionPrefix()'s trailing space.
+  tmux switch-client -t "=${target}"
+}
+
+if help_wanted "${@}"; then
+  usage
+  exit 0
+fi
+
+main "${@}"
