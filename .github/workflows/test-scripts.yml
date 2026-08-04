@@ -49,11 +49,37 @@ jobs:
         echo "bats ${version}"
 
     - name: Install shellcheck
+      # Pinned from upstream's own release for the same reason bats is: the
+      # distro builds drift per runner image, and here they disagreed on the
+      # result. ubuntu 24.04 ships 0.9.0 and brew ships 0.11.0; 0.9.0 reports
+      # SC2120 for the `${1:-default}` optional-argument idiom that 0.11.0
+      # accepts, so lib/tmux.sh's client_dimensions linted clean on macOS and
+      # failed on Linux against the identical tree. An unpinned linter makes
+      # a green run a statement about the runner image rather than the code.
       run: |
-        if [ "$RUNNER_OS" == "Linux" ]; then
-          sudo apt-get update && sudo apt-get install -y shellcheck
-        else
-          brew install shellcheck
+        version=0.11.0
+        case "$(uname -s)-$(uname -m)" in
+          Linux-x86_64)   target=linux.x86_64 ;;
+          Linux-aarch64)  target=linux.aarch64 ;;
+          Darwin-arm64)   target=darwin.aarch64 ;;
+          Darwin-x86_64)  target=darwin.x86_64 ;;
+          *) echo "no pinned shellcheck for $(uname -s)-$(uname -m)" >&2; exit 1 ;;
+        esac
+        dir="$(mktemp -d)"
+        curl -sSLf "https://github.com/koalaman/shellcheck/releases/download/v${version}/shellcheck-v${version}.${target}.tar.xz" \
+          | tar -xJ -C "${dir}"
+        mkdir -p "${HOME}/.local/bin"
+        mv "${dir}/shellcheck-v${version}/shellcheck" "${HOME}/.local/bin/shellcheck"
+        rm -rf "${dir}"
+        echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+
+    - name: Check shellcheck version
+      run: |
+        shellcheck --version
+        version="$(shellcheck --version | awk '/^version:/ {print $2}')"
+        if [ "${version}" != "0.11.0" ]; then
+          echo "expected the pinned shellcheck 0.11.0, got ${version}"
+          exit 1
         fi
 
     - name: Lint scripts
