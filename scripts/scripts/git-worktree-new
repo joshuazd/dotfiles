@@ -138,7 +138,7 @@ dev.server:
 	done; \
 	mkdir -p tmp && echo $$port > tmp/dev.port; \
 	echo "Starting dev server on port $$port"; \
-	PORT=$$port aws-vault exec $${AWS_PROFILE} -- foreman start -f Procfile.dev -m all=1,temporal=0
+	PORT=$$port aws-vault exec $${AWS_PROFILE} -- foreman start -f Procfile.dev -m all=1,temporal=0,temporal_huntai=0
 MAKEFILE
     info "Created Makefile.local (auto-picks port at dev.server time)"
   fi
