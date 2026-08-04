@@ -23,7 +23,18 @@ jobs:
       # BATS_TEST_TMPDIR (bats >= 1.4) and the apt/brew versions drift per
       # runner image. Too old a bats fails every test inside setup_tmux_stub
       # with a confusing permission error rather than a version error.
-      run: npm install -g bats@1.13.0
+      #
+      # sudo on Linux only. The ubuntu runner's global npm prefix is /usr/local,
+      # which the runner user cannot write to - an unprivileged install dies
+      # with EACCES on mkdir of /usr/local/share/man/man7. The macOS runner's
+      # prefix is homebrew-owned and already writable, where sudo would instead
+      # leave root-owned files in it.
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo npm install -g bats@1.13.0
+        else
+          npm install -g bats@1.13.0
+        fi
 
     - name: Check bats version
       run: |
