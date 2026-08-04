@@ -178,4 +178,8 @@ APPLESCRIPT
   done
 }
 
-main "$@"
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and on
+# the macos-latest runner: there "$@" with no positional parameters is an
+# unbound variable under `set -o nounset` rather than an empty list, so a
+# no-argument run aborted here instead of printing usage.
+main ${1+"$@"}

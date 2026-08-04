@@ -136,9 +136,17 @@ esac
 if [ -n "${TMUX_STUB_LOG:-}" ]; then
   printf '%s' "${1:-}" >> "${TMUX_STUB_LOG}"
   shift || true
-  for arg in "${@}"; do
-    printf '\x1f%s' "${arg}" >> "${TMUX_STUB_LOG}"
-  done
+  # The count guard is for bash 3.2, which is what /bin/bash is on a stock
+  # macOS and on the macos-latest runner: there "${@}" with no positional
+  # parameters left is an unbound variable under `set -o nounset`, not an
+  # empty list, and the stub exits non-zero before recording anything.
+  # "tmux start-server" is the only call with no arguments after the
+  # subcommand, so it was the only one that tripped it.
+  if [ "${#}" -gt 0 ]; then
+    for arg in "${@}"; do
+      printf '\x1f%s' "${arg}" >> "${TMUX_STUB_LOG}"
+    done
+  fi
   printf '\n' >> "${TMUX_STUB_LOG}"
 fi
 

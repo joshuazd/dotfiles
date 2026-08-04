@@ -505,7 +505,10 @@ claude_launch_cmd() {
   local slash_command="${4}"
   local extra_system_block="${5:-}"
   shift 5
-  local -a extra_flags=("${@}")
+  # ${1+...} for bash 3.2: the shift above can leave no positional
+  # parameters, and "${@}" is then an unbound variable there, not an
+  # empty list. A five-argument call is the case that reaches it.
+  local -a extra_flags=(${1+"${@}"})
 
   local model
   model="$(model_id "${tier}")" || return 1

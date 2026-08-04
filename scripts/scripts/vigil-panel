@@ -38,5 +38,10 @@ main() {
 }
 
 if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
-  main "${@}"
+  # ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and on
+  # the macos-latest runner: there "${@}" with no positional parameters is an
+  # unbound variable under `set -o nounset` rather than an empty list. prefix p
+  # passes no arguments, so without this the panel toggle never ran at all on
+  # such a machine.
+  main ${1+"${@}"}
 fi

@@ -100,4 +100,12 @@ Gets the active Chrome tab URL via osascript, validates it looks like a Shortcut
 - `readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"` at top of each script
 - Argument parsing with a `while [ "${#}" -gt 0 ]` / `case` loop
 - JSON parsed with `jq` when available, falling back to `grep`+`sed`
-- Scripts call `help_wanted "${@}"` before `main` and print usage then exit
+- Scripts call `help_wanted ${1+"${@}"}` before `main` and print usage then exit.
+  **The `${1+...}` is load-bearing and applies to every top-level `"${@}"`.**
+  `/bin/bash` is 3.2 on a stock macOS and on the macos-latest runner, and there
+  `"${@}"` with no positional parameters is an unbound variable under
+  `set -o nounset` rather than an empty list. Without it every one of these
+  scripts aborted with `@: unbound variable` on a no-argument run instead of
+  printing usage, and `vigil-panel` - bound to `prefix p`, which passes no
+  arguments at all - never worked on such a machine. The same applies after a
+  `shift` leaves nothing, which is why `lib/route.sh`'s `extra_flags` uses it
