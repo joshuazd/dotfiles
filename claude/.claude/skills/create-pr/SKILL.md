@@ -94,6 +94,23 @@ gh pr create --draft --title "..." --body-file "$pr_body_file" [labels...]
 rm -f "$pr_body_file"
 ```
 
+### 7. Quiz, then reveal
+
+After the PR exists, invoke the `quiz` skill on the branch diff.
+
+The quiz applies its own novelty gate — if the change is mechanical, it will say so and exit, and that is the expected outcome for most sweeps. Do not second-guess the gate or skip this step because the diff looks small.
+
+**Order matters. Quiz first, reveal second.** If the summary below is printed before the quiz, it hands over every answer.
+
+Once the quiz is done or gated out, print a short **What you should know** section to the terminal — never into the PR body:
+
+- New files, one line each on their purpose
+- Contracts changed, and who calls them
+- Concepts introduced
+- The one thing future-you will be surprised by
+
+Keep it under ten lines. If the user answers "skip" at any point, skip straight to this summary.
+
 ## Conventions
 
 - Always create **draft** PRs (`gh pr create --draft`)
