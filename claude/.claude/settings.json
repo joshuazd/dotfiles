@@ -49,6 +49,7 @@
       "~/"
     ]
   },
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -65,6 +66,10 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/gh-pr-create-rewrite.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/rg-flag-rewrite.sh"
           },
           {
             "type": "command",
@@ -91,6 +96,11 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/block-force-push.sh"
+          },
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-remote-writes.sh",
+            "statusMessage": "Checking for remote writes..."
           }
         ]
       },
@@ -100,6 +110,15 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/block-manual-migration-write.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/block-remote-writes.sh"
           }
         ]
       }
@@ -167,7 +186,7 @@
       "Force multiplying"
     ]
   },
-  "effortLevel": "high",
+  "effortLevel": "medium",
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "showClearContextOnPlanAccept": true,
@@ -179,5 +198,6 @@
       "$defaults",
       "Deleting your own prior `@greptileai review` trigger comments via `gh api -X DELETE /repos/{owner}/{repo}/issues/comments/{id}` — used by the watch-pull-request skill to keep PR conversations tidy. Safe because it only removes the user's own trigger comments (filtered by `user.login == me` AND `body == \"@greptileai review\"`)."
     ]
-  }
+  },
+  "skipDangerousModePermissionPrompt": true
 }

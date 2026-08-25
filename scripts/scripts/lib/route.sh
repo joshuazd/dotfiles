@@ -188,13 +188,14 @@ _route_debug() {
 }
 
 #######################################
-# Map a tier name to a Claude CLI model ID.
-# Opus 4.7 and Sonnet 4.6 include the 1M context window at standard pricing,
-# so we always opt in via the `[1m]` suffix. Haiku 4.5 stays at standard.
+# Map a tier name to a Claude CLI model argument.
+# Aliases, not pinned IDs, so the CLI always resolves the latest model of each
+# tier. Opus and Sonnet include the 1M context window at standard pricing, so we
+# always opt in via the `[1m]` suffix; Haiku has no 1M variant.
 # Arguments:
 #   tier — opus | sonnet | haiku
 # Outputs:
-#   Writes the model ID to stdout
+#   Writes the model argument to stdout
 # Returns:
 #   0 on success, 1 on unknown tier
 #######################################
@@ -202,10 +203,10 @@ model_id() {
   local tier="${1}"
 
   case "${tier}" in
-    opus)     printf "claude-opus-4-8[1m]" ;;
+    opus)     printf "opus[1m]" ;;
     opusplan) printf "opusplan" ;;
-    sonnet)   printf "claude-sonnet-4-6[1m]" ;;
-    haiku)    printf "claude-haiku-4-5-20251001" ;;
+    sonnet)   printf "sonnet[1m]" ;;
+    haiku)    printf "haiku" ;;
     *)
       error "Unknown tier: ${tier}"
       return 1
