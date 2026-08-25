@@ -22,6 +22,7 @@ if [[ "$cmd" =~ ^([[:space:]]*git[[:space:]]+-C[[:space:]]+)(\"[^\"]+\"|\'[^\']+
   unquoted="${unquoted%\'}"; unquoted="${unquoted#\'}"
 
   # Expand leading tilde (quote ~ to prevent bash tilde-expansion in the pattern)
+  # shellcheck disable=SC2088 # a literal ~ is the pattern being matched, not an expansion
   case "$unquoted" in
     "~"|"~/"*) expanded="${HOME}${unquoted#"~"}" ;;
     *) expanded="$unquoted" ;;

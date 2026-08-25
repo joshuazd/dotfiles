@@ -89,3 +89,13 @@ jobs:
     - name: Run tests
       working-directory: scripts/scripts
       run: make test
+
+    # The Claude hooks are bash with bats tests too, and this job already has
+    # the pinned bats and shellcheck a second workflow would have to duplicate.
+    - name: Lint Claude hooks
+      working-directory: claude/.claude/hooks
+      run: make lint
+
+    - name: Test Claude hooks
+      working-directory: claude/.claude/hooks
+      run: make test
