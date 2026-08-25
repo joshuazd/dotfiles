@@ -116,6 +116,7 @@ Valid verbs: `blocks`, `duplicates`, `relates to`
 
 ## Gotchas
 
-- Owner and state names support partial/regex matches
+- **`-o` matches every member the string matches, and assigns all of them.** It is a partial/regex match, not a lookup. `-o "Josh"` on a company with 14 Joshes assigns all 14 as owners — and on `short create` they each get a notification you cannot unsend. Always pass the full unique mention name (`-o "joshuazd"`, not `-o "Josh"`). Verify after any owner write: `short api /stories/<ID>` and check `owner_ids` has the length you expect — `short story <ID>`'s human-readable output echoes the pre-update owner list, so it looks wrong even when the write succeeded.
+- State names also support partial/regex matches (lower stakes — a story has one state, so a loose match just picks one).
 - `-d` with heredocs silently fails when the string contains backticks — use plain inline strings instead
 - `-f` sends all values as strings, but the Shortcut API coerces numeric strings to integers for ID fields
