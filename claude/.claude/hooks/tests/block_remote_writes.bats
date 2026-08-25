@@ -24,7 +24,10 @@ assert_denied() {
 }
 
 assert_allowed() {
-  [ -z "${output}" ]
+  if [ -n "${output}" ]; then
+    printf 'expected no output, got status %s and:\n%s\n' "${status}" "${output}" >&2
+    return 1
+  fi
 }
 
 @test "an unarmed session is untouched" {
