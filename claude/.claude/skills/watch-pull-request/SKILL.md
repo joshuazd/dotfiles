@@ -29,9 +29,14 @@ If `gh pr view` fails, abort and tell the user — don't silently fall back.
 
 ### 2. Self-Review
 
-Dispatch a `general-purpose` subagent via the Agent tool to run the `review-pr` skill. **Always pin this subagent to Opus** (`model: opus` in the Agent call) regardless of the session model — the self-review is the quality gate and warrants the strongest model. The subagent's prompt must instruct it to invoke `Skill review-pr` with the PR number and return the review verbatim. This keeps the review output out of the main context.
+Dispatch a `general-purpose` subagent via the Agent tool to run the `self-review-pr` skill. **Always pin this subagent to Opus** (`model: opus` in the Agent call) regardless of the session model — the self-review is the quality gate and warrants the strongest model. The subagent's prompt must instruct it to invoke `Skill self-review-pr` with the PR number and return the report verbatim. This keeps the review output out of the main context.
 
-For each finding, implement the **minimal** fix, commit, and push so Greptile reviews the cleaned-up state in step 3:
+The subagent leaves its own small fixes **uncommitted in the working tree** and lists them under `## Fixed`. It does not commit or push. You do.
+
+1. `git diff` to confirm the subagent's edits match what its report claims. Anything unexplained, drop it.
+2. Implement the **minimal** fix for each `## Needs your call` finding you agree with. Report the ones you skip and why.
+3. Run any spec files listed under `## Specs to run`.
+4. Commit everything and push so Greptile reviews the cleaned-up state in step 3:
 
 ```bash
 git push origin HEAD
