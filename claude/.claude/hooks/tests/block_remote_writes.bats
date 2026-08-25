@@ -9,13 +9,20 @@ setup() {
   export CLAUDE_READONLY_REMOTE=1
 }
 
+# The payload arrives on a here-string rather than a pipe: an unarmed hook
+# exits before reading stdin, which leaves a piped jq writing to a closed pipe
+# and its "Broken pipe" on stderr looking like hook output.
+run_hook() {
+  bash "${HOOK}" <<<"${1}"
+}
+
 # Run the hook over a Bash command, as Claude would.
 hook_bash() {
-  jq -n --arg c "${1}" '{tool_name:"Bash",tool_input:{command:$c}}' | bash "${HOOK}"
+  run_hook "$(jq -n --arg c "${1}" '{tool_name:"Bash",tool_input:{command:$c}}')"
 }
 
 hook_tool() {
-  jq -n --arg t "${1}" '{tool_name:$t,tool_input:{}}' | bash "${HOOK}"
+  run_hook "$(jq -n --arg t "${1}" '{tool_name:$t,tool_input:{}}')"
 }
 
 assert_denied() {
