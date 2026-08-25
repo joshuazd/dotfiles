@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+#
+# rubocop-server-prune - Reap orphaned rubocop servers and their state dirs
+#
+# Usage: rubocop-server-prune [--dry-run]
+#
+# git-worktree-cleanup stops the server for the worktree it removes, but every
+# worktree removed before that existed left one behind. This sweeps them.
+#
+# Example:
+#   rubocop-server-prune --dry-run
+#   rubocop-server-prune
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/rubocop.sh"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  cat <<USAGE
+Usage: ${0##*/} [--dry-run]
+
+Remove rubocop server state directories whose server is no longer running or
+whose project directory no longer exists, stopping the server first when it is
+still alive but its project is gone.
+
+A live server whose project still exists is left running.
+
+Options:
+  --dry-run    Report what would be pruned without changing anything
+
+Examples:
+  ${0##*/} --dry-run
+  ${0##*/}
+USAGE
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional --dry-run flag
+# Returns:
+#   0 on success, 1 on unknown arguments
+#######################################
+main() {
+  local dry_run=""
+
+  while [[ "${#}" -gt 0 ]]; do
+    case "${1}" in
+      --dry-run) dry_run="--dry-run"; shift ;;
+      *) error "Unknown argument: ${1}"; usage; return 1 ;;
+    esac
+  done
+
+  prune_rubocop_servers "${dry_run}"
+}
+
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS: there
+# "${@}" with no positional parameters is an unbound variable under
+# `set -o nounset` rather than an empty list.
+if help_wanted ${1+"${@}"}; then
+  usage
+  exit 0
+fi
+
+main ${1+"${@}"}

@@ -220,6 +220,9 @@ main() {
   kill_tmux_session "${session_name}"
   stamp 'cleanup: kill-session returned'
 
+  # Before the early return below: the server leaks either way
+  stop_rubocop_server "${absolute_path}"
+
   # If directory is already gone, clean up mise entries and exit
   if [[ ! -d "${absolute_path}" ]]; then
     info "Directory already removed: ${absolute_path}"

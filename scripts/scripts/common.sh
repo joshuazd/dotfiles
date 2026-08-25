@@ -9,6 +9,7 @@
 #   source "${SCRIPT_DIR}/lib/shortcut.sh" — fetch_story_summary
 #   source "${SCRIPT_DIR}/lib/tmux.sh"     — tmux session mgmt, worktree popup, resolve_session_name
 #   source "${SCRIPT_DIR}/lib/route.sh"    — classifier + claude_launch_cmd for model/effort routing
+#   source "${SCRIPT_DIR}/lib/rubocop.sh"  - rubocop server teardown for removed worktrees
 #
 # Usage:
 #   source "${SCRIPT_DIR}/common.sh"
@@ -20,3 +21,4 @@ source "${_COMMON_LIB_DIR}/git.sh"
 source "${_COMMON_LIB_DIR}/shortcut.sh"
 source "${_COMMON_LIB_DIR}/tmux.sh"
 source "${_COMMON_LIB_DIR}/route.sh"
+source "${_COMMON_LIB_DIR}/rubocop.sh"
