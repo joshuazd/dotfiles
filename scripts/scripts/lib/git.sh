@@ -78,3 +78,42 @@ extract_story_id() {
 normalize_pr_input() {
   printf "%s" "${1#\#}"
 }
+
+#######################################
+# Print the repository directory a PR's review worktree should be cut from.
+#
+# A PR URL names its repository and the caller's working directory does not, so
+# the URL wins: a worktree cut from the wrong repository has no such branch, and
+# a review dispatched from a portal pane would otherwise always land in portal
+# whatever repository the PR came from.
+#
+# Clones live at ${HOME}/<repo>, the same layout dispatch-from-chrome resolves
+# its --repo flag against. A missing clone is an error rather than a fall back to
+# the working directory, because that silent fall back is the defect itself.
+#
+# A bare PR number names no repository, so `gh pr view` resolves it against the
+# caller's repo and the working directory is the only correct answer.
+# Arguments:
+#   PR number or URL
+# Outputs:
+#   Writes the repository directory to stdout
+# Returns:
+#   0 on success, 1 when the URL names a repo with no clone under ${HOME}
+#######################################
+pr_repo_dir() {
+  local pr_ref="${1}"
+
+  if [[ ! "${pr_ref}" =~ ^https?://[^/]*github\.com/[^/]+/([^/]+)/pull/ ]]; then
+    printf "%s" "${PWD}"
+    return 0
+  fi
+
+  local repo="${BASH_REMATCH[1]}"
+  if [ ! -d "${HOME}/${repo}" ]; then
+    error "PR ${pr_ref} lives in '${repo}', which has no clone at ${HOME}/${repo}"
+    error "Clone it there and retry"
+    return 1
+  fi
+
+  printf "%s" "${HOME}/${repo}"
+}

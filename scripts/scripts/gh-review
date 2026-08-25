@@ -147,7 +147,8 @@ main() {
   session_script="$(resolve_session_script "${SCRIPT_DIR}")" || return 1
 
   pr_input="$(normalize_pr_input "${pr_input}")"
-  current_dir="$(pwd)"
+  # The PR's own repository, not the caller's: see pr_repo_dir.
+  current_dir="$(pr_repo_dir "${pr_input}")" || return 1
 
   info "Fetching PR ${pr_input} from GitHub..."
   local pr_json
@@ -173,7 +174,9 @@ main() {
     route_json="$(manual_route "${tier_override}" "${reasoning_override}")"
   else
     info "Classifying PR for model routing..."
-    route_json="$(classify_pr "${pr_number}")"
+    # pr_input, not pr_number: the classifier reads the PR through gh, and a
+    # bare number resolves against the caller's repo rather than the PR's.
+    route_json="$(classify_pr "${pr_input}")"
   fi
   local route_model route_reasoning route_rationale
   IFS=$'\t' read -r route_model route_reasoning route_rationale <<<"$(parse_route "${route_json}")"
@@ -210,8 +213,12 @@ main() {
   # shellcheck disable=SC2034 # read by claude_launch_cmd's command substitution, which forks and inherits it
   CLAUDE_PROMPT_FILE="${prompt_file}" launch_cmd="$(claude_launch_cmd \
     "${route_model}" "${route_reasoning}" "${route_rationale}" \
-    "/review-pr ${pr_input}" "")"
-  launch_claude_in_pane "${session_name}" "${session_dir}" "${launch_cmd}"
+    "/review-pr ${pr_input}" "" "--permission-mode" "bypassPermissions")"
+  # A review reads; it never publishes. Bypassing permissions removes the
+  # prompts, and CLAUDE_READONLY_REMOTE arms block-remote-writes.sh, which
+  # denies every push, gh mutation, and Shortcut/Slack write in its place.
+  launch_claude_in_pane "${session_name}" "${session_dir}" \
+    "CLAUDE_READONLY_REMOTE=1 ${launch_cmd}"
 
   if ! ${detached}; then
     teleport_client_to "=${session_name}:claude"

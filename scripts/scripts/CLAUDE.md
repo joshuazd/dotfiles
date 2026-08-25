@@ -46,7 +46,7 @@ Both run in CI (`.github/workflows/test-scripts.yml`) on Ubuntu and macOS.
 Functions are organized into focused libraries under `lib/`. All scripts source `common.sh` (which loads everything), but individual libs can be sourced directly when only a subset is needed.
 
 - **`lib/output.sh`** — `error` / `info` / `warn`, color codes, `help_wanted`
-- **`lib/git.sh`** — `is_git_repo`, `get_name_from_branch`, `extract_story_id`, `normalize_pr_input`
+- **`lib/git.sh`** — `is_git_repo`, `get_name_from_branch`, `extract_story_id`, `normalize_pr_input`, `pr_repo_dir`
 - **`lib/shortcut.sh`** — `fetch_story_summary` (returns tab-delimited `title\tbranch` via `short --format`, no JSON parsing)
 - **`lib/tmux.sh`** — `is_in_tmux`, `session_name_from_title`, `setup_secondary_pane`, `create_tmux_session`, `launch_claude_in_pane`, `worktree_prompt_file`, `resolve_session_name`, `resolve_session_script`, `run_worktree_popup`, the `SESSION_EXISTED` status
 
@@ -76,6 +76,8 @@ Every session created by `git-worktree-session` has two windows:
 
 Worktrees are created one level up from the main repo root: `../branch-name`. The directory name is the branch name with its type prefix stripped. The `--prefix` flag prepends a string (e.g., `pr-` for GitHub PRs).
 
+**Which repo a review worktree comes from is decided by the PR, not by the caller's directory.** `gh-review` resolves it with `pr_repo_dir`: a PR URL names its repository, so the clone at `${HOME}/<repo>` wins over `$(pwd)`, and a repo with no clone there is a hard error rather than a fall back. Same layout `dispatch-from-chrome` resolves `--repo` against. A bare `gh-review 123` has no repository in its input and keeps using the working directory, which is also what `gh pr view 123` resolves against. This is why vigil's dispatch `cwd` no longer decides anything for a PR: every review dispatched from the vigil queue used to land in whatever repo the pane was in - portal, in practice - because that cwd was the only signal anyone read. `classify_pr` is passed the URL for the same reason: a bare number would classify the same-numbered PR in the caller's repo.
+
 ### Portal Repo Detection
 
 `setup_portal_files` in `git-worktree-new` triggers only when `Procfile.dev` exists in the repo root. It symlinks `.env` and `node_modules`, copies generated route files, and creates `Procfile.personal` (port 3001) and `Makefile.local` (skips `docker.up`).
@@ -89,6 +91,12 @@ The multi-line system prompt travels via a file rather than the command line: `w
 Re-dispatching a story or PR that already has a session must not relaunch Claude - `respawn-pane -k` would SIGKILL the Claude running there. `create_tmux_session` returns `SESSION_EXISTED`, `git-worktree-session` and `run_worktree_popup` carry that status out through the popup, and both callers skip the launch and just switch to the live session.
 
 The `claude-trust` script modifies `~/.claude.json` to pre-trust new worktree directories so Claude doesn't prompt for confirmation.
+
+### Read-Only Review Sessions
+
+A review reads; it never publishes. `gh-review` therefore launches with `--permission-mode bypassPermissions`, so a review never stops to ask, and with `CLAUDE_READONLY_REMOTE=1`, which arms the `block-remote-writes.sh` PreToolUse hook in `claude/.claude/hooks`. Hooks still run under a bypassed permission mode, so that hook - not the permission system - is what denies `git push`, remote-mutating `gh`/`short` calls, and Slack posts in these sessions. It is an allowlist: an unrecognised `gh` subcommand is denied. The pairing is load-bearing in both directions, and `tests/gh_review.bats` asserts both flags travel together; the hook's own bats suite lives beside it.
+
+No other launcher sets the variable, so `shortcut-implement` sessions keep the normal permission prompts and can still push.
 
 ### dispatch-from-chrome
 
