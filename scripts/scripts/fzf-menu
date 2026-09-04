@@ -31,6 +31,7 @@ source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
 
 readonly MENU_DIR="${FZF_MENU_DIR:-${SCRIPT_DIR}/menus}"
+readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
 
 # Exit status for "the menu could not be run", distinct from "nothing picked",
 # which is a successful no-op.
@@ -131,6 +132,64 @@ menu_rows() {
 }
 
 #######################################
+# Run a selected menu command according to its leading sigil.
+#
+# The sigil answers "where does this run", which is the one thing a flat
+# label-to-command table cannot express and the usual reason a menu would
+# otherwise have to become a script.
+# Arguments:
+#   The command string, sigil included
+# Returns:
+#   0 on success, MENU_UNAVAILABLE on an unknown sigil
+#######################################
+run_action() {
+  local command="${1}"
+  local sigil=""
+  local body="${command}"
+
+  case "${command}" in
+    '@window '*) sigil="window"; body="${command#@window }" ;;
+    '@pane '*)   sigil="pane";   body="${command#@pane }" ;;
+    '@bg '*)     sigil="bg";     body="${command#@bg }" ;;
+    '@'*)
+      error "unknown sigil in: ${command}"
+      return "${MENU_UNAVAILABLE}"
+      ;;
+  esac
+
+  case "${sigil}" in
+    window)
+      tmux new-window -c "#{pane_current_path}" "${body}"
+      ;;
+    pane)
+      tmux send-keys "${body}" Enter
+      ;;
+    bg)
+      mkdir -p "$(dirname "${MENU_LOG}")"
+      nohup sh -c "${body}" >> "${MENU_LOG}" 2>&1 &
+      info "running in background, logging to ${MENU_LOG/#${HOME}/~}"
+      ;;
+    *)
+      # A failing action must not look like a failing menu, so its status is
+      # reported rather than propagated - and reported before the pause, so it
+      # is readable instead of flashing past as the popup closes.
+      local status=0
+      sh -c "${body}" || status="${?}"
+      if [ "${status}" -ne 0 ]; then
+        warn "exited ${status}"
+      fi
+      # Only pause when there is a terminal to pause for. The prompt exists so
+      # a popup does not close before its output can be read; with no tty
+      # (a test, a pipe) there is nothing to wait on and blocking would hang.
+      if [ -t 0 ]; then
+        printf '\n'
+        read -r -n 1 -p "Press any key to close... " _ || true
+      fi
+      ;;
+  esac
+}
+
+#######################################
 # Main function
 #
 # Only PICKER_NO_SELECTION (the user pressed Escape, or there was nothing to
@@ -180,7 +239,7 @@ main() {
   # final field leaves the command intact even if it contains tabs itself.
   local command="${selection%$'\t'*}"
 
-  printf '%s\n' "${command}"
+  run_action "${command}"
 }
 
 # Check for help flag

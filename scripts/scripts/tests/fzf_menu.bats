@@ -8,6 +8,7 @@ load helper
 
 setup() {
   setup_fzf_stub
+  setup_tmux_stub
   export FZF_MENU_DIR="${BATS_TEST_TMPDIR}/menus"
   mkdir -p "${FZF_MENU_DIR}"
   MENU="${FZF_MENU_DIR}/demo.menu"
@@ -88,4 +89,69 @@ setup() {
   run "${FZF_MENU}" --help
   [ "${status}" -eq 0 ]
   [[ "${output}" == *"Usage:"* ]]
+}
+
+@test "@window opens a new tmux window" {
+  setup_tmux_stub
+  printf '# Win\nEdit\t@window vim\n' > "${FZF_MENU_DIR}/win.menu"
+  export FZF_STUB_SELECTION=$'@window vim\tEdit'
+  run "${FZF_MENU}" win
+  [ "${status}" -eq 0 ]
+  run assert_tmux_subcommand "new-window"
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "new-window"
+  [[ "${output}" == *"vim"* ]]
+  [[ "${output}" != *"@window"* ]]
+}
+
+@test "@pane sends keys to the current pane" {
+  setup_tmux_stub
+  printf '# Pane\nList\t@pane ls -la\n' > "${FZF_MENU_DIR}/pane.menu"
+  export FZF_STUB_SELECTION=$'@pane ls -la\tList'
+  run "${FZF_MENU}" pane
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "send-keys"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"ls -la"* ]]
+  [[ "${output}" == *"Enter"* ]]
+}
+
+@test "@bg runs detached and reports the log path" {
+  setup_tmux_stub
+  printf '# Bg\nTouch\t@bg touch %s/bg-ran\n' "${BATS_TEST_TMPDIR}" \
+    > "${FZF_MENU_DIR}/bg.menu"
+  export FZF_STUB_SELECTION="$(printf '@bg touch %s/bg-ran\tTouch' "${BATS_TEST_TMPDIR}")"
+  run "${FZF_MENU}" bg
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"background"* ]]
+}
+
+@test "an unknown sigil exits 2 without running the line" {
+  setup_tmux_stub
+  printf '# Bad\nOops\t@nope echo hi\n' > "${FZF_MENU_DIR}/bad.menu"
+  export FZF_STUB_SELECTION=$'@nope echo hi\tOops'
+  run "${FZF_MENU}" bad
+  [ "${status}" -eq 2 ]
+  [[ "${output}" == *"unknown sigil"* ]]
+  run refute_tmux_subcommand "new-window"
+  [ "${status}" -eq 0 ]
+}
+
+@test "a bare command runs in the popup and reports a nonzero status" {
+  setup_tmux_stub
+  printf '# Bare\nFail\texit 3\n' > "${FZF_MENU_DIR}/bare2.menu"
+  export FZF_STUB_SELECTION=$'exit 3\tFail'
+  run "${FZF_MENU}" bare2
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"exited 3"* ]]
+}
+
+@test "a bare command's output is shown and does not block without a tty" {
+  setup_tmux_stub
+  printf '# Bare\nSay\techo bare-ran\n' > "${FZF_MENU_DIR}/bare3.menu"
+  export FZF_STUB_SELECTION=$'echo bare-ran\tSay'
+  run "${FZF_MENU}" bare3
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"bare-ran"* ]]
+  [[ "${output}" != *"Press any key"* ]]
 }
