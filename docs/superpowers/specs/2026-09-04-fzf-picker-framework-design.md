@@ -178,7 +178,7 @@ Tier 1 opts back into a centered modal via its `--size` default.
 `window-status-current-format`, replace `#W` with:
 
 ```
-#{?#{||:#{m:SC-*,#{session_name}},#{m:PR-*,#{session_name}}},#W,#{?#{m:✳ *,#{pane_title}},#{=24:pane_title},#W}}
+#{?#{||:#{m:SC-*,#{session_name}},#{m:PR-*,#{session_name}}},#W,#{?#{m:✳ *,#{pane_title}},✳ #{=24:#{s/^✳ //:pane_title}},#W}}
 ```
 
 Claude Code renames its window to `claude` (which sets `automatic-rename=0`)
