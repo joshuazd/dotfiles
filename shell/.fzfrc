@@ -11,4 +11,4 @@
     fi
     '
 --bind 'focus:transform-preview-label:[[ -n {} ]] && printf " Previewing [%s] " {}'
---tmux 90%,70%
+--tmux bottom,50%
