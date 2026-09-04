@@ -2,10 +2,12 @@
 #
 # lib/picker.sh - fzf picker primitive for popup-driven selection
 #
-# Owns every fzf invocation in this package: popup geometry, the PATH
+# Owns every fzf invocation's argv in this package: popup geometry, the PATH
 # bootstrap a `tmux display-popup` needs, the TAB delimiter convention, and
-# the exit-code contract. Callers supply rows on stdin and read selections
-# from stdout.
+# the exit-code contract. It does not neutralize FZF_DEFAULT_OPTS or
+# FZF_DEFAULT_OPTS_FILE, so the user's `.fzfrc` binds still apply underneath -
+# explicit argv here wins wherever the two conflict. Callers supply rows on
+# stdin and read selections from stdout.
 #
 # Rows are TAB-delimited with the DISPLAY COLUMN LAST, so `--with-nth` is
 # uniform and callers can carry hidden leading fields (an id, a path, a
@@ -30,6 +32,13 @@ readonly PICKER_UNAVAILABLE=2
 # `--tmux bottom,50%` that .fzfrc sets for everyday C-t / C-r / M-c: a picker
 # the user asked for by name has earned the screen, an incidental history
 # search has not.
+#
+# Inert when fzf is already running inside a `tmux display-popup` (the
+# shipping path for fzf-menu's prefix-g binding): per `man tmux`, a
+# display-popup started inside an existing popup accepts only
+# -b -B -C -E -EE -K -N -s -S, so `--tmux`/`--size` here has no effect and the
+# outer binding's -w/-h govern instead. Still matters for a tier-3 picker
+# invoked from a normal pane.
 readonly PICKER_DEFAULT_SIZE="center,80%,70%"
 
 #######################################
@@ -86,6 +95,14 @@ _picker_run() {
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
+      --prompt|--header|--with-nth|--preview|--size|--delimiter)
+        if [ "${#}" -lt 2 ]; then
+          error "picker: ${1} requires a value"
+          return "${PICKER_UNAVAILABLE}"
+        fi
+        ;;
+    esac
+    case "${1}" in
       --prompt)    prompt="${2}";    shift 2 ;;
       --header)    header="${2}";    shift 2 ;;
       --with-nth)  with_nth="${2}";  shift 2 ;;
@@ -129,9 +146,13 @@ _picker_run() {
     args+=(--multi --bind "ctrl-a:select-all,ctrl-d:deselect-all")
   fi
 
-  local selection
-  selection="$(printf '%s\n' "${rows}" | fzf "${args[@]}")" \
-    || return "${PICKER_NO_SELECTION}"
+  local selection fzf_status=0
+  selection="$(printf '%s\n' "${rows}" | fzf "${args[@]}")" || fzf_status="${?}"
+  if [ "${fzf_status}" -eq 2 ]; then
+    error "fzf exited with an error"
+    return "${PICKER_UNAVAILABLE}"
+  fi
+  [ "${fzf_status}" -eq 0 ] || return "${PICKER_NO_SELECTION}"
   [ -n "${selection}" ] || return "${PICKER_NO_SELECTION}"
 
   printf '%s\n' "${selection}"

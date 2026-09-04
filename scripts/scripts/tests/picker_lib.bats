@@ -91,6 +91,22 @@ setup() {
   [ "${status}" -eq 2 ]
 }
 
+@test "a trailing --prompt with no value returns PICKER_UNAVAILABLE" {
+  run pick_one --prompt < "${ROWS}"
+  [ "${status}" -eq 2 ]
+}
+
+@test "a trailing --size with no value returns PICKER_UNAVAILABLE" {
+  run pick_one --size < "${ROWS}"
+  [ "${status}" -eq 2 ]
+}
+
+@test "fzf exiting 2 returns PICKER_UNAVAILABLE" {
+  export FZF_STUB_EXIT=2
+  run pick_one < "${ROWS}"
+  [ "${status}" -eq 2 ]
+}
+
 @test "picker_bootstrap_path is idempotent" {
   PATH="/usr/bin:/bin"
   picker_bootstrap_path

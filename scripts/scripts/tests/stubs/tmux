@@ -114,6 +114,22 @@ case "${1:-}" in
       exit 1
     fi
     ;;
+  new-window)
+    if [ -n "${TMUX_STUB_NEW_WINDOW_FAILS:-}" ]; then
+      if [ -n "${TMUX_STUB_LOG:-}" ]; then
+        printf 'new-window\n' >> "${TMUX_STUB_LOG}"
+      fi
+      exit 1
+    fi
+    ;;
+  send-keys)
+    if [ -n "${TMUX_STUB_SEND_KEYS_FAILS:-}" ]; then
+      if [ -n "${TMUX_STUB_LOG:-}" ]; then
+        printf 'send-keys\n' >> "${TMUX_STUB_LOG}"
+      fi
+      exit 1
+    fi
+    ;;
   split-window)
     if [ -n "${TMUX_STUB_SPLIT_FAILS:-}" ]; then
       # Log it before bailing: a test asserting nothing followed the failure

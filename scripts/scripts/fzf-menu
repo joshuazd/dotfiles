@@ -52,9 +52,10 @@ usage() {
     "" \
     "Available menus:"
   local name
-  for name in $(list_menus); do
+  while IFS= read -r name; do
+    [ -n "${name}" ] || continue
     printf '  %s\n' "${name}"
-  done
+  done < <(list_menus)
 }
 
 #######################################
@@ -159,10 +160,18 @@ run_action() {
 
   case "${sigil}" in
     window)
-      tmux new-window -c "#{pane_current_path}" "${body}"
+      # A failing action must not look like a failing menu, so its status is
+      # reported rather than propagated (same contract as the bare case
+      # below). Without this, `errexit` kills the script at the failing tmux
+      # call and nothing is printed at all.
+      tmux new-window -c "#{pane_current_path}" "${body}" || warn "new-window failed"
       ;;
     pane)
-      tmux send-keys "${body}" Enter
+      # -l types the body literally; without it tmux resolves each argument
+      # as a key name first, so a body that is itself a key name (e.g. "up")
+      # or starts with a flag-like token is sent as a key instead of typed.
+      tmux send-keys -l -- "${body}" || warn "send-keys failed"
+      tmux send-keys Enter || warn "send-keys failed"
       ;;
     bg)
       mkdir -p "$(dirname "${MENU_LOG}")"

@@ -24,9 +24,9 @@ set -g status-fg colour12
 set -g status-left '#[fg=colour5,bold,bg=colour0] #S § '
 set -g status-right '#{battery_status_fg}#{battery_percentage}#[fg=default] #[fg=colour5,nobold]%Y-%m-%d#[fg=colour4,nobold] %H:%M:%S#[bg=default,fg=colour3] #{username}#[fg=default]@#{hostname} '
 
-setw -g window-status-current-format '#[fg=colour4,bg=colour0] #I:#{?#{||:#{m:SC-*,#{session_name}},#{m:PR-*,#{session_name}}},#W,#{?#{m:✳ *,#{pane_title}},#{=24:pane_title},#W}}#{?#{&&:#{==:#{window_name},claude},#{window_bell_flag}},✦,#F} '
+setw -g window-status-current-format '#[fg=colour4,bg=colour0] #I:#{?#{||:#{m:SC-*,#{session_name}},#{m:PR-*,#{session_name}}},#W,#{?#{m:✳ *,#{pane_title}},✳ #{=24:#{s/^✳ //:pane_title}},#W}}#{?#{&&:#{==:#{window_name},claude},#{window_bell_flag}},✦,#F} '
 setw -g window-status-style fg=colour7,bg=colour8
-setw -g window-status-format ' #I:#{?#{||:#{m:SC-*,#{session_name}},#{m:PR-*,#{session_name}}},#W,#{?#{m:✳ *,#{pane_title}},#{=24:pane_title},#W}}#{?#{&&:#{==:#{window_name},claude},#{window_bell_flag}},✦,#F} '
+setw -g window-status-format ' #I:#{?#{||:#{m:SC-*,#{session_name}},#{m:PR-*,#{session_name}}},#W,#{?#{m:✳ *,#{pane_title}},✳ #{=24:#{s/^✳ //:pane_title}},#W}}#{?#{&&:#{==:#{window_name},claude},#{window_bell_flag}},✦,#F} '
 setw -g window-status-separator ''
 setw -g window-status-bell-style fg=colour6,bold
 

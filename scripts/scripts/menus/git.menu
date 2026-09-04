@@ -4,5 +4,4 @@ Status	git status
 Rebase on origin/main	git rebase origin/main
 Interactive rebase	@window git rebase -i origin/main
 Log (graph)	@window git log --oneline --decorate --graph --all
-Push (force with lease)	git push --force-with-lease
 Open PR in browser	@bg gh pr view --web

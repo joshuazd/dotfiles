@@ -66,8 +66,8 @@ path, a session name) the way `cleanup-sessions` carries
 
 ### Behavior
 
-- Exports `PATH` for the popup context before invoking fzf, and sources
-  `~/.profile` when present. This is the boilerplate the lib exists to own.
+- Exports `PATH` for the popup context before invoking fzf, via the fixed
+  `PICKER_PATH_DIRS` list. This is the boilerplate the lib exists to own.
 - Always passes `--ansi --cycle --layout=reverse`, so colored rows from
   `vigil rows` and similar render correctly.
 - `pick_many` adds `--multi` and binds `ctrl-a:select-all`,
@@ -75,6 +75,15 @@ path, a session name) the way `cleanup-sessions` carries
 - Deliberately opts into a centered modal via `--size`, overriding the
   unobtrusive `--tmux bottom,50%` default that `.fzfrc` sets for everyday
   `C-t` / `C-r` / `M-c`. Two contexts, two treatments.
+- `--tmux`/`--size` is IGNORED when fzf is already running inside a `tmux
+  display-popup`. Per `man tmux`, a display-popup started inside an existing
+  popup accepts only `-b -B -C -E -EE -K -N -s -S`; every other option,
+  including `-w`/`-h`, is silently dropped for the *inner* popup, but here it
+  is fzf's own `--tmux` invocation being ignored by the outer popup for the
+  same reason. `fzf-menu`'s shipping path is the `prefix g` binding, which is
+  itself a popup, so `PICKER_DEFAULT_SIZE` and `--size` are inert there and
+  the binding's `-w`/`-h` govern instead. `--size` still matters for a tier-3
+  picker invoked from a normal pane.
 
 ### Error handling
 

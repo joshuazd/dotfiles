@@ -5,6 +5,8 @@
 #
 # FZF_STUB_SELECTION - exact text to emit as the selection
 # FZF_STUB_ABORT     - when set, exit 130 (what fzf does on Escape)
+# FZF_STUB_EXIT      - when set, exit with this status instead (e.g. 2, what
+#                       fzf uses for its own errors)
 set -o nounset
 
 sep=$'\x1f'
@@ -24,6 +26,10 @@ stub_rows="$(cat)"
 
 if [ -n "${FZF_STUB_ABORT:-}" ]; then
   exit 130
+fi
+
+if [ -n "${FZF_STUB_EXIT:-}" ]; then
+  exit "${FZF_STUB_EXIT}"
 fi
 
 if [ -n "${FZF_STUB_SELECTION+x}" ]; then

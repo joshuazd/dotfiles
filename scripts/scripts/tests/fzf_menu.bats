@@ -104,6 +104,16 @@ setup() {
   [[ "${output}" != *"@window"* ]]
 }
 
+@test "a failing @window reports a warning and does not fail the menu" {
+  setup_tmux_stub
+  export TMUX_STUB_NEW_WINDOW_FAILS=1
+  printf '# Win\nEdit\t@window vim\n' > "${FZF_MENU_DIR}/win2.menu"
+  export FZF_STUB_SELECTION=$'@window vim\tEdit'
+  run "${FZF_MENU}" win2
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"new-window failed"* ]]
+}
+
 @test "@pane sends keys to the current pane" {
   setup_tmux_stub
   printf '# Pane\nList\t@pane ls -la\n' > "${FZF_MENU_DIR}/pane.menu"
@@ -112,8 +122,21 @@ setup() {
   [ "${status}" -eq 0 ]
   run tmux_call_args "send-keys"
   [ "${status}" -eq 0 ]
+  [[ "${output}" == *"-l"* ]]
   [[ "${output}" == *"ls -la"* ]]
+  run tmux_call_args_matching "send-keys" "Enter"
+  [ "${status}" -eq 0 ]
   [[ "${output}" == *"Enter"* ]]
+}
+
+@test "a failing @pane reports a warning and does not fail the menu" {
+  setup_tmux_stub
+  export TMUX_STUB_SEND_KEYS_FAILS=1
+  printf '# Pane\nList\t@pane ls -la\n' > "${FZF_MENU_DIR}/pane2.menu"
+  export FZF_STUB_SELECTION=$'@pane ls -la\tList'
+  run "${FZF_MENU}" pane2
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"send-keys failed"* ]]
 }
 
 @test "@bg runs detached and reports the log path" {
