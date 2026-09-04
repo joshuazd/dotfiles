@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+#
+# fzf-menu - Run a declarative menu of actions through an fzf picker
+#
+# Usage: fzf-menu <name>
+#
+# Loads <menu dir>/<name>.menu, presents its entries with pick_one, and runs
+# the selected command. The menu directory defaults to `menus/` beside this
+# script and can be overridden with FZF_MENU_DIR.
+#
+# Menu file format — one file per menu:
+#   # Header shown above the picker
+#   Label<TAB>command
+#   Label<TAB>@window command
+#
+# A leading sigil on the command decides where it runs:
+#   (none)    run in this popup, pause for a keypress
+#   @window   new tmux window in the current pane's directory
+#   @pane     send-keys into the current pane
+#   @bg       detached, output appended to ~/.cache/fzf-menu.log
+#
+# Example:
+#   fzf-menu git
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/output.sh"
+source "${SCRIPT_DIR}/lib/picker.sh"
+
+readonly MENU_DIR="${FZF_MENU_DIR:-${SCRIPT_DIR}/menus}"
+# shellcheck disable=SC2034 # read by @bg dispatch, landing in Task 3
+readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
+
+# Exit status for "the menu could not be run", distinct from "nothing picked",
+# which is a successful no-op.
+readonly MENU_UNAVAILABLE=2
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  printf '%s\n' \
+    "Usage: ${0##*/} <name>" \
+    "" \
+    "Run a declarative menu of actions through an fzf picker." \
+    "" \
+    "Menus are read from ${MENU_DIR}/<name>.menu" \
+    "" \
+    "Available menus:"
+  local name
+  for name in $(list_menus); do
+    printf '  %s\n' "${name}"
+  done
+}
+
+#######################################
+# List the available menu names, one per line.
+# Outputs:
+#   Menu names to stdout, nothing if the directory is absent or empty
+#######################################
+list_menus() {
+  local file
+  for file in "${MENU_DIR}"/*.menu; do
+    [ -f "${file}" ] || continue
+    basename "${file}" .menu
+  done
+}
+
+#######################################
+# Print a menu's header: its first line with the leading "# " stripped, or
+# the menu's own name when the file does not open with a comment.
+# Arguments:
+#   Path to the menu file
+# Outputs:
+#   Header text to stdout
+#######################################
+menu_header() {
+  local file="${1}"
+  local first=""
+  IFS= read -r first < "${file}" || first=""
+  case "${first}" in
+    '#'*) printf '%s' "${first#\# }" ;;
+    *)    printf '%s' "$(basename "${file}" .menu)" ;;
+  esac
+}
+
+#######################################
+# Convert a menu file into picker rows.
+#
+# Emits "command<TAB>label" so the label is the last field and pick_one's
+# default --with-nth of -1 displays it while the command rides along hidden.
+# A malformed line is warned about and skipped rather than aborting the menu:
+# one bad row must not cost the user the other nine.
+# Arguments:
+#   Path to the menu file
+# Outputs:
+#   Rows to stdout, warnings to stderr
+#######################################
+menu_rows() {
+  local file="${1}"
+  local base
+  base="$(basename "${file}")"
+  local lineno=0
+  local line label command
+
+  while IFS= read -r line || [ -n "${line}" ]; do
+    lineno=$((lineno + 1))
+    [ -z "${line}" ] && continue
+    case "${line}" in '#'*) continue ;; esac
+
+    case "${line}" in
+      *$'\t'*) ;;
+      *)
+        warn "${base}:${lineno}: no tab separator, skipping"
+        continue
+        ;;
+    esac
+
+    label="${line%%$'\t'*}"
+    command="${line#*$'\t'}"
+    if [ -z "${label}" ] || [ -z "${command}" ]; then
+      warn "${base}:${lineno}: empty label or command, skipping"
+      continue
+    fi
+
+    printf '%s\t%s\n' "${command}" "${label}"
+  done < "${file}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Menu name
+# Returns:
+#   0 on success or on no selection, MENU_UNAVAILABLE on a bad invocation
+#######################################
+main() {
+  local name="${1:-}"
+
+  if [ -z "${name}" ]; then
+    error "missing required argument: menu name"
+    printf '\n'
+    usage
+    return "${MENU_UNAVAILABLE}"
+  fi
+
+  local file="${MENU_DIR}/${name}.menu"
+  if [ ! -f "${file}" ]; then
+    error "no such menu: ${name}"
+    error "available: $(list_menus | tr '\n' ' ')"
+    return "${MENU_UNAVAILABLE}"
+  fi
+
+  local rows
+  rows="$(menu_rows "${file}")"
+
+  local selection
+  selection="$(printf '%s\n' "${rows}" \
+    | pick_one --prompt "${name}> " --header "$(menu_header "${file}")")" \
+    || return 0
+
+  # The label is the last field and cannot contain a tab, so stripping the
+  # final field leaves the command intact even if it contains tabs itself.
+  local command="${selection%$'\t'*}"
+
+  printf '%s\n' "${command}"
+}
+
+# Check for help flag
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and
+# on the macos-latest runner: there "${@}" with no positional parameters is
+# an unbound variable under `set -o nounset` rather than an empty list, so a
+# no-argument run aborted here instead of printing usage.
+if help_wanted ${1+"${@}"}; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main ${1+"${@}"}
