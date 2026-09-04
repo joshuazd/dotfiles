@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+#
+# lib/picker.sh - fzf picker primitive for popup-driven selection
+#
+# Owns every fzf invocation in this package: popup geometry, the PATH
+# bootstrap a `tmux display-popup` needs, the TAB delimiter convention, and
+# the exit-code contract. Callers supply rows on stdin and read selections
+# from stdout.
+#
+# Rows are TAB-delimited with the DISPLAY COLUMN LAST, so `--with-nth` is
+# uniform and callers can carry hidden leading fields (an id, a path, a
+# session name) that the user never sees.
+#
+# Usage:
+#   source "${SCRIPT_DIR}/lib/picker.sh"
+#   printf 'run-me\tAlpha\n' | pick_one --prompt "Pick> "
+
+[[ -n "${__LIB_PICKER_LOADED:-}" ]] && return
+readonly __LIB_PICKER_LOADED=1
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/output.sh"
+
+# Nothing was selected: the user pressed Escape, or there was nothing to show.
+# This is the common path, not a failure. Callers use `|| return 0`.
+readonly PICKER_NO_SELECTION=1
+# The picker could not run at all: fzf is missing, or the options were bad.
+readonly PICKER_UNAVAILABLE=2
+
+# Deliberately a centered modal. This overrides the unobtrusive
+# `--tmux bottom,50%` that .fzfrc sets for everyday C-t / C-r / M-c: a picker
+# the user asked for by name has earned the screen, an incidental history
+# search has not.
+readonly PICKER_DEFAULT_SIZE="center,80%,70%"
+
+#######################################
+# Ensure PATH covers the tools a picker needs when it runs inside
+# `tmux display-popup`, which starts a non-login, non-interactive shell that
+# reads no profile at all.
+#
+# Appends rather than prepends, so a caller's own PATH choices still win, and
+# skips directories already present so repeated sourcing cannot grow PATH
+# without bound.
+#
+# The directory list comes from PICKER_PATH_DIRS, space separated. It uses
+# ${VAR-default}, not ${VAR:-default}: an explicitly empty value means "add
+# nothing", which is how a caller (or a test) opts out of the bootstrap
+# entirely. Same idiom as the no-client case in tests/stubs/tmux.
+# Outputs:
+#   Exports the amended PATH
+#######################################
+picker_bootstrap_path() {
+  local dir
+  local dirs="${PICKER_PATH_DIRS-${HOME}/scripts ${HOME}/.local/bin /opt/homebrew/bin /opt/homebrew/sbin /usr/local/bin}"
+  for dir in ${dirs}; do
+    case ":${PATH}:" in
+      *":${dir}:"*) ;;
+      *) [ -d "${dir}" ] && PATH="${PATH}:${dir}" ;;
+    esac
+  done
+  export PATH
+}
+
+#######################################
+# Shared implementation behind pick_one and pick_many.
+# Arguments:
+#   multi - "true" to allow multi-select, "false" otherwise
+#   ...   - the caller's options
+# Inputs:
+#   Rows on stdin
+# Outputs:
+#   Selected rows on stdout
+# Returns:
+#   0 on a selection, PICKER_NO_SELECTION if none, PICKER_UNAVAILABLE on error
+#######################################
+_picker_run() {
+  local multi="${1}"
+  shift
+
+  local prompt="> "
+  local header=""
+  local with_nth="-1"
+  local preview=""
+  local size="${PICKER_DEFAULT_SIZE}"
+  local delimiter
+  delimiter=$'\t'
+
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --prompt)    prompt="${2}";    shift 2 ;;
+      --header)    header="${2}";    shift 2 ;;
+      --with-nth)  with_nth="${2}";  shift 2 ;;
+      --preview)   preview="${2}";   shift 2 ;;
+      --size)      size="${2}";      shift 2 ;;
+      --delimiter) delimiter="${2}"; shift 2 ;;
+      *)
+        error "picker: unknown option: ${1}"
+        return "${PICKER_UNAVAILABLE}"
+        ;;
+    esac
+  done
+
+  picker_bootstrap_path
+
+  if ! command -v fzf > /dev/null 2>&1; then
+    error "fzf not found"
+    return "${PICKER_UNAVAILABLE}"
+  fi
+
+  # Read stdin up front so an empty list never opens an empty modal.
+  local rows
+  rows="$(cat)"
+  if [ -z "${rows}" ]; then
+    warn "nothing to pick from"
+    return "${PICKER_NO_SELECTION}"
+  fi
+
+  local -a args=(
+    --ansi
+    --cycle
+    --layout=reverse
+    --delimiter "${delimiter}"
+    --with-nth "${with_nth}"
+    --prompt "${prompt}"
+    --tmux "${size}"
+  )
+  [ -n "${header}" ] && args+=(--header "${header}")
+  [ -n "${preview}" ] && args+=(--preview "${preview}")
+  if [ "${multi}" = "true" ]; then
+    args+=(--multi --bind "ctrl-a:select-all,ctrl-d:deselect-all")
+  fi
+
+  local selection
+  selection="$(printf '%s\n' "${rows}" | fzf "${args[@]}")" \
+    || return "${PICKER_NO_SELECTION}"
+  [ -n "${selection}" ] || return "${PICKER_NO_SELECTION}"
+
+  printf '%s\n' "${selection}"
+}
+
+#######################################
+# Pick exactly one row.
+# Arguments:
+#   --prompt P, --header H, --with-nth N, --preview CMD, --size GEO,
+#   --delimiter D (all optional)
+# Inputs:
+#   TAB-delimited rows on stdin, display column last
+# Outputs:
+#   The selected row on stdout
+# Returns:
+#   0, PICKER_NO_SELECTION, or PICKER_UNAVAILABLE
+#######################################
+pick_one() {
+  _picker_run false ${1+"${@}"}
+}
+
+#######################################
+# Pick zero or more rows. Tab marks, C-a selects all, C-d deselects all.
+# Arguments:
+#   Same as pick_one
+# Inputs:
+#   TAB-delimited rows on stdin, display column last
+# Outputs:
+#   The selected rows on stdout, newline separated
+# Returns:
+#   0, PICKER_NO_SELECTION, or PICKER_UNAVAILABLE
+#######################################
+pick_many() {
+  _picker_run true ${1+"${@}"}
+}

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Test stub for fzf. Records argv to $FZF_STUB_LOG, arguments joined by the
+# unit separator so embedded spaces stay parseable, then emits a canned
+# selection.
+#
+# FZF_STUB_SELECTION - exact text to emit as the selection
+# FZF_STUB_ABORT     - when set, exit 130 (what fzf does on Escape)
+set -o nounset
+
+sep=$'\x1f'
+first=1
+for arg in "${@}"; do
+  if [ "${first}" = 1 ]; then
+    printf '%s' "${arg}" >> "${FZF_STUB_LOG}"
+    first=0
+  else
+    printf '%s%s' "${sep}" "${arg}" >> "${FZF_STUB_LOG}"
+  fi
+done
+printf '\n' >> "${FZF_STUB_LOG}"
+
+# Drain stdin so the producing side never sees EPIPE.
+stub_rows="$(cat)"
+
+if [ -n "${FZF_STUB_ABORT:-}" ]; then
+  exit 130
+fi
+
+if [ -n "${FZF_STUB_SELECTION+x}" ]; then
+  printf '%s\n' "${FZF_STUB_SELECTION}"
+else
+  printf '%s\n' "${stub_rows}" | head -1
+fi

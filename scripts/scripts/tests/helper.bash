@@ -85,3 +85,28 @@ refute_tmux_subcommand_matching() {
   local pattern="${2}"
   ! grep -q -e "^${subcommand}${TMUX_STUB_SEP}.*${pattern}" "${TMUX_STUB_LOG}"
 }
+
+# The fzf stub joins argv with the unit separator, same as the tmux stub.
+readonly FZF_STUB_SEP=$'\x1f'
+
+setup_fzf_stub() {
+  export FZF_STUB_LOG="${BATS_TEST_TMPDIR}/fzf-calls.log"
+  : > "${FZF_STUB_LOG}"
+  export PATH="${BATS_TEST_DIRNAME}/stubs:${PATH}"
+}
+
+# Print the argv of the first fzf invocation, one argument per line.
+# tr needs the octal escape: it does not understand \x.
+fzf_args() {
+  head -1 "${FZF_STUB_LOG}" | tr '\037' '\n'
+}
+
+# Assert fzf was invoked at least once.
+assert_fzf_called() {
+  [ -s "${FZF_STUB_LOG}" ]
+}
+
+# Assert fzf was never invoked.
+refute_fzf_called() {
+  [ ! -s "${FZF_STUB_LOG}" ]
+}
