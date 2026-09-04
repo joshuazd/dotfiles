@@ -31,8 +31,6 @@ source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
 
 readonly MENU_DIR="${FZF_MENU_DIR:-${SCRIPT_DIR}/menus}"
-# shellcheck disable=SC2034 # read by @bg dispatch, landing in Task 3
-readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
 
 # Exit status for "the menu could not be run", distinct from "nothing picked",
 # which is a successful no-op.
@@ -134,10 +132,17 @@ menu_rows() {
 
 #######################################
 # Main function
+#
+# Only PICKER_NO_SELECTION (the user pressed Escape, or there was nothing to
+# show) is a successful no-op. Any other nonzero from pick_one - notably
+# PICKER_UNAVAILABLE when fzf itself cannot run - is a real failure and must
+# propagate rather than being swallowed as "nothing picked". Task 3's
+# run_action inherits this same contract.
 # Arguments:
 #   Menu name
 # Returns:
-#   0 on success or on no selection, MENU_UNAVAILABLE on a bad invocation
+#   0 on success or on no selection, MENU_UNAVAILABLE on a bad invocation,
+#   or whatever nonzero status pick_one reports
 #######################################
 main() {
   local name="${1:-}"
@@ -159,10 +164,17 @@ main() {
   local rows
   rows="$(menu_rows "${file}")"
 
-  local selection
+  local selection status=0
   selection="$(printf '%s\n' "${rows}" \
     | pick_one --prompt "${name}> " --header "$(menu_header "${file}")")" \
-    || return 0
+    || status="${?}"
+
+  if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then
+    return 0
+  fi
+  if [ "${status}" -ne 0 ]; then
+    return "${status}"
+  fi
 
   # The label is the last field and cannot contain a tab, so stripping the
   # final field leaves the command intact even if it contains tabs itself.

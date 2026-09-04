@@ -79,6 +79,11 @@ setup() {
   [ "${status}" -eq 0 ]
 }
 
+@test "an unavailable picker exits 2, not 0" {
+  PICKER_PATH_DIRS="" PATH="/usr/bin:/bin" run "${FZF_MENU}" demo
+  [ "${status}" -eq 2 ]
+}
+
 @test "--help exits 0" {
   run "${FZF_MENU}" --help
   [ "${status}" -eq 0 ]
