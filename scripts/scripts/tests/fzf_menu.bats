@@ -190,7 +190,7 @@ setup() {
   run "${FZF_MENU}" --explain "git status"
   [ "${status}" -eq 0 ]
   [ "$(printf '%s' "${output}" | head -1)" = "git status" ]
-  [[ "${output}" == *"runs here"* ]]
+  [[ "${output}" == *"runs in the popup"* ]]
 }
 
 @test "--explain strips @window and names the destination" {

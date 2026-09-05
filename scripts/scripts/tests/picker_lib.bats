@@ -57,13 +57,14 @@ setup() {
   printf '%s\n' "${output}" | assert_arg_after "--preview-window" "down,3,border-top"
 }
 
-# Styling belongs to the user's ~/.fzfrc. A picker that sets --style or
-# --padding makes every fzf in the package look like a different program.
-@test "the picker does not override the user's fzf styling" {
+# --style belongs to the user's ~/.fzfrc: the per-section borders and labels
+# are their aesthetic. --padding is spacing, and a picker in a popup sized to
+# its contents cannot afford two rows of it.
+@test "the picker keeps the user's fzf style but drops its padding" {
   run pick_one < "${ROWS}"
   run fzf_args
   [[ "${output}" != *"--style"* ]]
-  [[ "${output}" != *"--padding"* ]]
+  printf '%s\n' "${output}" | assert_arg_after "--padding" "0"
 }
 
 # An empty --size must render inline instead of spawning a nested popup.
