@@ -182,3 +182,67 @@ setup() {
   [[ "${output}" == *"bare-ran"* ]]
   [[ "${output}" != *"Press any key"* ]]
 }
+
+# The bare (no sigil) case is the one a packed "sigil<TAB>body" return value
+# silently broke: tab is IFS whitespace, so the leading empty field collapsed
+# and the command's first word was read as the sigil.
+@test "--explain shows the command and where it runs, bare" {
+  run "${FZF_MENU}" --explain "git status"
+  [ "${status}" -eq 0 ]
+  [ "$(printf '%s' "${output}" | head -1)" = "git status" ]
+  [[ "${output}" == *"runs here"* ]]
+}
+
+@test "--explain strips @window and names the destination" {
+  run "${FZF_MENU}" --explain "@window git rebase -i origin/main"
+  [ "${status}" -eq 0 ]
+  [ "$(printf '%s' "${output}" | head -1)" = "git rebase -i origin/main" ]
+  [[ "${output}" == *"new tmux window"* ]]
+}
+
+@test "--explain strips @pane" {
+  run "${FZF_MENU}" --explain "@pane ls -la"
+  [ "$(printf '%s' "${output}" | head -1)" = "ls -la" ]
+  [[ "${output}" == *"current pane"* ]]
+}
+
+@test "--explain strips @bg and names the log" {
+  run "${FZF_MENU}" --explain "@bg gh pr view --web"
+  [ "$(printf '%s' "${output}" | head -1)" = "gh pr view --web" ]
+  [[ "${output}" == *"detached"* ]]
+}
+
+@test "--explain flags an unknown sigil instead of pretending it will run" {
+  run "${FZF_MENU}" --explain "@nope oops"
+  [[ "${output}" == *"UNKNOWN SIGIL"* ]]
+}
+
+@test "--popup height grows with the entry count" {
+  setup_tmux_stub
+  printf '# Three\nA\techo a\nB\techo b\nC\techo c\n' > "${FZF_MENU_DIR}/three.menu"
+  run "${FZF_MENU}" --popup three
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "display-popup"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "17"
+}
+
+@test "--popup height is capped for a long menu" {
+  setup_tmux_stub
+  printf '# Many\n' > "${FZF_MENU_DIR}/many.menu"
+  local i
+  for i in $(seq 1 40); do
+    printf 'E%s\techo %s\n' "${i}" "${i}" >> "${FZF_MENU_DIR}/many.menu"
+  done
+  run "${FZF_MENU}" --popup many
+  [ "${status}" -eq 0 ]
+  run tmux_call_args "display-popup"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "32"
+}
+
+@test "--popup on a missing menu exits 2 without opening anything" {
+  setup_tmux_stub
+  run "${FZF_MENU}" --popup nope
+  [ "${status}" -eq 2 ]
+  run refute_tmux_subcommand "display-popup"
+  [ "${status}" -eq 0 ]
+}

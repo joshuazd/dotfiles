@@ -3,13 +3,19 @@
 # fzf-menu - Run a declarative menu of actions through an fzf picker
 #
 # Usage: fzf-menu <name>
+#        fzf-menu --popup <name>     size a tmux popup to the menu and run in it
+#        fzf-menu --explain <cmd>    render the fzf preview for one entry
 #
 # Loads <menu dir>/<name>.menu, presents its entries with pick_one, and runs
 # the selected command. The menu directory defaults to `menus/` beside this
 # script and can be overridden with FZF_MENU_DIR.
 #
+# --popup is what the tmux binding calls: it counts the menu's entries,
+# computes a height, and re-runs this script inside a display-popup of that
+# size. --explain is called by fzf for the highlighted row.
+#
 # Menu file format — one file per menu:
-#   # Header shown above the picker
+#   # Description, shown as the picker's prompt
 #   Label<TAB>command
 #   Label<TAB>@window command
 #
@@ -33,6 +39,16 @@ source "${SCRIPT_DIR}/lib/picker.sh"
 readonly MENU_DIR="${FZF_MENU_DIR:-${SCRIPT_DIR}/menus}"
 readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
 
+# Popup geometry for --popup. Chrome under .fzfrc's `--style full` is the
+# input border and prompt, the list border, the preview and its border, and
+# the padding: 14 rows before a single entry is drawn. Height grows with the
+# entry count between these bounds so a 3-entry menu is not given the same
+# box as a 20-entry one.
+readonly POPUP_WIDTH=72
+readonly POPUP_CHROME_ROWS=14
+readonly POPUP_MIN_ROWS=16
+readonly POPUP_MAX_ROWS=32
+
 # Exit status for "the menu could not be run", distinct from "nothing picked",
 # which is a successful no-op.
 readonly MENU_UNAVAILABLE=2
@@ -45,6 +61,8 @@ readonly MENU_UNAVAILABLE=2
 usage() {
   printf '%s\n' \
     "Usage: ${0##*/} <name>" \
+    "       ${0##*/} --popup <name>   size a tmux popup and run in it" \
+    "       ${0##*/} --explain <cmd>  render the preview for one entry" \
     "" \
     "Run a declarative menu of actions through an fzf picker." \
     "" \
@@ -151,18 +169,14 @@ menu_rows() {
 #######################################
 run_action() {
   local command="${1}"
-  local sigil=""
-  local body="${command}"
+  local sigil body
+  sigil="$(action_sigil "${command}")"
+  body="$(action_body "${command}")"
 
-  case "${command}" in
-    '@window '*) sigil="window"; body="${command#@window }" ;;
-    '@pane '*)   sigil="pane";   body="${command#@pane }" ;;
-    '@bg '*)     sigil="bg";     body="${command#@bg }" ;;
-    '@'*)
-      error "unknown sigil in: ${command}"
-      return "${MENU_UNAVAILABLE}"
-      ;;
-  esac
+  if [ "${sigil}" = "unknown" ]; then
+    error "unknown sigil in: ${command}"
+    return "${MENU_UNAVAILABLE}"
+  fi
 
   case "${sigil}" in
     window)
@@ -205,6 +219,110 @@ run_action() {
 }
 
 #######################################
+# Name the sigil a menu command carries.
+#
+# Deliberately two functions rather than one that returns "sigil<TAB>body":
+# unpacking that with `IFS=$'\t' read` silently mangles a bare command,
+# because tab is IFS *whitespace*, so the leading empty field collapses and
+# the first word of the command lands in the sigil variable.
+# Arguments:
+#   The command string, sigil included
+# Outputs:
+#   window | pane | bg | unknown, or nothing at all for a bare command
+#######################################
+action_sigil() {
+  case "${1}" in
+    '@window '*) printf 'window' ;;
+    '@pane '*)   printf 'pane' ;;
+    '@bg '*)     printf 'bg' ;;
+    '@'*)        printf 'unknown' ;;
+    *)           printf '' ;;
+  esac
+}
+
+#######################################
+# Strip a menu command's sigil, leaving the command that actually runs.
+# An unrecognised @word is returned untouched: there is no body to isolate,
+# and the caller reports it as an error rather than running it.
+# Arguments:
+#   The command string, sigil included
+# Outputs:
+#   The command without its sigil
+#######################################
+action_body() {
+  local command="${1}"
+  case "$(action_sigil "${command}")" in
+    window) printf '%s' "${command#@window }" ;;
+    pane)   printf '%s' "${command#@pane }" ;;
+    bg)     printf '%s' "${command#@bg }" ;;
+    *)      printf '%s' "${command}" ;;
+  esac
+}
+
+#######################################
+# Render the fzf preview for one menu command.
+#
+# The list shows a label and the raw field shows menu syntax; neither is the
+# thing that actually executes. Print the real command on its own line, then
+# say in words where it will run, so `@window git rebase -i origin/main`
+# reads as the rebase it is rather than as a sigil the reader must decode.
+# Arguments:
+#   The command string, sigil included
+# Outputs:
+#   Preview text to stdout
+#######################################
+explain_action() {
+  local sigil body
+  sigil="$(action_sigil "${1}")"
+  body="$(action_body "${1}")"
+
+  local where
+  case "${sigil}" in
+    window)  where="opens a new tmux window" ;;
+    pane)    where="types into the current pane" ;;
+    bg)      where="runs detached, logging to ${MENU_LOG/#${HOME}/\~}" ;;
+    unknown) where="UNKNOWN SIGIL - this entry will not run" ;;
+    *)       where="runs here, output held until you press a key" ;;
+  esac
+
+  printf '%s\n\n%s\n' "${body}" "${where}"
+}
+
+#######################################
+# Re-run this script inside a tmux popup sized to the menu it will show.
+#
+# The height has to be computed out here: the binding creates the popup
+# before fzf-menu runs, and tmux cannot count the rows of a file. A menu of
+# three entries and a menu of twenty should not get the same box.
+# Arguments:
+#   Menu name
+# Returns:
+#   0 on success, MENU_UNAVAILABLE if the menu does not exist
+#######################################
+popup() {
+  local name="${1:-}"
+  local file="${MENU_DIR}/${name}.menu"
+
+  if [ -z "${name}" ] || [ ! -f "${file}" ]; then
+    error "no such menu: ${name:-<none>}"
+    error "available: $(list_menus | tr '\n' ' ')"
+    return "${MENU_UNAVAILABLE}"
+  fi
+
+  local count
+  count="$(menu_rows "${file}" 2>/dev/null | grep -c . || true)"
+  [ -n "${count}" ] || count=0
+
+  local height=$((count + POPUP_CHROME_ROWS))
+  [ "${height}" -lt "${POPUP_MIN_ROWS}" ] && height="${POPUP_MIN_ROWS}"
+  [ "${height}" -gt "${POPUP_MAX_ROWS}" ] && height="${POPUP_MAX_ROWS}"
+
+  tmux display-popup -EE -B -w "${POPUP_WIDTH}" -h "${height}" \
+    -d '#{pane_current_path}' \
+    "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") $(printf '%q' "${name}")"
+}
+
+#######################################
 # Main function
 #
 # Only PICKER_NO_SELECTION (the user pressed Escape, or there was nothing to
@@ -243,16 +361,15 @@ main() {
   # no client to draw on: fzf exits 0 printing nothing, the selection is lost,
   # and the popup closes on that success status. Inline fills the popup we are
   # already in, which is the geometry the binding's -w/-h already chose.
-  # The preview shows field 1 - the command the highlighted label will run,
-  # sigil included. That is the one thing a menu hides by design: the list
-  # shows "Interactive rebase", not whether it opens a window or blocks the
-  # popup. Three rows is enough for any single command and costs almost
-  # nothing.
+  # The preview re-enters this script with --explain so it can resolve the
+  # sigil into the command that actually runs plus where it runs, rather than
+  # showing raw menu syntax the reader has to decode.
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
     | pick_one --size "" --prompt "$(menu_header "${file}")> " \
-        --preview 'printf %s {1}' --preview-label ' Runs ' \
-        --preview-window 'down,3,border-rounded,wrap')" \
+        --preview "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --explain {1}" \
+        --preview-label ' Runs ' \
+        --preview-window 'down,4,border-rounded,wrap')" \
     || status="${?}"
 
   if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then
@@ -278,6 +395,22 @@ if help_wanted ${1+"${@}"}; then
   usage
   exit 0
 fi
+
+case "${1:-}" in
+  # Called by fzf for each highlighted row, not by a human.
+  --explain)
+    shift
+    explain_action "${1:-}"
+    exit 0
+    ;;
+  # What the tmux binding calls: sizes a popup to the menu, then re-runs
+  # this script inside it.
+  --popup)
+    shift
+    popup "${1:-}"
+    exit "${?}"
+    ;;
+esac
 
 # Run main function
 main ${1+"${@}"}
