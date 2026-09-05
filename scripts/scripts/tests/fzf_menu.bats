@@ -16,12 +16,16 @@ setup() {
   FZF_MENU="${BATS_TEST_DIRNAME}/../fzf-menu"
 }
 
-@test "the header comes from the first comment line" {
+# The menu file's first line becomes the PROMPT, not a --header: a header
+# under --style full is a bordered section of its own, which is a lot of
+# furniture for six self-evident rows.
+@test "the prompt comes from the first comment line" {
   export FZF_STUB_SELECTION=$'echo fetch-ran\tFetch'
   run "${FZF_MENU}" demo
   [ "${status}" -eq 0 ]
   run fzf_args
-  printf '%s\n' "${output}" | assert_arg_after "--header" "Demo actions"
+  printf '%s\n' "${output}" | assert_arg_after "--prompt" "Demo actions> "
+  [[ "${output}" != *"--header"* ]]
 }
 
 @test "a menu without a header comment falls back to the menu name" {
@@ -30,7 +34,7 @@ setup() {
   run "${FZF_MENU}" bare
   [ "${status}" -eq 0 ]
   run fzf_args
-  printf '%s\n' "${output}" | assert_arg_after "--header" "bare"
+  printf '%s\n' "${output}" | assert_arg_after "--prompt" "bare> "
 }
 
 @test "labels are the display column and commands are hidden" {

@@ -72,12 +72,18 @@ list_menus() {
 }
 
 #######################################
-# Print a menu's header: its first line with the leading "# " stripped, or
-# the menu's own name when the file does not open with a comment.
+# Print a menu's description: its first line with the leading "# " stripped,
+# or the menu's own name when the file does not open with a comment.
+#
+# This becomes the fzf PROMPT rather than a `--header`. A header under
+# `--style full` is a bordered section of its own - three or four rows and a
+# label - which is a lot of furniture to say "Git actions" above six rows
+# that are self-evidently git actions. The prompt says the same thing in the
+# line that has to exist anyway.
 # Arguments:
 #   Path to the menu file
 # Outputs:
-#   Header text to stdout
+#   Description text to stdout
 #######################################
 menu_header() {
   local file="${1}"
@@ -244,8 +250,7 @@ main() {
   # nothing.
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
-    | pick_one --size "" --prompt "${name}> " --header "$(menu_header "${file}")" \
-        --header-label " ${name} " \
+    | pick_one --size "" --prompt "$(menu_header "${file}")> " \
         --preview 'printf %s {1}' --preview-label ' Runs ' \
         --preview-window 'down,3,border-rounded,wrap')" \
     || status="${?}"
