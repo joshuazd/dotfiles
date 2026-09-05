@@ -89,13 +89,15 @@ _picker_run() {
   local with_nth="-1"
   local preview=""
   local preview_window=""
+  local header_label=""
+  local preview_label=""
   local size="${PICKER_DEFAULT_SIZE}"
   local delimiter
   delimiter=$'\t'
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      --prompt|--header|--with-nth|--preview|--preview-window|--size|--delimiter)
+      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--size|--delimiter)
         if [ "${#}" -lt 2 ]; then
           error "picker: ${1} requires a value"
           return "${PICKER_UNAVAILABLE}"
@@ -106,8 +108,10 @@ _picker_run() {
       --prompt)    prompt="${2}";    shift 2 ;;
       --header)    header="${2}";    shift 2 ;;
       --with-nth)  with_nth="${2}";  shift 2 ;;
+      --header-label) header_label="${2}"; shift 2 ;;
       --preview)   preview="${2}";   shift 2 ;;
       --preview-window) preview_window="${2}"; shift 2 ;;
+      --preview-label)  preview_label="${2}";  shift 2 ;;
       --size)      size="${2}";      shift 2 ;;
       --delimiter) delimiter="${2}"; shift 2 ;;
       *)
@@ -157,6 +161,10 @@ _picker_run() {
     args+=(--height 100%)
   fi
   [ -n "${header}" ] && args+=(--header "${header}")
+  # ~/.fzfrc hardcodes `--header-label ' File Type '`, which is right for a
+  # file finder and nonsense over a list of actions. A caller that knows what
+  # its rows are should say so.
+  [ -n "${header_label}" ] && args+=(--header-label "${header_label}")
   # A picker's rows are arbitrary TAB-delimited records, not filenames, so the
   # user's ~/.fzfrc `--preview` (which shells out to a file previewer on {})
   # would run against a command string or a session id and render an error
@@ -166,6 +174,15 @@ _picker_run() {
   if [ -n "${preview}" ]; then
     args+=(--preview "${preview}")
     [ -n "${preview_window}" ] && args+=(--preview-window "${preview_window}")
+    if [ -n "${preview_label}" ]; then
+      # The static label is not enough on its own: ~/.fzfrc binds
+      # `focus:transform-preview-label` to print "Previewing [<row>]", and that
+      # transform rewrites the label on every focus event, clobbering whatever
+      # --preview-label set. Re-binding the same event in argv replaces the
+      # file's bind, which is what actually makes the label stick.
+      args+=(--preview-label "${preview_label}")
+      args+=(--bind "focus:transform-preview-label:printf '%s' $(printf '%q' "${preview_label}")")
+    fi
   else
     args+=(--no-preview)
   fi
@@ -188,8 +205,8 @@ _picker_run() {
 #######################################
 # Pick exactly one row.
 # Arguments:
-#   --prompt P, --header H, --with-nth N, --preview CMD, --preview-window W,
-#   --size GEO, --delimiter D (all optional)
+#   --prompt P, --header H, --header-label L, --with-nth N, --preview CMD,
+#   --preview-window W, --preview-label L, --size GEO, --delimiter D (optional)
 # Inputs:
 #   TAB-delimited rows on stdin, display column last
 # Outputs:

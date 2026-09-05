@@ -245,7 +245,9 @@ main() {
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
     | pick_one --size "" --prompt "${name}> " --header "$(menu_header "${file}")" \
-        --preview 'printf %s {1}' --preview-window 'down,3,border-top,wrap')" \
+        --header-label " ${name} " \
+        --preview 'printf %s {1}' --preview-label ' Runs ' \
+        --preview-window 'down,3,border-rounded,wrap')" \
     || status="${?}"
 
   if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then
