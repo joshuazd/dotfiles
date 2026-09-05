@@ -232,9 +232,14 @@ main() {
   local rows
   rows="$(menu_rows "${file}")"
 
+  # --size "" renders fzf inline rather than in a popup of its own. This menu
+  # is always invoked from a `display-popup` binding, and a nested popup has
+  # no client to draw on: fzf exits 0 printing nothing, the selection is lost,
+  # and the popup closes on that success status. Inline fills the popup we are
+  # already in, which is the geometry the binding's -w/-h already chose.
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
-    | pick_one --prompt "${name}> " --header "$(menu_header "${file}")")" \
+    | pick_one --size "" --prompt "${name}> " --header "$(menu_header "${file}")")" \
     || status="${?}"
 
   if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then

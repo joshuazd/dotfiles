@@ -33,12 +33,11 @@ readonly PICKER_UNAVAILABLE=2
 # the user asked for by name has earned the screen, an incidental history
 # search has not.
 #
-# Inert when fzf is already running inside a `tmux display-popup` (the
-# shipping path for fzf-menu's prefix-g binding): per `man tmux`, a
-# display-popup started inside an existing popup accepts only
-# -b -B -C -E -EE -K -N -s -S, so `--tmux`/`--size` here has no effect and the
-# outer binding's -w/-h govern instead. Still matters for a tier-3 picker
-# invoked from a normal pane.
+# ONLY for a picker invoked from a normal pane. A caller that is already
+# inside a `tmux display-popup` must pass `--size ""` and render inline
+# instead: `--tmux` spawns a nested popup, and with no client for that popup
+# to draw on fzf exits 0 having printed nothing, so the selection vanishes
+# rather than erroring. `fzf-menu` therefore always passes `--size ""`.
 readonly PICKER_DEFAULT_SIZE="center,80%,70%"
 
 #######################################
@@ -138,10 +137,31 @@ _picker_run() {
     --delimiter "${delimiter}"
     --with-nth "${with_nth}"
     --prompt "${prompt}"
-    --tmux "${size}"
   )
+  # An empty --size means "render inline, fill whatever we are already in".
+  # This is not a nicety: `--tmux` makes fzf re-launch itself in a NEW tmux
+  # popup, and when there is no client for that popup to draw on - which is
+  # the case inside an existing `display-popup` - fzf exits 0 with EMPTY
+  # output. The selection is silently lost, the caller reads it as "nothing
+  # picked", and a `-EE` popup closes on the success status. That is exactly
+  # the "popup flashes and nothing happens" symptom fzf-menu shipped with.
+  if [ -n "${size}" ]; then
+    args+=(--tmux "${size}")
+  else
+    args+=(--height 100%)
+  fi
   [ -n "${header}" ] && args+=(--header "${header}")
-  [ -n "${preview}" ] && args+=(--preview "${preview}")
+  # A picker's rows are arbitrary TAB-delimited records, not filenames, so the
+  # user's ~/.fzfrc `--preview` (which shells out to a file previewer on {})
+  # would run against a command string or a session id and render an error
+  # pane. Explicitly disable it unless this caller asked for one of its own;
+  # argv beats FZF_DEFAULT_OPTS_FILE, so this is what turns the bleed-through
+  # off.
+  if [ -n "${preview}" ]; then
+    args+=(--preview "${preview}")
+  else
+    args+=(--no-preview)
+  fi
   if [ "${multi}" = "true" ]; then
     args+=(--multi --bind "ctrl-a:select-all,ctrl-d:deselect-all")
   fi
