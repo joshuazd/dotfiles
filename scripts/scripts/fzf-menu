@@ -39,14 +39,18 @@ source "${SCRIPT_DIR}/lib/picker.sh"
 readonly MENU_DIR="${FZF_MENU_DIR:-${SCRIPT_DIR}/menus}"
 readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
 
-# Popup geometry for --popup. Chrome under .fzfrc's `--style full` is the
-# input border and prompt, the list border, the preview and its border, and
-# the padding: 14 rows before a single entry is drawn. Height grows with the
-# entry count between these bounds so a 3-entry menu is not given the same
-# box as a 20-entry one.
+# Popup geometry for --popup. Chrome under .fzfrc's `--style full`, with the
+# picker's --padding 0: outer border 2, input border 2, prompt 1, list border
+# 2, preview 2 and its border 2 - 11 rows before a single entry is drawn.
+# Height grows with the entry count between these bounds, so a 3-entry menu
+# is not handed the same box as a 20-entry one.
+#
+# Keep in step with lib/picker.sh's argv and fzf-menu's --preview-window: any
+# change to the padding or the preview height moves this constant, and the
+# only symptom of getting it wrong is a popup slightly too big or too small.
 readonly POPUP_WIDTH=72
-readonly POPUP_CHROME_ROWS=14
-readonly POPUP_MIN_ROWS=16
+readonly POPUP_CHROME_ROWS=11
+readonly POPUP_MIN_ROWS=13
 readonly POPUP_MAX_ROWS=32
 
 # Exit status for "the menu could not be run", distinct from "nothing picked",
@@ -278,14 +282,16 @@ explain_action() {
 
   local where
   case "${sigil}" in
-    window)  where="opens a new tmux window" ;;
+    window)  where="runs in a new tmux window" ;;
     pane)    where="types into the current pane" ;;
     bg)      where="runs detached, logging to ${MENU_LOG/#${HOME}/\~}" ;;
     unknown) where="UNKNOWN SIGIL - this entry will not run" ;;
-    *)       where="runs here, output held until you press a key" ;;
+    *)       where="runs in the popup, output held for a keypress" ;;
   esac
 
-  printf '%s\n\n%s\n' "${body}" "${where}"
+  # Two lines, no blank between them: the preview window is two rows, so a
+  # spacer would push the destination out of view.
+  printf '%s\n%s\n' "${body}" "${where}"
 }
 
 #######################################
@@ -369,7 +375,7 @@ main() {
     | pick_one --size "" --prompt "$(menu_header "${file}")> " \
         --preview "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --explain {1}" \
         --preview-label ' Runs ' \
-        --preview-window 'down,4,border-rounded,wrap')" \
+        --preview-window 'down,2,border-rounded,wrap')" \
     || status="${?}"
 
   if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then

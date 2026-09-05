@@ -223,7 +223,7 @@ setup() {
   run "${FZF_MENU}" --popup three
   [ "${status}" -eq 0 ]
   run tmux_call_args "display-popup"
-  printf '%s\n' "${output}" | assert_arg_after "-h" "17"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "14"
 }
 
 @test "--popup height is capped for a long menu" {
@@ -245,4 +245,15 @@ setup() {
   [ "${status}" -eq 2 ]
   run refute_tmux_subcommand "display-popup"
   [ "${status}" -eq 0 ]
+}
+
+@test "the picker drops fzfrc padding but keeps its style" {
+  setup_fzf_stub
+  export FZF_STUB_SELECTION=$'echo hi\tSay hi'
+  printf '# P\nSay hi\techo hi\n' > "${FZF_MENU_DIR}/pad.menu"
+  run "${FZF_MENU}" pad
+  [ "${status}" -eq 0 ]
+  run fzf_args
+  printf '%s\n' "${output}" | assert_arg_after "--padding" "0"
+  [[ "${output}" != *"--style"* ]]
 }

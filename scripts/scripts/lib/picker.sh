@@ -136,14 +136,17 @@ _picker_run() {
     return "${PICKER_NO_SELECTION}"
   fi
 
-  # Deliberately does NOT set --style or --padding. Those belong to the user's
-  # ~/.fzfrc and are theirs to tune; a picker that overrides them makes every
-  # fzf in the package look like a different program. Popup size is the
-  # binding's job (-w/-h), not something to claw back by stripping chrome.
+  # --style is deliberately NOT set: the per-section borders and labels are
+  # the user's aesthetic and a picker has no business replacing them.
+  # --padding is, because it is pure spacing rather than style - two rows of
+  # it inside a popup sized to its contents is two rows the entries could
+  # have had, and the popup's own edge already provides the breathing room
+  # the padding exists for in a full-screen finder.
   local -a args=(
     --ansi
     --cycle
     --layout=reverse
+    --padding 0
     --delimiter "${delimiter}"
     --with-nth "${with_nth}"
     --prompt "${prompt}"
