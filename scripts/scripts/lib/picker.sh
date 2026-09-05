@@ -132,19 +132,14 @@ _picker_run() {
     return "${PICKER_NO_SELECTION}"
   fi
 
-  # --style/--padding override whatever ~/.fzfrc sets, because argv beats
-  # FZF_DEFAULT_OPTS_FILE. That file is tuned for browsing files, where
-  # `--style full` (a separate border around the input, list, header and
-  # preview) plus `--padding 1,2` is worth the room. A picker shows a short
-  # list of actions in a popup someone opened deliberately: the same chrome
-  # costs about eight rows and forces the popup to be far bigger than its
-  # contents.
+  # Deliberately does NOT set --style or --padding. Those belong to the user's
+  # ~/.fzfrc and are theirs to tune; a picker that overrides them makes every
+  # fzf in the package look like a different program. Popup size is the
+  # binding's job (-w/-h), not something to claw back by stripping chrome.
   local -a args=(
     --ansi
     --cycle
     --layout=reverse
-    --style default
-    --padding 0
     --delimiter "${delimiter}"
     --with-nth "${with_nth}"
     --prompt "${prompt}"

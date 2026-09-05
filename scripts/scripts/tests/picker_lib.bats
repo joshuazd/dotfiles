@@ -57,13 +57,13 @@ setup() {
   printf '%s\n' "${output}" | assert_arg_after "--preview-window" "down,3,border-top"
 }
 
-# ~/.fzfrc sets `--style full` and `--padding 1,2`, which is right for browsing
-# files and about eight rows too much chrome for a short action list.
-@test "picker chrome overrides the user's file-browsing fzfrc" {
+# Styling belongs to the user's ~/.fzfrc. A picker that sets --style or
+# --padding makes every fzf in the package look like a different program.
+@test "the picker does not override the user's fzf styling" {
   run pick_one < "${ROWS}"
   run fzf_args
-  printf '%s\n' "${output}" | assert_arg_after "--style" "default"
-  printf '%s\n' "${output}" | assert_arg_after "--padding" "0"
+  [[ "${output}" != *"--style"* ]]
+  [[ "${output}" != *"--padding"* ]]
 }
 
 # An empty --size must render inline instead of spawning a nested popup.
