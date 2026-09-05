@@ -88,13 +88,14 @@ _picker_run() {
   local header=""
   local with_nth="-1"
   local preview=""
+  local preview_window=""
   local size="${PICKER_DEFAULT_SIZE}"
   local delimiter
   delimiter=$'\t'
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      --prompt|--header|--with-nth|--preview|--size|--delimiter)
+      --prompt|--header|--with-nth|--preview|--preview-window|--size|--delimiter)
         if [ "${#}" -lt 2 ]; then
           error "picker: ${1} requires a value"
           return "${PICKER_UNAVAILABLE}"
@@ -106,6 +107,7 @@ _picker_run() {
       --header)    header="${2}";    shift 2 ;;
       --with-nth)  with_nth="${2}";  shift 2 ;;
       --preview)   preview="${2}";   shift 2 ;;
+      --preview-window) preview_window="${2}"; shift 2 ;;
       --size)      size="${2}";      shift 2 ;;
       --delimiter) delimiter="${2}"; shift 2 ;;
       *)
@@ -130,10 +132,19 @@ _picker_run() {
     return "${PICKER_NO_SELECTION}"
   fi
 
+  # --style/--padding override whatever ~/.fzfrc sets, because argv beats
+  # FZF_DEFAULT_OPTS_FILE. That file is tuned for browsing files, where
+  # `--style full` (a separate border around the input, list, header and
+  # preview) plus `--padding 1,2` is worth the room. A picker shows a short
+  # list of actions in a popup someone opened deliberately: the same chrome
+  # costs about eight rows and forces the popup to be far bigger than its
+  # contents.
   local -a args=(
     --ansi
     --cycle
     --layout=reverse
+    --style default
+    --padding 0
     --delimiter "${delimiter}"
     --with-nth "${with_nth}"
     --prompt "${prompt}"
@@ -159,6 +170,7 @@ _picker_run() {
   # off.
   if [ -n "${preview}" ]; then
     args+=(--preview "${preview}")
+    [ -n "${preview_window}" ] && args+=(--preview-window "${preview_window}")
   else
     args+=(--no-preview)
   fi
@@ -181,8 +193,8 @@ _picker_run() {
 #######################################
 # Pick exactly one row.
 # Arguments:
-#   --prompt P, --header H, --with-nth N, --preview CMD, --size GEO,
-#   --delimiter D (all optional)
+#   --prompt P, --header H, --with-nth N, --preview CMD, --preview-window W,
+#   --size GEO, --delimiter D (all optional)
 # Inputs:
 #   TAB-delimited rows on stdin, display column last
 # Outputs:

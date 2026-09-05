@@ -237,9 +237,15 @@ main() {
   # no client to draw on: fzf exits 0 printing nothing, the selection is lost,
   # and the popup closes on that success status. Inline fills the popup we are
   # already in, which is the geometry the binding's -w/-h already chose.
+  # The preview shows field 1 - the command the highlighted label will run,
+  # sigil included. That is the one thing a menu hides by design: the list
+  # shows "Interactive rebase", not whether it opens a window or blocks the
+  # popup. Three rows is enough for any single command and costs almost
+  # nothing.
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
-    | pick_one --size "" --prompt "${name}> " --header "$(menu_header "${file}")")" \
+    | pick_one --size "" --prompt "${name}> " --header "$(menu_header "${file}")" \
+        --preview 'printf %s {1}' --preview-window 'down,3,border-top,wrap')" \
     || status="${?}"
 
   if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then
