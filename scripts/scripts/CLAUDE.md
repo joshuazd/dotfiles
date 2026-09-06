@@ -102,6 +102,43 @@ No other launcher sets the variable, so `shortcut-implement` sessions keep the n
 
 Gets the active Chrome tab URL via osascript, validates it looks like a Shortcut story or GitHub PR, brings a tmux client to the front (attaching one via iTerm2 if none exists, so the job's closing `switch-client` has somewhere to land), then hands the URL straight to `vigil dispatch`, which submits it to vigild. No popup is opened here.
 
+### Worktree Removal Is Gated
+
+`git-worktree-done` (bound to `prefix d`) and `wt-pick remove` both destroy a
+worktree and a tmux session. Both go through `wt-confirm`, which is the only
+gate — do not add a third path that skips it, and a gate that cannot be found
+is a hard error rather than a silent proceed.
+
+`wt-confirm` renders inline when it has a tty and opens its own popup when it
+does not. That branch is load-bearing: `prefix d` runs under `run-shell -b`
+with no tty, while `wt-pick` is already inside the menu's popup, and a NESTED
+`display-popup` has no client to draw on, so fzf exits 0 printing nothing and
+the answer is silently lost. `tmux display-popup -E` also does not return the
+popup command's exit status, which is why the popup pass communicates through
+an answer file.
+
+Cancel is the first row, so it is the cursor position and the Enter answer.
+
+### Menus
+
+`fzf-menu` runs `menus/<name>.menu`, a tab-separated `Label<TAB>command`
+table. Sigils say where a command runs: none (in the popup, pausing for a
+key), `@window`, `@pane`, `@bg`, `@menu`.
+
+**Dynamic lists are scripts, not menu syntax.** `wt-pick`, `pr-pick` and
+`sc-pick` each take a verb and call `pick_one` themselves; because `fzf-menu`
+renders inline (`--size ""`), that second picker draws in the same popup as a
+second screen. Keeping pipelines out of the `.menu` files is the whole reason
+the format is worth having.
+
+Sibling scripts are dispatched by absolute path through `PKG_DIR`, overridable
+with `SCRIPTS_PKG_DIR` — that override is how the tests point them at
+recorders, since a PATH stub cannot intercept an absolute path.
+
+`popup()` sizes the tmux popup to the tallest screen a menu can reach,
+including one level of `@menu` target. `POPUP_CHROME_ROWS` is **measured, not
+derived** (`tests/manual/verify-menu-fit`); do not adjust it by estimation.
+
 ### Script Conventions
 
 - All scripts use `set -o errexit -o nounset -o pipefail`

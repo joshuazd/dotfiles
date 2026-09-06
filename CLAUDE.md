@@ -65,6 +65,19 @@ After installing vim, run `:PackUpdate` to install remote plugins.
 
 - `scripts/` — utility scripts installed via stow (dispatch, gh helpers, tmux utilities, etc.)
 
+### Menus
+
+fzf-driven action menus, opened from tmux popups.
+
+- `scripts/scripts/lib/picker.sh` — the only place fzf argv is built (`pick_one` / `pick_many`)
+- `scripts/scripts/fzf-menu` — runs a declarative `menus/<name>.menu` file
+- `scripts/scripts/menus/*.menu` — one file per menu, `Label<TAB>command`, tab separated. A leading sigil says where the command runs: none (in the popup), `@window`, `@pane`, `@bg`, `@menu`
+- `scripts/scripts/{wt,pr,sc}-pick` — list-then-act pickers for the entries that need a second choice. Dynamic lists are scripts, not menu syntax
+
+Bindings: `prefix g` git, `w` worktree, `r` pr, `t` tmux, `s` shortcut, `m` all menus. Each has a `C-` variant except `m` (terminals send `C-m` as Enter).
+
+To add a menu: drop a `.menu` file in `menus/` and bind `fzf-menu --popup <name>`. No script needed unless an entry has to pick from a list.
+
 ### Claude
 
 - `claude/` — Claude Code trust settings (`CLAUDE.md`)
