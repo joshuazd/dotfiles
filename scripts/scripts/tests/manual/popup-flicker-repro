@@ -2,11 +2,14 @@
 #
 # popup-flicker-repro - Reproduce the tmux popup flicker in any terminal
 #
-# Usage: popup-flicker-repro [small|full]
+# Usage: popup-flicker-repro [small|full|title]
 #
 #   full   (default) the pane repaints its WHOLE screen ~12x/sec, the way a
 #          full TUI such as an agent session does
 #   small  the pane rewrites a dozen characters in one spot ~12x/sec
+#   title  the pane writes nothing but re-sends the SAME OSC 2 window title
+#          ~12x/sec, with set-titles on, so tmux retitles the outer terminal
+#          on every one
 #
 # Opens a throwaway tmux server (socket "flickrepro") with one repainting
 # pane, then binds prefix + g to a display-popup over it. Watch the popup's
@@ -22,17 +25,31 @@
 # output OUTSIDE them - 18/19 overlay writes inside sync, 66/71 pane writes
 # outside.
 #
-# The hypothesis this script tests: the tear needs pane writes that land in
-# the popup's own rectangle. So `full` should flicker and `small` should not,
-# because a dozen characters in one corner never touch the popup's cells.
+# OBSERVED SO FAR, in Terminal.app and iTerm2 alike:
+#   full   no flicker
+#   small  no flicker
+#   real Claude Code session  FLICKERS
 #
-#   full flickers, small does not
-#     -> confirmed: unsynchronized pane writes under the overlay
-#   neither flickers, but a real agent session does
-#     -> the trigger is narrower than "repaints a lot"; capture what the
-#        agent's TUI emits and compare
-#   both flicker
-#     -> any pane output is enough; the rectangle theory is wrong
+# So neither volume of output nor the renderer is the trigger, and the
+# earlier "unsynchronized pane writes under the overlay" theory does not
+# survive: a whole-screen repaint 12x/sec writes far more under the popup
+# than an agent does, and it is steady.
+#
+# What an agent session does that neither synthetic mode did is re-send its
+# OSC 2 window title continuously. With `set-titles on` - which the real
+# config has - tmux re-emits a window retitle to the outer terminal for each
+# one, and both iTerm2 and Terminal.app redraw the window on a retitle. That
+# is terminal-independent, which matches, and it is invisible to sampling
+# #{pane_title} because the VALUE never changes. `title` mode tests exactly
+# this and nothing else.
+#
+#   title flickers
+#     -> confirmed. Fix is one line: set -g set-titles off, or a
+#        set-titles-string without #T so an unchanged title is not a retitle.
+#   title steady
+#     -> not the titles either. Next step is to capture the bytes a real
+#        agent pane emits and diff them against these modes, rather than
+#        guessing at another candidate.
 #
 # Press q or Escape to close the popup, then C-b d to tear the server down.
 
@@ -44,9 +61,9 @@ readonly SOCK=flickrepro
 readonly MODE="${1:-full}"
 
 case "${MODE}" in
-  full | small) ;;
+  full | small | title) ;;
   *)
-    printf 'Usage: %s [small|full]\n' "${0##*/}" >&2
+    printf 'Usage: %s [small|full|title]\n' "${0##*/}" >&2
     exit 2
     ;;
 esac
@@ -60,17 +77,30 @@ tmux -L "${SOCK}" kill-server 2> /dev/null || true
 
 # `full` uses the alternate screen and rewrites every line from the home
 # position, which is what a TUI does. `small` writes in place with \r.
+# `title` writes almost nothing but re-sends the SAME OSC 2 window title
+# ~12x/sec, which is what an agent session appears to do and what neither of
+# the other two modes exercises.
 #
 # The single quotes are deliberate: $i, $RANDOM and $SECONDS must expand in
 # the pane's own shell each iteration, not once here while the string is
 # being built. Hence the SC2016 exemptions.
-if [ "${MODE}" = full ]; then
-  # shellcheck disable=SC2016
-  pane_cmd='printf "\033[?1049h"; while :; do printf "\033[H"; i=1; while [ "$i" -le 45 ]; do printf "line %02d  %s\033[K\n" "$i" "$RANDOM"; i=$((i+1)); done; perl -e "select undef,undef,undef,0.08"; done'
-else
-  # shellcheck disable=SC2016
-  pane_cmd='while :; do printf "\rrepainting %s  " "${SECONDS}"; perl -e "select undef,undef,undef,0.08"; done'
-fi
+case "${MODE}" in
+  full)
+    # shellcheck disable=SC2016
+    pane_cmd='printf "\033[?1049h"; while :; do printf "\033[H"; i=1; while [ "$i" -le 45 ]; do printf "line %02d  %s\033[K\n" "$i" "$RANDOM"; i=$((i+1)); done; perl -e "select undef,undef,undef,0.08"; done'
+    ;;
+  small)
+    # shellcheck disable=SC2016
+    pane_cmd='while :; do printf "\rrepainting %s  " "${SECONDS}"; perl -e "select undef,undef,undef,0.08"; done'
+    ;;
+  title)
+    # Unchanged text on purpose: the question is whether tmux reacts to the
+    # SEQUENCE arriving, not to the value differing. A stable value is why
+    # sampling #{pane_title} showed nothing while the flicker was happening.
+    # shellcheck disable=SC2016
+    pane_cmd='printf "title mode: resending the same OSC 2 title 12x/sec\n"; while :; do printf "\033]2;claude working\033\\"; perl -e "select undef,undef,undef,0.08"; done'
+    ;;
+esac
 
 tmux -L "${SOCK}" new-session -d -s repro "sh -c '${pane_cmd}'"
 
@@ -79,13 +109,23 @@ tmux -L "${SOCK}" set -g status-interval 0
 tmux -L "${SOCK}" set -g status-right ''
 tmux -L "${SOCK}" set -g status-left " flicker repro: ${MODE} mode "
 
+# Mirror the real config's title forwarding, which is what `title` mode
+# exercises: with set-titles on, every pane-title sequence tmux receives is
+# re-emitted to the outer terminal as a window retitle. allow-rename off
+# matches too - it stops the window NAME changing while still letting the
+# pane title through, so this is not testing a rename storm.
+tmux -L "${SOCK}" set -g set-titles on
+tmux -L "${SOCK}" set -g set-titles-string '#S:#I:#W - "#T" #{session_alerts}'
+tmux -L "${SOCK}" setw -g allow-rename off
+
 tmux -L "${SOCK}" bind-key g display-popup -EE -w 72 -h 17 \
   "printf '  Mode: %s\n  Watch the borders.\n  q or Escape to close.\n' '${MODE}'; read -r -n 1 _ || true"
 
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
 printf 'Press C-b g to open the popup, q to close it.\n'
 printf 'C-b d detaches and tears the server down.\n'
-printf 'Run again with the other mode to compare:  %s %s\n\n' \
-  "${0##*/}" "$([ "${MODE}" = full ] && printf small || printf full)"
+printf 'Compare the modes:  %s full | %s small | %s title\n' \
+  "${0##*/}" "${0##*/}" "${0##*/}"
+printf 'In title mode, C-b : then "set -g set-titles off" should stop it.\n\n'
 
 tmux -L "${SOCK}" attach -t repro
