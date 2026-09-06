@@ -234,15 +234,28 @@ setup() {
   [[ "${output}" != *"#{e|"* ]]
 }
 
-# A 1-item menu in a 120x40 pane: menu_h = 1 + 2 = 3, and -y names the BOTTOM
-# row, so y = (40 + 3)/2 = 21. The label is 3 wide, so menu_w = 3 + 6 + 4 = 13
-# and x = (120 - 13)/2 = 53.
-@test "the menu is centred on the pane" {
-  export TMUX_STUB_PANE_GEOMETRY="0 0 120 40"
+# A pane spanning the client's full width hands the horizontal centring to
+# tmux's own C, which uses the menu's REAL drawn width. Estimating that width
+# put the menu several columns right of centre, and it is not observable from
+# a script, so C is the only exact answer available.
+#
+# Vertically: menu_h = 1 + 2 = 3 and -y is the BOTTOM row, so y = (40+3)/2 = 21.
+@test "a full-width pane lets tmux centre horizontally" {
+  export TMUX_STUB_PANE_GEOMETRY="0 0 120 40 120"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  printf '%s\n' "${output}" | assert_arg_after "-x" "53"
+  printf '%s\n' "${output}" | assert_arg_after "-x" "C"
   printf '%s\n' "${output}" | assert_arg_after "-y" "21"
+}
+
+# C is the centre of the CLIENT, so a pane narrower than the client cannot use
+# it and falls back to the estimate.
+@test "a narrower pane falls back to the computed column" {
+  export TMUX_STUB_PANE_GEOMETRY="0 0 60 40 120"
+  printf 'v1\tOne\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  # 3 + 6 + 4 = 13, so x = 0 + (60 - 13)/2 = 23
+  printf '%s\n' "${output}" | assert_arg_after "-x" "23"
 }
 
 # The centre is the PANE's, so a pane offset within the window shifts it.

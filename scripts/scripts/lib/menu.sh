@@ -32,11 +32,11 @@ readonly MENU_CHROME_ROWS=4
 # a padding column each side, and a border row top and bottom. The key column
 # is the widest key plus the gap tmux leaves before it.
 #
-# MENU_KEY_COLS is 6 rather than 4 by observation: at 4 the menu sat about a
-# column right of centre, which means the drawn width was about two columns
-# wider than the estimate. tmux does not expose the drawn width anywhere
-# readable, so this is calibrated by eye - if a menu drifts right, raise it;
-# left, lower it.
+# MENU_KEY_COLS is only used for the horizontal ESTIMATE, which in turn is
+# only used for a pane that does not span the client's full width - a
+# full-width pane gets tmux's own `C`, which centres on the real drawn width.
+# The estimate is known to run several columns narrow than what tmux draws;
+# raising it moves such a menu left.
 readonly MENU_BORDER_COLS=4
 readonly MENU_BORDER_ROWS=2
 readonly MENU_KEY_COLS=6
@@ -115,7 +115,8 @@ menu_tmux_quote() {
 menu_pane_geometry() {
   local geom
   geom="$(tmux display-message -p \
-    '#{pane_left} #{pane_top} #{pane_width} #{pane_height}' 2>/dev/null || true)"
+    '#{pane_left} #{pane_top} #{pane_width} #{pane_height} #{client_width}' \
+    2>/dev/null || true)"
   case "${geom}" in
     ''|*[!0-9\ ]*) printf '' ;;
     *)             printf '%s' "${geom}" ;;
@@ -123,14 +124,26 @@ menu_pane_geometry() {
 }
 
 #######################################
-# Top-left corner that centres a menu of the given size on the focused pane.
+# Position that centres a menu on the focused pane.
 #
-# Computed here rather than with a tmux format because popup_width,
-# popup_height, popup_pane_left and popup_pane_top all expand to EMPTY in
-# -x/-y - see the note by MENU_BORDER_COLS.
+# The horizontal half prefers tmux's own `C`, which centres using the menu's
+# REAL drawn width. That width is not observable from a script - tmux exposes
+# it only to its own placement code - so any width computed here is an
+# estimate, and estimating it was repeatedly wrong: the menu kept sitting
+# right of centre because the drawn menu is several columns wider than the
+# labels suggest.
 #
-# Clamped to the pane's own corner: a menu wider than the pane would otherwise
-# be given a negative column, and tmux would place it off-screen.
+# `C` is the centre of the CLIENT, so it is only equal to the centre of the
+# pane when the pane spans the client's full width. That covers the common
+# case of a vertical stack of panes. A horizontally split pane falls back to
+# the estimate, which is approximate but bounded, and better than centring on
+# the wrong pane entirely.
+#
+# The vertical half is always computed, since a pane's rows rarely match the
+# client's. -y names the menu's BOTTOM row, so the height is ADDED. Measured:
+# with -y 91 and an 8-row menu in a pane spanning rows 64 to 125, the menu
+# drew at 84 to 91, about seven rows above the pane's centre. Top-semantics
+# would have been centred, so it cannot be that.
 # Arguments:
 #   Menu width, menu height
 # Outputs:
@@ -144,16 +157,18 @@ menu_centre_position() {
   geom="$(menu_pane_geometry)"
   [ -n "${geom}" ] || { printf ''; return 0; }
 
-  local pane_left pane_top pane_w pane_h
-  read -r pane_left pane_top pane_w pane_h <<< "${geom}"
+  local pane_left pane_top pane_w pane_h client_w
+  read -r pane_left pane_top pane_w pane_h client_w <<< "${geom}"
 
-  # -y names the menu's BOTTOM row, so the height is ADDED. Measured: with
-  # -y 91 and an 8-row menu in a pane spanning rows 64 to 125, the menu drew
-  # at 84 to 91 - about seven rows high of the pane's centre. Top-semantics
-  # would have been centred, so it cannot be that. -x is the left edge.
-  local x=$((pane_left + (pane_w - menu_w) / 2))
+  local x
+  if [ "${pane_left}" -eq 0 ] && [ "${pane_w}" -eq "${client_w}" ]; then
+    x="C"
+  else
+    x=$((pane_left + (pane_w - menu_w) / 2))
+    [ "${x}" -lt "${pane_left}" ] && x="${pane_left}"
+  fi
+
   local y=$((pane_top + (pane_h + menu_h) / 2))
-  [ "${x}" -lt "${pane_left}" ] && x="${pane_left}"
   # The bottom cannot sit above the menu's own height, or it is drawn off the
   # top of the pane.
   [ "${y}" -lt "$((pane_top + menu_h))" ] && y="$((pane_top + menu_h))"

@@ -35,6 +35,14 @@ case "${1:-}" in
         # explicitly empty value is the unmeasurable case and must survive.
         printf '%s\n' "${TMUX_STUB_CLIENT_HEIGHT-40}"
         ;;
+      *'#{pane_height} #{client_width}')
+        # The five-in-one geometry query menu_centre_position makes. It has to
+        # be matched BEFORE the *client_width* branch below, which would
+        # otherwise claim it and answer with a client dimension pair.
+        # ${VAR-default}, not ${VAR:-default}: an explicitly empty value is
+        # the unmeasurable case and must survive.
+        printf '%s\n' "${TMUX_STUB_PANE_GEOMETRY-0 0 120 40 120}"
+        ;;
       *client_height*|*client_width*)
         # A -c query measures a named client; without it tmux measures the
         # calling client. The two have to be answerable separately, or no test
@@ -49,13 +57,6 @@ case "${1:-}" in
         else
           printf '%s\n' "${TMUX_STUB_DISPLAY-40 200}"
         fi
-        ;;
-      *'#{pane_left} #{pane_top} #{pane_width} #{pane_height}')
-        # The four-in-one geometry query menu_centre_position makes. Matched
-        # before the lone *pane_width* branch below, which would claim it.
-        # ${VAR-default}, not ${VAR:-default}: an explicitly empty value is
-        # the unmeasurable case and must survive.
-        printf '%s\n' "${TMUX_STUB_PANE_GEOMETRY-0 0 120 40}"
         ;;
       *pane_width*)
         printf '%s\n' "${TMUX_STUB_PANE_WIDTH:-200}"
