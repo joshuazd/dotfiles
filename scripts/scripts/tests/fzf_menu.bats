@@ -14,6 +14,10 @@ setup() {
   MENU="${FZF_MENU_DIR}/demo.menu"
   printf '# Demo actions\nFetch\techo fetch-ran\nStatus\techo hidden-command-ran\n' > "${MENU}"
   FZF_MENU="${BATS_TEST_DIRNAME}/../fzf-menu"
+  # Short client by default, so the tests written for the fzf popup keep
+  # exercising it. The native-menu tests raise it explicitly. With
+  # MENU_CHROME_ROWS at 4, a height of 4 cannot fit even one item.
+  export TMUX_STUB_CLIENT_HEIGHT=4
 }
 
 # The menu file's first line becomes the PROMPT, not a --header: a header
@@ -478,4 +482,68 @@ setup() {
 @test "--run with no command is a usage error" {
   run "${FZF_MENU}" --run
   [ "${status}" -eq 2 ]
+}
+
+@test "--popup renders a native menu when the rows fit" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run "${FZF_MENU}" --popup demo
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand display-menu
+  refute_tmux_subcommand display-popup
+}
+
+# The whole entry travels as ONE argument to --run, so it arrives escaped.
+# Asserting on the unescaped text would be asserting on the bug.
+@test "the native menu's items call --run with the whole entry" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run "${FZF_MENU}" --popup demo
+  run tmux_call_args display-menu
+  [[ "${output}" == *"--run"* ]]
+  [[ "${output}" == *'echo\ fetch-ran'* ]]
+}
+
+# menu_rows numbers labels for fzf's benefit; tmux draws the key itself, so a
+# native menu must not carry the number as well.
+@test "the native menu's labels are not numbered" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run "${FZF_MENU}" --popup demo
+  run tmux_call_args display-menu
+  [[ "${output}" == *"Fetch"* ]]
+  [[ "${output}" != *"1 Fetch"* ]]
+}
+
+@test "--popup falls back to fzf when the rows do not fit" {
+  export TMUX_STUB_CLIENT_HEIGHT=5
+  printf '# Big\n' > "${FZF_MENU_DIR}/big.menu"
+  local i
+  for i in $(seq 1 30); do
+    printf 'Row %s\techo %s\n' "${i}" "${i}" >> "${FZF_MENU_DIR}/big.menu"
+  done
+  run "${FZF_MENU}" --popup big
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand display-popup
+  refute_tmux_subcommand display-menu
+}
+
+# A chaining menu has to fit the tallest screen it can reach, not just its own
+# rows, or picking a leaf blanks it.
+@test "--popup measures an @menu target for the fit test too" {
+  printf '# Leaf\n' > "${FZF_MENU_DIR}/leaf.menu"
+  local i
+  for i in $(seq 1 30); do
+    printf 'Row %s\techo %s\n' "${i}" "${i}" >> "${FZF_MENU_DIR}/leaf.menu"
+  done
+  printf '# Top\nLeaf\t@menu leaf\n' > "${FZF_MENU_DIR}/top.menu"
+  export TMUX_STUB_CLIENT_HEIGHT=12
+  run "${FZF_MENU}" --popup top
+  refute_tmux_subcommand display-menu
+  assert_tmux_subcommand display-popup
+}
+
+@test "--popup on a missing menu still exits 2 without rendering" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run "${FZF_MENU}" --popup nosuch
+  [ "${status}" -eq 2 ]
+  refute_tmux_subcommand display-menu
+  refute_tmux_subcommand display-popup
 }

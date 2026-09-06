@@ -37,6 +37,7 @@ set -o pipefail  # don't hide errors within pipes
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/menu.sh"
 
 readonly MENU_DIR="${FZF_MENU_DIR:-${SCRIPT_DIR}/menus}"
 readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
@@ -451,6 +452,31 @@ menu_max_rows() {
 }
 
 #######################################
+# Menu rows with the digit prefix removed.
+#
+# menu_rows numbers labels for fzf, which has no key column of its own. tmux
+# draws the key at the end of the item line, so a native menu must not carry
+# the number as well.
+# Arguments:
+#   Path to the menu file
+# Outputs:
+#   "command<TAB>label" rows to stdout
+#######################################
+menu_rows_unnumbered() {
+  local file="${1}"
+  local row command label
+  while IFS= read -r row; do
+    [ -n "${row}" ] || continue
+    command="${row%$'\t'*}"
+    label="${row##*$'\t'}"
+    # "1 Fetch" -> "Fetch"; "  Fetch" -> "Fetch"
+    label="${label#[0-9] }"
+    label="${label#  }"
+    printf '%s\t%s\n' "${command}" "${label}"
+  done < <(menu_rows "${file}")
+}
+
+#######################################
 # Re-run this script inside a tmux popup sized to the menu it will show.
 #
 # The height has to be computed out here: the binding creates the popup
@@ -473,6 +499,16 @@ popup() {
 
   local count
   count="$(menu_max_rows "${file}")"
+
+  # A native menu when it will fit. menu_max_rows, not the file's own row
+  # count: a chaining menu has to fit the tallest screen it can reach, or
+  # picking a leaf blanks it.
+  if menu_fits "${count}"; then
+    menu_rows_unnumbered "${file}" \
+      | menu_show "$(menu_header "${file}")" \
+          "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --run"
+    return "${?}"
+  fi
 
   local shown="${count}"
   [ "${shown}" -gt "${POPUP_MAX_ITEMS}" ] && shown="${POPUP_MAX_ITEMS}"
