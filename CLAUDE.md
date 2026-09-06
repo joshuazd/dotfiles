@@ -81,3 +81,37 @@ To add a menu: drop a `.menu` file in `menus/` and bind `fzf-menu --popup <name>
 ### Claude
 
 - `claude/` — Claude Code trust settings (`CLAUDE.md`)
+
+#### `TERM_PROGRAM: Apple_Terminal` in settings.json is deliberate
+
+`claude/.claude/settings.json` sets `TERM_PROGRAM=Apple_Terminal` even though
+the terminal is not Apple Terminal. **Do not "correct" this.** It is what stops
+tmux popups flickering, and JSON cannot hold the comment saying so.
+
+Claude Code decides whether to use synchronized output (DECSET 2026) like this:
+
+```
+aO():   if (TMUX) return synchronizedOutputSupported === true
+probe:  skip DECRQM(2026) if no XTVERSION reply OR TERM_PROGRAM === "Apple_Terminal"
+        skipped -> undefined status -> synchronizedOutputSupported = false
+```
+
+tmux repaints an overlay's outermost cells whenever a pane flushes a
+synchronized-output frame, so any `display-popup` drawn over a working Claude
+tore continuously along its border. Claiming to be Apple Terminal makes Claude
+skip the probe, emit no 2026 frames, and the tearing stops.
+
+Two things worth knowing before changing it:
+
+- **`TERM_PROGRAM === "tmux"`, its real value here, is compared nowhere in the
+  Claude Code bundle**, so nothing is lost by replacing it. The only behaviour
+  it does change is strikethrough support, which is why
+  `CLAUDE_CODE_FORCE_STRIKETHROUGH=1` sits beside it.
+- **Unsetting `TMUX` also disables sync output** (the allowlist below the TMUX
+  branch matches neither `tmux` nor `xterm-256color`) but breaks the tmux
+  clipboard, pane targeting and agent-teams panes. It was tried and rejected.
+
+`CLAUDE_CODE_FORCE_SYNC_OUTPUT` cannot help either way: the `TMUX` branch
+returns before it is read.
+
+Verify with `claude --debug-file /tmp/cc.log` and grep for `DECRQM`.
