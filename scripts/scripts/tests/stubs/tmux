@@ -29,6 +29,12 @@ case "${1:-}" in
     # The client branch uses ${VAR-default}, not ${VAR:-default}: an
     # explicitly empty value is the no-client case and must survive.
     case "${*}" in
+      *'#{client_height}')
+        # A lone client_height query, distinct from the "height width" pair the
+        # branch below answers. ${VAR-default}, not ${VAR:-default}: an
+        # explicitly empty value is the unmeasurable case and must survive.
+        printf '%s\n' "${TMUX_STUB_CLIENT_HEIGHT-40}"
+        ;;
       *client_height*|*client_width*)
         # A -c query measures a named client; without it tmux measures the
         # calling client. The two have to be answerable separately, or no test
