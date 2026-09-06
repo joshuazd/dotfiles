@@ -164,7 +164,7 @@ _picker_run() {
     --cycle
     --layout=reverse
     --padding 0
-    --margin 1,1,0,1
+    --margin "1,1,0,1"
     --delimiter "${delimiter}"
     --with-nth "${with_nth}"
     --prompt "${prompt}"
