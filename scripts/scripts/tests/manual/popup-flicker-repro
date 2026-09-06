@@ -241,6 +241,8 @@ tmux -L "${SOCK}" bind-key S run-shell \
 #     drawn on the border row, which is the outer ring that tears; an item
 #     sits inside the menu body, so it is both steady and covered by
 #     menu-style's background fill.
+#   - labels carry no number: tmux already renders each item's key at the
+#     end of its line, so numbering the text duplicates it.
 #   - separators are a disabled item with a blank name rather than "".
 #     tmux renders "" as a rule line styled separately from menu-style,
 #     which leaves an uncoloured gap through an otherwise solid block.
@@ -252,11 +254,11 @@ tmux -L "${SOCK}" bind-key S run-shell \
 tmux -L "${SOCK}" bind-key G display-menu -x C -y C -- \
   "-  Git actions"        "" "" \
   "- "                    "" "" \
-  "  1 Fetch and prune"   1  "" \
-  "  2 Status"            2  "" \
-  "  3 Rebase on main"    3  "" \
+  "  Fetch and prune"     1  "" \
+  "  Status"              2  "" \
+  "  Rebase on main"      3  "" \
   "- "                    "" "" \
-  "  q Close"             q  ""
+  "  Close"               q  ""
 
 # T: display-menu with NO title. The title text tears even with the border
 # off, so title and border are separate contributors and both have to go for
