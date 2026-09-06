@@ -237,31 +237,38 @@ tmux -L "${SOCK}" bind-key S run-shell \
 
 # G: a borderless menu that still reads as a titled block. Two tricks:
 #
-#   - the title is a plain ITEM with an empty command, not -T. An empty
-#     command makes it unselectable; a leading "-" would ALSO dim it, which
-#     is not wanted for a title. A -T title is
-#     drawn on the border row, which is the outer ring that tears; an item
-#     sits inside the menu body, so it is both steady and covered by
-#     menu-style's background fill.
-#   - labels carry no number: tmux already renders each item's key at the
-#     end of its line, so numbering the text duplicates it.
-#   - labels carry no leading spaces either: tmux pads items to the menu
-#     width, so hand-added indentation just widens the coloured block.
-#   - separators are a disabled item with a blank name rather than "".
-#     tmux renders "" as a rule line styled separately from menu-style,
-#     which leaves an uncoloured gap through an otherwise solid block.
+#   - a "- " item (disabled, blank name) is the separator, NOT "". tmux
+#     draws "" as a rule line styled independently of menu-style, leaving an
+#     uncoloured gap through an otherwise solid block.
+#   - labels carry no number and no leading spaces: tmux renders each item's
+#     key at the end of its line and pads items to the menu width itself.
 #
-# Pair with C-b S to fill the background.
-# The `--` is load-bearing: an item name starting with "-" is otherwise
-# parsed as a flag, and tmux rejects the whole command with
-# "invalid flag - ". A leading "-" is what marks an item disabled.
+# The title is the one thing tmux will not give you both ways. A leading "-"
+# marks an item disabled, which makes it unselectable AND dims it, and there
+# is no menu-disabled-style to separate the two. An empty command alone does
+# not make an item unselectable. So:
+#
+#   C-b G   dimmed title, cursor skips it
+#   C-b H   full-brightness title, cursor can land on it (selecting does
+#           nothing, since its command is empty)
+#
+# Pair either with C-b S to fill the background.
 tmux -L "${SOCK}" bind-key G display-menu -x C -y C -- \
-  "Git actions"           "" "" \
-  ""                      "" "" \
+  "-Git actions"          "" "" \
+  "- "                    "" "" \
   "Fetch and prune"       1  "" \
   "Status"                2  "" \
   "Rebase on main"        3  "" \
-  ""                      "" "" \
+  "- "                    "" "" \
+  "Close"                 q  ""
+
+tmux -L "${SOCK}" bind-key H display-menu -x C -y C -- \
+  "Git actions"           "" "" \
+  "- "                    "" "" \
+  "Fetch and prune"       1  "" \
+  "Status"                2  "" \
+  "Rebase on main"        3  "" \
+  "- "                    "" "" \
   "Close"                 q  ""
 
 # T: display-menu with NO title. The title text tears even with the border
@@ -285,7 +292,7 @@ tmux -L "${SOCK}" bind-key m display-menu -T " display-menu " -x C -y C \
   "close"       q ""
 
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
-printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M cycle border style   C-b T menu (no title)   C-b P menu over popup   C-b S cycle colours   C-b G titled block\n'
+printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M cycle border style   C-b T menu (no title)   C-b P menu over popup   C-b S cycle colours   C-b G titled (dim)   C-b H titled (bright)\n'
 printf 'C-b d detaches and tears the server down.\n'
 printf 'Modes: full small title agent sync cursor sync-off\n'
 printf 'Start with agent - it replays the real captured frame. If that\n'
