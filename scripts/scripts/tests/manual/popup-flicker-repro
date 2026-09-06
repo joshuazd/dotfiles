@@ -84,6 +84,16 @@
 # has no margin option and puts its border and title at the edge by
 # construction, so it is steady only when bare.
 #
+# TERMINALS TESTED, all tear identically:
+#   iTerm2 3.6.10   GPU renderer, supports DECSET 2026
+#   Terminal.app    CPU renderer
+#   Ghostty         GPU renderer with damage tracking
+#
+# Three independent renderers, including a modern damage-tracking one, is
+# what makes "this is tmux, not the terminal" evidence rather than inference.
+# Renderer settings were also eliminated one at a time on iTerm2: adaptive
+# framerate, Metal, maximize throughput, transparency and blur.
+#
 # Minimal upstream repro: this script, `sync` versus `cursor`, tmux 3.7b.
 # Press q or Escape to close the popup, then C-b d to tear the server down.
 
