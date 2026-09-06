@@ -1,5 +1,5 @@
 # Worktree actions
-Switch worktree	wt-pick switch
-Remove a worktree	wt-pick remove
+Switch worktree	@pick wt-pick switch
+Remove a worktree	@pick wt-pick remove
 New worktree	@window git-worktree-new
 Done (this worktree)	git-worktree-done

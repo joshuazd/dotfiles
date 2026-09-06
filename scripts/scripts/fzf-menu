@@ -26,6 +26,7 @@
 #   @pane     send-keys into the current pane
 #   @bg       detached, output appended to ~/.cache/fzf-menu.log
 #   @menu     another menu, in this same popup
+#   @pick     a command that draws its own menu or popup (the *-pick scripts)
 #
 # Example:
 #   fzf-menu git
@@ -85,6 +86,13 @@ readonly MENU_UNAVAILABLE=2
 # output, not a list sized to its contents.
 readonly RUN_POPUP_WIDTH="80%"
 readonly RUN_POPUP_HEIGHT="60%"
+
+# The prompt shown once a bare command has finished. -s so the keypress is not
+# echoed into the output the user is reading, and a rule above it so the
+# prompt is visibly separate from the command's own output rather than looking
+# like one more line of it. Escape counts: read -n1 returns on the ESC byte,
+# so it needs no special case, only saying so.
+readonly RUN_POPUP_PAUSE="printf '\\n%s\\n' \"\$(printf '=%.0s' \$(seq 1 \${COLUMNS:-60}))\"; read -rsn 1 -p 'Done. Press any key (or Esc) to close... ' _"
 
 readonly MENU_MAX_DEPTH=8
 readonly MENU_DEPTH="${FZF_MENU_DEPTH:-0}"
@@ -213,7 +221,7 @@ run_in_popup() {
   local body="${1}"
   tmux display-popup -E -w "${RUN_POPUP_WIDTH}" -h "${RUN_POPUP_HEIGHT}" \
     -d '#{pane_current_path}' \
-    "${body}; printf '\\n'; read -r -n 1 -p 'Press any key to close... ' _" \
+    "${body}; ${RUN_POPUP_PAUSE}" \
     || warn "display-popup failed"
 }
 
@@ -277,6 +285,13 @@ run_action() {
       mkdir -p "$(dirname "${MENU_LOG}")"
       nohup sh -c "${body}" >> "${MENU_LOG}" 2>&1 &
       info "running in background, logging to ${MENU_LOG/#${HOME}/~}"
+      ;;
+    pick)
+      # The command runs its own picker - a native menu when the list fits,
+      # its own popup when it has to fall back to fzf. Wrapping it in a popup
+      # here is what made "Review PR" open an empty box: a display-menu cannot
+      # draw while a popup is already up.
+      sh -c "${body}" || warn "picker exited ${?}"
       ;;
     menu)
       # Two menus that name each other would exec back and forth forever, and
@@ -347,6 +362,7 @@ action_sigil() {
     '@pane '*)   printf 'pane' ;;
     '@bg '*)     printf 'bg' ;;
     '@menu '*)   printf 'menu' ;;
+    '@pick '*)   printf 'pick' ;;
     '@'*)        printf 'unknown' ;;
     *)           printf '' ;;
   esac
@@ -368,6 +384,7 @@ action_body() {
     pane)   printf '%s' "${command#@pane }" ;;
     bg)     printf '%s' "${command#@bg }" ;;
     menu)   printf '%s' "${command#@menu }" ;;
+    pick)   printf '%s' "${command#@pick }" ;;
     *)      printf '%s' "${command}" ;;
   esac
 }
@@ -395,6 +412,8 @@ explain_action() {
     printf '%s\nUNKNOWN SIGIL - this entry will not run\n' "${body}"
   elif [ "${sigil}" = "menu" ]; then
     printf 'opens the %s menu\n' "${body}"
+  elif [ "${sigil}" = "pick" ]; then
+    printf '%s\n' "${body}"
   else
     printf '%s\n' "${body}"
   fi

@@ -77,6 +77,7 @@ setup() {
         '@window '*) body="${command#@window }" ;;
         '@pane '*)   body="${command#@pane }" ;;
         '@bg '*)     body="${command#@bg }" ;;
+        '@pick '*)   body="${command#@pick }" ;;
         '@menu '*)   continue ;;
       esac
       word="${body%% *}"

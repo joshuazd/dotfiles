@@ -13,6 +13,9 @@ setup() {
   # Short client by default, so the tests written for the fzf picker keep
   # exercising it. The native-menu tests raise it explicitly.
   export TMUX_STUB_CLIENT_HEIGHT=4
+  # bats has no terminal, so the fzf path would otherwise re-enter a popup
+  # instead of running fzf. The popup re-entry has its own test below.
+  export MENU_ASSUME_TTY=1
 }
 
 @test "checkout hands the number to gh-worktree" {
@@ -171,4 +174,34 @@ setup() {
   refute_tmux_subcommand display-menu
   run cmd_call_args gh-review
   [ "${lines[1]}" = "7" ]
+}
+
+# Without a terminal there is nothing for fzf to draw on, so the picker has to
+# re-enter inside a popup rather than silently doing nothing. Getting this
+# wrong is what made "Review PR" open an empty box.
+@test "the fzf path re-enters a popup when there is no terminal" {
+  unset MENU_ASSUME_TTY
+  export TMUX_STUB_CLIENT_HEIGHT=10
+  local rows="" i
+  for i in $(seq 1 40); do
+    rows="${rows}${i}"$'\t'"PR ${i}"$'\t'"branch-${i}"$'\n'
+  done
+  stub_cmd gh "${rows}"
+  run "${PR_PICK}" review
+  assert_tmux_subcommand display-popup
+  run tmux_call_args display-popup
+  [[ "${output}" == *"pr-pick"* ]]
+  [[ "${output}" == *"review"* ]]
+}
+
+# A list that fits needs no popup and no terminal: the native menu is drawn by
+# tmux itself, which is the whole reason @pick entries work under run-shell.
+@test "a fitting list needs no popup even without a terminal" {
+  unset MENU_ASSUME_TTY
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  stub_cmd gh "${PR_LIST}"
+  run "${PR_PICK}" review
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand display-menu
+  refute_tmux_subcommand display-popup
 }

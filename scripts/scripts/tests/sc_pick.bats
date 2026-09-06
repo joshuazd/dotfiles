@@ -15,6 +15,9 @@ setup() {
   # Short client by default, so the tests written for the fzf picker keep
   # exercising it. The native-menu tests raise it explicitly.
   export TMUX_STUB_CLIENT_HEIGHT=4
+  # bats has no terminal, so the fzf path would otherwise re-enter a popup
+  # instead of running fzf. The popup re-entry has its own test below.
+  export MENU_ASSUME_TTY=1
 }
 
 stub_listing() {

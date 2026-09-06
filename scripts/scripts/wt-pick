@@ -218,6 +218,7 @@ main() {
   worktree_rows \
     | menu_or_pick "Worktree to ${verb}" \
         "$(printf '%q' "${SCRIPT_DIR}/wt-pick") --act ${verb}" \
+        "$(printf '%q' "${SCRIPT_DIR}/wt-pick") ${verb}" \
         --size "" --style default --info hidden \
         --prompt "Worktree to ${verb}> " \
         --empty-message "No other worktrees." \

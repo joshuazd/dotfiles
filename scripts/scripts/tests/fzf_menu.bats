@@ -547,3 +547,38 @@ setup() {
   refute_tmux_subcommand display-menu
   refute_tmux_subcommand display-popup
 }
+
+# @pick is for commands that draw their own menu or popup. Wrapping one in a
+# popup is what made "Review PR" open an empty box: a display-menu cannot be
+# drawn while a popup is already up.
+@test "@pick runs the command without a popup of its own" {
+  run "${FZF_MENU}" --run "@pick echo picked"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"picked"* ]]
+  refute_tmux_subcommand display-popup
+}
+
+@test "@pick does not pause for a keypress" {
+  run "${FZF_MENU}" --run "@pick echo picked"
+  [[ "${output}" != *"Press any key"* ]]
+}
+
+@test "@pick is not mistaken for an unknown sigil" {
+  run "${FZF_MENU}" --explain "@pick pr-pick review"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"UNKNOWN SIGIL"* ]]
+  [[ "${output}" == *"pr-pick review"* ]]
+}
+
+@test "a failing @pick reports it without failing the menu" {
+  run "${FZF_MENU}" --run "@pick exit 3"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"picker exited"* ]]
+}
+
+# The pause prompt is what the user reads after a bare command finishes.
+@test "the bare-command popup names Escape as a way out" {
+  run "${FZF_MENU}" --run "echo hi"
+  run tmux_call_args display-popup
+  [[ "${output}" == *"Esc"* ]]
+}

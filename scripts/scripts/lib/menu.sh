@@ -35,14 +35,14 @@ readonly MENU_CHROME_ROWS=4
 # positioning the menu (they are empty at any other time, which is why this
 # can only be checked on a live client). Arithmetic is tmux's #{e|op:a,b}.
 #
-#   x = (pane_left + pane_right - menu_width)  / 2
-#   y = (pane_top  + pane_bottom + menu_height) / 2
+#   x = pane_left + (pane_width  - menu_width)  / 2
+#   y = pane_top  + (pane_height - menu_height) / 2
 #
-# The y formula ADDS the height on the assumption that display-menu's -y names
-# the menu's BOTTOM row rather than its top. If a menu ever appears about one
-# menu-height too low or too high, that assumption is what to flip.
-readonly MENU_POS_X='#{e|/:#{e|-:#{e|+:#{popup_pane_left},#{popup_pane_right}},#{popup_width}},2}'
-readonly MENU_POS_Y='#{e|/:#{e|+:#{e|+:#{popup_pane_top},#{popup_pane_bottom}},#{popup_height}},2}'
+# Built from pane_width/pane_height rather than pane_right/pane_bottom: those
+# are inclusive column and row indices, so using them lands the menu half a
+# cell left and low. -y names the menu's TOP row, so the height is SUBTRACTED.
+readonly MENU_POS_X='#{e|+:#{popup_pane_left},#{e|/:#{e|-:#{pane_width},#{popup_width}},2}}'
+readonly MENU_POS_Y='#{e|+:#{popup_pane_top},#{e|/:#{e|-:#{pane_height},#{popup_height}},2}}'
 
 #######################################
 # Height of the attached client, in rows.
@@ -165,6 +165,8 @@ menu_show() {
 # Arguments:
 #   Menu title
 #   Act prefix - a shell-quoted command taking one value argument
+#   Popup command - how to re-run the caller inside a popup when the fzf path
+#     is needed and there is no terminal to draw it on. Empty to disable.
 #   Remaining arguments are passed through to pick_one
 # Inputs:
 #   "value<TAB>label" rows on stdin
@@ -175,7 +177,8 @@ menu_show() {
 menu_or_pick() {
   local title="${1}"
   local act_prefix="${2}"
-  shift 2
+  local popup_cmd="${3}"
+  shift 3
 
   # Read the caller's empty-message so the menu path can report an empty list
   # in the same words pick_one would. It stays in the forwarded arguments.
@@ -206,6 +209,22 @@ menu_or_pick() {
 
   if menu_fits "${count}"; then
     printf '%s\n' "${rows}" | menu_show "${title}" "${act_prefix}"
+    return "${?}"
+  fi
+
+  # fzf needs a terminal. Invoked from a menu item the caller is running under
+  # `run-shell`, which has none, so it re-enters inside a popup - where the fit
+  # test comes out the same and this branch is reached again, with a terminal.
+  #
+  # The test is on STDOUT, not stdin: stdin here is the pipe carrying the rows
+  # and is never a terminal, so testing it would re-enter a popup every time,
+  # including from inside one.
+  #
+  # MENU_ASSUME_TTY skips the re-entry, which is how the tests exercise the
+  # fzf path without a terminal - the same kind of seam as FZF_MENU_DIR and
+  # SCRIPTS_PKG_DIR elsewhere in this package.
+  if [ -z "${MENU_ASSUME_TTY:-}" ] && [ ! -t 1 ] && [ -n "${popup_cmd}" ]; then
+    tmux display-popup -E -w 80% -h 60% "${popup_cmd}"
     return "${?}"
   fi
 

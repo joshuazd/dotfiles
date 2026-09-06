@@ -147,6 +147,7 @@ main() {
   pr_rows \
     | menu_or_pick "PR to ${verb}" \
         "$(printf '%q' "${SCRIPT_DIR}/pr-pick") --act ${verb}" \
+        "$(printf '%q' "${SCRIPT_DIR}/pr-pick") ${verb}" \
         --size "" --style default --info hidden \
         --prompt "PR to ${verb}> " \
         --empty-message "No open PRs." \

@@ -151,6 +151,7 @@ main() {
   story_rows \
     | menu_or_pick "Story to ${verb}" \
         "$(printf '%q' "${SCRIPT_DIR}/sc-pick") --act ${verb}" \
+        "$(printf '%q' "${SCRIPT_DIR}/sc-pick") ${verb}" \
         --size "" --style default --info hidden \
         --prompt "Story to ${verb}> " \
         --empty-message "No stories assigned to you." \

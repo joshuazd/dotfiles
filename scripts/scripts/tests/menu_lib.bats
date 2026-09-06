@@ -146,7 +146,7 @@ setup() {
 @test "a fitting list renders a menu and no fzf" {
   setup_fzf_stub
   export TMUX_STUB_CLIENT_HEIGHT=40
-  printf 'v1\tOne\n' | menu_or_pick "T" "true" --empty-message "none"
+  printf 'v1\tOne\n' | menu_or_pick "T" "true" "" --empty-message "none"
   assert_tmux_subcommand display-menu
   refute_fzf_called
 }
@@ -157,7 +157,7 @@ setup() {
   export FZF_STUB_SELECTION=$'v3\tThree'
   local i
   for i in $(seq 1 20); do printf 'v%s\tItem%s\n' "${i}" "${i}"; done \
-    | menu_or_pick "T" "true" --empty-message "none"
+    | menu_or_pick "T" "true" "" --empty-message "none"
   refute_tmux_subcommand display-menu
   [ -s "${FZF_STUB_LOG}" ]
 }
@@ -171,7 +171,7 @@ setup() {
   export FZF_STUB_SELECTION=$'chosen-value\tThree'
   local i
   for i in $(seq 1 20); do printf 'v%s\tItem%s\n' "${i}" "${i}"; done \
-    | menu_or_pick "T" "acted" --empty-message "none"
+    | menu_or_pick "T" "acted" "" --empty-message "none"
   run cmd_call_args acted
   [ "${lines[1]}" = "chosen-value" ]
 }
@@ -184,7 +184,7 @@ setup() {
   export FZF_STUB_ABORT=1
   local i status=0
   for i in $(seq 1 20); do printf 'v%s\tItem%s\n' "${i}" "${i}"; done \
-    | menu_or_pick "T" "acted" --empty-message "none" || status="${?}"
+    | menu_or_pick "T" "acted" "" --empty-message "none" || status="${?}"
   [ "${status}" -eq "${PICKER_QUIET_EXIT}" ]
   refute_cmd_called acted
 }
@@ -192,7 +192,7 @@ setup() {
 @test "an empty list reports the caller's message and renders nothing" {
   setup_fzf_stub
   export TMUX_STUB_CLIENT_HEIGHT=40
-  run bash -c "source '${BATS_TEST_DIRNAME}/../lib/menu.sh'; printf '' | menu_or_pick T true --empty-message 'No open PRs.'"
+  run bash -c "source '${BATS_TEST_DIRNAME}/../lib/menu.sh'; printf '' | menu_or_pick T true '' --empty-message 'No open PRs.'"
   [ "${status}" -eq 3 ]
   [[ "${output}" == *"No open PRs."* ]]
   refute_tmux_subcommand display-menu
@@ -204,7 +204,7 @@ setup() {
   export FZF_STUB_SELECTION=$'v1\tOne'
   local i
   for i in $(seq 1 20); do printf 'v%s\tItem%s\n' "${i}" "${i}"; done \
-    | menu_or_pick "T" "true" --prompt "Pick this> " --empty-message "none"
+    | menu_or_pick "T" "true" "" --prompt "Pick this> " --empty-message "none"
   run fzf_args
   printf '%s\n' "${output}" | assert_arg_after "--prompt" "Pick this> "
 }
@@ -213,7 +213,7 @@ setup() {
 @test "the menu path builds items calling the act prefix" {
   setup_fzf_stub
   export TMUX_STUB_CLIENT_HEIGHT=40
-  printf 'the-value\tOne\n' | menu_or_pick "T" "acted" --empty-message "none"
+  printf 'the-value\tOne\n' | menu_or_pick "T" "acted" "" --empty-message "none"
   run tmux_call_args display-menu
   [[ "${output}" == *"acted"* ]]
   [[ "${output}" == *"the-value"* ]]
@@ -226,7 +226,7 @@ setup() {
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
   [[ "${output}" == *"popup_pane_left"* ]]
-  [[ "${output}" == *"popup_pane_right"* ]]
+  [[ "${output}" == *"pane_width"* ]]
   [[ "${output}" == *"popup_width"* ]]
 }
 
@@ -234,7 +234,7 @@ setup() {
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
   [[ "${output}" == *"popup_pane_top"* ]]
-  [[ "${output}" == *"popup_pane_bottom"* ]]
+  [[ "${output}" == *"pane_height"* ]]
 }
 
 # Terminal-centring would be the fallback, so make sure it is not what shipped.
