@@ -37,8 +37,26 @@ setup() {
   printf '%s\n' "${output}" | assert_arg_after "--prompt" "bare> "
 }
 
+@test "entries are numbered and bound to digit keys" {
+  export FZF_STUB_SELECTION=$'echo hidden-command-ran\t2 Status'
+  run "${FZF_MENU}" demo
+  [ "${status}" -eq 0 ]
+  run fzf_args
+  # Two entries in the demo menu, so two binds and no third.
+  printf '%s\n' "${output}" | assert_arg_after "--bind" "1:pos(1)+accept,2:pos(2)+accept"
+}
+
+@test "digit binds stop at the number of entries" {
+  printf '# One\nOnly\techo one\n' > "${FZF_MENU_DIR}/one.menu"
+  export FZF_STUB_SELECTION=$'echo one\t1 Only'
+  run "${FZF_MENU}" one
+  [ "${status}" -eq 0 ]
+  run fzf_args
+  printf '%s\n' "${output}" | assert_arg_after "--bind" "1:pos(1)+accept"
+}
+
 @test "labels are the display column and commands are hidden" {
-  export FZF_STUB_SELECTION=$'echo hidden-command-ran\tStatus'
+  export FZF_STUB_SELECTION=$'echo hidden-command-ran\t2 Status'
   run "${FZF_MENU}" demo
   [ "${status}" -eq 0 ]
   # The marker appears whether main prints the command (this task) or runs it

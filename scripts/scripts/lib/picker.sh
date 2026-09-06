@@ -91,13 +91,14 @@ _picker_run() {
   local preview_window=""
   local header_label=""
   local preview_label=""
+  local extra_bind=""
   local size="${PICKER_DEFAULT_SIZE}"
   local delimiter
   delimiter=$'\t'
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--size|--delimiter)
+      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--bind|--size|--delimiter)
         if [ "${#}" -lt 2 ]; then
           error "picker: ${1} requires a value"
           return "${PICKER_UNAVAILABLE}"
@@ -112,6 +113,7 @@ _picker_run() {
       --preview)   preview="${2}";   shift 2 ;;
       --preview-window) preview_window="${2}"; shift 2 ;;
       --preview-label)  preview_label="${2}";  shift 2 ;;
+      --bind)      extra_bind="${2}";  shift 2 ;;
       --size)      size="${2}";      shift 2 ;;
       --delimiter) delimiter="${2}"; shift 2 ;;
       *)
@@ -200,6 +202,8 @@ _picker_run() {
   if [ "${multi}" = "true" ]; then
     args+=(--multi --bind "ctrl-a:select-all,ctrl-d:deselect-all")
   fi
+  # A caller's own bindings come last so they win over anything above.
+  [ -n "${extra_bind}" ] && args+=(--bind "${extra_bind}")
 
   local selection fzf_status=0
   selection="$(printf '%s\n' "${rows}" | fzf "${args[@]}")" || fzf_status="${?}"
@@ -217,7 +221,8 @@ _picker_run() {
 # Pick exactly one row.
 # Arguments:
 #   --prompt P, --header H, --header-label L, --with-nth N, --preview CMD,
-#   --preview-window W, --preview-label L, --size GEO, --delimiter D (optional)
+#   --preview-window W, --preview-label L, --bind SPEC, --size GEO,
+#   --delimiter D (all optional)
 # Inputs:
 #   TAB-delimited rows on stdin, display column last
 # Outputs:

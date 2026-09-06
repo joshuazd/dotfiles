@@ -135,6 +135,7 @@ menu_rows() {
   local base
   base="$(basename "${file}")"
   local lineno=0
+  local emitted=0
   local line label command
 
   while IFS= read -r line || [ -n "${line}" ]; do
@@ -157,7 +158,12 @@ menu_rows() {
       continue
     fi
 
-    printf '%s\t%s\n' "${command}" "${label}"
+    emitted=$((emitted + 1))
+    if [ "${emitted}" -le 9 ]; then
+      printf '%s\t%s %s\n' "${command}" "${emitted}" "${label}"
+    else
+      printf '%s\t  %s\n' "${command}" "${label}"
+    fi
   done < "${file}"
 }
 
@@ -207,16 +213,24 @@ run_action() {
       # A failing action must not look like a failing menu, so its status is
       # reported rather than propagated - and reported before the pause, so it
       # is readable instead of flashing past as the popup closes.
+      # A leading blank line keeps the popup's top row empty. That row is the
+      # overlay's outer ring, which tmux repaints when a pane flushes a
+      # DECSET 2026 frame, so anything printed there tears - the same reason
+      # the picker itself runs with --margin 1. fzf's margin does not cover
+      # this branch, because by now fzf has exited and the command is writing
+      # to the popup directly.
+      printf '\n'
       local status=0
       sh -c "${body}" || status="${?}"
       if [ "${status}" -ne 0 ]; then
         warn "exited ${status}"
       fi
+      # And a trailing one, so the last row stays empty too.
+      printf '\n'
       # Only pause when there is a terminal to pause for. The prompt exists so
       # a popup does not close before its output can be read; with no tty
       # (a test, a pipe) there is nothing to wait on and blocking would hang.
       if [ -t 0 ]; then
-        printf '\n'
         read -r -n 1 -p "Press any key to close... " _ || true
       fi
       ;;
@@ -371,12 +385,25 @@ main() {
   # The preview re-enters this script with --explain so it can resolve the
   # sigil into the command that actually runs plus where it runs, rather than
   # showing raw menu syntax the reader has to decode.
+  # One keypress per entry, which is the thing a tmux display-menu does well
+  # and an fzf picker normally does not. pos(N) needs the `load` event: at
+  # `start` the list is not populated yet and the jump is a no-op.
+  local count binds="" n
+  count="$(printf '%s\n' "${rows}" | grep -c . || true)"
+  [ -n "${count}" ] || count=0
+  n=1
+  while [ "${n}" -le 9 ] && [ "${n}" -le "${count}" ]; do
+    binds="${binds}${binds:+,}${n}:pos(${n})+accept"
+    n=$((n + 1))
+  done
+
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
     | pick_one --size "" --prompt "$(menu_header "${file}")> " \
         --preview "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --explain {1}" \
         --preview-label ' Runs ' \
-        --preview-window 'down,2,border-rounded,wrap,noinfo')" \
+        --preview-window 'down,2,border-rounded,wrap,noinfo' \
+        ${binds:+--bind "${binds}"})" \
     || status="${?}"
 
   if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then
