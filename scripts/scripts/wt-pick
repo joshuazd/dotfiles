@@ -1,0 +1,197 @@
+#!/usr/bin/env bash
+#
+# wt-pick - Pick a git worktree and act on it
+#
+# Usage: wt-pick <switch|remove>
+#
+# Arguments:
+#   switch    attach or create the tmux session for the chosen worktree
+#   remove    confirm, then remove the chosen worktree and its session
+#
+# Lists every worktree of the current repository except the main checkout and
+# the one you are standing in. Rendered inline, so it draws in whatever popup
+# the caller already has: menus/worktree.menu invokes it, and it also works
+# from a plain shell.
+#
+# Example:
+#   wt-pick switch
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/output.sh"
+source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/worktree.sh"
+
+readonly PICK_USAGE_ERROR=2
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  printf '%s\n' \
+    "Usage: ${0##*/} <switch|remove>" \
+    "" \
+    "Pick a git worktree and act on it." \
+    "" \
+    "  switch    attach or create the tmux session for the worktree" \
+    "  remove    confirm, then remove the worktree and kill its session"
+}
+
+#######################################
+# Print one row unless it names the main checkout or the current worktree.
+# Arguments:
+#   Worktree path, branch name, main checkout path, current directory
+# Outputs:
+#   "path<TAB>basename  branch" to stdout, or nothing
+#######################################
+emit_worktree_row() {
+  local path="${1}"
+  local branch="${2}"
+  local main_dir="${3}"
+  local here="${4}"
+
+  [ -n "${path}" ] || return 0
+  local resolved="${path}"
+  [ -d "${path}" ] && resolved="$(cd "${path}" && pwd -P)"
+  [ "${resolved}" = "${main_dir}" ] && return 0
+  [ "${resolved}" = "${here}" ] && return 0
+
+  printf '%s\t%s  %s\n' "${path}" "$(basename "${path}")" "${branch:-?}"
+}
+
+#######################################
+# Emit one picker row per eligible worktree.
+#
+# The main checkout is excluded because it is not removable and is not a
+# worktree to switch to; the current directory's worktree is excluded because
+# both verbs are no-ops on it. `git worktree list --porcelain` puts the main
+# checkout first, but it is identified by PATH rather than by position: a
+# positional assumption would silently start offering it if the format ever
+# grew a leading record.
+# Outputs:
+#   "path<TAB>basename  branch" rows to stdout
+#######################################
+worktree_rows() {
+  local main_dir here
+  main_dir="$(dirname "$(git rev-parse --git-common-dir)")"
+  main_dir="$(cd "${main_dir}" && pwd -P)"
+  here="$(pwd -P)"
+
+  local line path="" branch=""
+  # A blank line terminates each record, so flush there as well as at EOF.
+  while IFS= read -r line || [ -n "${line}" ]; do
+    case "${line}" in
+      'worktree '*) path="${line#worktree }" ;;
+      'branch refs/heads/'*) branch="${line#branch refs/heads/}" ;;
+      'detached') branch="detached" ;;
+      '')
+        emit_worktree_row "${path}" "${branch}" "${main_dir}" "${here}"
+        path=""
+        branch=""
+        ;;
+    esac
+  done < <(git worktree list --porcelain)
+  emit_worktree_row "${path}" "${branch}" "${main_dir}" "${here}"
+}
+
+#######################################
+# Attach or create the tmux session for a worktree.
+# Arguments:
+#   Worktree path
+#######################################
+do_switch() {
+  ts "${1}"
+}
+
+#######################################
+# Confirm, then remove a worktree and its tmux session.
+#
+# wt-confirm is called with a tty here (this runs inside the menu's popup), so
+# it renders inline rather than opening a nested popup of its own.
+# Arguments:
+#   Worktree path
+#######################################
+do_remove() {
+  local path="${1}"
+  local session
+  session="$(basename "${path}")"
+
+  local gate="${WT_CONFIRM_BIN:-${SCRIPT_DIR}/wt-confirm}"
+  if [ ! -x "${gate}" ]; then
+    error "wt-confirm not found or not executable: ${gate}"
+    return 1
+  fi
+  if ! "${gate}" "${path}" "${session}"; then
+    info "Cancelled"
+    return 0
+  fi
+  "${SCRIPT_DIR}/git-worktree-cleanup" "${path}"
+}
+
+#######################################
+# Main function
+# Arguments:
+#   The verb
+# Returns:
+#   0 on success or no selection, PICK_USAGE_ERROR on a bad verb
+#######################################
+main() {
+  local verb="${1:-}"
+
+  case "${verb}" in
+    switch|remove) ;;
+    '')
+      error "missing required argument: verb"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+    *)
+      error "unknown verb: ${verb}"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+  esac
+
+  if ! git rev-parse --git-dir > /dev/null 2>&1; then
+    error "not a git repository"
+    return "${PICK_USAGE_ERROR}"
+  fi
+
+  local selection status=0
+  selection="$(worktree_rows \
+    | pick_one --size "" --style default --info hidden \
+        --prompt "Worktree to ${verb}> " \
+        --empty-message "No other worktrees.")" \
+    || status="${?}"
+
+  # PICKER_NO_SELECTION is Escape or an empty list, both successful no-ops.
+  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return 0
+  [ "${status}" -eq 0 ] || return "${status}"
+
+  local path="${selection%%$'\t'*}"
+
+  case "${verb}" in
+    switch) do_switch "${path}" ;;
+    remove) do_remove "${path}" ;;
+  esac
+}
+
+# Check for help flag
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and
+# on the macos-latest runner: there "${@}" with no positional parameters is
+# an unbound variable under `set -o nounset` rather than an empty list, so a
+# no-argument run aborted here instead of printing usage.
+if help_wanted ${1+"${@}"}; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main ${1+"${@}"}

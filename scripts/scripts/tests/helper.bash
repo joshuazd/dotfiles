@@ -89,7 +89,15 @@ refute_tmux_subcommand_matching() {
 setup_fzf_stub() {
   export FZF_STUB_LOG="${BATS_TEST_TMPDIR}/fzf-calls.log"
   : > "${FZF_STUB_LOG}"
+  export FZF_STUB_ROWS_LOG="${BATS_TEST_TMPDIR}/fzf-rows.log"
+  : > "${FZF_STUB_ROWS_LOG}"
   export PATH="${BATS_TEST_DIRNAME}/stubs:${PATH}"
+}
+
+# The rows a picker offered, which arrive on stdin rather than in argv. An
+# assertion about what was on offer has to read this, not fzf_args.
+fzf_rows() {
+  cat "${FZF_STUB_ROWS_LOG}"
 }
 
 # Print the argv of the first fzf invocation, one argument per line.

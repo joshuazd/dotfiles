@@ -29,6 +29,13 @@ printf '\n' >> "${FZF_STUB_LOG}"
 # Drain stdin so the producing side never sees EPIPE.
 stub_rows="$(cat)"
 
+# Record the rows as well as the argv. What a picker OFFERS is half of what it
+# does, and it arrives on stdin - an assertion made against argv alone silently
+# passes for rows that were never there to begin with.
+if [ -n "${FZF_STUB_ROWS_LOG:-}" ]; then
+  printf '%s\n' "${stub_rows}" >> "${FZF_STUB_ROWS_LOG}"
+fi
+
 if [ -n "${FZF_STUB_ABORT:-}" ]; then
   exit 130
 fi
