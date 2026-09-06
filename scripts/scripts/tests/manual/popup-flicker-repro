@@ -67,6 +67,23 @@
 # no tmux option for the latter, so there is no local fix - the levers are
 # upstream in tmux, or Claude Code not emitting 2026 inside tmux.
 #
+# SURFACE RESULTS against an animating pane:
+#
+#   bordered popup            tears
+#   borderless popup          steady
+#   fullscreen popup          steady   (border sits at the screen edge)
+#   popup + fzf --margin 1    steady   <- what the menu ships
+#   display-menu, framed      tears
+#   display-menu, no border   tears    (the TITLE tears on its own)
+#   display-menu, bare        steady
+#   menu stacked over a popup n/a      tmux will not draw one over the other
+#
+# The rule: any drawn cell on the overlay's outermost ring tears - box
+# glyphs, ASCII glyphs and title text alike - and blank cells cannot. fzf
+# escapes with --margin, which insets its border by one cell. display-menu
+# has no margin option and puts its border and title at the edge by
+# construction, so it is steady only when bare.
+#
 # Minimal upstream repro: this script, `sync` versus `cursor`, tmux 3.7b.
 # Press q or Escape to close the popup, then C-b d to tear the server down.
 
