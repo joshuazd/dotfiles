@@ -375,7 +375,7 @@ main() {
     | pick_one --size "" --prompt "$(menu_header "${file}")> " \
         --preview "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --explain {1}" \
         --preview-label ' Runs ' \
-        --preview-window 'down,2,border-rounded,wrap')" \
+        --preview-window 'down,2,border-rounded,wrap,noinfo')" \
     || status="${?}"
 
   if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then
