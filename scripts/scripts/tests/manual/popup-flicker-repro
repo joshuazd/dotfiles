@@ -66,9 +66,9 @@ readonly SOCK=flickrepro
 readonly MODE="${1:-full}"
 
 case "${MODE}" in
-  full | small | title | agent | sync | cursor) ;;
+  full | small | title | agent | sync | cursor | sync-off) ;;
   *)
-    printf 'Usage: %s [full|small|title|agent|sync|cursor]\n' "${0##*/}" >&2
+    printf 'Usage: %s [full|small|title|agent|sync|cursor|sync-off]\n' "${0##*/}" >&2
     exit 2
     ;;
 esac
@@ -116,6 +116,14 @@ case "${MODE}" in
     # Bisect half one: synchronized-output brackets only, no cursor toggle.
     pane_cmd='while :; do printf "\033[?2026h\033[H\033[1msync only \033[0m\033[?2026l"; perl -e "select undef,undef,undef,0.1"; done'
     ;;
+  sync-off)
+    # Identical pane to `sync`, but the server drops the Sync capability
+    # before the client attaches. This is the ONLY trustworthy test of
+    # whether `terminal-overrides ...:Sync@` actually suppresses a pane's
+    # relayed 2026 brackets - a byte-counting harness gave inconsistent
+    # answers, a human watching a border does not.
+    pane_cmd='while :; do printf "\033[?2026h\033[H\033[1msync off  \033[0m\033[?2026l"; perl -e "select undef,undef,undef,0.1"; done'
+    ;;
   cursor)
     # Bisect half two: cursor hide/show only, no sync brackets.
     pane_cmd='while :; do printf "\033[?25l\033[H\033[1mcursor only\033[0m\033[?25h"; perl -e "select undef,undef,undef,0.1"; done'
@@ -134,6 +142,10 @@ tmux -L "${SOCK}" set -g status-left " flicker repro: ${MODE} mode "
 # re-emitted to the outer terminal as a window retitle. allow-rename off
 # matches too - it stops the window NAME changing while still letting the
 # pane title through, so this is not testing a rename storm.
+if [ "${MODE}" = sync-off ]; then
+  tmux -L "${SOCK}" set -ags terminal-overrides ',*:Sync@'
+fi
+
 tmux -L "${SOCK}" set -g set-titles on
 tmux -L "${SOCK}" set -g set-titles-string '#S:#I:#W - "#T" #{session_alerts}'
 tmux -L "${SOCK}" setw -g allow-rename off
@@ -144,7 +156,7 @@ tmux -L "${SOCK}" bind-key g display-popup -EE -w 72 -h 17 \
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
 printf 'Press C-b g to open the popup, q to close it.\n'
 printf 'C-b d detaches and tears the server down.\n'
-printf 'Modes: full small title agent sync cursor\n'
+printf 'Modes: full small title agent sync cursor sync-off\n'
 printf 'Start with agent - it replays the real captured frame. If that\n'
 printf 'flickers, sync and cursor bisect which half is responsible.\n\n'
 
