@@ -7,7 +7,7 @@ SHELL_SCRIPTS := common.sh $(wildcard lib/*.sh) \
 	gh-review gh-worktree \
 	git-worktree-cleanup git-worktree-done git-worktree-new git-worktree-session \
 	portal-open rubocop-server-prune short-story-md shortcut-claim shortcut-implement shortcut-worktree \
-	ts vigil-panel
+	ts vigil-panel wt-confirm
 
 # -x plus the source paths lets shellcheck follow the lib/ sources instead of
 # reporting SC1091 on every one. SC2155 is excluded because the
