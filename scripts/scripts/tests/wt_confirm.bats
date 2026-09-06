@@ -44,11 +44,20 @@ setup() {
   [ "${status}" -eq 1 ]
 }
 
-@test "the prompt names the session" {
+# Quoted, so the name's boundaries are visible against the rest of the prompt.
+@test "the prompt names the session in quotes" {
   export FZF_STUB_SELECTION=$'cancel\t1 Cancel'
   run "${WT_CONFIRM}" --inline "${REPO}" repo-session
   run fzf_args
-  [[ "${output}" == *"repo-session"* ]]
+  [[ "${output}" == *"'repo-session'"* ]]
+}
+
+# -B, matching fzf-menu's popup: the picker draws its own frame, and a second
+# tmux border around it is both redundant and the ring that tears.
+@test "the popup is borderless" {
+  run "${WT_CONFIRM}" "${REPO}" repo-session < /dev/null
+  run tmux_call_args display-popup
+  [[ "${output}" == *"-B"* ]]
 }
 
 @test "the header names the path" {

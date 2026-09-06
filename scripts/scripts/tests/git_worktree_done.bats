@@ -32,10 +32,12 @@ use_gate() {
   refute_tmux_subcommand display-popup
 }
 
-@test "a cancelled confirmation says so" {
+# run-shell -b surfaces this script's stdout in the pane, where it outlives
+# the popup the user just dismissed. A cancel has to leave nothing behind.
+@test "a cancelled confirmation prints nothing" {
   use_gate 1
   run "${DONE}"
-  [[ "${output}" == *"Cancelled"* ]]
+  [ -z "${output}" ]
 }
 
 @test "a confirmed removal switches the client" {

@@ -84,7 +84,7 @@ ask() {
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
     | pick_one --size "" --style default --info hidden \
-        --prompt "Remove ${session}? [${summary}] " \
+        --prompt "Remove '${session}'? [${summary}] " \
         --header "${dir}" \
         --bind "1:pos(1)+accept,2:pos(2)+accept")" \
     || status="${?}"
@@ -168,7 +168,7 @@ main() {
 
   local file
   file="$(mktemp "${TMPDIR:-/tmp}/wt-confirm.XXXXXX")"
-  tmux display-popup -E -w "${CONFIRM_POPUP_WIDTH}" -h "${CONFIRM_POPUP_HEIGHT}" \
+  tmux display-popup -E -B -w "${CONFIRM_POPUP_WIDTH}" -h "${CONFIRM_POPUP_HEIGHT}" \
     "$(printf '%q' "${self}") --inline --answer-file $(printf '%q' "${file}") $(printf '%q' "${dir}") $(printf '%q' "${session}")"
 
   local status=0

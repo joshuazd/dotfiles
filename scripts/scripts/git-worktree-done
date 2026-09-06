@@ -110,7 +110,9 @@ main() {
     return 1
   fi
   if ! "${confirm_script}" "${worktree_path}" "${current_session}"; then
-    info "Cancelled"
+    # Silent on purpose. This runs under `run-shell -b`, which surfaces stdout
+    # in the pane, so anything printed here outlives the popup the user just
+    # dismissed.
     return 0
   fi
 
