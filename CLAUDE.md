@@ -67,7 +67,7 @@ After installing vim, run `:PackUpdate` to install remote plugins.
 
 ### Menus
 
-fzf-driven action menus, opened from tmux popups.
+Action menus, opened over the focused pane.
 
 - `scripts/scripts/lib/picker.sh` — the only place fzf argv is built (`pick_one` / `pick_many`)
 - `scripts/scripts/fzf-menu` — runs a declarative `menus/<name>.menu` file
@@ -75,6 +75,15 @@ fzf-driven action menus, opened from tmux popups.
 - `scripts/scripts/{wt,pr,sc}-pick` — list-then-act pickers for the entries that need a second choice. Dynamic lists are scripts, not menu syntax
 
 Bindings: `prefix g` git, `w` worktree, `r` pr, `t` tmux, `s` shortcut, `m` all menus. Each has a `C-` variant except `m` (terminals send `C-m` as Enter).
+
+**Two backends, chosen by measurement:**
+
+- native `tmux display-menu` whenever the items fit the client
+- the fzf picker when they do not, because a menu too tall for the terminal is not displayed at all - no scroll, no truncation, no error
+
+`display-menu` runs a command rather than returning a selection, so every picker has a list half and an `--act <verb> <value>` half. Both backends drive the same `--act`, which is what makes the fallback safe to rely on.
+
+Previews and type-to-filter exist only on the fzf path. `lib/menu.sh` owns `display-menu` argv the way `lib/picker.sh` owns fzf's.
 
 To add a menu: drop a `.menu` file in `menus/` and bind `fzf-menu --popup <name>`. No script needed unless an entry has to pick from a list.
 

@@ -135,6 +135,22 @@ Sibling scripts are dispatched by absolute path through `PKG_DIR`, overridable
 with `SCRIPTS_PKG_DIR` — that override is how the tests point them at
 recorders, since a PATH stub cannot intercept an absolute path.
 
+`lib/menu.sh` owns every `display-menu` invocation the way `lib/picker.sh`
+owns fzf's. `menu_or_pick` is the single decision point; nothing else should
+be choosing a backend.
+
+`MENU_CHROME_ROWS` is deliberately generous and must only be lowered against a
+measurement. Too large costs an early fzf fallback; too small means tmux
+silently draws nothing, which reads as a broken keybinding. It cannot be
+measured headlessly - see `tests/manual/verify-menu-chrome.md` for the two
+approaches that fail and why.
+
+Values crossing into a menu item's `run-shell` command are escaped twice:
+`printf '%q'` for the shell and `menu_tmux_quote` for tmux's own parser.
+Dropping either makes a path with a space act on its first word. Assertions
+about these commands must expect the ESCAPED form - checking for the plain
+text is checking for the bug.
+
 `popup()` sizes the tmux popup to the tallest screen a menu can reach,
 including one level of `@menu` target. `POPUP_CHROME_ROWS` is **measured, not
 derived** (`tests/manual/verify-menu-fit`); do not adjust it by estimation.
