@@ -427,3 +427,55 @@ setup() {
   run fzf_args
   printf '%s\n' "${output}" | assert_arg_after "--margin" "0"
 }
+
+# A menu item has no popup to write into, so a bare command opens its own.
+@test "--run on a bare command opens a popup" {
+  run "${FZF_MENU}" --run "echo hi"
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand display-popup
+  run tmux_call_args display-popup
+  [[ "${output}" == *"echo hi"* ]]
+}
+
+# Bordered, like the other popups that show command output.
+@test "--run's popup keeps its border" {
+  run "${FZF_MENU}" --run "echo hi"
+  run tmux_call_args display-popup
+  [[ "${output}" != *"-B"* ]]
+}
+
+@test "--run's popup waits for a key so output can be read" {
+  run "${FZF_MENU}" --run "echo hi"
+  run tmux_call_args display-popup
+  [[ "${output}" == *"Press any key"* ]]
+}
+
+@test "--run honours @window without a popup" {
+  run "${FZF_MENU}" --run "@window vim"
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand new-window
+  refute_tmux_subcommand display-popup
+}
+
+@test "--run honours @pane without a popup" {
+  run "${FZF_MENU}" --run "@pane ls -la"
+  assert_tmux_subcommand send-keys
+  refute_tmux_subcommand display-popup
+}
+
+@test "--run honours @bg without a popup" {
+  run "${FZF_MENU}" --run "@bg true"
+  [ "${status}" -eq 0 ]
+  refute_tmux_subcommand display-popup
+}
+
+@test "--run rejects an unknown sigil" {
+  run "${FZF_MENU}" --run "@nope echo hi"
+  [ "${status}" -eq 2 ]
+  [[ "${output}" == *"unknown sigil"* ]]
+}
+
+@test "--run with no command is a usage error" {
+  run "${FZF_MENU}" --run
+  [ "${status}" -eq 2 ]
+}

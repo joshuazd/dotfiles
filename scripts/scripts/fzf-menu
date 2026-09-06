@@ -5,6 +5,7 @@
 # Usage: fzf-menu <name>
 #        fzf-menu --popup <name>     size a tmux popup to the menu and run in it
 #        fzf-menu --explain <cmd>    render the fzf preview for one entry
+#        fzf-menu --run <cmd>        run one entry, as a menu item does
 #
 # Loads <menu dir>/<name>.menu, presents its entries with pick_one, and runs
 # the selected command. The menu directory defaults to `menus/` beside this
@@ -78,6 +79,12 @@ readonly MENU_UNAVAILABLE=2
 
 # How many @menu hops one invocation may make. menu.menu chaining into a leaf
 # is one hop, so anything beyond a handful is a cycle rather than a design.
+# Geometry for a bare command's own popup, opened from a native menu item.
+# Percentages rather than the menu's fixed width: this holds arbitrary command
+# output, not a list sized to its contents.
+readonly RUN_POPUP_WIDTH="80%"
+readonly RUN_POPUP_HEIGHT="60%"
+
 readonly MENU_MAX_DEPTH=8
 readonly MENU_DEPTH="${FZF_MENU_DEPTH:-0}"
 
@@ -91,6 +98,7 @@ usage() {
     "Usage: ${0##*/} <name>" \
     "       ${0##*/} --popup <name>   size a tmux popup and run in it" \
     "       ${0##*/} --explain <cmd>  render the preview for one entry" \
+    "       ${0##*/} --run <cmd>      run one entry, as a menu item does" \
     "" \
     "Run a declarative menu of actions through an fzf picker." \
     "" \
@@ -188,6 +196,43 @@ menu_rows() {
       printf '%s\t  %s\n' "${command}" "${label}"
     fi
   done < "${file}"
+}
+
+#######################################
+# Run a bare command in a popup of its own and wait for a keypress.
+#
+# run_action's bare branch assumes it is already inside the fzf popup. A menu
+# item is not: display-menu runs a tmux command with nowhere to write, so the
+# output needs a popup built for it. Bordered, matching the other popups that
+# show command output.
+# Arguments:
+#   The command to run
+#######################################
+run_in_popup() {
+  local body="${1}"
+  tmux display-popup -E -w "${RUN_POPUP_WIDTH}" -h "${RUN_POPUP_HEIGHT}" \
+    -d '#{pane_current_path}' \
+    "${body}; printf '\\n'; read -r -n 1 -p 'Press any key to close... ' _" \
+    || warn "display-popup failed"
+}
+
+#######################################
+# Run a menu entry chosen from a native menu.
+#
+# Identical to run_action except for the bare case, which has no popup to
+# write into and so is given one.
+# Arguments:
+#   The command string, sigil included
+# Returns:
+#   0 on success, MENU_UNAVAILABLE on an unknown sigil
+#######################################
+run_action_from_menu() {
+  local command="${1}"
+  if [ -z "$(action_sigil "${command}")" ]; then
+    run_in_popup "$(action_body "${command}")"
+    return 0
+  fi
+  run_action "${command}"
 }
 
 #######################################
@@ -556,6 +601,17 @@ case "${1:-}" in
   --popup)
     shift
     popup "${1:-}"
+    exit "${?}"
+    ;;
+  # The act half. Invoked by a display-menu item, which runs a tmux command
+  # rather than handing a selection back.
+  --run)
+    shift
+    if [ "${#}" -lt 1 ] || [ -z "${1}" ]; then
+      error "missing required argument: command"
+      exit "${MENU_UNAVAILABLE}"
+    fi
+    run_action_from_menu "${1}"
     exit "${?}"
     ;;
 esac
