@@ -59,3 +59,82 @@ menu_fits() {
   [ -n "${height}" ] || return 1
   [ "$((count + MENU_CHROME_ROWS))" -le "${height}" ]
 }
+
+#######################################
+# Single-quote a string for tmux's command parser.
+#
+# The command handed to display-menu is parsed by TMUX first and by the shell
+# second, so a value crosses two parsers. This covers the tmux one; the caller
+# uses printf '%q' for the shell. Embedded single quotes are closed, escaped
+# and reopened, which is the same idiom a POSIX shell needs.
+# Arguments:
+#   The string to quote
+# Outputs:
+#   The quoted string to stdout
+#######################################
+menu_tmux_quote() {
+  local s="${1}"
+  printf "'%s'" "$(printf '%s' "${s}" | sed "s/'/'\\\\''/g")"
+}
+
+#######################################
+# Display a menu of TAB-delimited rows.
+#
+# Item names are NOT numbered: tmux draws the key at the end of the item line
+# itself, so a numbered label shows the number twice - which is exactly how
+# the first attempt at this looked wrong.
+#
+# A label of "-" becomes a separator: display-menu takes an empty name for
+# that and expects the key and command to be omitted entirely, so a separator
+# contributes ONE argv element where an item contributes three.
+# Arguments:
+#   Menu title
+#   Act prefix - a shell-quoted command that takes one value argument
+# Inputs:
+#   "value<TAB>label" rows on stdin
+# Returns:
+#   0 on success, PICKER_EMPTY when there were no rows
+#######################################
+menu_show() {
+  local title="${1}"
+  local act_prefix="${2}"
+
+  local -a args=()
+  local row value label key
+  local n=0
+  local items=0
+
+  while IFS= read -r row; do
+    [ -n "${row}" ] || continue
+    value="${row%%$'\t'*}"
+    label="${row#*$'\t'}"
+
+    if [ "${label}" = "-" ]; then
+      args+=("")
+      continue
+    fi
+
+    n=$((n + 1))
+    items=$((items + 1))
+    if [ "${n}" -le 9 ]; then
+      key="${n}"
+    else
+      key=""
+    fi
+
+    args+=("${label}" "${key}" \
+      "run-shell -b $(menu_tmux_quote "${act_prefix} $(printf '%q' "${value}")")")
+  done
+
+  if [ "${items}" -eq 0 ]; then
+    return "${PICKER_EMPTY}"
+  fi
+
+  # -- terminates the options: a label may begin with a hyphen, which is both
+  # display-menu's "disabled item" marker and the shape of its own flags.
+  tmux display-menu \
+    -T "#[align=centre] ${title} " \
+    -b rounded \
+    -x C -y C \
+    -- "${args[@]}"
+}
