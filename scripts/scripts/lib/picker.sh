@@ -94,13 +94,14 @@ _picker_run() {
   local extra_bind=""
   local style=""
   local info=""
+  local empty_message=""
   local size="${PICKER_DEFAULT_SIZE}"
   local delimiter
   delimiter=$'\t'
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--bind|--style|--info|--size|--delimiter)
+      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--bind|--style|--info|--size|--delimiter|--empty-message)
         if [ "${#}" -lt 2 ]; then
           error "picker: ${1} requires a value"
           return "${PICKER_UNAVAILABLE}"
@@ -118,6 +119,7 @@ _picker_run() {
       --bind)      extra_bind="${2}";  shift 2 ;;
       --style)     style="${2}";       shift 2 ;;
       --info)      info="${2}";        shift 2 ;;
+      --empty-message) empty_message="${2}"; shift 2 ;;
       --size)      size="${2}";      shift 2 ;;
       --delimiter) delimiter="${2}"; shift 2 ;;
       *)
@@ -138,7 +140,10 @@ _picker_run() {
   local rows
   rows="$(cat)"
   if [ -z "${rows}" ]; then
-    warn "nothing to pick from"
+    # A caller that knows what its rows are can say what "none" means. The
+    # generic text is right for a library and useless in a popup that just
+    # closed on the user.
+    warn "${empty_message:-nothing to pick from}"
     return "${PICKER_NO_SELECTION}"
   fi
 
@@ -232,7 +237,7 @@ _picker_run() {
 # Arguments:
 #   --prompt P, --header H, --header-label L, --with-nth N, --preview CMD,
 #   --preview-window W, --preview-label L, --bind SPEC, --style STYLE,
-#   --info STYLE,
+#   --info STYLE, --empty-message TEXT,
 #   --size GEO,
 #   --delimiter D (all optional)
 # Inputs:

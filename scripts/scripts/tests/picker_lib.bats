@@ -172,3 +172,37 @@ setup() {
   picker_bootstrap_path
   [ "${PATH}" = "${once}" ]
 }
+
+# An empty list closes the popup instantly with no explanation unless the
+# caller supplies one. "No open PRs." is the difference between a working
+# menu and one that looks broken.
+@test "--empty-message replaces the default empty-list warning" {
+  run pick_one --empty-message "No open PRs." < /dev/null
+  [ "${status}" -eq 1 ]
+  [[ "${output}" == *"No open PRs."* ]]
+  [[ "${output}" != *"nothing to pick from"* ]]
+}
+
+@test "--empty-message does not invoke fzf" {
+  run pick_one --empty-message "No open PRs." < /dev/null
+  refute_fzf_called
+}
+
+@test "without --empty-message an empty list keeps the default warning" {
+  run pick_one < /dev/null
+  [ "${status}" -eq 1 ]
+  [[ "${output}" == *"nothing to pick from"* ]]
+}
+
+@test "--empty-message requires a value" {
+  run pick_one --empty-message < /dev/null
+  [ "${status}" -eq 2 ]
+}
+
+@test "--empty-message is not passed through to fzf" {
+  export FZF_STUB_SELECTION=$'run-me\tAlpha'
+  run pick_one --empty-message "unused" < "${ROWS}"
+  [ "${status}" -eq 0 ]
+  run fzf_args
+  [[ "${output}" != *"--empty-message"* ]]
+}
