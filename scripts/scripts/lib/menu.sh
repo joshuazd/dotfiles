@@ -41,6 +41,14 @@ readonly MENU_BORDER_COLS=4
 readonly MENU_BORDER_ROWS=2
 readonly MENU_KEY_COLS=6
 
+# Columns to shift the menu from tmux's geometric centre, negative being
+# leftward. Overridable with MENU_X_NUDGE.
+#
+# tmux centres the BOX, and a menu's text does not fill its box evenly: the
+# key column down the right is mostly blank, so a geometrically centred menu
+# still reads a little right. Two columns left looks centred.
+readonly MENU_X_NUDGE_DEFAULT=-2
+
 # Centring is computed HERE, in the shell, and passed to -x/-y as plain
 # numbers.
 #
@@ -163,11 +171,13 @@ menu_centre_position() {
   # nothing here has to estimate it - and for a full-width pane the offset is
   # zero, leaving tmux's centring untouched.
   #
-  # MENU_X_NUDGE shifts it further, positive being rightward. It exists because
-  # "centred" is partly a matter of perception once the box is wider than its
-  # text, and dialling one number beats another round of measurement.
+  # MENU_X_NUDGE shifts it further, positive being rightward. Default -2, set
+  # by eye: tmux centres the BOX, and a menu's text does not fill its box
+  # evenly - the key column on the right is mostly blank - so a
+  # geometrically centred menu still reads slightly right. Two columns left
+  # made it look centred.
   local pane_offset=$(( (pane_left + pane_w / 2) - client_w / 2 ))
-  local shift=$(( pane_offset + ${MENU_X_NUDGE:-0} ))
+  local shift=$(( pane_offset + ${MENU_X_NUDGE:-${MENU_X_NUDGE_DEFAULT}} ))
   local x
   if [ "${shift}" -eq 0 ]; then
     x='#{popup_centre_x}'

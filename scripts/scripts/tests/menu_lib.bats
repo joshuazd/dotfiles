@@ -222,16 +222,16 @@ setup() {
 # -x C -y C centres on the terminal, which on a split window is not where the
 # user is looking. The pane variables are only expanded while tmux positions
 # the menu, so all a unit test can check is that the formats were passed.
-# The position is computed in the shell and passed as plain numbers. A tmux
-# format cannot do it: popup_width, popup_height, popup_pane_left and
-# popup_pane_top all expand to EMPTY in -x/-y, which put the menu's left edge
-# at the pane's centre.
-@test "the position is passed as numbers, not as a format" {
+# The menu's own drawn size must never reach the position: popup_width and
+# popup_height do not expand in -x/-y, and estimating them left the menu right
+# of centre twice. The horizontal comes from tmux's popup_centre_x instead,
+# and the vertical is a plain row number.
+@test "the menu's own size does not reach the position" {
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
   [[ "${output}" != *"popup_width"* ]]
+  [[ "${output}" != *"popup_height"* ]]
   [[ "${output}" != *"popup_pane_left"* ]]
-  [[ "${output}" != *"#{e|"* ]]
 }
 
 # The horizontal position is tmux's own exact centre. A full-width pane needs
@@ -240,11 +240,12 @@ setup() {
 # centre twice.
 #
 # Vertically: menu_h = 1 + 2 = 3 and -y is the BOTTOM row, so y = (40+3)/2 = 21.
-@test "a full-width pane uses tmux's own centre unshifted" {
+@test "a full-width pane uses tmux's centre plus only the nudge" {
   export TMUX_STUB_PANE_GEOMETRY="0 0 120 40 120"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  printf '%s\n' "${output}" | assert_arg_after "-x" '#{popup_centre_x}'
+  # No pane offset, so the whole shift is MENU_X_NUDGE_DEFAULT of -2.
+  printf '%s\n' "${output}" | assert_arg_after "-x" '#{e|-:#{popup_centre_x},2}'
   printf '%s\n' "${output}" | assert_arg_after "-y" "21"
 }
 
@@ -254,16 +255,26 @@ setup() {
   export TMUX_STUB_PANE_GEOMETRY="0 0 60 40 120"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  # pane centre 30, client centre 60, so 30 columns left.
-  printf '%s\n' "${output}" | assert_arg_after "-x" '#{e|-:#{popup_centre_x},30}'
+  # pane centre 30, client centre 60, so 30 left, plus the -2 nudge.
+  printf '%s\n' "${output}" | assert_arg_after "-x" '#{e|-:#{popup_centre_x},32}'
 }
 
 @test "a right-hand pane shifts tmux's centre right" {
   export TMUX_STUB_PANE_GEOMETRY="60 0 60 40 120"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  # pane centre 90, client centre 60, so 30 columns right.
-  printf '%s\n' "${output}" | assert_arg_after "-x" '#{e|+:#{popup_centre_x},30}'
+  # pane centre 90, client centre 60, so 30 right, less the -2 nudge.
+  printf '%s\n' "${output}" | assert_arg_after "-x" '#{e|+:#{popup_centre_x},28}'
+}
+
+# The nudge and the pane offset can cancel exactly, which must leave tmux's
+# own number untouched rather than a +0 expression.
+@test "a shift of zero passes tmux's centre through untouched" {
+  export TMUX_STUB_PANE_GEOMETRY="0 0 120 40 120"
+  export MENU_X_NUDGE=0
+  printf 'v1\tOne\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "-x" '#{popup_centre_x}'
 }
 
 # The knob exists because "centred" is partly perception once the box is wider
