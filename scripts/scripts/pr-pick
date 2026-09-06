@@ -2,6 +2,7 @@
 #
 # pr-pick - Pick an open pull request and act on it
 #
+#        pr-pick --act <verb> <number>  act on one PR (used by menu items)
 # Usage: pr-pick <checkout|review|browse|diff>
 #
 # Arguments:
@@ -23,6 +24,7 @@ set -o pipefail  # don't hide errors within pipes
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/menu.sh"
 
 # Where sibling scripts are found. Defaults to this script's own
 # directory; SCRIPTS_PKG_DIR redirects it, which is how the tests point
@@ -73,6 +75,63 @@ pr_rows() {
 }
 
 #######################################
+# Reject anything that is not a known verb.
+#
+# Both entry points validate, so an --act with a bad verb is a usage error
+# rather than a silent no-op.
+# Arguments:
+#   The verb
+# Returns:
+#   0 when valid, PICK_USAGE_ERROR otherwise
+#######################################
+check_verb() {
+  case "${1}" in
+    checkout|review|browse|diff) return 0 ;;
+    '')
+      error "missing required argument: verb"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+    *)
+      error "unknown verb: ${1}"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+  esac
+}
+
+#######################################
+# Act on one already-chosen value.
+#
+# This is what a native menu item invokes: display-menu runs a command rather
+# than handing a selection back. The fzf path reaches the same function, which
+# is what keeps the two backends honest about doing the same thing.
+# Arguments:
+#   The verb, the PR number
+# Returns:
+#   0 on success, PICK_USAGE_ERROR on a bad invocation
+#######################################
+act() {
+  local verb="${1:-}"
+  local number="${2:-}"
+
+  check_verb "${verb}" || return "${?}"
+  if [ -z "${number}" ]; then
+    error "missing required argument: PR number"
+    return "${PICK_USAGE_ERROR}"
+  fi
+
+  case "${verb}" in
+    checkout) "${PKG_DIR}/gh-worktree" "${number}" ;;
+    review)   "${PKG_DIR}/gh-review" "${number}" ;;
+    browse)   gh pr view --web "${number}" ;;
+    diff)     gh pr diff "${number}" ;;
+  esac
+}
+
+#######################################
 # Main function
 # Arguments:
 #   The verb
@@ -82,46 +141,38 @@ pr_rows() {
 main() {
   local verb="${1:-}"
 
-  case "${verb}" in
-    checkout|review|browse|diff) ;;
-    '')
-      error "missing required argument: verb"
-      printf '\n'
-      usage
-      return "${PICK_USAGE_ERROR}"
-      ;;
-    *)
-      error "unknown verb: ${verb}"
-      printf '\n'
-      usage
-      return "${PICK_USAGE_ERROR}"
-      ;;
-  esac
+  check_verb "${verb}" || return "${?}"
 
-  local selection status=0
-  selection="$(pr_rows \
-    | pick_one --size "" --style default --info hidden \
+  local status=0
+  pr_rows \
+    | menu_or_pick "PR to ${verb}" \
+        "$(printf '%q' "${SCRIPT_DIR}/pr-pick") --act ${verb}" \
+        --size "" --style default --info hidden \
         --prompt "PR to ${verb}> " \
-        --empty-message "No open PRs.")" \
+        --empty-message "No open PRs." \
     || status="${?}"
 
-  # Escape and an empty list are both no-ops, but they close differently.
-  # An empty list has just printed "No open PRs." and the user needs a moment
-  # to read it, so it returns 0 and fzf-menu pauses. Escape has nothing to
-  # show, so it asks fzf-menu to close the popup without a pause.
-  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return "${PICKER_QUIET_EXIT}"
-  [ "${status}" -eq "${PICKER_EMPTY}" ] && return 0
-  [ "${status}" -eq 0 ] || return "${status}"
-
-  local number="${selection%%$'\t'*}"
-
-  case "${verb}" in
-    checkout) "${PKG_DIR}/gh-worktree" "${number}" ;;
-    review)   "${PKG_DIR}/gh-review" "${number}" ;;
-    browse)   gh pr view --web "${number}" ;;
-    diff)     gh pr diff "${number}" ;;
-  esac
+  # An empty list has printed its message and the user needs a moment to read
+  # it, so it reports success and fzf-menu pauses. An escape (QUIET_EXIT)
+  # propagates, so the popup closes without a pause. Same contract the
+  # fzf-only version had.
+  #
+  # Captured with || rather than read afterwards: errexit aborts main on a
+  # nonzero pipeline, so a plain "${?}" on the next line never runs.
+  if [ "${status}" -eq "${PICKER_EMPTY}" ]; then
+    return 0
+  fi
+  return "${status}"
 }
+
+case "${1:-}" in
+  # The act half, invoked by a native menu item.
+  --act)
+    shift
+    act ${1+"${@}"}
+    exit "${?}"
+    ;;
+esac
 
 # Check for help flag
 # ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and

@@ -25,6 +25,9 @@ setup() {
   git -C "${MAIN}" worktree add -q -b feature-b "${WT_B}"
 
   cd "${MAIN}"
+  # Short client by default, so the tests written for the fzf picker keep
+  # exercising it. The native-menu tests raise it explicitly.
+  export TMUX_STUB_CLIENT_HEIGHT=4
 }
 
 @test "switch hands the chosen directory to ts" {
@@ -182,4 +185,54 @@ setup() {
   run "${WT_PICK}" --help
   [ "${status}" -eq 0 ]
   [[ "${output}" == *"Usage:"* ]]
+}
+
+@test "--act switch hands the path to ts without a picker" {
+  stub_cmd ts
+  run "${WT_PICK}" --act switch "${WT_A}"
+  [ "${status}" -eq 0 ]
+  run cmd_call_args ts
+  [ "${lines[1]}" = "${WT_A}" ]
+  refute_fzf_called
+}
+
+@test "--act remove goes through the gate" {
+  stub_cmd wt-confirm "" 0
+  stub_cmd git-worktree-cleanup
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
+  run "${WT_PICK}" --act remove "${WT_A}"
+  [ "${status}" -eq 0 ]
+  assert_cmd_called wt-confirm
+  assert_cmd_called git-worktree-cleanup
+}
+
+@test "--act with an unknown verb is a usage error" {
+  run "${WT_PICK}" --act frobnicate "${WT_A}"
+  [ "${status}" -eq 2 ]
+}
+
+@test "--act with no value is a usage error" {
+  run "${WT_PICK}" --act switch
+  [ "${status}" -eq 2 ]
+}
+
+@test "the verb path renders a menu whose items call --act" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  stub_cmd ts
+  run "${WT_PICK}" switch
+  [ "${status}" -eq 0 ]
+  run tmux_call_args display-menu
+  [[ "${output}" == *"--act switch"* ]]
+  [[ "${output}" == *"wt-a"* ]]
+}
+
+@test "the verb path falls back to fzf on a short client" {
+  export TMUX_STUB_CLIENT_HEIGHT=4
+  stub_cmd ts
+  export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
+  run "${WT_PICK}" switch
+  [ "${status}" -eq 0 ]
+  refute_tmux_subcommand display-menu
+  run cmd_call_args ts
+  [ "${lines[1]}" = "${WT_A}" ]
 }
