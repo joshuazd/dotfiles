@@ -1,0 +1,7 @@
+# Tmux actions
+Toggle synchronize-panes	@bg tmux set -w synchronize-panes
+Rename this window	@bg tmux command-prompt -I "#W" "rename-window -- '%%'"
+Move window to session	@bg tmux command-prompt -p "session:" "move-window -t '%%'"
+Clear this pane history	@bg tmux clear-history
+Respawn this pane	@bg tmux respawn-pane -k
+Reload tmux.conf	@bg tmux source-file ~/.tmux.conf
