@@ -45,17 +45,29 @@
 # the pane and tmux are both driving frame boundaries and can cross. And the
 # cursor is hidden and shown 10x/sec while a popup owns the cursor.
 #
-#   agent flickers
-#     -> the captured frame is the trigger; bisect with sync and cursor
-#   sync flickers, cursor does not
-#     -> crossed synchronized-update brackets. tmux bug, reportable.
-#   cursor flickers, sync does not
-#     -> cursor visibility churn under an overlay
-#   agent steady
-#     -> the frame alone is not enough; something about the real session's
-#        timing or size matters. Capture again over a longer window and
-#        compare byte-for-byte rather than adding another guess.
+# RESULTS, all observed by eye, which has been more reliable here than any
+# byte-counting harness:
 #
+#   agent     FLICKERS      the captured frame, replayed
+#   sync      FLICKERS      2026 brackets only
+#   cursor    steady        cursor hide/show only
+#   sync-off  FLICKERS      2026 brackets with Sync@ set before attach
+#
+# sync vs cursor isolates it to the pane's DECSET 2026 brackets: the two
+# modes draw identically and differ only in which private mode they toggle.
+#
+# The decisive detail is that this reproduces in Terminal.app, which does not
+# implement 2026 at all and simply ignores those bytes. So the tear is not a
+# terminal mishandling crossed frame boundaries - the terminal never sees a
+# frame boundary. tmux itself parses the pane's 2026, batches the pane output,
+# and the flush repaints the overlay.
+#
+# That is also why `terminal-overrides ...:Sync@` does nothing (sync-off): it
+# governs what tmux EMITS, not how tmux REACTS to a pane's brackets. There is
+# no tmux option for the latter, so there is no local fix - the levers are
+# upstream in tmux, or Claude Code not emitting 2026 inside tmux.
+#
+# Minimal upstream repro: this script, `sync` versus `cursor`, tmux 3.7b.
 # Press q or Escape to close the popup, then C-b d to tear the server down.
 
 set -o errexit
