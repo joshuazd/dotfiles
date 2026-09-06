@@ -165,9 +165,16 @@ Empty message: `No open PRs.`
 
 ### B3. `sc-pick <claim|implement|worktree|browse>`
 
-Lists the user's unfinished Shortcut stories via
-`short s -q owner:%self% -f '%j'` piped through `jq`. Rows show the story ID,
-workflow state, and name.
+Lists the user's unfinished Shortcut stories. The listing command is
+**verified live against the CLI**:
+
+```sh
+short s -q 'owner:%self% !is:done' -f '%j' \
+  | jq -r '"sc-\(.id)\t\(.state.name // "?")\t\(.name)"'
+```
+
+`-f '%j'` emits pretty-printed JSON objects back to back, not JSONL; `jq`
+consumes that stream without `-s`. Rows are story ID, workflow state, name.
 
 - `claim` — `shortcut-claim <id>`
 - `implement` — `shortcut-implement <id>`
@@ -176,11 +183,9 @@ workflow state, and name.
 
 Empty message: `No stories assigned to you.`
 
-The exact search-operator string is inferred from `short s --help` and is
-**verified against the live CLI before this script is written**. If
-`owner:%self%` does not filter as expected, the `-o/--owner` client-side
-filter is the fallback. Note that `short story -o` *assigns* owners; only
-`short s -o` filters, and the two must not be confused.
+Note that `short story -o` *assigns* owners; only `short s -o` filters, and
+the two must not be confused. `sc-pick` uses neither — the `owner:%self%`
+search operator does the filtering server-side.
 
 `short story <id> -O` opens in a browser and does not modify the story.
 
@@ -389,8 +394,8 @@ bats, in `scripts/scripts/tests/`, against the existing argv-recording stubs.
 
 ## Risks
 
-- **`short` search operators** are inferred from `--help`. Verified live
-  before `sc-pick` is written; `-o/--owner` is the fallback.
+- ~~**`short` search operators**~~ Resolved: verified live on 2026-09-06,
+  command recorded in B3.
 - **`popup()` sizing** is the one place a change here can silently degrade
   the existing `git.menu`. The `POPUP_CHROME_ROWS` constant is not to be
   touched, and `tests/manual/verify-menu-fit` re-measures if it seems wrong.
