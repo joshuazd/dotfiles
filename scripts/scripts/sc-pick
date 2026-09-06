@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+#
+# sc-pick - Pick one of your unfinished Shortcut stories and act on it
+#
+# Usage: sc-pick <claim|implement|worktree|browse>
+#
+# Arguments:
+#   claim       claim ownership of the story
+#   implement   implement the story with Claude
+#   worktree    create a worktree and tmux session for the story
+#   browse      open the story in a browser
+#
+# Rendered inline, so it draws in whatever popup the caller already has:
+# menus/shortcut.menu invokes it, and it also works from a plain shell.
+#
+# Example:
+#   sc-pick implement
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/output.sh"
+source "${SCRIPT_DIR}/lib/picker.sh"
+
+# Where sibling scripts are found. Defaults to this script's own directory;
+# SCRIPTS_PKG_DIR redirects it, which is how the tests point sibling
+# dispatches at recorders. A PATH stub cannot intercept an absolute path, and
+# these are all called by absolute path on purpose.
+readonly PKG_DIR="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}"
+
+readonly PICK_USAGE_ERROR=2
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  printf '%s\n' \
+    "Usage: ${0##*/} <claim|implement|worktree|browse>" \
+    "" \
+    "Pick one of your unfinished Shortcut stories and act on it." \
+    "" \
+    "  claim       claim ownership of the story" \
+    "  implement   implement the story with Claude" \
+    "  worktree    create a worktree and tmux session for the story" \
+    "  browse      open the story in a browser"
+}
+
+#######################################
+# Emit one picker row per unfinished story owned by the user.
+#
+# `-f %j` emits pretty-printed JSON objects back to back, not JSONL, which jq
+# consumes as a stream without -s. `%self%` is expanded by short into the
+# caller's mention name, so the filtering happens server-side.
+#
+# NOTE: `short s -o` also filters, but `short story -o` ASSIGNS owners. The
+# search operator is used here precisely so that neither flag is in play.
+#
+# A short or jq failure produces no rows rather than an error: the caller
+# turns that into "No stories assigned to you.", which is a better popup than
+# a stack of diagnostics the user cannot act on.
+# Outputs:
+#   "sc-ID<TAB>sc-ID  State  Name" rows to stdout
+#######################################
+story_rows() {
+  local id state name
+  while IFS=$'\t' read -r id state name; do
+    [ -n "${id}" ] || continue
+    printf '%s\t%s  %s  %s\n' "${id}" "${id}" "${state}" "${name}"
+  done < <(short s -q 'owner:%self% !is:done' -f '%j' 2>/dev/null \
+    | jq -r '"sc-\(.id)\t\(.state.name // "?")\t\(.name)"' 2>/dev/null \
+    || true)
+}
+
+#######################################
+# Main function
+# Arguments:
+#   The verb
+# Returns:
+#   0 on success or no selection, PICK_USAGE_ERROR on a bad verb
+#######################################
+main() {
+  local verb="${1:-}"
+
+  case "${verb}" in
+    claim|implement|worktree|browse) ;;
+    '')
+      error "missing required argument: verb"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+    *)
+      error "unknown verb: ${verb}"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+  esac
+
+  local selection status=0
+  selection="$(story_rows \
+    | pick_one --size "" --style default --info hidden \
+        --prompt "Story to ${verb}> " \
+        --empty-message "No stories assigned to you.")" \
+    || status="${?}"
+
+  # PICKER_NO_SELECTION is Escape or an empty list, both successful no-ops.
+  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return 0
+  [ "${status}" -eq 0 ] || return "${status}"
+
+  local id="${selection%%$'\t'*}"
+
+  case "${verb}" in
+    claim)     "${PKG_DIR}/shortcut-claim" "${id}" ;;
+    implement) "${PKG_DIR}/shortcut-implement" "${id}" ;;
+    worktree)  "${PKG_DIR}/shortcut-worktree" "${id}" ;;
+    # -O opens a browser. Lowercase -o would ASSIGN an owner.
+    browse)    short story "${id}" -O ;;
+  esac
+}
+
+# Check for help flag
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and
+# on the macos-latest runner: there "${@}" with no positional parameters is
+# an unbound variable under `set -o nounset` rather than an empty list, so a
+# no-argument run aborted here instead of printing usage.
+if help_wanted ${1+"${@}"}; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main ${1+"${@}"}
