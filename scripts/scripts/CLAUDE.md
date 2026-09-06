@@ -139,6 +139,43 @@ recorders, since a PATH stub cannot intercept an absolute path.
 including one level of `@menu` target. `POPUP_CHROME_ROWS` is **measured, not
 derived** (`tests/manual/verify-menu-fit`); do not adjust it by estimation.
 
+### What The Menu Actions Do
+
+The menu labels are short; the side effects are not. Read this before adding
+or reaching for an entry.
+
+**shortcut.menu**
+
+| Entry | Side effects |
+|---|---|
+| Claim a story | **Mutates the story.** Adds you as an owner through the API |
+| Implement a story | Full dispatch: creates a worktree at `../branch-name`, creates a tmux session with `claude` and `server` windows, launches Claude in plan mode seeded with the story, and switches you to it |
+| Worktree from a story | Worktree and session as above. No Claude |
+| Open a story in browser | Read-only (`short story <id> -O`) |
+| Story from this branch | Read-only |
+
+**pr.menu**
+
+| Entry | Side effects |
+|---|---|
+| Checkout PR as worktree | Fetches the branch, creates worktree and session, switches you there |
+| Review PR with Claude | As above, plus Claude with the review prompt under `bypassPermissions` and `CLAUDE_READONLY_REMOTE=1`, so the `block-remote-writes.sh` hook denies pushes |
+| Open in browser / Diff a PR / Checks | Read-only |
+| Create PR | New window, interactive `gh pr create`. **Publishes** once you complete it |
+
+**worktree.menu**
+
+| Entry | Side effects |
+|---|---|
+| Switch worktree | `ts` attaches **or creates** a session and switches you there |
+| Remove a worktree | Gated. Kills the session, moves the directory aside and deletes it, prunes, drops mise tracked-config symlinks, stops the rubocop server |
+| New worktree | Creates `../branch-name`, runs `claude-trust` and the portal / `CLAUDE.local.md` setup. No session |
+| Done (this worktree) | Gated. The same destruction, for the worktree you are in |
+
+**tmux.menu** is local tmux state and reversible, except: `Clear this pane
+history` discards scrollback, and `Respawn this pane` kills the pane's running
+process, which is why it goes through a confirmation.
+
 ### Script Conventions
 
 - All scripts use `set -o errexit -o nounset -o pipefail`

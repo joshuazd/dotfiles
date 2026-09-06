@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+#
+# tmux-respawn - Confirm, then restart the current pane's process
+#
+# Usage: tmux-respawn
+#
+# `tmux respawn-pane -k` SIGKILLs whatever is running in the pane, which in
+# this setup is routinely a working Claude. This asks first, and names the
+# process it is about to kill.
+#
+# Runs as a BARE menu entry, not @bg: it needs the popup's tty to draw the
+# confirmation inline, the same way wt-pick reaches wt-confirm.
+#
+# Example:
+#   tmux-respawn
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/output.sh"
+source "${SCRIPT_DIR}/lib/picker.sh"
+
+readonly RESPAWN_UNAVAILABLE=2
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  printf '%s\n' \
+    "Usage: ${0##*/}" \
+    "" \
+    "Confirm, then restart the current pane's process." \
+    "Kills whatever is running in the pane, so it asks first."
+}
+
+#######################################
+# Main function
+# Returns:
+#   0 on respawn or cancel, RESPAWN_UNAVAILABLE outside tmux
+#######################################
+main() {
+  if [ -z "${TMUX:-}" ]; then
+    error "not running inside tmux"
+    return "${RESPAWN_UNAVAILABLE}"
+  fi
+
+  # Resolve the target explicitly and pass it with -t. A display-popup is not
+  # a pane, so an unqualified respawn-pane would be resolving "the current
+  # pane" from inside something that is not one.
+  local pane_id pane_cmd pane_title
+  pane_id="$(tmux display-message -p '#{pane_id}')"
+  pane_cmd="$(tmux display-message -p '#{pane_current_command}')"
+  pane_title="$(tmux display-message -p '#{pane_title}')"
+
+  local detail="${pane_cmd}"
+  [ -n "${pane_title}" ] && detail="${pane_cmd} - ${pane_title}"
+
+  local rows
+  rows="$(printf 'cancel\t1 Cancel\nconfirm\t2 Kill the process and respawn\n')"
+
+  local selection status=0
+  selection="$(printf '%s\n' "${rows}" \
+    | pick_one --size "" --style default --info hidden \
+        --prompt "Respawn ${pane_id}? [running: ${detail}] " \
+        --bind "1:pos(1)+accept,2:pos(2)+accept")" \
+    || status="${?}"
+
+  # Cancel, Escape, or anything that is not an explicit confirm.
+  if [ "${status}" -ne 0 ]; then
+    return "${PICKER_QUIET_EXIT}"
+  fi
+  case "${selection}" in
+    confirm*) ;;
+    *) return "${PICKER_QUIET_EXIT}" ;;
+  esac
+
+  tmux respawn-pane -k -t "${pane_id}" || warn "respawn-pane failed"
+  # Nothing on screen to read, and the pane behind the popup has just been
+  # replaced, so close without the keypress pause.
+  return "${PICKER_QUIET_EXIT}"
+}
+
+# Check for help flag
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and
+# on the macos-latest runner: there "${@}" with no positional parameters is
+# an unbound variable under `set -o nounset` rather than an empty list, so a
+# no-argument run aborted here instead of printing usage.
+if help_wanted ${1+"${@}"}; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main ${1+"${@}"}
