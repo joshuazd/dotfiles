@@ -324,3 +324,47 @@ setup() {
   run "${FZF_MENU}" --explain "@menu git"
   [[ "${output}" != *"UNKNOWN SIGIL"* ]]
 }
+
+# popup() sizes the box before fzf-menu runs inside it. A two-row menu that
+# chains into a nine-row one must be built for nine, or the target scrolls.
+@test "popup sizes to the tallest @menu target, not its own rows" {
+  printf '# Big\nA\techo a\nB\techo b\nC\techo c\nD\techo d\nE\techo e\n' \
+    > "${FZF_MENU_DIR}/big.menu"
+  printf '# Menus\nBig\t@menu big\n' > "${FZF_MENU_DIR}/top.menu"
+  run "${FZF_MENU}" --popup top
+  [ "${status}" -eq 0 ]
+  run tmux_call_args display-popup
+  # 5 rows + POPUP_CHROME_ROWS(7) = 12, not 1 + 7 = 8.
+  printf '%s\n' "${output}" | assert_arg_after "-h" "12"
+}
+
+@test "popup keeps its own rows when they are the tallest" {
+  printf '# Small\nA\techo a\n' > "${FZF_MENU_DIR}/small.menu"
+  printf '# Menus\nA\techo a\nB\techo b\nC\techo c\nSmall\t@menu small\n' \
+    > "${FZF_MENU_DIR}/top.menu"
+  run "${FZF_MENU}" --popup top
+  run tmux_call_args display-popup
+  # 4 own rows beats the 1-row target: 4 + 7 = 11.
+  printf '%s\n' "${output}" | assert_arg_after "-h" "11"
+}
+
+@test "popup still clamps a tall @menu target at POPUP_MAX_ITEMS" {
+  printf '# Huge\n' > "${FZF_MENU_DIR}/huge.menu"
+  for i in $(seq 1 30); do
+    printf 'Row %s\techo %s\n' "${i}" "${i}" >> "${FZF_MENU_DIR}/huge.menu"
+  done
+  printf '# Menus\nHuge\t@menu huge\n' > "${FZF_MENU_DIR}/top.menu"
+  run "${FZF_MENU}" --popup top
+  run tmux_call_args display-popup
+  # Clamped to POPUP_MAX_ITEMS(15) + 7 = 22.
+  printf '%s\n' "${output}" | assert_arg_after "-h" "22"
+}
+
+@test "popup ignores an @menu target that does not exist" {
+  printf '# Menus\nGone\t@menu nosuch\nA\techo a\n' > "${FZF_MENU_DIR}/top.menu"
+  run "${FZF_MENU}" --popup top
+  [ "${status}" -eq 0 ]
+  run tmux_call_args display-popup
+  # Falls back to its own 2 rows: 2 + 7 = 9.
+  printf '%s\n' "${output}" | assert_arg_after "-h" "9"
+}

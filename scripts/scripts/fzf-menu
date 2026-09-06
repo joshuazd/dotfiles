@@ -336,6 +336,57 @@ explain_action() {
 }
 
 #######################################
+# Count a menu file's pickable rows.
+# Arguments:
+#   Path to the menu file
+# Outputs:
+#   The count to stdout, 0 for a missing or empty menu
+#######################################
+menu_row_count() {
+  local file="${1}"
+  local count
+  count="$(menu_rows "${file}" 2>/dev/null | grep -c . || true)"
+  [ -n "${count}" ] || count=0
+  printf '%s' "${count}"
+}
+
+#######################################
+# Rows of the tallest screen this menu can reach: its own, or any menu one of
+# its @menu rows opens.
+#
+# popup() builds the tmux popup before fzf-menu runs inside it, so the box has
+# to be big enough for every screen that popup will show. One level deep, by
+# design: menu.menu chains into the leaf menus and the leaf menus chain into
+# nothing, so recursion would buy nothing and could not terminate on a cycle.
+# A target that does not exist is skipped rather than counted as zero.
+# Arguments:
+#   Path to the menu file
+# Outputs:
+#   The row count to stdout
+#######################################
+menu_max_rows() {
+  local file="${1}"
+  local max row command target target_file target_rows
+  max="$(menu_row_count "${file}")"
+
+  while IFS= read -r row; do
+    [ -n "${row}" ] || continue
+    # menu_rows emits "command<TAB>N label"; the label is the last field.
+    command="${row%$'\t'*}"
+    [ "$(action_sigil "${command}")" = "menu" ] || continue
+    target="$(action_body "${command}")"
+    target_file="${MENU_DIR}/${target}.menu"
+    [ -f "${target_file}" ] || continue
+    target_rows="$(menu_row_count "${target_file}")"
+    if [ "${target_rows}" -gt "${max}" ]; then
+      max="${target_rows}"
+    fi
+  done < <(menu_rows "${file}" 2>/dev/null)
+
+  printf '%s' "${max}"
+}
+
+#######################################
 # Re-run this script inside a tmux popup sized to the menu it will show.
 #
 # The height has to be computed out here: the binding creates the popup
@@ -357,8 +408,7 @@ popup() {
   fi
 
   local count
-  count="$(menu_rows "${file}" 2>/dev/null | grep -c . || true)"
-  [ -n "${count}" ] || count=0
+  count="$(menu_max_rows "${file}")"
 
   local shown="${count}"
   [ "${shown}" -gt "${POPUP_MAX_ITEMS}" ] && shown="${POPUP_MAX_ITEMS}"
