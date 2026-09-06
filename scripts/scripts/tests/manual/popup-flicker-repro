@@ -178,17 +178,13 @@ tmux -L "${SOCK}" bind-key f display-popup -EE -w 100% -h 100% "${popup_body}"
 # border specifically that tears rather than the whole overlay.
 tmux -L "${SOCK}" bind-key n display-popup -EE -B -w 72 -h 17 "${popup_body}"
 
-# M: display-menu with menu-border-lines none. If the border is what tears -
-# borderless popups are steady while bordered ones are not - then a
-# borderless menu should be steady too, which would keep display-menu's look
-# and speed rather than forcing a move back to fzf.
-tmux -L "${SOCK}" bind-key M set -g menu-border-lines none \; \
-  display-menu -T "" -x C -y C \
-    "borderless first"  1 "" \
-    "borderless second" 2 "" \
-    "borderless third"  3 "" \
-    "" \
-    "close"             q ""
+# M: toggle menu-border-lines between single and none, so C-b m can be
+# compared with and without a border. Chaining `set` and `display-menu` in
+# one binding fails with "no current client", so the toggle is its own key
+# and does nothing but set the option.
+# shellcheck disable=SC2016  # $(...) must run in the pane shell, not here
+tmux -L "${SOCK}" bind-key M run-shell \
+  'if [ "$(tmux -L flickrepro show -gv menu-border-lines)" = none ]; then tmux -L flickrepro set -g menu-border-lines single; tmux -L flickrepro display-message "menu border: single"; else tmux -L flickrepro set -g menu-border-lines none; tmux -L flickrepro display-message "menu border: none"; fi'
 
 # m: display-menu, tmux's own menu primitive rather than a popup running a
 # program. Different draw path, and for a six-item menu arguably the better
@@ -201,7 +197,7 @@ tmux -L "${SOCK}" bind-key m display-menu -T " display-menu " -x C -y C \
   "close"       q ""
 
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
-printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M menu (no border)\n'
+printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M toggle menu border\n'
 printf 'C-b d detaches and tears the server down.\n'
 printf 'Modes: full small title agent sync cursor sync-off\n'
 printf 'Start with agent - it replays the real captured frame. If that\n'
