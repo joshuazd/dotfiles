@@ -225,6 +225,16 @@ tmux -L "${SOCK}" bind-key M run-shell \
 tmux -L "${SOCK}" bind-key P run-shell -b \
   'tmux -L flickrepro display-popup -B -w 80 -h 24 "perl -e \"select undef,undef,undef,20\"" >/dev/null 2>&1 & sleep 0.4; tmux -L flickrepro display-menu -T " over a popup " -x C -y C "stacked first" 1 "" "stacked second" 2 "" "" "close" q ""'
 
+# S: cycle menu-style so a borderless menu can be made to stand out by
+# filling its background instead of framing it. The open question is whether
+# a filled background reaches the overlay's outer ring: a bare menu is
+# steady, which suggests tmux keeps a blank ring even with border lines off,
+# and filling it may put drawn cells back on the edge that tears.
+#
+# shellcheck disable=SC2016  # must evaluate in the pane shell, not here
+tmux -L "${SOCK}" bind-key S run-shell \
+  'cur=$(tmux -L flickrepro show -gv menu-style); case "$cur" in *bg=colour4*) n="bg=colour0,fg=colour7"; d="dim block" ;; *bg=colour0*) n="default"; d="default" ;; *) n="bg=colour4,fg=colour15,bold"; d="bright block" ;; esac; tmux -L flickrepro set -g menu-style "$n"; tmux -L flickrepro set -g menu-selected-style "bg=colour15,fg=colour0,bold"; tmux -L flickrepro display-message "menu-style: $d"'
+
 # T: display-menu with NO title. The title text tears even with the border
 # off, so title and border are separate contributors and both have to go for
 # a steady menu. Pair with C-b M to test all four combinations.
@@ -246,7 +256,7 @@ tmux -L "${SOCK}" bind-key m display-menu -T " display-menu " -x C -y C \
   "close"       q ""
 
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
-printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M cycle border style   C-b T menu (no title)   C-b P menu over popup\n'
+printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M cycle border style   C-b T menu (no title)   C-b P menu over popup   C-b S cycle menu colours\n'
 printf 'C-b d detaches and tears the server down.\n'
 printf 'Modes: full small title agent sync cursor sync-off\n'
 printf 'Start with agent - it replays the real captured frame. If that\n'
