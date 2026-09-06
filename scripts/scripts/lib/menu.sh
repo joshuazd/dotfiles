@@ -28,21 +28,27 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/picker.sh"
 # user nothing at all and looks like a broken keybinding.
 readonly MENU_CHROME_ROWS=4
 
-# Centre the menu on the PANE rather than the terminal: -x C -y C centres on
-# the whole client, which on a split window is not where the user is looking.
+# Chrome around a menu's items, for sizing it: a border column each side plus
+# a padding column each side, and a border row top and bottom. The key column
+# is the widest key plus the gap tmux leaves before it.
+readonly MENU_BORDER_COLS=4
+readonly MENU_BORDER_ROWS=2
+readonly MENU_KEY_COLS=4
+
+# Centring is computed HERE, in the shell, and passed to -x/-y as plain
+# numbers.
 #
-# -x/-y accept a format, and tmux expands these pane variables while it is
-# positioning the menu (they are empty at any other time, which is why this
-# can only be checked on a live client). Arithmetic is tmux's #{e|op:a,b}.
+# The obvious approach - a format over tmux's own popup_width, popup_height,
+# popup_pane_left and popup_pane_top - does not work: those variables expand
+# to EMPTY in -x/-y, so the arithmetic silently treated them as zero and put
+# the menu's LEFT EDGE at the pane's centre. Measured with MENU_DEBUG_POS,
+# which reported "x=76 y=31 mw= mh= pw=152 ph=62 pl= pt=" - every popup_*
+# field blank, and x exactly pane_width/2.
 #
-#   x = pane_left + (pane_width  - menu_width)  / 2
-#   y = pane_top  + (pane_height - menu_height) / 2
-#
-# Built from pane_width/pane_height rather than pane_right/pane_bottom: those
-# are inclusive column and row indices, so using them lands the menu half a
-# cell left and low. -y names the menu's TOP row, so the height is SUBTRACTED.
-readonly MENU_POS_X='#{e|+:#{popup_pane_left},#{e|/:#{e|-:#{pane_width},#{popup_width}},2}}'
-readonly MENU_POS_Y='#{e|+:#{popup_pane_top},#{e|/:#{e|-:#{pane_height},#{popup_height}},2}}'
+# So the menu's size has to be estimated from the rows, which is possible
+# because this function has them. The estimate can be off by a column if a
+# label contains wide characters; being a column out is a cosmetic miss,
+# whereas relying on the empty variables was half a menu out.
 
 #######################################
 # Height of the attached client, in rows.
@@ -94,6 +100,56 @@ menu_tmux_quote() {
 }
 
 #######################################
+# Geometry of the focused pane: left, top, width and height.
+#
+# One query, so the four numbers describe the same pane even if focus moves.
+# Outputs:
+#   "left top width height" to stdout, or nothing when unmeasurable
+#######################################
+menu_pane_geometry() {
+  local geom
+  geom="$(tmux display-message -p \
+    '#{pane_left} #{pane_top} #{pane_width} #{pane_height}' 2>/dev/null || true)"
+  case "${geom}" in
+    ''|*[!0-9\ ]*) printf '' ;;
+    *)             printf '%s' "${geom}" ;;
+  esac
+}
+
+#######################################
+# Top-left corner that centres a menu of the given size on the focused pane.
+#
+# Computed here rather than with a tmux format because popup_width,
+# popup_height, popup_pane_left and popup_pane_top all expand to EMPTY in
+# -x/-y - see the note by MENU_BORDER_COLS.
+#
+# Clamped to the pane's own corner: a menu wider than the pane would otherwise
+# be given a negative column, and tmux would place it off-screen.
+# Arguments:
+#   Menu width, menu height
+# Outputs:
+#   "x y" to stdout, or nothing when the pane cannot be measured
+#######################################
+menu_centre_position() {
+  local menu_w="${1}"
+  local menu_h="${2}"
+
+  local geom
+  geom="$(menu_pane_geometry)"
+  [ -n "${geom}" ] || { printf ''; return 0; }
+
+  local pane_left pane_top pane_w pane_h
+  read -r pane_left pane_top pane_w pane_h <<< "${geom}"
+
+  local x=$((pane_left + (pane_w - menu_w) / 2))
+  local y=$((pane_top + (pane_h - menu_h) / 2))
+  [ "${x}" -lt "${pane_left}" ] && x="${pane_left}"
+  [ "${y}" -lt "${pane_top}" ] && y="${pane_top}"
+
+  printf '%s %s' "${x}" "${y}"
+}
+
+#######################################
 # Display a menu of TAB-delimited rows.
 #
 # Item names are NOT numbered: tmux draws the key at the end of the item line
@@ -119,6 +175,8 @@ menu_show() {
   local row value label key
   local n=0
   local items=0
+  local rows_drawn=0
+  local widest=0
 
   while IFS= read -r row; do
     [ -n "${row}" ] || continue
@@ -127,11 +185,14 @@ menu_show() {
 
     if [ "${label}" = "-" ]; then
       args+=("")
+      rows_drawn=$((rows_drawn + 1))
       continue
     fi
 
     n=$((n + 1))
     items=$((items + 1))
+    rows_drawn=$((rows_drawn + 1))
+    [ "${#label}" -gt "${widest}" ] && widest="${#label}"
     if [ "${n}" -le 9 ]; then
       key="${n}"
     else
@@ -146,23 +207,36 @@ menu_show() {
     return "${PICKER_EMPTY}"
   fi
 
-  # MENU_DEBUG_POS puts the positioning numbers in the title. The popup_*
-  # variables only expand while tmux is placing a menu, so reading them off a
-  # rendered title is the only way to see what they actually were.
+  # The title widens the menu too, so it counts toward the estimate.
+  local menu_w="$((widest + MENU_KEY_COLS + MENU_BORDER_COLS))"
+  local title_w="$(( ${#title} + MENU_BORDER_COLS ))"
+  [ "${title_w}" -gt "${menu_w}" ] && menu_w="${title_w}"
+  local menu_h="$((rows_drawn + MENU_BORDER_ROWS))"
+
+  local -a pos=()
+  local xy
+  xy="$(menu_centre_position "${menu_w}" "${menu_h}")"
+  if [ -n "${xy}" ]; then
+    local x y
+    read -r x y <<< "${xy}"
+    pos=(-x "${x}" -y "${y}")
+  fi
+
   local shown_title="#[align=centre] ${title} "
   if [ -n "${MENU_DEBUG_POS:-}" ]; then
-    shown_title="x=${MENU_POS_X} y=${MENU_POS_Y}"
-    shown_title="${shown_title} mw=#{popup_width} mh=#{popup_height}"
-    shown_title="${shown_title} pw=#{pane_width} ph=#{pane_height}"
-    shown_title="${shown_title} pl=#{popup_pane_left} pt=#{popup_pane_top}"
+    shown_title="xy=${xy:-unmeasured} mw=${menu_w} mh=${menu_h}"
+    shown_title="${shown_title} pane=$(menu_pane_geometry)"
   fi
 
   # -- terminates the options: a label may begin with a hyphen, which is both
   # display-menu's "disabled item" marker and the shape of its own flags.
+  #
+  # No -x/-y at all when the pane could not be measured: tmux's own default
+  # placement is a better answer than a number computed from nothing.
   tmux display-menu \
     -T "${shown_title}" \
     -b rounded \
-    -x "${MENU_POS_X}" -y "${MENU_POS_Y}" \
+    ${pos+"${pos[@]}"} \
     -- "${args[@]}"
 }
 

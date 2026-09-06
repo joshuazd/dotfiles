@@ -50,6 +50,13 @@ case "${1:-}" in
           printf '%s\n' "${TMUX_STUB_DISPLAY-40 200}"
         fi
         ;;
+      *'#{pane_left} #{pane_top} #{pane_width} #{pane_height}')
+        # The four-in-one geometry query menu_centre_position makes. Matched
+        # before the lone *pane_width* branch below, which would claim it.
+        # ${VAR-default}, not ${VAR:-default}: an explicitly empty value is
+        # the unmeasurable case and must survive.
+        printf '%s\n' "${TMUX_STUB_PANE_GEOMETRY-0 0 120 40}"
+        ;;
       *pane_width*)
         printf '%s\n' "${TMUX_STUB_PANE_WIDTH:-200}"
         ;;
