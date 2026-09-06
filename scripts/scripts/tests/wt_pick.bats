@@ -92,7 +92,7 @@ setup() {
 @test "remove asks the gate before cleaning up" {
   stub_cmd wt-confirm "" 0
   stub_cmd git-worktree-cleanup
-  export WT_CONFIRM_BIN="${CMD_STUB_BIN}/wt-confirm"
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
   run "${WT_PICK}" remove
   [ "${status}" -eq 0 ]
@@ -102,17 +102,38 @@ setup() {
 @test "a cancelled gate cleans up nothing" {
   stub_cmd wt-confirm "" 1
   stub_cmd git-worktree-cleanup
-  export WT_CONFIRM_BIN="${CMD_STUB_BIN}/wt-confirm"
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
   run "${WT_PICK}" remove
   [ "${status}" -eq 0 ]
   refute_cmd_called git-worktree-cleanup
 }
 
+@test "a confirmed removal cleans up the chosen worktree" {
+  stub_cmd wt-confirm "" 0
+  stub_cmd git-worktree-cleanup
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
+  export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
+  run "${WT_PICK}" remove
+  [ "${status}" -eq 0 ]
+  assert_cmd_called git-worktree-cleanup
+  run cmd_call_args git-worktree-cleanup
+  [ "${lines[1]}" = "${WT_A}" ]
+}
+
+@test "the gate is asked before the cleanup, not after" {
+  stub_cmd wt-confirm "" 0
+  stub_cmd git-worktree-cleanup
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
+  export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
+  run "${WT_PICK}" remove
+  [ "$(cmd_call_index wt-confirm)" -lt "$(cmd_call_index git-worktree-cleanup)" ]
+}
+
 @test "the gate is told which worktree is at stake" {
   stub_cmd wt-confirm "" 0
   stub_cmd git-worktree-cleanup
-  export WT_CONFIRM_BIN="${CMD_STUB_BIN}/wt-confirm"
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
   run "${WT_PICK}" remove
   run cmd_call_args wt-confirm
@@ -122,7 +143,7 @@ setup() {
 # Nothing may be destroyed by a gate that could not run.
 @test "a missing gate cleans up nothing" {
   stub_cmd git-worktree-cleanup
-  export WT_CONFIRM_BIN="${BATS_TEST_TMPDIR}/does-not-exist"
+  export SCRIPTS_PKG_DIR="${BATS_TEST_TMPDIR}/empty-pkg"
   export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
   run "${WT_PICK}" remove
   [ "${status}" -ne 0 ]

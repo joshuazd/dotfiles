@@ -11,12 +11,12 @@ setup() {
 }
 
 # The gate is a separate script so prefix d and wt-pick reach the same one.
-# WT_CONFIRM_BIN points git-worktree-done at a recorder instead, the same way
+# SCRIPTS_PKG_DIR points sibling lookups at a recorder instead, the same way
 # FZF_MENU_DIR redirects fzf-menu in its own suite. This keeps these tests
 # about the wiring rather than about the prompt, which wt_confirm.bats covers.
 use_gate() {
   stub_cmd wt-confirm "" "${1}"
-  export WT_CONFIRM_BIN="${CMD_STUB_BIN}/wt-confirm"
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
 }
 
 @test "a cancelled confirmation switches no client" {
@@ -74,7 +74,7 @@ use_gate() {
 
 # Nothing may be destroyed by a gate that could not run.
 @test "a missing gate is a hard error, not a silent proceed" {
-  export WT_CONFIRM_BIN="${BATS_TEST_TMPDIR}/does-not-exist"
+  export SCRIPTS_PKG_DIR="${BATS_TEST_TMPDIR}/empty-pkg"
   run "${DONE}"
   [ "${status}" -eq 1 ]
   refute_tmux_subcommand switch-client

@@ -25,6 +25,12 @@ source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
 source "${SCRIPT_DIR}/lib/worktree.sh"
 
+# Where sibling scripts are found. Defaults to this script's own
+# directory; SCRIPTS_PKG_DIR redirects it, which is how the tests point
+# sibling dispatches at recorders. A PATH stub cannot intercept an
+# absolute path, and these are all called by absolute path on purpose.
+readonly PKG_DIR="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}"
+
 readonly PICK_USAGE_ERROR=2
 
 #######################################
@@ -121,7 +127,7 @@ do_remove() {
   local session
   session="$(basename "${path}")"
 
-  local gate="${WT_CONFIRM_BIN:-${SCRIPT_DIR}/wt-confirm}"
+  local gate="${PKG_DIR}/wt-confirm"
   if [ ! -x "${gate}" ]; then
     error "wt-confirm not found or not executable: ${gate}"
     return 1
@@ -130,7 +136,7 @@ do_remove() {
     info "Cancelled"
     return 0
   fi
-  "${SCRIPT_DIR}/git-worktree-cleanup" "${path}"
+  "${PKG_DIR}/git-worktree-cleanup" "${path}"
 }
 
 #######################################

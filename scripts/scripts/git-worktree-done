@@ -9,8 +9,8 @@
 # popup to run git-worktree-cleanup for the current worktree.
 #
 # The confirmation runs first and cancelling is a no-op: nothing is switched
-# and nothing is removed. WT_CONFIRM_BIN overrides which gate is used, which
-# is how the tests point it at a recorder.
+# and nothing is removed. SCRIPTS_PKG_DIR overrides where sibling scripts are
+# looked up, which is how the tests point the gate at a recorder.
 #
 # Example:
 #   git-worktree-done
@@ -104,7 +104,7 @@ main() {
   #
   # wt-confirm builds its own popup: this script runs under
   # `bind-key d run-shell -b`, which has no tty to prompt on.
-  local confirm_script="${WT_CONFIRM_BIN:-${SCRIPT_DIR}/wt-confirm}"
+  local confirm_script="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}/wt-confirm"
   if [ ! -x "${confirm_script}" ]; then
     error "wt-confirm not found or not executable: ${confirm_script}"
     return 1

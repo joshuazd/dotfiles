@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+#
+# pr-pick - Pick an open pull request and act on it
+#
+# Usage: pr-pick <checkout|review|browse|diff>
+#
+# Arguments:
+#   checkout    create a worktree and tmux session for the PR
+#   review      review the PR with Claude
+#   browse      open the PR in a browser
+#   diff        show the PR diff
+#
+# Rendered inline, so it draws in whatever popup the caller already has:
+# menus/pr.menu invokes it, and it also works from a plain shell.
+#
+# Example:
+#   pr-pick review
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/output.sh"
+source "${SCRIPT_DIR}/lib/picker.sh"
+
+# Where sibling scripts are found. Defaults to this script's own
+# directory; SCRIPTS_PKG_DIR redirects it, which is how the tests point
+# sibling dispatches at recorders. A PATH stub cannot intercept an
+# absolute path, and these are all called by absolute path on purpose.
+readonly PKG_DIR="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}"
+
+readonly PICK_USAGE_ERROR=2
+readonly PR_LIST_LIMIT=50
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  printf '%s\n' \
+    "Usage: ${0##*/} <checkout|review|browse|diff>" \
+    "" \
+    "Pick an open pull request and act on it." \
+    "" \
+    "  checkout    create a worktree and tmux session for the PR" \
+    "  review      review the PR with Claude" \
+    "  browse      open the PR in a browser" \
+    "  diff        show the PR diff"
+}
+
+#######################################
+# Emit one picker row per open pull request.
+#
+# The number rides in the hidden first field and the human-readable summary is
+# last, which is the package convention pick_one's `--with-nth -1` depends on.
+#
+# A gh failure (no network, not a repo, not authenticated) produces no rows
+# rather than an error: the caller turns that into "No open PRs.", which is a
+# better popup than a stack of gh diagnostics the user cannot act on.
+# Outputs:
+#   "number<TAB>#N  title  [branch]" rows to stdout
+#######################################
+pr_rows() {
+  local number title branch
+  while IFS=$'\t' read -r number title branch; do
+    [ -n "${number}" ] || continue
+    printf '%s\t#%s  %s  [%s]\n' "${number}" "${number}" "${title}" "${branch}"
+  done < <(gh pr list --limit "${PR_LIST_LIMIT}" \
+    --json number,title,headRefName \
+    --jq '.[] | "\(.number)\t\(.title)\t\(.headRefName)"' 2>/dev/null || true)
+}
+
+#######################################
+# Main function
+# Arguments:
+#   The verb
+# Returns:
+#   0 on success or no selection, PICK_USAGE_ERROR on a bad verb
+#######################################
+main() {
+  local verb="${1:-}"
+
+  case "${verb}" in
+    checkout|review|browse|diff) ;;
+    '')
+      error "missing required argument: verb"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+    *)
+      error "unknown verb: ${verb}"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+  esac
+
+  local selection status=0
+  selection="$(pr_rows \
+    | pick_one --size "" --style default --info hidden \
+        --prompt "PR to ${verb}> " \
+        --empty-message "No open PRs.")" \
+    || status="${?}"
+
+  # PICKER_NO_SELECTION is Escape or an empty list, both successful no-ops.
+  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return 0
+  [ "${status}" -eq 0 ] || return "${status}"
+
+  local number="${selection%%$'\t'*}"
+
+  case "${verb}" in
+    checkout) "${PKG_DIR}/gh-worktree" "${number}" ;;
+    review)   "${PKG_DIR}/gh-review" "${number}" ;;
+    browse)   gh pr view --web "${number}" ;;
+    diff)     gh pr diff "${number}" ;;
+  esac
+}
+
+# Check for help flag
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and
+# on the macos-latest runner: there "${@}" with no positional parameters is
+# an unbound variable under `set -o nounset` rather than an empty list, so a
+# no-argument run aborted here instead of printing usage.
+if help_wanted ${1+"${@}"}; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main ${1+"${@}"}
