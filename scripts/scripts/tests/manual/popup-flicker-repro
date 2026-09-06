@@ -162,11 +162,34 @@ tmux -L "${SOCK}" set -g set-titles on
 tmux -L "${SOCK}" set -g set-titles-string '#S:#I:#W - "#T" #{session_alerts}'
 tmux -L "${SOCK}" setw -g allow-rename off
 
-tmux -L "${SOCK}" bind-key g display-popup -EE -w 72 -h 17 \
-  "printf '  Mode: %s\n  Watch the borders.\n  q or Escape to close.\n' '${MODE}'; read -r -n 1 _ || true"
+# Four surfaces, so one run compares them all. They differ in whether tmux
+# draws an overlay at all, how much of the screen it covers, and whether
+# there is a border to tear.
+popup_body="printf '  Mode: %s\n  Watch for tearing.\n  q or Escape to close.\n' '${MODE}'; read -r -n 1 _ || true"
+
+# g: the current surface - bordered popup over the animating pane.
+tmux -L "${SOCK}" bind-key g display-popup -EE -w 72 -h 17 "${popup_body}"
+
+# f: full screen. No popup/pane edge is visible, so if the tear only shows
+# where the overlay meets the pane, this hides it.
+tmux -L "${SOCK}" bind-key f display-popup -EE -w 100% -h 100% "${popup_body}"
+
+# n: no border at all, tmux's or the command's. Isolates whether it is the
+# border specifically that tears rather than the whole overlay.
+tmux -L "${SOCK}" bind-key n display-popup -EE -B -w 72 -h 17 "${popup_body}"
+
+# m: display-menu, tmux's own menu primitive rather than a popup running a
+# program. Different draw path, and for a six-item menu arguably the better
+# UI anyway - single-key selection, no fuzzy matching needed.
+tmux -L "${SOCK}" bind-key m display-menu -T " display-menu " -x C -y C \
+  "first item"  1 "" \
+  "second item" 2 "" \
+  "third item"  3 "" \
+  "" \
+  "close"       q ""
 
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
-printf 'Press C-b g to open the popup, q to close it.\n'
+printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m display-menu\n'
 printf 'C-b d detaches and tears the server down.\n'
 printf 'Modes: full small title agent sync cursor sync-off\n'
 printf 'Start with agent - it replays the real captured frame. If that\n'
