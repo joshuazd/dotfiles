@@ -26,7 +26,7 @@
 #   @pane     send-keys into the current pane
 #   @bg       detached, output appended to ~/.cache/fzf-menu.log
 #   @menu     another menu, in this same popup
-#   @pick     a command that draws its own menu or popup (the *-pick scripts)
+#   @quiet    run as-is: no popup, no pause, no announcement
 #
 # Example:
 #   fzf-menu git
@@ -79,8 +79,6 @@ readonly POPUP_MAX_ITEMS=15
 # which is a successful no-op.
 readonly MENU_UNAVAILABLE=2
 
-# How many @menu hops one invocation may make. menu.menu chaining into a leaf
-# is one hop, so anything beyond a handful is a cycle rather than a design.
 # Geometry for a bare command's own popup, opened from a native menu item.
 # Percentages rather than the menu's fixed width: this holds arbitrary command
 # output, not a list sized to its contents.
@@ -96,6 +94,8 @@ readonly RUN_POPUP_HEIGHT="60%"
 # appeared not to work.
 readonly RUN_POPUP_PAUSE="$(printf '%q' "${SCRIPT_DIR}/menu-pause")"
 
+# How many @menu hops one invocation may make. menu.menu chaining into a leaf
+# is one hop, so anything beyond a handful is a cycle rather than a design.
 readonly MENU_MAX_DEPTH=8
 readonly MENU_DEPTH="${FZF_MENU_DEPTH:-0}"
 
@@ -288,12 +288,19 @@ run_action() {
       nohup sh -c "${body}" >> "${MENU_LOG}" 2>&1 &
       info "running in background, logging to ${MENU_LOG/#${HOME}/~}"
       ;;
-    pick)
-      # The command runs its own picker - a native menu when the list fits,
-      # its own popup when it has to fall back to fzf. Wrapping it in a popup
-      # here is what made "Review PR" open an empty box: a display-menu cannot
-      # draw while a popup is already up.
-      sh -c "${body}" || warn "picker exited ${?}"
+    quiet)
+      # Run as-is: no popup, no keypress pause, and nothing announced. Two
+      # kinds of command want this.
+      #
+      # A picker draws its own UI - a native menu when the list fits, its own
+      # popup when it falls back to fzf - and wrapping it in a popup is what
+      # made "Review PR" open an empty box, since a display-menu cannot draw
+      # while a popup is already up.
+      #
+      # A tmux control command (source-file, clear-history, set -w) has no
+      # output at all. Under @bg those announced a log file that would only
+      # ever be empty.
+      sh -c "${body}" || warn "exited ${?}"
       ;;
     menu)
       # Two menus that name each other would exec back and forth forever, and
@@ -364,7 +371,7 @@ action_sigil() {
     '@pane '*)   printf 'pane' ;;
     '@bg '*)     printf 'bg' ;;
     '@menu '*)   printf 'menu' ;;
-    '@pick '*)   printf 'pick' ;;
+    '@quiet '*)   printf 'quiet' ;;
     '@'*)        printf 'unknown' ;;
     *)           printf '' ;;
   esac
@@ -386,7 +393,7 @@ action_body() {
     pane)   printf '%s' "${command#@pane }" ;;
     bg)     printf '%s' "${command#@bg }" ;;
     menu)   printf '%s' "${command#@menu }" ;;
-    pick)   printf '%s' "${command#@pick }" ;;
+    quiet)   printf '%s' "${command#@quiet }" ;;
     *)      printf '%s' "${command}" ;;
   esac
 }
@@ -414,7 +421,7 @@ explain_action() {
     printf '%s\nUNKNOWN SIGIL - this entry will not run\n' "${body}"
   elif [ "${sigil}" = "menu" ]; then
     printf 'opens the %s menu\n' "${body}"
-  elif [ "${sigil}" = "pick" ]; then
+  elif [ "${sigil}" = "quiet" ]; then
     printf '%s\n' "${body}"
   else
     printf '%s\n' "${body}"

@@ -548,32 +548,42 @@ setup() {
   refute_tmux_subcommand display-popup
 }
 
-# @pick is for commands that draw their own menu or popup. Wrapping one in a
+# @quiet is for commands that draw their own UI or produce no output at all.
+# Wrapping one in a
 # popup is what made "Review PR" open an empty box: a display-menu cannot be
 # drawn while a popup is already up.
-@test "@pick runs the command without a popup of its own" {
-  run "${FZF_MENU}" --run "@pick echo picked"
+@test "@quiet runs the command without a popup of its own" {
+  run "${FZF_MENU}" --run "@quiet echo picked"
   [ "${status}" -eq 0 ]
   [[ "${output}" == *"picked"* ]]
   refute_tmux_subcommand display-popup
 }
 
-@test "@pick does not pause for a keypress" {
-  run "${FZF_MENU}" --run "@pick echo picked"
+@test "@quiet does not pause for a keypress" {
+  run "${FZF_MENU}" --run "@quiet echo picked"
   [[ "${output}" != *"Press any key"* ]]
 }
 
-@test "@pick is not mistaken for an unknown sigil" {
-  run "${FZF_MENU}" --explain "@pick pr-pick review"
+@test "@quiet is not mistaken for an unknown sigil" {
+  run "${FZF_MENU}" --explain "@quiet pr-pick review"
   [ "${status}" -eq 0 ]
   [[ "${output}" != *"UNKNOWN SIGIL"* ]]
   [[ "${output}" == *"pr-pick review"* ]]
 }
 
-@test "a failing @pick reports it without failing the menu" {
-  run "${FZF_MENU}" --run "@pick exit 3"
+@test "a failing @quiet reports it without failing the menu" {
+  run "${FZF_MENU}" --run "@quiet exit 3"
   [ "${status}" -eq 0 ]
-  [[ "${output}" == *"picker exited"* ]]
+  [[ "${output}" == *"exited 3"* ]]
+}
+
+# A tmux control command has no output, so announcing a log file for it - which
+# @bg does - was noise. This is the report that prompted the rename.
+@test "@quiet announces nothing" {
+  run "${FZF_MENU}" --run "@quiet true"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"running in background"* ]]
+  [[ "${output}" != *"fzf-menu.log"* ]]
 }
 
 # The pause prompt is what the user reads after a bare command finishes.

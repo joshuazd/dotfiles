@@ -77,7 +77,7 @@ setup() {
         '@window '*) body="${command#@window }" ;;
         '@pane '*)   body="${command#@pane }" ;;
         '@bg '*)     body="${command#@bg }" ;;
-        '@pick '*)   body="${command#@pick }" ;;
+        '@quiet '*)   body="${command#@quiet }" ;;
         '@menu '*)   continue ;;
       esac
       word="${body%% *}"
@@ -97,6 +97,13 @@ setup() {
 
 # menu.menu chains one level. A leaf that also chained would be sized wrong,
 # because menu_max_rows deliberately does not recurse.
+# @bg announces the log file it redirects to. A tmux control command produces
+# no output, so that announcement is pure noise - which is what "reload
+# tmux.conf" reported before these moved to @quiet.
+@test "no tmux control action announces a background log" {
+  ! grep -q '@bg tmux' "${MENU_DIR}/tmux.menu"
+}
+
 @test "only menu.menu carries @menu rows" {
   local file line
   for file in "${MENU_DIR}"/*.menu; do

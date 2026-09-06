@@ -195,7 +195,7 @@ setup() {
 }
 
 # A list that fits needs no popup and no terminal: the native menu is drawn by
-# tmux itself, which is the whole reason @pick entries work under run-shell.
+# tmux itself, which is the whole reason @quiet entries work under run-shell.
 @test "a fitting list needs no popup even without a terminal" {
   unset MENU_ASSUME_TTY
   export TMUX_STUB_CLIENT_HEIGHT=40

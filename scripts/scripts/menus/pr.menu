@@ -1,7 +1,7 @@
 # Pull request actions
-Checkout PR as worktree	@pick pr-pick checkout
-Review PR with Claude	@pick pr-pick review
-Open PR in browser	@pick pr-pick browse
-Diff a PR	@pick pr-pick diff
+Checkout PR as worktree	@quiet pr-pick checkout
+Review PR with Claude	@quiet pr-pick review
+Open PR in browser	@quiet pr-pick browse
+Diff a PR	@quiet pr-pick diff
 Checks for this branch	gh pr checks
 Create PR	@window gh pr create
