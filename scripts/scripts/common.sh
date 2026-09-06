@@ -11,6 +11,7 @@
 #   source "${SCRIPT_DIR}/lib/picker.sh"   — pick_one / pick_many fzf primitive
 #   source "${SCRIPT_DIR}/lib/route.sh"    — classifier + claude_launch_cmd for model/effort routing
 #   source "${SCRIPT_DIR}/lib/rubocop.sh"  - rubocop server teardown for removed worktrees
+#   source "${SCRIPT_DIR}/lib/worktree.sh" - worktree_risk_summary and its counts
 #
 # Usage:
 #   source "${SCRIPT_DIR}/common.sh"
@@ -24,3 +25,4 @@ source "${_COMMON_LIB_DIR}/tmux.sh"
 source "${_COMMON_LIB_DIR}/picker.sh"
 source "${_COMMON_LIB_DIR}/route.sh"
 source "${_COMMON_LIB_DIR}/rubocop.sh"
+source "${_COMMON_LIB_DIR}/worktree.sh"
