@@ -41,8 +41,14 @@ readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
 
 # Popup geometry for --popup. Chrome under .fzfrc's `--style full`, with the
 # picker's --padding 0: outer border 2, input border 2, prompt 1, list border
-# 2, preview 2 and its border 2, plus the picker's --margin 1 top and
-# bottom - 13 rows before a single entry is drawn.
+# With --style default there is ONE border rather than a box per section, and
+# --info hidden removes the match-counter row: margin 1 at the top, outer
+# border 2, prompt 1, preview 1 and the rule above it 1, one row fzf keeps
+# for itself, and a single blank margin row at the top only - 7 rows before a
+# single entry is drawn. MEASURED, not
+# derived: tests/manual counts visible entries at known pane heights, and an
+# estimate that was one row short made every menu scroll. Past POPUP_MAX_ITEMS the list scrolls rather than
+# growing the popup further.
 # Height grows with the entry count between these bounds, so a 3-entry menu
 # is not handed the same box as a 20-entry one.
 #
@@ -50,9 +56,8 @@ readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
 # change to the padding or the preview height moves this constant, and the
 # only symptom of getting it wrong is a popup slightly too big or too small.
 readonly POPUP_WIDTH=74
-readonly POPUP_CHROME_ROWS=13
-readonly POPUP_MIN_ROWS=15
-readonly POPUP_MAX_ROWS=34
+readonly POPUP_CHROME_ROWS=7
+readonly POPUP_MAX_ITEMS=15
 
 # Exit status for "the menu could not be run", distinct from "nothing picked",
 # which is a successful no-op.
@@ -295,18 +300,13 @@ explain_action() {
   sigil="$(action_sigil "${1}")"
   body="$(action_body "${1}")"
 
-  local where
-  case "${sigil}" in
-    window)  where="runs in a new tmux window" ;;
-    pane)    where="types into the current pane" ;;
-    bg)      where="runs detached, logging to ${MENU_LOG/#${HOME}/\~}" ;;
-    unknown) where="UNKNOWN SIGIL - this entry will not run" ;;
-    *)       where="runs in the popup, output held for a keypress" ;;
-  esac
-
-  # Two lines, no blank between them: the preview window is two rows, so a
-  # spacer would push the destination out of view.
-  printf '%s\n%s\n' "${body}" "${where}"
+  # The command alone. An unrecognised sigil is the one case worth a second
+  # line, because the entry will not run at all and the label gives no hint.
+  if [ "${sigil}" = "unknown" ]; then
+    printf '%s\nUNKNOWN SIGIL - this entry will not run\n' "${body}"
+  else
+    printf '%s\n' "${body}"
+  fi
 }
 
 #######################################
@@ -334,9 +334,10 @@ popup() {
   count="$(menu_rows "${file}" 2>/dev/null | grep -c . || true)"
   [ -n "${count}" ] || count=0
 
-  local height=$((count + POPUP_CHROME_ROWS))
-  [ "${height}" -lt "${POPUP_MIN_ROWS}" ] && height="${POPUP_MIN_ROWS}"
-  [ "${height}" -gt "${POPUP_MAX_ROWS}" ] && height="${POPUP_MAX_ROWS}"
+  local shown="${count}"
+  [ "${shown}" -gt "${POPUP_MAX_ITEMS}" ] && shown="${POPUP_MAX_ITEMS}"
+  [ "${shown}" -lt 1 ] && shown=1
+  local height=$((shown + POPUP_CHROME_ROWS))
 
   tmux display-popup -EE -B -w "${POPUP_WIDTH}" -h "${height}" \
     -d '#{pane_current_path}' \
@@ -388,9 +389,14 @@ main() {
   # One keypress per entry, which is the thing a tmux display-menu does well
   # and an fzf picker normally does not. pos(N) needs the `load` event: at
   # `start` the list is not populated yet and the jump is a no-op.
-  local count binds="" n
+  local count binds n
   count="$(printf '%s\n' "${rows}" | grep -c . || true)"
   [ -n "${count}" ] || count=0
+  # .fzfrc binds focus:transform-preview-label to print "Previewing [row]".
+  # Re-binding the same event blanks it; a static --preview-label cannot,
+  # because the transform reruns on every focus change. `true` prints
+  # nothing, which is the label we want and needs no quoting.
+  binds="focus:transform-preview-label:true"
   n=1
   while [ "${n}" -le 9 ] && [ "${n}" -le "${count}" ]; do
     binds="${binds}${binds:+,}${n}:pos(${n})+accept"
@@ -400,9 +406,10 @@ main() {
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
     | pick_one --size "" --prompt "$(menu_header "${file}")> " \
+        --style default \
         --preview "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --explain {1}" \
-        --preview-label ' Runs ' \
-        --preview-window 'down,2,border-rounded,wrap,noinfo' \
+        --info hidden \
+        --preview-window 'down,1,border-top,wrap,noinfo' \
         ${binds:+--bind "${binds}"})" \
     || status="${?}"
 

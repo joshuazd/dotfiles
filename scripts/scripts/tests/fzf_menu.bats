@@ -43,7 +43,8 @@ setup() {
   [ "${status}" -eq 0 ]
   run fzf_args
   # Two entries in the demo menu, so two binds and no third.
-  printf '%s\n' "${output}" | assert_arg_after "--bind" "1:pos(1)+accept,2:pos(2)+accept"
+  [[ "${output}" == *"1:pos(1)+accept,2:pos(2)+accept"* ]]
+  [[ "${output}" != *"3:pos(3)"* ]]
 }
 
 @test "digit binds stop at the number of entries" {
@@ -52,7 +53,8 @@ setup() {
   run "${FZF_MENU}" one
   [ "${status}" -eq 0 ]
   run fzf_args
-  printf '%s\n' "${output}" | assert_arg_after "--bind" "1:pos(1)+accept"
+  [[ "${output}" == *"1:pos(1)+accept"* ]]
+  [[ "${output}" != *"2:pos(2)"* ]]
 }
 
 @test "labels are the display column and commands are hidden" {
@@ -204,30 +206,27 @@ setup() {
 # The bare (no sigil) case is the one a packed "sigil<TAB>body" return value
 # silently broke: tab is IFS whitespace, so the leading empty field collapsed
 # and the command's first word was read as the sigil.
-@test "--explain shows the command and where it runs, bare" {
+@test "--explain shows the command alone, bare" {
   run "${FZF_MENU}" --explain "git status"
   [ "${status}" -eq 0 ]
   [ "$(printf '%s' "${output}" | head -1)" = "git status" ]
-  [[ "${output}" == *"runs in the popup"* ]]
+  [ "$(printf '%s' "${output}" | grep -c .)" -eq 1 ]
 }
 
-@test "--explain strips @window and names the destination" {
+@test "--explain strips @window" {
   run "${FZF_MENU}" --explain "@window git rebase -i origin/main"
   [ "${status}" -eq 0 ]
   [ "$(printf '%s' "${output}" | head -1)" = "git rebase -i origin/main" ]
-  [[ "${output}" == *"new tmux window"* ]]
 }
 
 @test "--explain strips @pane" {
   run "${FZF_MENU}" --explain "@pane ls -la"
   [ "$(printf '%s' "${output}" | head -1)" = "ls -la" ]
-  [[ "${output}" == *"current pane"* ]]
 }
 
-@test "--explain strips @bg and names the log" {
+@test "--explain strips @bg" {
   run "${FZF_MENU}" --explain "@bg gh pr view --web"
   [ "$(printf '%s' "${output}" | head -1)" = "gh pr view --web" ]
-  [[ "${output}" == *"detached"* ]]
 }
 
 @test "--explain flags an unknown sigil instead of pretending it will run" {
@@ -241,10 +240,10 @@ setup() {
   run "${FZF_MENU}" --popup three
   [ "${status}" -eq 0 ]
   run tmux_call_args "display-popup"
-  printf '%s\n' "${output}" | assert_arg_after "-h" "16"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "10"
 }
 
-@test "--popup height is capped for a long menu" {
+@test "--popup height is capped at POPUP_MAX_ITEMS entries" {
   setup_tmux_stub
   printf '# Many\n' > "${FZF_MENU_DIR}/many.menu"
   local i
@@ -254,7 +253,7 @@ setup() {
   run "${FZF_MENU}" --popup many
   [ "${status}" -eq 0 ]
   run tmux_call_args "display-popup"
-  printf '%s\n' "${output}" | assert_arg_after "-h" "34"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "22"
 }
 
 @test "--popup on a missing menu exits 2 without opening anything" {
@@ -265,7 +264,9 @@ setup() {
   [ "${status}" -eq 0 ]
 }
 
-@test "the picker drops fzfrc padding but keeps its style" {
+# The menu asks for one frame instead of .fzfrc's box-per-section, which is
+# right for a file finder and four nested borders too many for six entries.
+@test "the menu asks for a single frame and drops fzfrc padding" {
   setup_fzf_stub
   export FZF_STUB_SELECTION=$'echo hi\tSay hi'
   printf '# P\nSay hi\techo hi\n' > "${FZF_MENU_DIR}/pad.menu"
@@ -273,5 +274,7 @@ setup() {
   [ "${status}" -eq 0 ]
   run fzf_args
   printf '%s\n' "${output}" | assert_arg_after "--padding" "0"
-  [[ "${output}" != *"--style"* ]]
+  printf '%s\n' "${output}" | assert_arg_after "--style" "default"
+  printf '%s\n' "${output}" | assert_arg_after "--info" "hidden"
+  [[ "${output}" != *"--preview-label"* ]]
 }

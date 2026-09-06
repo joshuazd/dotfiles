@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# verify-menu-fit - Check POPUP_CHROME_ROWS against what fzf actually draws
+#
+# Usage: verify-menu-fit
+#
+# For each entry count, computes the height `fzf-menu --popup` would use,
+# renders the real menu in a pane of exactly that height, and counts how many
+# entries are visible. Every count should say "fits"; a "SCROLLS" row means
+# POPUP_CHROME_ROWS in fzf-menu is too small.
+#
+# This exists because that constant is not derivable by reading the code -
+# it depends on how fzf lays out a border, prompt, preview and rule at a
+# given --style, and it changes whenever any of those change. It was wrong
+# twice by estimation before being measured this way.
+#
+# Runs on its own tmux socket and never touches real sessions. It is not in
+# `make test`: it needs a tmux server and a second and a half per case.
+set -u
+
+SOCK=fitcheck
+MENUS=/tmp/fitcheck-menus
+CHROME=$(grep -oE '^readonly POPUP_CHROME_ROWS=[0-9]+' "$HOME/scripts/fzf-menu" | cut -d= -f2)
+MAXI=$(grep -oE '^readonly POPUP_MAX_ITEMS=[0-9]+' "$HOME/scripts/fzf-menu" | cut -d= -f2)
+
+pause() { perl -e "select undef,undef,undef,$1"; }
+
+printf 'chrome=%s max_items=%s\n\n' "$CHROME" "$MAXI"
+printf '%-8s %-8s %-9s %s\n' entries height visible verdict
+
+for n in 1 2 3 6 10 15 20; do
+  \rm -rf "$MENUS"; mkdir -p "$MENUS"
+  { printf '# Fit\n'; i=1; while [ "$i" -le "$n" ]; do printf 'Entry %s\techo %s\n' "$i" "$i"; i=$((i+1)); done; } > "$MENUS/m.menu"
+
+  shown="$n"; [ "$shown" -gt "$MAXI" ] && shown="$MAXI"
+  h=$((shown + CHROME))
+
+  tmux -L "$SOCK" kill-server 2>/dev/null
+  tmux -L "$SOCK" new-session -d -s t -x 74 -y "$h" 'sh -c "while :; do perl -e \"select undef,undef,undef,1\"; done"'
+  tmux -L "$SOCK" set -g status off
+  tmux -L "$SOCK" respawn-pane -k -t t "FZF_MENU_DIR=$MENUS $HOME/scripts/fzf-menu m" 2>/dev/null
+  pause 1.5
+  visible=$(tmux -L "$SOCK" capture-pane -p -t t 2>/dev/null | grep -cE 'Entry [0-9]')
+  tmux -L "$SOCK" kill-server 2>/dev/null
+
+  if [ "$visible" -eq "$shown" ]; then verdict="fits"; else verdict="SCROLLS ($visible of $shown)"; fi
+  printf '%-8s %-8s %-9s %s\n' "$n" "$h" "$visible" "$verdict"
+done
+
+\rm -rf "$MENUS"

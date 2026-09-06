@@ -92,13 +92,15 @@ _picker_run() {
   local header_label=""
   local preview_label=""
   local extra_bind=""
+  local style=""
+  local info=""
   local size="${PICKER_DEFAULT_SIZE}"
   local delimiter
   delimiter=$'\t'
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--bind|--size|--delimiter)
+      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--bind|--style|--info|--size|--delimiter)
         if [ "${#}" -lt 2 ]; then
           error "picker: ${1} requires a value"
           return "${PICKER_UNAVAILABLE}"
@@ -114,6 +116,8 @@ _picker_run() {
       --preview-window) preview_window="${2}"; shift 2 ;;
       --preview-label)  preview_label="${2}";  shift 2 ;;
       --bind)      extra_bind="${2}";  shift 2 ;;
+      --style)     style="${2}";       shift 2 ;;
+      --info)      info="${2}";        shift 2 ;;
       --size)      size="${2}";      shift 2 ;;
       --delimiter) delimiter="${2}"; shift 2 ;;
       *)
@@ -138,15 +142,19 @@ _picker_run() {
     return "${PICKER_NO_SELECTION}"
   fi
 
-  # --margin 1 leaves a one-cell blank ring OUTSIDE fzf's border (--padding is
-  # inside it). That ring is the flicker mitigation: tmux repaints an
+  # --margin is TRBL and leaves blank cells OUTSIDE fzf's border (--padding is
+  # inside it). Those blanks are the flicker mitigation: tmux repaints an
   # overlay's outermost cells when a pane flushes a DECSET 2026 frame, and
   # anything drawn there tears - border glyphs, ASCII glyphs and title text
-  # all do, while blank cells have nothing to tear. The border and its labels
-  # survive because they now sit one cell in.
+  # all do, while blank cells have nothing to tear.
   #
-  # --style is deliberately NOT set: the per-section borders and labels are
-  # the user's aesthetic and a picker has no business replacing them.
+  # Bottom is 0 because the tearing was only ever reported on the top edge,
+  # and a blank row there is one row of popup height spent on nothing. If the
+  # bottom border starts tearing, this is the line to change back to 1.
+  #
+  # --style is not set by default: the per-section borders and labels are the
+  # user's aesthetic and a picker has no business replacing them. A caller
+  # that wants a simpler frame asks for one explicitly.
   # --padding is, because it is pure spacing rather than style - two rows of
   # it inside a popup sized to its contents is two rows the entries could
   # have had, and the popup's own edge already provides the breathing room
@@ -156,7 +164,7 @@ _picker_run() {
     --cycle
     --layout=reverse
     --padding 0
-    --margin 1
+    --margin 1,1,0,1
     --delimiter "${delimiter}"
     --with-nth "${with_nth}"
     --prompt "${prompt}"
@@ -173,6 +181,8 @@ _picker_run() {
   else
     args+=(--height 100%)
   fi
+  [ -n "${style}" ] && args+=(--style "${style}")
+  [ -n "${info}" ] && args+=(--info "${info}")
   [ -n "${header}" ] && args+=(--header "${header}")
   # ~/.fzfrc hardcodes `--header-label ' File Type '`, which is right for a
   # file finder and nonsense over a list of actions. A caller that knows what
@@ -221,7 +231,9 @@ _picker_run() {
 # Pick exactly one row.
 # Arguments:
 #   --prompt P, --header H, --header-label L, --with-nth N, --preview CMD,
-#   --preview-window W, --preview-label L, --bind SPEC, --size GEO,
+#   --preview-window W, --preview-label L, --bind SPEC, --style STYLE,
+#   --info STYLE,
+#   --size GEO,
 #   --delimiter D (all optional)
 # Inputs:
 #   TAB-delimited rows on stdin, display column last
