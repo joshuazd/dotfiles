@@ -46,9 +46,6 @@ honest: the two paths differ only in how a value is chosen.
 
 ## Non-Goals
 
-- Centring on the terminal rather than the focused pane. Pane-centring is a
-  nice-to-have, attempted with `-x`/`-y` formats over `popup_pane_*`, with a
-  documented fallback to `-x C -y C` if the formats do not expand.
 - Previews in menu mode. `display-menu` has no preview pane; the `--explain`
   preview survives only on the fzf fallback path. Accepted.
 - Type-to-filter in menu mode. Same reason.
@@ -116,6 +113,15 @@ tmux display-menu -T "#[align=centre] ${title} " -b rounded \
 `-T` is used for the title rather than a disabled first item. An item-as-title
 was the earlier attempt and it was selectable and dimmed; a real title is
 neither.
+
+**Position: centred on the focused pane, not the terminal.** `-x C -y C`
+centres on the whole client, which on a split window puts the menu away from
+where the user is looking. `-x`/`-y` also take a format, and tmux expands
+`popup_pane_left/right/top/bottom` and `popup_width/height` while positioning
+a menu, so the centre can be computed with `#{e|op:a,b}` arithmetic. This is a
+nice-to-have: the `popup_pane_*` variables are empty outside a positioning
+context and so can only be confirmed on a live client, and the fallback if
+they do not expand is plain `-x C -y C`.
 
 `--` terminates options, because a label may legitimately begin with `-`
 (which is also how `display-menu` marks a disabled item, so the two uses must
