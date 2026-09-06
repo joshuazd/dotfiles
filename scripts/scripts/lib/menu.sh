@@ -28,6 +28,22 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/picker.sh"
 # user nothing at all and looks like a broken keybinding.
 readonly MENU_CHROME_ROWS=4
 
+# Centre the menu on the PANE rather than the terminal: -x C -y C centres on
+# the whole client, which on a split window is not where the user is looking.
+#
+# -x/-y accept a format, and tmux expands these pane variables while it is
+# positioning the menu (they are empty at any other time, which is why this
+# can only be checked on a live client). Arithmetic is tmux's #{e|op:a,b}.
+#
+#   x = (pane_left + pane_right - menu_width)  / 2
+#   y = (pane_top  + pane_bottom + menu_height) / 2
+#
+# The y formula ADDS the height on the assumption that display-menu's -y names
+# the menu's BOTTOM row rather than its top. If a menu ever appears about one
+# menu-height too low or too high, that assumption is what to flip.
+readonly MENU_POS_X='#{e|/:#{e|-:#{e|+:#{popup_pane_left},#{popup_pane_right}},#{popup_width}},2}'
+readonly MENU_POS_Y='#{e|/:#{e|+:#{e|+:#{popup_pane_top},#{popup_pane_bottom}},#{popup_height}},2}'
+
 #######################################
 # Height of the attached client, in rows.
 # Outputs:
@@ -135,7 +151,7 @@ menu_show() {
   tmux display-menu \
     -T "#[align=centre] ${title} " \
     -b rounded \
-    -x C -y C \
+    -x "${MENU_POS_X}" -y "${MENU_POS_Y}" \
     -- "${args[@]}"
 }
 

@@ -218,3 +218,29 @@ setup() {
   [[ "${output}" == *"acted"* ]]
   [[ "${output}" == *"the-value"* ]]
 }
+
+# -x C -y C centres on the terminal, which on a split window is not where the
+# user is looking. The pane variables are only expanded while tmux positions
+# the menu, so all a unit test can check is that the formats were passed.
+@test "the menu is positioned over the pane, not the terminal" {
+  printf 'v1\tOne\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  [[ "${output}" == *"popup_pane_left"* ]]
+  [[ "${output}" == *"popup_pane_right"* ]]
+  [[ "${output}" == *"popup_width"* ]]
+}
+
+@test "the vertical position also comes from the pane" {
+  printf 'v1\tOne\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  [[ "${output}" == *"popup_pane_top"* ]]
+  [[ "${output}" == *"popup_pane_bottom"* ]]
+}
+
+# Terminal-centring would be the fallback, so make sure it is not what shipped.
+@test "the bare C centring is gone" {
+  printf 'v1\tOne\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "-x" "C" && return 1
+  return 0
+}
