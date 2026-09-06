@@ -234,14 +234,15 @@ setup() {
   [[ "${output}" != *"#{e|"* ]]
 }
 
-# A 1-item menu in a 120x40 pane: menu_h = 1 + 2 = 3, so y = (40-3)/2 = 18.
-# The label is 3 wide, so menu_w = 3 + 4 + 4 = 11 and x = (120-11)/2 = 54.
+# A 1-item menu in a 120x40 pane: menu_h = 1 + 2 = 3, and -y names the BOTTOM
+# row, so y = (40 + 3)/2 = 21. The label is 3 wide, so menu_w = 3 + 6 + 4 = 13
+# and x = (120 - 13)/2 = 53.
 @test "the menu is centred on the pane" {
   export TMUX_STUB_PANE_GEOMETRY="0 0 120 40"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  printf '%s\n' "${output}" | assert_arg_after "-x" "54"
-  printf '%s\n' "${output}" | assert_arg_after "-y" "18"
+  printf '%s\n' "${output}" | assert_arg_after "-x" "53"
+  printf '%s\n' "${output}" | assert_arg_after "-y" "21"
 }
 
 # The centre is the PANE's, so a pane offset within the window shifts it.
@@ -249,8 +250,9 @@ setup() {
   export TMUX_STUB_PANE_GEOMETRY="60 20 60 20"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  printf '%s\n' "${output}" | assert_arg_after "-x" "84"
-  printf '%s\n' "${output}" | assert_arg_after "-y" "28"
+  # x = 60 + (60 - 13)/2 = 83; y = 20 + (20 + 3)/2 = 31
+  printf '%s\n' "${output}" | assert_arg_after "-x" "83"
+  printf '%s\n' "${output}" | assert_arg_after "-y" "31"
 }
 
 # A long label widens the menu, which moves its left edge left.
@@ -258,8 +260,8 @@ setup() {
   export TMUX_STUB_PANE_GEOMETRY="0 0 120 40"
   printf 'v1\tA label that is rather long indeed\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  # 34 + 4 + 4 = 42, so x = (120-42)/2 = 39.
-  printf '%s\n' "${output}" | assert_arg_after "-x" "39"
+  # 34 + 6 + 4 = 44, so x = (120 - 44)/2 = 38.
+  printf '%s\n' "${output}" | assert_arg_after "-x" "38"
 }
 
 # A menu wider than its pane would otherwise get a negative column, which
@@ -269,7 +271,9 @@ setup() {
   printf 'v1\tA label far wider than this pane\n' | menu_show "T" "act"
   run tmux_call_args display-menu
   printf '%s\n' "${output}" | assert_arg_after "-x" "0"
-  printf '%s\n' "${output}" | assert_arg_after "-y" "0"
+  # -y is the bottom row, so it cannot rise above the menu's own height or the
+  # menu is drawn off the top of the pane.
+  printf '%s\n' "${output}" | assert_arg_after "-y" "3"
 }
 
 # Better tmux's own placement than a number derived from nothing.

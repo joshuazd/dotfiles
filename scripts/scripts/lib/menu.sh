@@ -31,9 +31,15 @@ readonly MENU_CHROME_ROWS=4
 # Chrome around a menu's items, for sizing it: a border column each side plus
 # a padding column each side, and a border row top and bottom. The key column
 # is the widest key plus the gap tmux leaves before it.
+#
+# MENU_KEY_COLS is 6 rather than 4 by observation: at 4 the menu sat about a
+# column right of centre, which means the drawn width was about two columns
+# wider than the estimate. tmux does not expose the drawn width anywhere
+# readable, so this is calibrated by eye - if a menu drifts right, raise it;
+# left, lower it.
 readonly MENU_BORDER_COLS=4
 readonly MENU_BORDER_ROWS=2
-readonly MENU_KEY_COLS=4
+readonly MENU_KEY_COLS=6
 
 # Centring is computed HERE, in the shell, and passed to -x/-y as plain
 # numbers.
@@ -141,10 +147,16 @@ menu_centre_position() {
   local pane_left pane_top pane_w pane_h
   read -r pane_left pane_top pane_w pane_h <<< "${geom}"
 
+  # -y names the menu's BOTTOM row, so the height is ADDED. Measured: with
+  # -y 91 and an 8-row menu in a pane spanning rows 64 to 125, the menu drew
+  # at 84 to 91 - about seven rows high of the pane's centre. Top-semantics
+  # would have been centred, so it cannot be that. -x is the left edge.
   local x=$((pane_left + (pane_w - menu_w) / 2))
-  local y=$((pane_top + (pane_h - menu_h) / 2))
+  local y=$((pane_top + (pane_h + menu_h) / 2))
   [ "${x}" -lt "${pane_left}" ] && x="${pane_left}"
-  [ "${y}" -lt "${pane_top}" ] && y="${pane_top}"
+  # The bottom cannot sit above the menu's own height, or it is drawn off the
+  # top of the pane.
+  [ "${y}" -lt "$((pane_top + menu_h))" ] && y="$((pane_top + menu_h))"
 
   printf '%s %s' "${x}" "${y}"
 }
