@@ -102,3 +102,79 @@ fzf_args() {
 refute_fzf_called() {
   [ ! -s "${FZF_STUB_LOG}" ]
 }
+
+# Generic argv-recording stubs, for tools a test must observe but must not
+# actually run: gh, short, ts, and the worktree scripts. The checked-in stubs
+# in tests/stubs/ exist for fzf and tmux, whose behavior tests depend on;
+# these are throwaway recorders and are generated rather than committed.
+#
+# Deliberately not used for git. lib/git.sh and the worktree scripts lean on
+# real git behavior, and a real `git init` in BATS_TEST_TMPDIR is both faster
+# to reason about and harder to get subtly wrong than a stub.
+setup_cmd_stubs() {
+  export CMD_STUB_LOG="${BATS_TEST_TMPDIR}/cmd-calls.log"
+  : > "${CMD_STUB_LOG}"
+  export CMD_STUB_BIN="${BATS_TEST_TMPDIR}/bin"
+  mkdir -p "${CMD_STUB_BIN}"
+  # Front of PATH: these must win over anything real that is installed.
+  export PATH="${CMD_STUB_BIN}:${PATH}"
+}
+
+# Install an argv-recording stub.
+# Arguments:
+#   name          command name to shadow
+#   stdout        text the stub prints (optional, may be multi-line)
+#   exit-status   status the stub exits with (optional, default 0)
+stub_cmd() {
+  local name="${1}"
+  local out="${2-}"
+  local exit_status="${3-0}"
+  local script="${CMD_STUB_BIN}/${name}"
+  local out_file="${CMD_STUB_BIN}/${name}.stdout"
+
+  # The canned output goes in a sibling file rather than being interpolated
+  # into the script. Embedding it would need quoting that survives newlines,
+  # backslashes and quotes all at once, which is exactly the kind of thing
+  # that fails silently and makes a test pass for the wrong reason.
+  printf '%s' "${out}" > "${out_file}"
+
+  {
+    printf '#!/usr/bin/env bash\n'
+    printf 'set -o nounset\n'
+    printf 'printf %%s %s >> "${CMD_STUB_LOG}"\n' "$(printf '%q' "${name}")"
+    printf 'for a in ${1+"${@}"}; do printf "\\x1f%%s" "${a}" >> "${CMD_STUB_LOG}"; done\n'
+    printf 'printf "\\n" >> "${CMD_STUB_LOG}"\n'
+    printf 'if [ -s %s ]; then cat %s; printf "\\n"; fi\n' \
+      "$(printf '%q' "${out_file}")" "$(printf '%q' "${out_file}")"
+    printf 'exit %s\n' "${exit_status}"
+  } > "${script}"
+  chmod +x "${script}"
+}
+
+cmd_calls() {
+  cat "${CMD_STUB_LOG}"
+}
+
+# Anchored at both ends: a bare name must match the whole line, or `gh` would
+# match every `gh-review` call and refute_cmd_called would never fire.
+assert_cmd_called() {
+  grep -q -e "^${1}${TMUX_STUB_SEP}" -e "^${1}\$" "${CMD_STUB_LOG}"
+}
+
+refute_cmd_called() {
+  ! grep -q -e "^${1}${TMUX_STUB_SEP}" -e "^${1}\$" "${CMD_STUB_LOG}"
+}
+
+# Argv of the first invocation, one argument per line, the command name first.
+# tr needs the octal escape: it does not understand \x.
+cmd_call_args() {
+  grep -m1 -e "^${1}${TMUX_STUB_SEP}" -e "^${1}\$" "${CMD_STUB_LOG}" \
+    | tr '\037' '\n'
+}
+
+# 1-based log line of the first invocation, so a test can assert that one
+# command ran before another.
+cmd_call_index() {
+  grep -n -m1 -e "^${1}${TMUX_STUB_SEP}" -e "^${1}\$" "${CMD_STUB_LOG}" \
+    | cut -d: -f1
+}
