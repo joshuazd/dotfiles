@@ -368,3 +368,37 @@ setup() {
   # Falls back to its own 2 rows: 2 + 7 = 9.
   printf '%s\n' "${output}" | assert_arg_after "-h" "9"
 }
+
+# fzf's `transform-preview-label:` consumes everything after the colon as its
+# command, to the end of the --bind string, commas included. When it came
+# first, every digit binding after it was swallowed into that command and no
+# number key did anything. fzf reports no error for this, so the argv
+# assertions above all passed while the feature was dead.
+@test "the digit binds come before the transform, not after" {
+  export FZF_STUB_SELECTION=$'echo fetch-ran\t1 Fetch'
+  run "${FZF_MENU}" demo
+  run fzf_args
+  local binds
+  binds="$(printf '%s\n' "${output}" | grep -m1 'pos(1)')"
+  [[ "${binds}" == "1:pos(1)+accept"* ]]
+  [[ "${binds}" == *"transform-preview-label"* ]]
+  # The transform must be the last thing in the string.
+  [[ "${binds}" == *"focus:transform-preview-label:true" ]]
+}
+
+# The assertion above is about ordering; this one proves the ordering actually
+# buys a parsed binding, by asking real fzf to reject a bogus action sitting
+# in the digit slot. If the digit slot were being swallowed, fzf would accept
+# it silently - which is exactly the bug that shipped.
+@test "real fzf parses the digit slot as a binding, not as text" {
+  # setup_fzf_stub puts the stub first on PATH, and the stub accepts anything.
+  # This test is only worth running against the real binary.
+  local real_fzf
+  real_fzf="$(PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin" \
+    command -v fzf 2>/dev/null || true)"
+  if [ -z "${real_fzf}" ]; then
+    skip "real fzf not installed"
+  fi
+  run bash -c "printf 'a\n' | '${real_fzf}' --bind '1:bogus-action,focus:transform-preview-label:true' --filter=a 2>&1"
+  [[ "${output}" == *"unknown action"* ]]
+}

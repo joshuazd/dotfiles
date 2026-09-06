@@ -161,13 +161,18 @@ main() {
   fi
 
   # No tty: build a popup and re-enter inside it.
+  # SCRIPT_DIR, not ${0}: the popup starts in the client pane's directory, so
+  # a relative invocation path ("./wt-confirm") would not resolve inside it and
+  # the popup would die before drawing - which reads as an unexplained cancel.
+  local self="${SCRIPT_DIR}/${0##*/}"
+
   local file
   file="$(mktemp "${TMPDIR:-/tmp}/wt-confirm.XXXXXX")"
   tmux display-popup -E -w "${CONFIRM_POPUP_WIDTH}" -h "${CONFIRM_POPUP_HEIGHT}" \
-    "$(printf '%q' "${0}") --inline --answer-file $(printf '%q' "${file}") $(printf '%q' "${dir}") $(printf '%q' "${session}")"
+    "$(printf '%q' "${self}") --inline --answer-file $(printf '%q' "${file}") $(printf '%q' "${dir}") $(printf '%q' "${session}")"
 
   local status=0
-  "${0}" --read-answer "${file}" || status="${?}"
+  "${self}" --read-answer "${file}" || status="${?}"
   \rm -f "${file}"
   return "${status}"
 }

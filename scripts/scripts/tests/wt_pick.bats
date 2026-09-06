@@ -105,7 +105,7 @@ setup() {
   export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
   run "${WT_PICK}" remove
-  [ "${status}" -eq 0 ]
+  [ "${status}" -eq 97 ]
   refute_cmd_called git-worktree-cleanup
 }
 
@@ -154,7 +154,7 @@ setup() {
   stub_cmd ts
   export FZF_STUB_ABORT=1
   run "${WT_PICK}" switch
-  [ "${status}" -eq 0 ]
+  [ "${status}" -eq 97 ]
   refute_cmd_called ts
 }
 

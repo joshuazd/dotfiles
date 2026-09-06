@@ -105,8 +105,12 @@ main() {
         --empty-message "No open PRs.")" \
     || status="${?}"
 
-  # PICKER_NO_SELECTION is Escape or an empty list, both successful no-ops.
-  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return 0
+  # Escape and an empty list are both no-ops, but they close differently.
+  # An empty list has just printed "No open PRs." and the user needs a moment
+  # to read it, so it returns 0 and fzf-menu pauses. Escape has nothing to
+  # show, so it asks fzf-menu to close the popup without a pause.
+  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return "${PICKER_QUIET_EXIT}"
+  [ "${status}" -eq "${PICKER_EMPTY}" ] && return 0
   [ "${status}" -eq 0 ] || return "${status}"
 
   local number="${selection%%$'\t'*}"

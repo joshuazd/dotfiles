@@ -151,3 +151,14 @@ setup() {
   [ "${status}" -eq 0 ]
   [[ "${output}" == *"Usage:"* ]]
 }
+
+# The popup starts in the client pane's directory, not the caller's, so a
+# relative invocation path would not resolve inside it and the popup would die
+# before drawing - which the answer-file protocol reads as a cancel.
+@test "the popup re-enters by absolute path even when invoked relatively" {
+  cd "$(dirname "${WT_CONFIRM}")"
+  run ./wt-confirm "${REPO}" repo-session < /dev/null
+  run tmux_call_args display-popup
+  [[ "${output}" == */wt-confirm* ]]
+  [[ "${output}" != *"./wt-confirm"* ]]
+}

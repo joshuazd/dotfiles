@@ -27,6 +27,16 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/output.sh"
 readonly PICKER_NO_SELECTION=1
 # The picker could not run at all: fzf is missing, or the options were bad.
 readonly PICKER_UNAVAILABLE=2
+# There was nothing to pick from. Distinct from PICKER_NO_SELECTION because a
+# caller has to tell "the user backed out" from "we told the user there was
+# nothing here": the first should close silently, the second leaves a message
+# on screen that the user has to be given time to read.
+readonly PICKER_EMPTY=3
+# A caller ran, decided nothing happened, and wants its popup closed without
+# the "Press any key" pause. fzf-menu's bare-command branch honours this; from
+# a plain shell it is just an unusual exit status.
+# shellcheck disable=SC2034 # used by fzf-menu and the *-pick scripts
+readonly PICKER_QUIET_EXIT=97
 
 # Deliberately a centered modal. This overrides the unobtrusive
 # `--tmux bottom,50%` that .fzfrc sets for everyday C-t / C-r / M-c: a picker
@@ -144,7 +154,7 @@ _picker_run() {
     # generic text is right for a library and useless in a popup that just
     # closed on the user.
     warn "${empty_message:-nothing to pick from}"
-    return "${PICKER_NO_SELECTION}"
+    return "${PICKER_EMPTY}"
   fi
 
   # --margin is TRBL and leaves blank cells OUTSIDE fzf's border (--padding is

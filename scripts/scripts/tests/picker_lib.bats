@@ -122,10 +122,10 @@ setup() {
   [ "$(printf '%s' "${output}" | grep -c .)" -eq 2 ]
 }
 
-@test "empty stdin returns PICKER_NO_SELECTION without launching fzf" {
+@test "empty stdin returns PICKER_EMPTY without launching fzf" {
   : > "${BATS_TEST_TMPDIR}/empty"
   run pick_one < "${BATS_TEST_TMPDIR}/empty"
-  [ "${status}" -eq 1 ]
+  [ "${status}" -eq 3 ]
   run refute_fzf_called
   [ "${status}" -eq 0 ]
 }
@@ -178,7 +178,7 @@ setup() {
 # menu and one that looks broken.
 @test "--empty-message replaces the default empty-list warning" {
   run pick_one --empty-message "No open PRs." < /dev/null
-  [ "${status}" -eq 1 ]
+  [ "${status}" -eq 3 ]
   [[ "${output}" == *"No open PRs."* ]]
   [[ "${output}" != *"nothing to pick from"* ]]
 }
@@ -190,7 +190,7 @@ setup() {
 
 @test "without --empty-message an empty list keeps the default warning" {
   run pick_one < /dev/null
-  [ "${status}" -eq 1 ]
+  [ "${status}" -eq 3 ]
   [[ "${output}" == *"nothing to pick from"* ]]
 }
 

@@ -97,7 +97,7 @@ setup() {
   stub_cmd gh-worktree
   export FZF_STUB_ABORT=1
   run "${PR_PICK}" checkout
-  [ "${status}" -eq 0 ]
+  [ "${status}" -eq 97 ]
   refute_cmd_called gh-worktree
 }
 

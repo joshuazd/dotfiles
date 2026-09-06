@@ -133,8 +133,9 @@ do_remove() {
     return 1
   fi
   if ! "${gate}" "${path}" "${session}"; then
-    info "Cancelled"
-    return 0
+    # Nothing to read, so close the popup rather than making the user dismiss
+    # a confirmation they already declined.
+    return "${PICKER_QUIET_EXIT}"
   fi
   "${PKG_DIR}/git-worktree-cleanup" "${path}"
 }
@@ -177,8 +178,12 @@ main() {
         --empty-message "No other worktrees.")" \
     || status="${?}"
 
-  # PICKER_NO_SELECTION is Escape or an empty list, both successful no-ops.
-  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return 0
+  # Escape and an empty list are both no-ops, but they close differently.
+  # An empty list has just printed "No other worktrees." and the user needs a moment
+  # to read it, so it returns 0 and fzf-menu pauses. Escape has nothing to
+  # show, so it asks fzf-menu to close the popup without a pause.
+  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return "${PICKER_QUIET_EXIT}"
+  [ "${status}" -eq "${PICKER_EMPTY}" ] && return 0
   [ "${status}" -eq 0 ] || return "${status}"
 
   local path="${selection%%$'\t'*}"

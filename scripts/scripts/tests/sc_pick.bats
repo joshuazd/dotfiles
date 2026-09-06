@@ -125,7 +125,7 @@ stub_listing() {
   stub_cmd shortcut-claim
   export FZF_STUB_ABORT=1
   run "${SC_PICK}" claim
-  [ "${status}" -eq 0 ]
+  [ "${status}" -eq 97 ]
   refute_cmd_called shortcut-claim
 }
 

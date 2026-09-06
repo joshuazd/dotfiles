@@ -249,6 +249,13 @@ run_action() {
       printf '\n'
       local status=0
       sh -c "${body}" || status="${?}"
+      # PICKER_QUIET_EXIT means the action decided nothing happened - a picker
+      # the user escaped out of. There is nothing on screen to read, so close
+      # without the pause rather than making the user press a key to dismiss
+      # a popup they already dismissed.
+      if [ "${status}" -eq "${PICKER_QUIET_EXIT}" ]; then
+        return 0
+      fi
       if [ "${status}" -ne 0 ]; then
         warn "exited ${status}"
       fi
@@ -468,16 +475,25 @@ main() {
   local count binds n
   count="$(printf '%s\n' "${rows}" | grep -c . || true)"
   [ -n "${count}" ] || count=0
-  # .fzfrc binds focus:transform-preview-label to print "Previewing [row]".
-  # Re-binding the same event blanks it; a static --preview-label cannot,
-  # because the transform reruns on every focus change. `true` prints
-  # nothing, which is the label we want and needs no quoting.
-  binds="focus:transform-preview-label:true"
+  # The digit binds MUST come first and the transform LAST.
+  #
+  # fzf's `transform-preview-label:` takes everything after the colon as its
+  # command, to the end of the --bind string - commas included. With the
+  # transform first, `1:pos(1)+accept,2:pos(2)+accept` was silently swallowed
+  # into the transform's command instead of being parsed as bindings, so no
+  # digit key ever did anything. fzf reports no error for this; the only
+  # symptom is keys that quietly do nothing.
+  binds=""
   n=1
   while [ "${n}" -le 9 ] && [ "${n}" -le "${count}" ]; do
     binds="${binds}${binds:+,}${n}:pos(${n})+accept"
     n=$((n + 1))
   done
+  # .fzfrc binds focus:transform-preview-label to print "Previewing [row]".
+  # Re-binding the same event blanks it; a static --preview-label cannot,
+  # because the transform reruns on every focus change. `true` prints
+  # nothing, which is the label we want and needs no quoting.
+  binds="${binds}${binds:+,}focus:transform-preview-label:true"
 
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
@@ -489,7 +505,8 @@ main() {
         ${binds:+--bind "${binds}"})" \
     || status="${?}"
 
-  if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then
+  if [ "${status}" -eq "${PICKER_NO_SELECTION}" ] \
+    || [ "${status}" -eq "${PICKER_EMPTY}" ]; then
     return 0
   fi
   if [ "${status}" -ne 0 ]; then
