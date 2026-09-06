@@ -46,6 +46,9 @@ honest: the two paths differ only in how a value is chosen.
 
 ## Non-Goals
 
+- Centring on the terminal rather than the focused pane. Pane-centring is a
+  nice-to-have, attempted with `-x`/`-y` formats over `popup_pane_*`, with a
+  documented fallback to `-x C -y C` if the formats do not expand.
 - Previews in menu mode. `display-menu` has no preview pane; the `--explain`
   preview survives only on the fzf fallback path. Accepted.
 - Type-to-filter in menu mode. Same reason.
