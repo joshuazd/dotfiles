@@ -142,3 +142,79 @@ setup() {
   run bash -c "source '${BATS_TEST_DIRNAME}/../lib/menu.sh'; printf '' | menu_show T act"
   refute_tmux_subcommand display-menu
 }
+
+@test "a fitting list renders a menu and no fzf" {
+  setup_fzf_stub
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  printf 'v1\tOne\n' | menu_or_pick "T" "true" --empty-message "none"
+  assert_tmux_subcommand display-menu
+  refute_fzf_called
+}
+
+@test "a list too tall for the client uses fzf and no menu" {
+  setup_fzf_stub
+  export TMUX_STUB_CLIENT_HEIGHT=6
+  export FZF_STUB_SELECTION=$'v3\tThree'
+  local i
+  for i in $(seq 1 20); do printf 'v%s\tItem%s\n' "${i}" "${i}"; done \
+    | menu_or_pick "T" "true" --empty-message "none"
+  refute_tmux_subcommand display-menu
+  [ -s "${FZF_STUB_LOG}" ]
+}
+
+# The point of the design: both backends reach the same act half.
+@test "the fzf path invokes the act prefix with the chosen value" {
+  setup_fzf_stub
+  setup_cmd_stubs
+  stub_cmd acted
+  export TMUX_STUB_CLIENT_HEIGHT=6
+  export FZF_STUB_SELECTION=$'chosen-value\tThree'
+  local i
+  for i in $(seq 1 20); do printf 'v%s\tItem%s\n' "${i}" "${i}"; done \
+    | menu_or_pick "T" "acted" --empty-message "none"
+  run cmd_call_args acted
+  [ "${lines[1]}" = "chosen-value" ]
+}
+
+@test "escaping the fzf path acts on nothing and closes quietly" {
+  setup_fzf_stub
+  setup_cmd_stubs
+  stub_cmd acted
+  export TMUX_STUB_CLIENT_HEIGHT=6
+  export FZF_STUB_ABORT=1
+  local i status=0
+  for i in $(seq 1 20); do printf 'v%s\tItem%s\n' "${i}" "${i}"; done \
+    | menu_or_pick "T" "acted" --empty-message "none" || status="${?}"
+  [ "${status}" -eq "${PICKER_QUIET_EXIT}" ]
+  refute_cmd_called acted
+}
+
+@test "an empty list reports the caller's message and renders nothing" {
+  setup_fzf_stub
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run bash -c "source '${BATS_TEST_DIRNAME}/../lib/menu.sh'; printf '' | menu_or_pick T true --empty-message 'No open PRs.'"
+  [ "${status}" -eq 3 ]
+  [[ "${output}" == *"No open PRs."* ]]
+  refute_tmux_subcommand display-menu
+}
+
+@test "pick_one options are forwarded on the fzf path" {
+  setup_fzf_stub
+  export TMUX_STUB_CLIENT_HEIGHT=6
+  export FZF_STUB_SELECTION=$'v1\tOne'
+  local i
+  for i in $(seq 1 20); do printf 'v%s\tItem%s\n' "${i}" "${i}"; done \
+    | menu_or_pick "T" "true" --prompt "Pick this> " --empty-message "none"
+  run fzf_args
+  printf '%s\n' "${output}" | assert_arg_after "--prompt" "Pick this> "
+}
+
+# The menu path must reach the same act half, via the command it builds.
+@test "the menu path builds items calling the act prefix" {
+  setup_fzf_stub
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  printf 'the-value\tOne\n' | menu_or_pick "T" "acted" --empty-message "none"
+  run tmux_call_args display-menu
+  [[ "${output}" == *"acted"* ]]
+  [[ "${output}" == *"the-value"* ]]
+}

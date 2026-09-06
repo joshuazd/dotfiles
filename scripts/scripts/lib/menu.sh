@@ -138,3 +138,74 @@ menu_show() {
     -x C -y C \
     -- "${args[@]}"
 }
+
+#######################################
+# Choose a value from rows and act on it, using whichever backend can show
+# them.
+#
+# A native menu when the rows fit, fzf when they do not. Both paths end at the
+# same act prefix, which is the whole reason the fallback can be trusted: the
+# backends differ in how a value is chosen and in nothing else.
+# Arguments:
+#   Menu title
+#   Act prefix - a shell-quoted command taking one value argument
+#   Remaining arguments are passed through to pick_one
+# Inputs:
+#   "value<TAB>label" rows on stdin
+# Returns:
+#   0 on success, PICKER_EMPTY on no rows, PICKER_QUIET_EXIT when the user
+#   backed out of the fzf path
+#######################################
+menu_or_pick() {
+  local title="${1}"
+  local act_prefix="${2}"
+  shift 2
+
+  # Read the caller's empty-message so the menu path can report an empty list
+  # in the same words pick_one would. It stays in the forwarded arguments.
+  local empty_message=""
+  local -a forwarded=()
+  local arg
+  local want_message=""
+  for arg in ${1+"${@}"}; do
+    forwarded+=("${arg}")
+    if [ -n "${want_message}" ]; then
+      empty_message="${arg}"
+      want_message=""
+    elif [ "${arg}" = "--empty-message" ]; then
+      want_message=1
+    fi
+  done
+
+  local rows
+  rows="$(cat)"
+  if [ -z "${rows}" ]; then
+    warn "${empty_message:-nothing to pick from}"
+    return "${PICKER_EMPTY}"
+  fi
+
+  local count
+  count="$(printf '%s\n' "${rows}" | grep -c . || true)"
+  [ -n "${count}" ] || count=0
+
+  if menu_fits "${count}"; then
+    printf '%s\n' "${rows}" | menu_show "${title}" "${act_prefix}"
+    return "${?}"
+  fi
+
+  local selection status=0
+  selection="$(printf '%s\n' "${rows}" \
+    | pick_one ${forwarded+"${forwarded[@]}"})" || status="${?}"
+
+  if [ "${status}" -eq "${PICKER_NO_SELECTION}" ]; then
+    return "${PICKER_QUIET_EXIT}"
+  fi
+  if [ "${status}" -ne 0 ]; then
+    return "${status}"
+  fi
+
+  local value="${selection%%$'\t'*}"
+  # act_prefix is built by the caller from a %q-escaped script path plus fixed
+  # flags, and the value is escaped here, so both halves are safe to evaluate.
+  eval "${act_prefix} $(printf '%q' "${value}")"
+}
