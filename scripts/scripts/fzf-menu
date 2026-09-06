@@ -24,6 +24,7 @@
 #   @window   new tmux window in the current pane's directory
 #   @pane     send-keys into the current pane
 #   @bg       detached, output appended to ~/.cache/fzf-menu.log
+#   @menu     another menu, in this same popup
 #
 # Example:
 #   fzf-menu git
@@ -62,6 +63,11 @@ readonly POPUP_MAX_ITEMS=15
 # Exit status for "the menu could not be run", distinct from "nothing picked",
 # which is a successful no-op.
 readonly MENU_UNAVAILABLE=2
+
+# How many @menu hops one invocation may make. menu.menu chaining into a leaf
+# is one hop, so anything beyond a handful is a cycle rather than a design.
+readonly MENU_MAX_DEPTH=8
+readonly MENU_DEPTH="${FZF_MENU_DEPTH:-0}"
 
 #######################################
 # Print usage information
@@ -214,6 +220,22 @@ run_action() {
       nohup sh -c "${body}" >> "${MENU_LOG}" 2>&1 &
       info "running in background, logging to ${MENU_LOG/#${HOME}/~}"
       ;;
+    menu)
+      # Two menus that name each other would exec back and forth forever, and
+      # inside a tmux popup that looks like a hang with nothing to interrupt.
+      # menus.bats enforces that only menu.menu chains, but that guard covers
+      # the menus in this repo and not a menu dir someone points
+      # FZF_MENU_DIR at.
+      if [ "${MENU_DEPTH}" -ge "${MENU_MAX_DEPTH}" ]; then
+        error "menu chain too deep (${MENU_MAX_DEPTH}), stopping: @menu ${body}"
+        return "${MENU_UNAVAILABLE}"
+      fi
+      # exec, not a subshell: this process has nothing left to do, and
+      # replacing it keeps the popup's exit status the target menu's own.
+      # No keypress pause either - the user is moving between screens of the
+      # same popup, not reading command output.
+      FZF_MENU_DEPTH=$((MENU_DEPTH + 1)) exec "${SCRIPT_DIR}/fzf-menu" "${body}"
+      ;;
     *)
       # A failing action must not look like a failing menu, so its status is
       # reported rather than propagated - and reported before the pause, so it
@@ -259,6 +281,7 @@ action_sigil() {
     '@window '*) printf 'window' ;;
     '@pane '*)   printf 'pane' ;;
     '@bg '*)     printf 'bg' ;;
+    '@menu '*)   printf 'menu' ;;
     '@'*)        printf 'unknown' ;;
     *)           printf '' ;;
   esac
@@ -279,6 +302,7 @@ action_body() {
     window) printf '%s' "${command#@window }" ;;
     pane)   printf '%s' "${command#@pane }" ;;
     bg)     printf '%s' "${command#@bg }" ;;
+    menu)   printf '%s' "${command#@menu }" ;;
     *)      printf '%s' "${command}" ;;
   esac
 }
@@ -304,6 +328,8 @@ explain_action() {
   # line, because the entry will not run at all and the label gives no hint.
   if [ "${sigil}" = "unknown" ]; then
     printf '%s\nUNKNOWN SIGIL - this entry will not run\n' "${body}"
+  elif [ "${sigil}" = "menu" ]; then
+    printf 'opens the %s menu\n' "${body}"
   else
     printf '%s\n' "${body}"
   fi

@@ -3,9 +3,14 @@
 # unit separator so embedded spaces stay parseable, then emits a canned
 # selection.
 #
-# FZF_STUB_SELECTION - exact text to emit as the selection
-# FZF_STUB_ABORT     - when set, exit 130 (what fzf does on Escape)
-# FZF_STUB_EXIT      - when set, exit with this status instead (e.g. 2, what
+# FZF_STUB_SELECTION  - exact text to emit as the selection
+# FZF_STUB_SELECTIONS - one selection per line, consumed in order across
+#                       successive invocations. For multi-stage pickers, where
+#                       a single forced selection would be replayed at every
+#                       stage - which for an @menu chain is an infinite loop
+#                       rather than a failed assertion.
+# FZF_STUB_ABORT      - when set, exit 130 (what fzf does on Escape)
+# FZF_STUB_EXIT       - when set, exit with this status instead (e.g. 2, what
 #                       fzf uses for its own errors)
 set -o nounset
 
@@ -32,7 +37,16 @@ if [ -n "${FZF_STUB_EXIT:-}" ]; then
   exit "${FZF_STUB_EXIT}"
 fi
 
-if [ -n "${FZF_STUB_SELECTION+x}" ]; then
+if [ -n "${FZF_STUB_SELECTIONS+x}" ]; then
+  # Which invocation this is, taken from the log this run already appended to,
+  # so no extra counter file has to be kept in step with it. Past the end of
+  # the queue the last entry repeats, which keeps a test that under-supplies
+  # selections failing on its assertion rather than on a subscript error.
+  stub_nth="$(grep -c . < "${FZF_STUB_LOG}")"
+  stub_total="$(printf '%s\n' "${FZF_STUB_SELECTIONS}" | grep -c .)"
+  [ "${stub_nth}" -gt "${stub_total}" ] && stub_nth="${stub_total}"
+  printf '%s\n' "${FZF_STUB_SELECTIONS}" | sed -n "${stub_nth}p"
+elif [ -n "${FZF_STUB_SELECTION+x}" ]; then
   printf '%s\n' "${FZF_STUB_SELECTION}"
 else
   printf '%s\n' "${stub_rows}" | head -1

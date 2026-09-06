@@ -278,3 +278,49 @@ setup() {
   printf '%s\n' "${output}" | assert_arg_after "--info" "hidden"
   [[ "${output}" != *"--preview-label"* ]]
 }
+
+# menu.menu chains into the five leaf menus. Without a sigil for it, a
+# chaining row would run under the bare case: it would work, but it would
+# pause for a keypress on the way out of a menu the user is still using.
+# A queue, not a single forced selection: the chain picks twice, and one
+# forced value would be replayed by the child menu too - which for @menu is an
+# infinite exec loop, not a failed assertion.
+@test "@menu runs the target menu" {
+  printf '# Leaf\nOnly\techo leaf-ran\n' > "${FZF_MENU_DIR}/leaf.menu"
+  printf '# Menus\nLeaf\t@menu leaf\n' > "${FZF_MENU_DIR}/top.menu"
+  export FZF_STUB_SELECTIONS="$(printf '@menu leaf\t1 Leaf\necho leaf-ran\t1 Only')"
+  run "${FZF_MENU}" top
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"leaf-ran"* ]]
+}
+
+@test "@menu does not pause for a keypress on the way out" {
+  printf '# Leaf\nOnly\t@bg true\n' > "${FZF_MENU_DIR}/leaf.menu"
+  printf '# Menus\nLeaf\t@menu leaf\n' > "${FZF_MENU_DIR}/top.menu"
+  export FZF_STUB_SELECTIONS="$(printf '@menu leaf\t1 Leaf\n@bg true\t1 Only')"
+  run "${FZF_MENU}" top
+  [[ "${output}" != *"Press any key"* ]]
+}
+
+# Two menus naming each other would exec back and forth forever, and inside a
+# tmux popup that looks like a hang with nothing to interrupt.
+@test "an @menu cycle stops instead of looping forever" {
+  printf '# A\nB\t@menu bbb\n' > "${FZF_MENU_DIR}/aaa.menu"
+  printf '# B\nA\t@menu aaa\n' > "${FZF_MENU_DIR}/bbb.menu"
+  export FZF_STUB_SELECTIONS="$(printf '@menu bbb\t1 B\n@menu aaa\t1 A')"
+  run timeout 20 "${FZF_MENU}" aaa
+  [ "${status}" -eq 2 ]
+  [[ "${output}" == *"too deep"* ]]
+}
+
+@test "--explain names the menu an @menu row opens" {
+  run "${FZF_MENU}" --explain "@menu worktree"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"worktree"* ]]
+  [[ "${output}" != *"UNKNOWN SIGIL"* ]]
+}
+
+@test "@menu is not mistaken for an unknown sigil" {
+  run "${FZF_MENU}" --explain "@menu git"
+  [[ "${output}" != *"UNKNOWN SIGIL"* ]]
+}
