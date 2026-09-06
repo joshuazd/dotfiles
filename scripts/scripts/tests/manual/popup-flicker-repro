@@ -186,6 +186,16 @@ tmux -L "${SOCK}" bind-key n display-popup -EE -B -w 72 -h 17 "${popup_body}"
 tmux -L "${SOCK}" bind-key M run-shell \
   'if [ "$(tmux -L flickrepro show -gv menu-border-lines)" = none ]; then tmux -L flickrepro set -g menu-border-lines single; tmux -L flickrepro display-message "menu border: single"; else tmux -L flickrepro set -g menu-border-lines none; tmux -L flickrepro display-message "menu border: none"; fi'
 
+# T: display-menu with NO title. The title text tears even with the border
+# off, so title and border are separate contributors and both have to go for
+# a steady menu. Pair with C-b M to test all four combinations.
+tmux -L "${SOCK}" bind-key T display-menu -x C -y C \
+  "titleless first"  1 "" \
+  "titleless second" 2 "" \
+  "titleless third"  3 "" \
+  "" \
+  "close"            q ""
+
 # m: display-menu, tmux's own menu primitive rather than a popup running a
 # program. Different draw path, and for a six-item menu arguably the better
 # UI anyway - single-key selection, no fuzzy matching needed.
@@ -197,7 +207,7 @@ tmux -L "${SOCK}" bind-key m display-menu -T " display-menu " -x C -y C \
   "close"       q ""
 
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
-printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M toggle menu border\n'
+printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M toggle border   C-b T menu (no title)\n'
 printf 'C-b d detaches and tears the server down.\n'
 printf 'Modes: full small title agent sync cursor sync-off\n'
 printf 'Start with agent - it replays the real captured frame. If that\n'
