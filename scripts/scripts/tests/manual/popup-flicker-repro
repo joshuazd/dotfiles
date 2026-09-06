@@ -26,30 +26,35 @@
 # outside.
 #
 # OBSERVED SO FAR, in Terminal.app and iTerm2 alike:
-#   full   no flicker
-#   small  no flicker
-#   real Claude Code session  FLICKERS
+#   full   no flicker      whole-screen repaint 12x/sec
+#   small  no flicker      localised write 12x/sec
+#   title  no flicker      unchanged OSC 2 title 12x/sec
+#   real Claude Code session  FLICKERS in both terminals
 #
-# So neither volume of output nor the renderer is the trigger, and the
-# earlier "unsynchronized pane writes under the overlay" theory does not
-# survive: a whole-screen repaint 12x/sec writes far more under the popup
-# than an agent does, and it is steady.
+# So it is not output volume, not the renderer, and not window titles.
 #
-# What an agent session does that neither synthetic mode did is re-send its
-# OSC 2 window title continuously. With `set-titles on` - which the real
-# config has - tmux re-emits a window retitle to the outer terminal for each
-# one, and both iTerm2 and Terminal.app redraw the window on a retitle. That
-# is terminal-independent, which matches, and it is invisible to sampling
-# #{pane_title} because the VALUE never changes. `title` mode tests exactly
-# this and nothing else.
+# `tmux pipe-pane` on a live Claude pane gives the answer. Its frame, 10x/sec,
+# 64 bytes, and NONE of the synthetic modes above emitted any of it:
 #
-#   title flickers
-#     -> confirmed. Fix is one line: set -g set-titles off, or a
-#        set-titles-string without #T so an unchanged title is not a retitle.
-#   title steady
-#     -> not the titles either. Next step is to capture the bytes a real
-#        agent pane emits and diff them against these modes, rather than
-#        guessing at another candidate.
+#   ESC[?2026h  ESC[?25l  ESC[H  SGR  <text>  ESC[?25h  ESC[?2026l
+#   sync begin  cur hide  home        draw    cur show  sync end
+#
+# Two things there are new. The pane opens and closes the TERMINAL's
+# synchronized-update brackets - the same mechanism tmux uses for its own
+# overlay redraws, measured at 18/19 overlay writes inside sync blocks - so
+# the pane and tmux are both driving frame boundaries and can cross. And the
+# cursor is hidden and shown 10x/sec while a popup owns the cursor.
+#
+#   agent flickers
+#     -> the captured frame is the trigger; bisect with sync and cursor
+#   sync flickers, cursor does not
+#     -> crossed synchronized-update brackets. tmux bug, reportable.
+#   cursor flickers, sync does not
+#     -> cursor visibility churn under an overlay
+#   agent steady
+#     -> the frame alone is not enough; something about the real session's
+#        timing or size matters. Capture again over a longer window and
+#        compare byte-for-byte rather than adding another guess.
 #
 # Press q or Escape to close the popup, then C-b d to tear the server down.
 
@@ -61,9 +66,9 @@ readonly SOCK=flickrepro
 readonly MODE="${1:-full}"
 
 case "${MODE}" in
-  full | small | title) ;;
+  full | small | title | agent | sync | cursor) ;;
   *)
-    printf 'Usage: %s [small|full|title]\n' "${0##*/}" >&2
+    printf 'Usage: %s [full|small|title|agent|sync|cursor]\n' "${0##*/}" >&2
     exit 2
     ;;
 esac
@@ -100,6 +105,21 @@ case "${MODE}" in
     # shellcheck disable=SC2016
     pane_cmd='printf "title mode: resending the same OSC 2 title 12x/sec\n"; while :; do printf "\033]2;claude working\033\\"; perl -e "select undef,undef,undef,0.08"; done'
     ;;
+  agent)
+    # The exact frame a Claude Code pane emits, 10x/sec, captured via
+    # `tmux pipe-pane`: sync begin, cursor hide, tiny draw, cursor show,
+    # sync end. 64 bytes. Note the pane opens and closes the TERMINAL's
+    # frame boundaries, which tmux also uses for its own overlay redraws.
+    pane_cmd='while :; do printf "\033[?2026h\033[?25l\033[H\033[1magent frame\033[0m\033[?25h\033[?2026l"; perl -e "select undef,undef,undef,0.1"; done'
+    ;;
+  sync)
+    # Bisect half one: synchronized-output brackets only, no cursor toggle.
+    pane_cmd='while :; do printf "\033[?2026h\033[H\033[1msync only \033[0m\033[?2026l"; perl -e "select undef,undef,undef,0.1"; done'
+    ;;
+  cursor)
+    # Bisect half two: cursor hide/show only, no sync brackets.
+    pane_cmd='while :; do printf "\033[?25l\033[H\033[1mcursor only\033[0m\033[?25h"; perl -e "select undef,undef,undef,0.1"; done'
+    ;;
 esac
 
 tmux -L "${SOCK}" new-session -d -s repro "sh -c '${pane_cmd}'"
@@ -124,8 +144,8 @@ tmux -L "${SOCK}" bind-key g display-popup -EE -w 72 -h 17 \
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
 printf 'Press C-b g to open the popup, q to close it.\n'
 printf 'C-b d detaches and tears the server down.\n'
-printf 'Compare the modes:  %s full | %s small | %s title\n' \
-  "${0##*/}" "${0##*/}" "${0##*/}"
-printf 'In title mode, C-b : then "set -g set-titles off" should stop it.\n\n'
+printf 'Modes: full small title agent sync cursor\n'
+printf 'Start with agent - it replays the real captured frame. If that\n'
+printf 'flickers, sync and cursor bisect which half is responsible.\n\n'
 
 tmux -L "${SOCK}" attach -t repro
