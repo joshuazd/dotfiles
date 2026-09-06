@@ -146,10 +146,21 @@ menu_show() {
     return "${PICKER_EMPTY}"
   fi
 
+  # MENU_DEBUG_POS puts the positioning numbers in the title. The popup_*
+  # variables only expand while tmux is placing a menu, so reading them off a
+  # rendered title is the only way to see what they actually were.
+  local shown_title="#[align=centre] ${title} "
+  if [ -n "${MENU_DEBUG_POS:-}" ]; then
+    shown_title="x=${MENU_POS_X} y=${MENU_POS_Y}"
+    shown_title="${shown_title} mw=#{popup_width} mh=#{popup_height}"
+    shown_title="${shown_title} pw=#{pane_width} ph=#{pane_height}"
+    shown_title="${shown_title} pl=#{popup_pane_left} pt=#{popup_pane_top}"
+  fi
+
   # -- terminates the options: a label may begin with a hyphen, which is both
   # display-menu's "disabled item" marker and the shape of its own flags.
   tmux display-menu \
-    -T "#[align=centre] ${title} " \
+    -T "${shown_title}" \
     -b rounded \
     -x "${MENU_POS_X}" -y "${MENU_POS_Y}" \
     -- "${args[@]}"

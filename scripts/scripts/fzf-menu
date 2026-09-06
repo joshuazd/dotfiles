@@ -87,12 +87,14 @@ readonly MENU_UNAVAILABLE=2
 readonly RUN_POPUP_WIDTH="80%"
 readonly RUN_POPUP_HEIGHT="60%"
 
-# The prompt shown once a bare command has finished. -s so the keypress is not
-# echoed into the output the user is reading, and a rule above it so the
-# prompt is visibly separate from the command's own output rather than looking
-# like one more line of it. Escape counts: read -n1 returns on the ESC byte,
-# so it needs no special case, only saying so.
-readonly RUN_POPUP_PAUSE="printf '\\n%s\\n' \"\$(printf '=%.0s' \$(seq 1 \${COLUMNS:-60}))\"; read -rsn 1 -p 'Done. Press any key (or Esc) to close... ' _"
+# What holds the popup open once a bare command has finished.
+#
+# A SCRIPT, not a shell fragment: `display-popup -E` runs its command through
+# the user's own shell, and under zsh `read -p` reads from a coprocess instead
+# of printing a prompt while `-n` is not a character count. The inline bash
+# version therefore showed no message and waited for a whole line, so Escape
+# appeared not to work.
+readonly RUN_POPUP_PAUSE="$(printf '%q' "${SCRIPT_DIR}/menu-pause")"
 
 readonly MENU_MAX_DEPTH=8
 readonly MENU_DEPTH="${FZF_MENU_DEPTH:-0}"

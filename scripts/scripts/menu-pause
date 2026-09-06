@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+#
+# menu-pause - Hold a popup open until a key is pressed
+#
+# Usage: menu-pause [message]
+#
+# Arguments:
+#   message   Prompt to show (default: "Done. Press any key (or Esc) to close")
+#
+# Prints a rule, then waits for a single keypress. Escape counts, because
+# `read -n 1` returns on the ESC byte like any other.
+#
+# This is a script rather than a shell fragment appended to the popup command
+# because `tmux display-popup -E` runs its command through the user's own
+# shell. Under zsh, `read -p` reads from a coprocess rather than printing a
+# prompt and `-n` is not a character count, so the inline bash version showed
+# no message and waited for a whole line - Escape appeared not to work.
+#
+# Example:
+#   git status; menu-pause
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/output.sh"
+
+readonly DEFAULT_MESSAGE="Done. Press any key (or Esc) to close"
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  printf '%s\n' \
+    "Usage: ${0##*/} [message]" \
+    "" \
+    "Hold a popup open until a key is pressed. Escape counts."
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional prompt message
+# Returns:
+#   0 always: a pause has nothing to fail at, and a nonzero status here would
+#   be reported as the menu action having failed
+#######################################
+main() {
+  local message="${1:-${DEFAULT_MESSAGE}}"
+
+  # A rule the width of the terminal, so the prompt reads as separate from the
+  # output above it rather than as one more line of it.
+  local width="${COLUMNS:-}"
+  if [ -z "${width}" ]; then
+    width="$(tput cols 2>/dev/null || printf '60')"
+  fi
+  printf '\n'
+  printf '%*s\n' "${width}" '' | tr ' ' '-'
+
+  # -s so the keypress is not echoed into the output being read. Without a
+  # terminal there is nothing to wait on, so skip rather than block forever.
+  if [ -t 0 ]; then
+    read -r -s -n 1 -p "${message}... " _ || true
+    printf '\n'
+  fi
+  return 0
+}
+
+# Check for help flag
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and
+# on the macos-latest runner: there "${@}" with no positional parameters is
+# an unbound variable under `set -o nounset` rather than an empty list, so a
+# no-argument run aborted here instead of printing usage.
+if help_wanted ${1+"${@}"}; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main ${1+"${@}"}

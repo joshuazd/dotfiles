@@ -451,7 +451,7 @@ setup() {
 @test "--run's popup waits for a key so output can be read" {
   run "${FZF_MENU}" --run "echo hi"
   run tmux_call_args display-popup
-  [[ "${output}" == *"Press any key"* ]]
+  [[ "${output}" == *"menu-pause"* ]]
 }
 
 @test "--run honours @window without a popup" {
@@ -577,8 +577,13 @@ setup() {
 }
 
 # The pause prompt is what the user reads after a bare command finishes.
-@test "the bare-command popup names Escape as a way out" {
+# The pause is a script, not a shell fragment: display-popup runs its command
+# through the user shell, and under zsh read -p reads from a coprocess rather
+# than printing a prompt, so the inline version showed no message and waited
+# for a whole line.
+@test "the bare-command popup pauses via the script, not inline read" {
   run "${FZF_MENU}" --run "echo hi"
   run tmux_call_args display-popup
-  [[ "${output}" == *"Esc"* ]]
+  [[ "${output}" == *"menu-pause"* ]]
+  [[ "${output}" != *"read -"* ]]
 }
