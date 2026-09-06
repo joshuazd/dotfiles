@@ -102,8 +102,8 @@ _gen_fzf_default_opts() {
             local color0E='#5f8c7d'
             local color0F='#ffffff'
             FZF_DEFAULT_OPTS="
-              --color=bg+:$color07,bg:-1,spinner:$color0C,hl:$color01
-              --color=fg:-1,header:$color0D,info:$color0A,pointer:$color04
+              --color=bg+:$color07,spinner:$color0C,hl:$color01
+              --color=header:$color0D,info:$color0A,pointer:$color04
               --color=marker:$color04,fg+:$color00,prompt:$color04,hl+:$color01
               --preview='cat {} 2>/dev/null'
               --layout=reverse
@@ -127,12 +127,11 @@ _gen_fzf_default_opts() {
             local color0E='#88c0d0'
             local color0F='#eceff4'
             FZF_DEFAULT_OPTS="
-              --color=bg:-1,bg+:$color08
+              --color=bg+:$color08
               --color=hl:$color02,hl+:bold
-              --color=fg:-1,fg+:bold
+              --color=fg+:bold
               --color=spinner:$color0C,info:$color0A,pointer:$color0C
               --color=marker:$color0C,prompt:$color0A
-              --color=gutter:-1
               --color=border:$color08,label:$color07
               --color=list-border:$color0A,list-label:$color02
               --color=input-border:$color0D,input-label:$color05
@@ -160,8 +159,8 @@ _gen_fzf_default_opts() {
             local color0E='#39adb5'
             local color0F='#ffffff'
             FZF_DEFAULT_OPTS="
-              --color=bg+:$color08,bg:-1,spinner:$color0C,hl:$color05
-              --color=fg:-1,header:$color0D,info:$color0A,pointer:$color0C
+              --color=bg+:$color08,spinner:$color0C,hl:$color05
+              --color=header:$color0D,info:$color0A,pointer:$color0C
               --color=marker:$color0C,fg+:$color06,prompt:$color0A,hl+:$color05
               --layout=reverse
             "

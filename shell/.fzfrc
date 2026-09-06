@@ -1,3 +1,9 @@
+# bg/fg/gutter follow the terminal rather than pinning a theme's hex.
+# They live here, not in FZF_DEFAULT_OPTS: the tmux server snapshots its
+# environment at start, and `display-popup` sources no profile, so an
+# env-carried colour is stale in every popup until the server restarts.
+# This file is read from disk on every fzf run.
+--color=bg:-1,fg:-1,gutter:-1
 --style full
 --border --padding 1,2
 --preview 'fzf-preview.sh {}'
