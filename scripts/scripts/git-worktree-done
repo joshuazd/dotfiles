@@ -121,17 +121,18 @@ main() {
   stamp 'done: switch-client returned'
 
   # Open popup in the destination session to run cleanup
-  # A leading blank line, and -B below, for the same reason the picker runs
-  # with --margin: tmux repaints an overlay's outermost cells when a pane
-  # flushes a DECSET 2026 frame, so a border glyph or a line of text sitting
-  # in that ring tears. Blank cells have nothing to tear.
+  # Bordered on purpose. This popup shows scrolling command output, and the
+  # border is what separates it from the pane behind; a picker gets that from
+  # fzf's own frame instead. The cost is real - a border glyph sits in the
+  # outer ring tmux repaints on a DECSET 2026 flush, so it tears while
+  # something animates behind it - and is accepted here for the legibility.
   local popup_command
-  popup_command="printf '\\n'; ${cleanup_script} --session '${current_session}' '${worktree_path}'"
+  popup_command="${cleanup_script} --session '${current_session}' '${worktree_path}'"
 
   stamp 'done: opening popup'
   tmux display-popup \
     -c "${current_client}" \
-    -E -B -w 80% -h 60% \
+    -E -w 80% -h 60% \
     "${popup_command}"
   stamp 'done: popup closed'
 

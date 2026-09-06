@@ -82,20 +82,12 @@ use_gate() {
   refute_tmux_subcommand switch-client
 }
 
-# tmux repaints an overlay's outermost cells when a pane flushes a DECSET 2026
-# frame, so a border glyph in that ring tears. -B drops the border, and the
-# leading blank line keeps the row it exposes empty rather than full of the
-# cleanup script's first line of output.
-@test "the cleanup popup is borderless" {
+# This popup shows scrolling command output, so it keeps its border: that is
+# what separates it from the pane behind. A picker gets the same from fzf's
+# own frame and passes -B instead.
+@test "the cleanup popup keeps its border" {
   use_gate 0
   run "${DONE}"
   run tmux_call_args display-popup
-  [[ "${output}" == *"-B"* ]]
-}
-
-@test "the cleanup popup opens on a blank row" {
-  use_gate 0
-  run "${DONE}"
-  run tmux_call_args display-popup
-  [[ "${output}" == *"printf '\\n';"* ]]
+  [[ "${output}" != *"-B"* ]]
 }

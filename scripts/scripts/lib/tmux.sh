@@ -584,10 +584,10 @@ run_worktree_popup() {
   # Use printf '%q' to safely escape all values for shell evaluation, since the
   # command string is passed to bash -c or tmux display-popup -E.
   local popup_command
-  # The leading blank line, and -B below, keep the popup's outermost row
-  # empty: tmux repaints an overlay's outer ring when a pane flushes a DECSET
-  # 2026 frame, and a border glyph or line of text there tears.
-  popup_command="printf '\\n'; cd $(printf '%q' "${current_dir}") && $(printf '%q' "${session_script}")"
+  # Bordered on purpose: this popup shows scrolling command output, and the
+  # border is what separates it from the pane behind. It tears while something
+  # animates behind it, which is accepted for the legibility.
+  popup_command="cd $(printf '%q' "${current_dir}") && $(printf '%q' "${session_script}")"
   local arg
   for arg in "${session_args[@]}"; do
     popup_command+=" $(printf '%q' "${arg}")"
@@ -611,7 +611,7 @@ run_worktree_popup() {
   if [ "${DISPATCH_INLINE:-}" = "1" ]; then
     bash -c "${popup_command}" || popup_status="${?}"
   else
-    tmux display-popup -E -B -w 80% -h 60% "${popup_command}" || popup_status="${?}"
+    tmux display-popup -E -w 80% -h 60% "${popup_command}" || popup_status="${?}"
   fi
 
   if [ "${popup_status}" -ne 0 ] && [ "${popup_status}" -ne "${SESSION_EXISTED}" ]; then

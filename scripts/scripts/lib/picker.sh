@@ -104,6 +104,8 @@ _picker_run() {
   local extra_bind=""
   local style=""
   local info=""
+  local border=""
+  local margin="1,1,0,1"
   local empty_message=""
   local size="${PICKER_DEFAULT_SIZE}"
   local delimiter
@@ -111,7 +113,7 @@ _picker_run() {
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
-      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--bind|--style|--info|--size|--delimiter|--empty-message)
+      --prompt|--header|--header-label|--with-nth|--preview|--preview-window|--preview-label|--bind|--style|--info|--border|--margin|--size|--delimiter|--empty-message)
         if [ "${#}" -lt 2 ]; then
           error "picker: ${1} requires a value"
           return "${PICKER_UNAVAILABLE}"
@@ -129,6 +131,8 @@ _picker_run() {
       --bind)      extra_bind="${2}";  shift 2 ;;
       --style)     style="${2}";       shift 2 ;;
       --info)      info="${2}";        shift 2 ;;
+      --border)    border="${2}";      shift 2 ;;
+      --margin)    margin="${2}";      shift 2 ;;
       --empty-message) empty_message="${2}"; shift 2 ;;
       --size)      size="${2}";      shift 2 ;;
       --delimiter) delimiter="${2}"; shift 2 ;;
@@ -167,6 +171,10 @@ _picker_run() {
   # and a blank row there is one row of popup height spent on nothing. If the
   # bottom border starts tearing, this is the line to change back to 1.
   #
+  # A caller whose popup keeps a tmux border does not need any of this and
+  # passes --margin 0: the border already occupies the ring that tears, and a
+  # blank ring inside it is just a wasted row.
+  #
   # --style is not set by default: the per-section borders and labels are the
   # user's aesthetic and a picker has no business replacing them. A caller
   # that wants a simpler frame asks for one explicitly.
@@ -179,7 +187,7 @@ _picker_run() {
     --cycle
     --layout=reverse
     --padding 0
-    --margin "1,1,0,1"
+    --margin "${margin}"
     --delimiter "${delimiter}"
     --with-nth "${with_nth}"
     --prompt "${prompt}"
@@ -198,6 +206,9 @@ _picker_run() {
   fi
   [ -n "${style}" ] && args+=(--style "${style}")
   [ -n "${info}" ] && args+=(--info "${info}")
+  # A caller drawing its own frame - or sitting inside a bordered tmux
+  # popup - has to be able to turn fzf's off, or there are two.
+  [ -n "${border}" ] && args+=(--border "${border}")
   [ -n "${header}" ] && args+=(--header "${header}")
   # ~/.fzfrc hardcodes `--header-label ' File Type '`, which is right for a
   # file finder and nonsense over a list of actions. A caller that knows what
@@ -247,7 +258,8 @@ _picker_run() {
 # Arguments:
 #   --prompt P, --header H, --header-label L, --with-nth N, --preview CMD,
 #   --preview-window W, --preview-label L, --bind SPEC, --style STYLE,
-#   --info STYLE, --empty-message TEXT,
+#   --info STYLE, --border STYLE, --margin TRBL,
+#   --empty-message TEXT,
 #   --size GEO,
 #   --delimiter D (all optional)
 # Inputs:

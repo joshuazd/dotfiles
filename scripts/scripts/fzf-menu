@@ -40,24 +40,36 @@ source "${SCRIPT_DIR}/lib/picker.sh"
 readonly MENU_DIR="${FZF_MENU_DIR:-${SCRIPT_DIR}/menus}"
 readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
 
-# Popup geometry for --popup. Chrome under .fzfrc's `--style full`, with the
-# picker's --padding 0: outer border 2, input border 2, prompt 1, list border
-# With --style default there is ONE border rather than a box per section, and
-# --info hidden removes the match-counter row: margin 1 at the top, outer
-# border 2, prompt 1, preview 1 and the rule above it 1, one row fzf keeps
-# for itself, and a single blank margin row at the top only - 7 rows before a
-# single entry is drawn. MEASURED, not
-# derived: tests/manual counts visible entries at known pane heights, and an
-# estimate that was one row short made every menu scroll. Past POPUP_MAX_ITEMS the list scrolls rather than
-# growing the popup further.
+# Popup geometry for --popup.
+#
+# This popup is BORDERED (no -B), unlike the pickers' own: it hosts a bare
+# command's output as well as the picker, and the border is what separates
+# that output from the pane behind. fzf is therefore told `--border none`, or
+# there would be two. The cost is accepted: a border glyph sits in the outer
+# ring tmux repaints on a DECSET 2026 flush, so it tears while something
+# animates behind it.
+#
+# The chrome accounting changed with that and the total did not, which is
+# worth spelling out because it looks like a coincidence and is not quite one.
+# Borderless it was: margin 1, fzf's own border 2, prompt 1, preview 1, the
+# rule above it 1, and 1 row fzf keeps for itself - 7, against a usable
+# interior of the full height. Bordered it is prompt 1, preview 1, rule 1 and
+# fzf's own row - 4, against an interior of height - 2, so height is
+# entries + 6. fzf's border and the margin both went: tmux's border replaces
+# the first and makes the second a wasted row.
+#
+# MEASURED, not derived: tests/manual counts visible entries at known pane
+# heights, and an estimate that was one row short made every menu scroll.
+# Past POPUP_MAX_ITEMS the list scrolls rather than growing further.
 # Height grows with the entry count between these bounds, so a 3-entry menu
 # is not handed the same box as a 20-entry one.
 #
 # Keep in step with lib/picker.sh's argv and fzf-menu's --preview-window: any
-# change to the padding or the preview height moves this constant, and the
-# only symptom of getting it wrong is a popup slightly too big or too small.
+# change to the padding, the border, or the preview height moves this
+# constant, and the only symptom of getting it wrong is a popup slightly too
+# big or too small.
 readonly POPUP_WIDTH=74
-readonly POPUP_CHROME_ROWS=7
+readonly POPUP_CHROME_ROWS=6
 readonly POPUP_MAX_ITEMS=15
 
 # Exit status for "the menu could not be run", distinct from "nothing picked",
@@ -422,7 +434,7 @@ popup() {
   [ "${shown}" -lt 1 ] && shown=1
   local height=$((shown + POPUP_CHROME_ROWS))
 
-  tmux display-popup -EE -B -w "${POPUP_WIDTH}" -h "${height}" \
+  tmux display-popup -EE -w "${POPUP_WIDTH}" -h "${height}" \
     -d '#{pane_current_path}' \
     "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") $(printf '%q' "${name}")"
 }
@@ -499,6 +511,8 @@ main() {
   selection="$(printf '%s\n' "${rows}" \
     | pick_one --size "" --prompt "$(menu_header "${file}")> " \
         --style default \
+        --border none \
+        --margin 0 \
         --preview "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --explain {1}" \
         --info hidden \
         --preview-window 'down,1,border-top,wrap,noinfo' \

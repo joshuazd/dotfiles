@@ -171,3 +171,12 @@ setup() {
   [[ "${output}" == */wt-confirm* ]]
   [[ "${output}" != *"./wt-confirm"* ]]
 }
+
+# This popup passes -B, so its picker still needs the blank ring: there is no
+# tmux border occupying the row that tears.
+@test "the confirm picker keeps its margin" {
+  export FZF_STUB_SELECTION=$'cancel\t1 Cancel'
+  run "${WT_CONFIRM}" --inline "${REPO}" repo-session
+  run fzf_args
+  printf '%s\n' "${output}" | assert_arg_after "--margin" "1,1,0,1"
+}

@@ -240,7 +240,7 @@ setup() {
   run "${FZF_MENU}" --popup three
   [ "${status}" -eq 0 ]
   run tmux_call_args "display-popup"
-  printf '%s\n' "${output}" | assert_arg_after "-h" "10"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "9"
 }
 
 @test "--popup height is capped at POPUP_MAX_ITEMS entries" {
@@ -253,7 +253,7 @@ setup() {
   run "${FZF_MENU}" --popup many
   [ "${status}" -eq 0 ]
   run tmux_call_args "display-popup"
-  printf '%s\n' "${output}" | assert_arg_after "-h" "22"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "21"
 }
 
 @test "--popup on a missing menu exits 2 without opening anything" {
@@ -334,8 +334,8 @@ setup() {
   run "${FZF_MENU}" --popup top
   [ "${status}" -eq 0 ]
   run tmux_call_args display-popup
-  # 5 rows + POPUP_CHROME_ROWS(7) = 12, not 1 + 7 = 8.
-  printf '%s\n' "${output}" | assert_arg_after "-h" "12"
+  # 5 rows + POPUP_CHROME_ROWS(6) = 11, not 1 + 6 = 7.
+  printf '%s\n' "${output}" | assert_arg_after "-h" "11"
 }
 
 @test "popup keeps its own rows when they are the tallest" {
@@ -344,8 +344,8 @@ setup() {
     > "${FZF_MENU_DIR}/top.menu"
   run "${FZF_MENU}" --popup top
   run tmux_call_args display-popup
-  # 4 own rows beats the 1-row target: 4 + 7 = 11.
-  printf '%s\n' "${output}" | assert_arg_after "-h" "11"
+  # 4 own rows beats the 1-row target: 4 + 6 = 10.
+  printf '%s\n' "${output}" | assert_arg_after "-h" "10"
 }
 
 @test "popup still clamps a tall @menu target at POPUP_MAX_ITEMS" {
@@ -356,8 +356,8 @@ setup() {
   printf '# Menus\nHuge\t@menu huge\n' > "${FZF_MENU_DIR}/top.menu"
   run "${FZF_MENU}" --popup top
   run tmux_call_args display-popup
-  # Clamped to POPUP_MAX_ITEMS(15) + 7 = 22.
-  printf '%s\n' "${output}" | assert_arg_after "-h" "22"
+  # Clamped to POPUP_MAX_ITEMS(15) + 6 = 21.
+  printf '%s\n' "${output}" | assert_arg_after "-h" "21"
 }
 
 @test "popup ignores an @menu target that does not exist" {
@@ -365,8 +365,8 @@ setup() {
   run "${FZF_MENU}" --popup top
   [ "${status}" -eq 0 ]
   run tmux_call_args display-popup
-  # Falls back to its own 2 rows: 2 + 7 = 9.
-  printf '%s\n' "${output}" | assert_arg_after "-h" "9"
+  # Falls back to its own 2 rows: 2 + 6 = 8.
+  printf '%s\n' "${output}" | assert_arg_after "-h" "8"
 }
 
 # fzf's `transform-preview-label:` consumes everything after the colon as its
@@ -401,4 +401,29 @@ setup() {
   fi
   run bash -c "printf 'a\n' | '${real_fzf}' --bind '1:bogus-action,focus:transform-preview-label:true' --filter=a 2>&1"
   [[ "${output}" == *"unknown action"* ]]
+}
+
+# The menu popup hosts a bare command's output as well as the picker, so it
+# keeps tmux's border - that is what separates the output from the pane
+# behind. fzf must then not draw a second one inside it.
+@test "the menu popup keeps its tmux border" {
+  run "${FZF_MENU}" --popup demo
+  run tmux_call_args display-popup
+  [[ "${output}" != *"-B"* ]]
+}
+
+@test "fzf draws no border of its own inside it" {
+  export FZF_STUB_SELECTION=$'echo fetch-ran\t1 Fetch'
+  run "${FZF_MENU}" demo
+  run fzf_args
+  printf '%s\n' "${output}" | assert_arg_after "--border" "none"
+}
+
+# The blank ring existed only to keep the tearing row empty on a borderless
+# popup. With tmux drawing the border it is a wasted row inside it.
+@test "the menu picker asks for no margin" {
+  export FZF_STUB_SELECTION=$'echo fetch-ran\t1 Fetch'
+  run "${FZF_MENU}" demo
+  run fzf_args
+  printf '%s\n' "${output}" | assert_arg_after "--margin" "0"
 }
