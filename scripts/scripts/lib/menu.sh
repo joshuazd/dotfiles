@@ -126,18 +126,16 @@ menu_pane_geometry() {
 #######################################
 # Position that centres a menu on the focused pane.
 #
-# The horizontal half prefers tmux's own `C`, which centres using the menu's
-# REAL drawn width. That width is not observable from a script - tmux exposes
-# it only to its own placement code - so any width computed here is an
-# estimate, and estimating it was repeatedly wrong: the menu kept sitting
-# right of centre because the drawn menu is several columns wider than the
-# labels suggest.
+# The horizontal position is tmux's own `popup_centre_x` - the exact centre,
+# computed by tmux from the menu's REAL drawn width - shifted by however far
+# the pane's centre lies from the client's.
 #
-# `C` is the centre of the CLIENT, so it is only equal to the centre of the
-# pane when the pane spans the client's full width. That covers the common
-# case of a vertical stack of panes. A horizontally split pane falls back to
-# the estimate, which is approximate but bounded, and better than centring on
-# the wrong pane entirely.
+# That width is not observable from a script: tmux exposes it only to its own
+# placement code. Estimating it was wrong twice, each time leaving the menu
+# right of centre, because a drawn menu is several columns wider than its
+# labels suggest. Taking tmux's number and translating it removes the estimate
+# from the horizontal entirely, for every layout rather than only for a
+# full-width pane.
 #
 # The vertical half is always computed, since a pane's rows rarely match the
 # client's. -y names the menu's BOTTOM row, so the height is ADDED. Measured:
@@ -160,12 +158,23 @@ menu_centre_position() {
   local pane_left pane_top pane_w pane_h client_w
   read -r pane_left pane_top pane_w pane_h client_w <<< "${geom}"
 
+  # tmux's own exact centre, shifted by however far the pane's centre is from
+  # the client's. popup_centre_x already accounts for the real drawn width, so
+  # nothing here has to estimate it - and for a full-width pane the offset is
+  # zero, leaving tmux's centring untouched.
+  #
+  # MENU_X_NUDGE shifts it further, positive being rightward. It exists because
+  # "centred" is partly a matter of perception once the box is wider than its
+  # text, and dialling one number beats another round of measurement.
+  local pane_offset=$(( (pane_left + pane_w / 2) - client_w / 2 ))
+  local shift=$(( pane_offset + ${MENU_X_NUDGE:-0} ))
   local x
-  if [ "${pane_left}" -eq 0 ] && [ "${pane_w}" -eq "${client_w}" ]; then
-    x="C"
+  if [ "${shift}" -eq 0 ]; then
+    x='#{popup_centre_x}'
+  elif [ "${shift}" -gt 0 ]; then
+    x="#{e|+:#{popup_centre_x},${shift}}"
   else
-    x=$((pane_left + (pane_w - menu_w) / 2))
-    [ "${x}" -lt "${pane_left}" ] && x="${pane_left}"
+    x="#{e|-:#{popup_centre_x},$(( -shift ))}"
   fi
 
   local y=$((pane_top + (pane_h + menu_h) / 2))

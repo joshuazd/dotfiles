@@ -234,58 +234,79 @@ setup() {
   [[ "${output}" != *"#{e|"* ]]
 }
 
-# A pane spanning the client's full width hands the horizontal centring to
-# tmux's own C, which uses the menu's REAL drawn width. Estimating that width
-# put the menu several columns right of centre, and it is not observable from
-# a script, so C is the only exact answer available.
+# The horizontal position is tmux's own exact centre. A full-width pane needs
+# no shift at all, so it is passed through untouched - the menu's drawn width
+# is not observable from a script, and estimating it left the menu right of
+# centre twice.
 #
 # Vertically: menu_h = 1 + 2 = 3 and -y is the BOTTOM row, so y = (40+3)/2 = 21.
-@test "a full-width pane lets tmux centre horizontally" {
+@test "a full-width pane uses tmux's own centre unshifted" {
   export TMUX_STUB_PANE_GEOMETRY="0 0 120 40 120"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  printf '%s\n' "${output}" | assert_arg_after "-x" "C"
+  printf '%s\n' "${output}" | assert_arg_after "-x" '#{popup_centre_x}'
   printf '%s\n' "${output}" | assert_arg_after "-y" "21"
 }
 
-# C is the centre of the CLIENT, so a pane narrower than the client cannot use
-# it and falls back to the estimate.
-@test "a narrower pane falls back to the computed column" {
+# A pane left of the client's centre shifts tmux's centre left by the same
+# distance, which needs no knowledge of the menu's width.
+@test "a left-hand pane shifts tmux's centre left" {
   export TMUX_STUB_PANE_GEOMETRY="0 0 60 40 120"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  # 3 + 6 + 4 = 13, so x = 0 + (60 - 13)/2 = 23
-  printf '%s\n' "${output}" | assert_arg_after "-x" "23"
+  # pane centre 30, client centre 60, so 30 columns left.
+  printf '%s\n' "${output}" | assert_arg_after "-x" '#{e|-:#{popup_centre_x},30}'
 }
 
-# The centre is the PANE's, so a pane offset within the window shifts it.
-@test "a pane offset within the window shifts the menu" {
-  export TMUX_STUB_PANE_GEOMETRY="60 20 60 20"
+@test "a right-hand pane shifts tmux's centre right" {
+  export TMUX_STUB_PANE_GEOMETRY="60 0 60 40 120"
   printf 'v1\tOne\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  # x = 60 + (60 - 13)/2 = 83; y = 20 + (20 + 3)/2 = 31
-  printf '%s\n' "${output}" | assert_arg_after "-x" "83"
+  # pane centre 90, client centre 60, so 30 columns right.
+  printf '%s\n' "${output}" | assert_arg_after "-x" '#{e|+:#{popup_centre_x},30}'
+}
+
+# The knob exists because "centred" is partly perception once the box is wider
+# than its text.
+@test "MENU_X_NUDGE shifts the result" {
+  export TMUX_STUB_PANE_GEOMETRY="0 0 120 40 120"
+  export MENU_X_NUDGE=-3
+  printf 'v1\tOne\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "-x" '#{e|-:#{popup_centre_x},3}'
+}
+
+# The vertical centre is the PANE's, so a pane offset down the window moves it.
+@test "a pane offset down the window shifts the menu down" {
+  export TMUX_STUB_PANE_GEOMETRY="60 20 60 20 120"
+  printf 'v1\tOne\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  # y = 20 + (20 + 3)/2 = 31
   printf '%s\n' "${output}" | assert_arg_after "-y" "31"
 }
 
-# A long label widens the menu, which moves its left edge left.
-@test "a wider menu is still centred" {
-  export TMUX_STUB_PANE_GEOMETRY="0 0 120 40"
+# The label width no longer reaches the horizontal position at all: tmux
+# computes the centre from the width it actually drew. This is the property
+# that two rounds of estimating the width failed to achieve.
+@test "the label width does not move the menu horizontally" {
+  export TMUX_STUB_PANE_GEOMETRY="0 0 120 40 120"
+  printf 'v1\tOne\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  local narrow="${output}"
+  setup_tmux_stub
+  export TMUX_STUB_PANE_GEOMETRY="0 0 120 40 120"
   printf 'v1\tA label that is rather long indeed\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  # 34 + 6 + 4 = 44, so x = (120 - 44)/2 = 38.
-  printf '%s\n' "${output}" | assert_arg_after "-x" "38"
+  [ "$(printf '%s\n' "${narrow}" | grep -c 'popup_centre_x')" -eq \
+    "$(printf '%s\n' "${output}" | grep -c 'popup_centre_x')" ]
 }
 
-# A menu wider than its pane would otherwise get a negative column, which
-# tmux places off-screen.
-@test "the position never goes outside the pane" {
-  export TMUX_STUB_PANE_GEOMETRY="0 0 10 4"
+# -y is the bottom row, so it cannot rise above the menu's own height without
+# the menu being drawn off the top of the pane.
+@test "the vertical position never goes above the pane" {
+  export TMUX_STUB_PANE_GEOMETRY="0 0 10 4 10"
   printf 'v1\tA label far wider than this pane\n' | menu_show "T" "act"
   run tmux_call_args display-menu
-  printf '%s\n' "${output}" | assert_arg_after "-x" "0"
-  # -y is the bottom row, so it cannot rise above the menu's own height or the
-  # menu is drawn off the top of the pane.
   printf '%s\n' "${output}" | assert_arg_after "-y" "3"
 }
 
