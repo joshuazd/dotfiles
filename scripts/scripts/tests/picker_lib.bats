@@ -67,6 +67,15 @@ setup() {
   printf '%s\n' "${output}" | assert_arg_after "--padding" "0"
 }
 
+# A one-cell blank ring outside the border. tmux repaints an overlay's
+# outermost cells when a pane flushes a DECSET 2026 frame, and anything drawn
+# there tears; blank cells cannot.
+@test "the picker leaves a blank margin outside the border" {
+  run pick_one < "${ROWS}"
+  run fzf_args
+  printf '%s\n' "${output}" | assert_arg_after "--margin" "1"
+}
+
 # An empty --size must render inline instead of spawning a nested popup.
 # Inside an existing display-popup, --tmux makes fzf exit 0 having printed
 # nothing, so the selection is lost and the caller sees "nothing picked".

@@ -41,17 +41,18 @@ readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
 
 # Popup geometry for --popup. Chrome under .fzfrc's `--style full`, with the
 # picker's --padding 0: outer border 2, input border 2, prompt 1, list border
-# 2, preview 2 and its border 2 - 11 rows before a single entry is drawn.
+# 2, preview 2 and its border 2, plus the picker's --margin 1 top and
+# bottom - 13 rows before a single entry is drawn.
 # Height grows with the entry count between these bounds, so a 3-entry menu
 # is not handed the same box as a 20-entry one.
 #
 # Keep in step with lib/picker.sh's argv and fzf-menu's --preview-window: any
 # change to the padding or the preview height moves this constant, and the
 # only symptom of getting it wrong is a popup slightly too big or too small.
-readonly POPUP_WIDTH=72
-readonly POPUP_CHROME_ROWS=11
-readonly POPUP_MIN_ROWS=13
-readonly POPUP_MAX_ROWS=32
+readonly POPUP_WIDTH=74
+readonly POPUP_CHROME_ROWS=13
+readonly POPUP_MIN_ROWS=15
+readonly POPUP_MAX_ROWS=34
 
 # Exit status for "the menu could not be run", distinct from "nothing picked",
 # which is a successful no-op.

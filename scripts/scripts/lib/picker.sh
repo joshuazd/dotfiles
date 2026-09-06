@@ -136,6 +136,13 @@ _picker_run() {
     return "${PICKER_NO_SELECTION}"
   fi
 
+  # --margin 1 leaves a one-cell blank ring OUTSIDE fzf's border (--padding is
+  # inside it). That ring is the flicker mitigation: tmux repaints an
+  # overlay's outermost cells when a pane flushes a DECSET 2026 frame, and
+  # anything drawn there tears - border glyphs, ASCII glyphs and title text
+  # all do, while blank cells have nothing to tear. The border and its labels
+  # survive because they now sit one cell in.
+  #
   # --style is deliberately NOT set: the per-section borders and labels are
   # the user's aesthetic and a picker has no business replacing them.
   # --padding is, because it is pure spacing rather than style - two rows of
@@ -147,6 +154,7 @@ _picker_run() {
     --cycle
     --layout=reverse
     --padding 0
+    --margin 1
     --delimiter "${delimiter}"
     --with-nth "${with_nth}"
     --prompt "${prompt}"

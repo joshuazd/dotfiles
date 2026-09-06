@@ -223,7 +223,7 @@ setup() {
   run "${FZF_MENU}" --popup three
   [ "${status}" -eq 0 ]
   run tmux_call_args "display-popup"
-  printf '%s\n' "${output}" | assert_arg_after "-h" "14"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "16"
 }
 
 @test "--popup height is capped for a long menu" {
@@ -236,7 +236,7 @@ setup() {
   run "${FZF_MENU}" --popup many
   [ "${status}" -eq 0 ]
   run tmux_call_args "display-popup"
-  printf '%s\n' "${output}" | assert_arg_after "-h" "32"
+  printf '%s\n' "${output}" | assert_arg_after "-h" "34"
 }
 
 @test "--popup on a missing menu exits 2 without opening anything" {
