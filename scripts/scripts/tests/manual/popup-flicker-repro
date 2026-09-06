@@ -237,12 +237,16 @@ tmux -L "${SOCK}" bind-key S run-shell \
 
 # G: a borderless menu that still reads as a titled block. Two tricks:
 #
-#   - the title is a DISABLED ITEM ("-Git actions"), not -T. A -T title is
+#   - the title is a plain ITEM with an empty command, not -T. An empty
+#     command makes it unselectable; a leading "-" would ALSO dim it, which
+#     is not wanted for a title. A -T title is
 #     drawn on the border row, which is the outer ring that tears; an item
 #     sits inside the menu body, so it is both steady and covered by
 #     menu-style's background fill.
 #   - labels carry no number: tmux already renders each item's key at the
 #     end of its line, so numbering the text duplicates it.
+#   - labels carry no leading spaces either: tmux pads items to the menu
+#     width, so hand-added indentation just widens the coloured block.
 #   - separators are a disabled item with a blank name rather than "".
 #     tmux renders "" as a rule line styled separately from menu-style,
 #     which leaves an uncoloured gap through an otherwise solid block.
@@ -252,13 +256,13 @@ tmux -L "${SOCK}" bind-key S run-shell \
 # parsed as a flag, and tmux rejects the whole command with
 # "invalid flag - ". A leading "-" is what marks an item disabled.
 tmux -L "${SOCK}" bind-key G display-menu -x C -y C -- \
-  "-  Git actions"        "" "" \
-  "- "                    "" "" \
-  "  Fetch and prune"     1  "" \
-  "  Status"              2  "" \
-  "  Rebase on main"      3  "" \
-  "- "                    "" "" \
-  "  Close"               q  ""
+  "Git actions"           "" "" \
+  ""                      "" "" \
+  "Fetch and prune"       1  "" \
+  "Status"                2  "" \
+  "Rebase on main"        3  "" \
+  ""                      "" "" \
+  "Close"                 q  ""
 
 # T: display-menu with NO title. The title text tears even with the border
 # off, so title and border are separate contributors and both have to go for
