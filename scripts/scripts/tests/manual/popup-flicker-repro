@@ -2,34 +2,54 @@
 #
 # popup-flicker-repro - Reproduce the tmux popup flicker in any terminal
 #
-# Usage: popup-flicker-repro
+# Usage: popup-flicker-repro [small|full]
 #
-# Opens a throwaway tmux server (socket "flickrepro") with one pane that
-# repaints continuously, standing in for an agent's spinner, then opens a
-# display-popup over it. Watch the popup's borders.
+#   full   (default) the pane repaints its WHOLE screen ~12x/sec, the way a
+#          full TUI such as an agent session does
+#   small  the pane rewrites a dozen characters in one spot ~12x/sec
 #
-# Runs on its own socket and never touches your real sessions, so it is safe
-# to run from a second terminal while your normal tmux keeps working.
+# Opens a throwaway tmux server (socket "flickrepro") with one repainting
+# pane, then binds prefix + g to a display-popup over it. Watch the popup's
+# borders. Runs on its own socket and never touches your real sessions, so it
+# is safe from a second terminal while your normal tmux keeps working.
 #
-# Why this exists: tmux draws the popup overlay INSIDE synchronized-output
-# blocks (DECSET 2026) but writes the underlying pane's output OUTSIDE them.
-# Measured on tmux 3.7b: 18/19 overlay writes inside sync, 66/71 pane writes
-# outside. Interleaving unsynchronized pane writes with atomic overlay
-# redraws is the suspected cause of the visible tearing.
+# THE STATUS BAR IS DELIBERATELY STATIC HERE. status-interval was tested and
+# eliminated as a cause, so this repro must not reintroduce it as a variable:
+# the pane is the only thing repainting.
 #
-# Interpreting the result:
-#   flickers here too, in a terminal with no 2026 support (Terminal.app)
-#     -> tmux output behaviour, independent of renderer and of sync
-#   steady in a second terminal but not in the first
-#     -> that terminal's renderer; compare a third with sync support
+# What is measured, on tmux 3.7b: tmux draws the popup overlay INSIDE
+# synchronized-output blocks (DECSET 2026) but writes the underlying pane's
+# output OUTSIDE them - 18/19 overlay writes inside sync, 66/71 pane writes
+# outside.
 #
-# Press q or Escape to close the popup, then the script tears the server down.
+# The hypothesis this script tests: the tear needs pane writes that land in
+# the popup's own rectangle. So `full` should flicker and `small` should not,
+# because a dozen characters in one corner never touch the popup's cells.
+#
+#   full flickers, small does not
+#     -> confirmed: unsynchronized pane writes under the overlay
+#   neither flickers, but a real agent session does
+#     -> the trigger is narrower than "repaints a lot"; capture what the
+#        agent's TUI emits and compare
+#   both flicker
+#     -> any pane output is enough; the rectangle theory is wrong
+#
+# Press q or Escape to close the popup, then C-b d to tear the server down.
 
 set -o errexit
 set -o nounset
 set -o pipefail
 
 readonly SOCK=flickrepro
+readonly MODE="${1:-full}"
+
+case "${MODE}" in
+  full | small) ;;
+  *)
+    printf 'Usage: %s [small|full]\n' "${0##*/}" >&2
+    exit 2
+    ;;
+esac
 
 cleanup() {
   tmux -L "${SOCK}" kill-server 2> /dev/null || true
@@ -38,22 +58,34 @@ trap cleanup EXIT
 
 tmux -L "${SOCK}" kill-server 2> /dev/null || true
 
-# A pane that repaints ~12 times a second with no other activity.
-tmux -L "${SOCK}" new-session -d -s repro \
-  "while :; do printf '\rrepainting %s  ' \"\${SECONDS}\"; perl -e 'select undef,undef,undef,0.08'; done"
+# `full` uses the alternate screen and rewrites every line from the home
+# position, which is what a TUI does. `small` writes in place with \r.
+#
+# The single quotes are deliberate: $i, $RANDOM and $SECONDS must expand in
+# the pane's own shell each iteration, not once here while the string is
+# being built. Hence the SC2016 exemptions.
+if [ "${MODE}" = full ]; then
+  # shellcheck disable=SC2016
+  pane_cmd='printf "\033[?1049h"; while :; do printf "\033[H"; i=1; while [ "$i" -le 45 ]; do printf "line %02d  %s\033[K\n" "$i" "$RANDOM"; i=$((i+1)); done; perl -e "select undef,undef,undef,0.08"; done'
+else
+  # shellcheck disable=SC2016
+  pane_cmd='while :; do printf "\rrepainting %s  " "${SECONDS}"; perl -e "select undef,undef,undef,0.08"; done'
+fi
 
-# Match the real setup: top status bar, seconds ticking, one-second interval.
-tmux -L "${SOCK}" set -g status-position top
-tmux -L "${SOCK}" set -g status-interval 1
-tmux -L "${SOCK}" set -g status-right ' %H:%M:%S '
+tmux -L "${SOCK}" new-session -d -s repro "sh -c '${pane_cmd}'"
 
-# prefix + g opens the popup, so the flicker can be triggered repeatedly
-# without restarting. prefix is C-b on this throwaway server.
+# Static status bar: no clock, no interval churn, nothing to redraw.
+tmux -L "${SOCK}" set -g status-interval 0
+tmux -L "${SOCK}" set -g status-right ''
+tmux -L "${SOCK}" set -g status-left " flicker repro: ${MODE} mode "
+
 tmux -L "${SOCK}" bind-key g display-popup -EE -w 72 -h 17 \
-  "printf '  Watch the borders.\n  q or Escape to close.\n'; read -r -n 1 _ || true"
+  "printf '  Mode: %s\n  Watch the borders.\n  q or Escape to close.\n' '${MODE}'; read -r -n 1 _ || true"
 
-printf 'Throwaway tmux server "%s" is up.\n' "${SOCK}"
-printf 'Attaching now. Press C-b g to open the popup; q to close it.\n'
-printf 'Detach with C-b d and the server is torn down.\n\n'
+printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
+printf 'Press C-b g to open the popup, q to close it.\n'
+printf 'C-b d detaches and tears the server down.\n'
+printf 'Run again with the other mode to compare:  %s %s\n\n' \
+  "${0##*/}" "$([ "${MODE}" = full ] && printf small || printf full)"
 
 tmux -L "${SOCK}" attach -t repro
