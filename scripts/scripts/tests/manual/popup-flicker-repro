@@ -178,13 +178,15 @@ tmux -L "${SOCK}" bind-key f display-popup -EE -w 100% -h 100% "${popup_body}"
 # border specifically that tears rather than the whole overlay.
 tmux -L "${SOCK}" bind-key n display-popup -EE -B -w 72 -h 17 "${popup_body}"
 
-# M: toggle menu-border-lines between single and none, so C-b m can be
-# compared with and without a border. Chaining `set` and `display-menu` in
-# one binding fails with "no current client", so the toggle is its own key
-# and does nothing but set the option.
-# shellcheck disable=SC2016  # $(...) must run in the pane shell, not here
+# M: cycle menu-border-lines through every value tmux accepts, so each can
+# be compared against the same menu. `padded` is the interesting one: a
+# border made of blank cells rather than line characters, which is what you
+# want if the line drawing is what tears but you still want the inset and
+# the title.
+#
+# shellcheck disable=SC2016  # must evaluate in the pane shell, not here
 tmux -L "${SOCK}" bind-key M run-shell \
-  'if [ "$(tmux -L flickrepro show -gv menu-border-lines)" = none ]; then tmux -L flickrepro set -g menu-border-lines single; tmux -L flickrepro display-message "menu border: single"; else tmux -L flickrepro set -g menu-border-lines none; tmux -L flickrepro display-message "menu border: none"; fi'
+  'cur=$(tmux -L flickrepro show -gv menu-border-lines); case "$cur" in single) n=rounded ;; rounded) n=double ;; double) n=heavy ;; heavy) n=simple ;; simple) n=padded ;; padded) n=none ;; *) n=single ;; esac; tmux -L flickrepro set -g menu-border-lines "$n"; tmux -L flickrepro display-message "menu-border-lines: $n"'
 
 # T: display-menu with NO title. The title text tears even with the border
 # off, so title and border are separate contributors and both have to go for
@@ -207,7 +209,7 @@ tmux -L "${SOCK}" bind-key m display-menu -T " display-menu " -x C -y C \
   "close"       q ""
 
 printf 'Throwaway tmux server "%s" is up in %s mode.\n' "${SOCK}" "${MODE}"
-printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M toggle border   C-b T menu (no title)\n'
+printf 'Surfaces:  C-b g popup   C-b f fullscreen   C-b n borderless   C-b m menu   C-b M cycle border style   C-b T menu (no title)\n'
 printf 'C-b d detaches and tears the server down.\n'
 printf 'Modes: full small title agent sync cursor sync-off\n'
 printf 'Start with agent - it replays the real captured frame. If that\n'
