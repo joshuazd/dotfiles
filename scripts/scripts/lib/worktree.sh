@@ -44,6 +44,28 @@ worktree_unpushed_count() {
 }
 
 #######################################
+# The branch a worktree has checked out.
+#
+# A detached HEAD has no branch name and reports the short sha instead, which
+# is still the answer to "what am I about to lose". Nothing at all when the
+# directory is not a git repository, so the caller can drop the line rather
+# than show an empty one.
+# Arguments:
+#   Worktree directory
+# Outputs:
+#   The branch name or short sha to stdout, or nothing
+#######################################
+worktree_branch() {
+  local dir="${1}"
+  local name
+  name="$(git -C "${dir}" symbolic-ref --short -q HEAD 2>/dev/null || true)"
+  if [ -z "${name}" ]; then
+    name="$(git -C "${dir}" rev-parse --short HEAD 2>/dev/null || true)"
+  fi
+  printf '%s' "${name}"
+}
+
+#######################################
 # One line naming everything at risk in a worktree.
 # Arguments:
 #   Worktree directory

@@ -167,6 +167,9 @@ menu_header() {
 # default --with-nth of -1 displays it while the command rides along hidden.
 # A malformed line is warned about and skipped rather than aborting the menu:
 # one bad row must not cost the user the other nine.
+#
+# The label is raw, mnemonic marker included, because that is what the native
+# backend needs; menu_rows_numbered renders it for fzf.
 # Arguments:
 #   Path to the menu file
 # Outputs:
@@ -177,7 +180,6 @@ menu_rows() {
   local base
   base="$(basename "${file}")"
   local lineno=0
-  local emitted=0
   local line label command
 
   while IFS= read -r line || [ -n "${line}" ]; do
@@ -200,13 +202,37 @@ menu_rows() {
       continue
     fi
 
-    emitted=$((emitted + 1))
-    if [ "${emitted}" -le 9 ]; then
-      printf '%s\t%s %s\n' "${command}" "${emitted}" "${label}"
+    printf '%s\t%s\n' "${command}" "${label}"
+  done < "${file}"
+}
+
+#######################################
+# Menu rows rendered for fzf: mnemonic marker stripped, position prefixed.
+#
+# fzf has no key column of its own, so the digit has to be part of the label
+# for the `N:pos(N)+accept` binds to be discoverable. The native backend takes
+# menu_rows directly, because tmux draws the key itself and a numbered label
+# would show a number and a key side by side.
+# Arguments:
+#   Path to the menu file
+# Outputs:
+#   "command<TAB>N label" rows to stdout
+#######################################
+menu_rows_numbered() {
+  local file="${1}"
+  local row command label
+  local n=0
+  while IFS= read -r row; do
+    [ -n "${row}" ] || continue
+    command="${row%$'\t'*}"
+    label="$(menu_label_text "${row##*$'\t'}")"
+    n=$((n + 1))
+    if [ "${n}" -le 9 ]; then
+      printf '%s\t%s %s\n' "${command}" "${n}" "${label}"
     else
       printf '%s\t  %s\n' "${command}" "${label}"
     fi
-  done < "${file}"
+  done < <(menu_rows "${file}")
 }
 
 #######################################
@@ -464,7 +490,7 @@ menu_max_rows() {
 
   while IFS= read -r row; do
     [ -n "${row}" ] || continue
-    # menu_rows emits "command<TAB>N label"; the label is the last field.
+    # menu_rows emits "command<TAB>label"; the label is the last field.
     command="${row%$'\t'*}"
     [ "$(action_sigil "${command}")" = "menu" ] || continue
     target="$(action_body "${command}")"
@@ -477,31 +503,6 @@ menu_max_rows() {
   done < <(menu_rows "${file}" 2>/dev/null)
 
   printf '%s' "${max}"
-}
-
-#######################################
-# Menu rows with the digit prefix removed.
-#
-# menu_rows numbers labels for fzf, which has no key column of its own. tmux
-# draws the key at the end of the item line, so a native menu must not carry
-# the number as well.
-# Arguments:
-#   Path to the menu file
-# Outputs:
-#   "command<TAB>label" rows to stdout
-#######################################
-menu_rows_unnumbered() {
-  local file="${1}"
-  local row command label
-  while IFS= read -r row; do
-    [ -n "${row}" ] || continue
-    command="${row%$'\t'*}"
-    label="${row##*$'\t'}"
-    # "1 Fetch" -> "Fetch"; "  Fetch" -> "Fetch"
-    label="${label#[0-9] }"
-    label="${label#  }"
-    printf '%s\t%s\n' "${command}" "${label}"
-  done < <(menu_rows "${file}")
 }
 
 #######################################
@@ -532,7 +533,7 @@ popup() {
   # count: a chaining menu has to fit the tallest screen it can reach, or
   # picking a leaf blanks it.
   if menu_fits "${count}"; then
-    menu_rows_unnumbered "${file}" \
+    menu_rows "${file}" \
       | menu_show "$(menu_header "${file}")" \
           "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --run"
     return "${?}"
@@ -580,7 +581,7 @@ main() {
   fi
 
   local rows
-  rows="$(menu_rows "${file}")"
+  rows="$(menu_rows_numbered "${file}")"
 
   # --size "" renders fzf inline rather than in a popup of its own. This menu
   # is always invoked from a `display-popup` binding, and a nested popup has

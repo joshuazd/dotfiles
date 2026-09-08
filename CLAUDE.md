@@ -71,7 +71,7 @@ Action menus, opened over the focused pane.
 
 - `scripts/scripts/lib/picker.sh` — the only place fzf argv is built (`pick_one` / `pick_many`)
 - `scripts/scripts/fzf-menu` — runs a declarative `menus/<name>.menu` file
-- `scripts/scripts/menus/*.menu` — one file per menu, `Label<TAB>command`, tab separated. A leading sigil says where the command runs: none (in the popup), `@window`, `@pane`, `@bg`, `@menu`
+- `scripts/scripts/menus/*.menu` — one file per menu, `Label<TAB>command`, tab separated. A leading sigil says where the command runs: none (in the popup), `@window`, `@pane`, `@bg`, `@menu`, `@quiet`. A `&` in the label marks its mnemonic key (`&Fetch` binds `f`), folded to lowercase
 - `scripts/scripts/{wt,pr,sc}-pick` — list-then-act pickers for the entries that need a second choice. Dynamic lists are scripts, not menu syntax
 
 Bindings: `prefix g` git, `w` worktree, `r` pr, `t` tmux, `s` shortcut, `m` all menus. Each has a `C-` variant except `m` (terminals send `C-m` as Enter).
@@ -82,6 +82,8 @@ Bindings: `prefix g` git, `w` worktree, `r` pr, `t` tmux, `s` shortcut, `m` all 
 - the fzf picker when they do not, because a menu too tall for the terminal is not displayed at all - no scroll, no truncation, no error
 
 `display-menu` runs a command rather than returning a selection, so every picker has a list half and an `--act <verb> <value>` half. Both backends drive the same `--act`, which is what makes the fallback safe to rely on.
+
+**It also cannot be relied on to block until its menu is answered** - measured returning 0 a second after opening, with the menu untouched. So confirmations hand the gate an action (`wt-confirm --run <command>`) and the chosen item runs it, the way tmux writes its own (`Yes y { kill-pane }`). Nothing reads an answer back. See `scripts/scripts/CLAUDE.md`.
 
 Previews and type-to-filter exist only on the fzf path. `lib/menu.sh` owns `display-menu` argv the way `lib/picker.sh` owns fzf's.
 

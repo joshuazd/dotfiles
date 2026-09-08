@@ -1,7 +1,7 @@
 # Git actions
-Fetch and prune	git fetch --all --prune
-Status	git status
-Rebase on origin/main	git rebase origin/main
-Interactive rebase	@window git rebase -i origin/main
-Log (graph)	@window git log --oneline --decorate --graph --all
-Open PR in browser	@quiet gh pr view --web
+&Fetch and prune	git fetch --all --prune
+&Status	git status
+&Rebase on origin/main	git rebase origin/main
+&Interactive rebase	@window git rebase -i origin/main
+&Log (graph)	@window git log --oneline --decorate --graph --all
+&Open PR in browser	@quiet gh pr view --web

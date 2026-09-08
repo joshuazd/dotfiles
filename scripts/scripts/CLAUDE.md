@@ -109,15 +109,44 @@ worktree and a tmux session. Both go through `wt-confirm`, which is the only
 gate — do not add a third path that skips it, and a gate that cannot be found
 is a hard error rather than a silent proceed.
 
-`wt-confirm` renders inline when it has a tty and opens its own popup when it
-does not. That branch is load-bearing: `prefix d` runs under `run-shell -b`
-with no tty, while `wt-pick` is already inside the menu's popup, and a NESTED
-`display-popup` has no client to draw on, so fzf exits 0 printing nothing and
-the answer is silently lost. `tmux display-popup -E` also does not return the
-popup command's exit status, which is why the popup pass communicates through
-an answer file.
+**The caller hands the gate an action, and never reads an answer back.**
+`wt-confirm --run <command>` is the only shape. The confirming menu item *is*
+`run-shell -b <command>`, exactly as tmux writes its own confirmations
+(`Yes y { kill-pane }`).
 
-Cancel is the first row, so it is the cursor position and the Enter answer.
+This is not stylistic. **`tmux display-menu` cannot be relied on to block until
+its menu is answered.** Measured from a menu item's `run-shell -b`: it returned
+0 one second after opening, with the menu still on screen and untouched. A gate
+that read an answer variable afterwards therefore always read the seeded
+default, reported a cancel, and exited - and the eventual keypress landed on a
+menu nobody was listening to, which looked exactly like a confirm that did
+nothing. A separate harness DID see it block, which is why this must not be
+rebuilt on that behaviour no matter what a local experiment shows.
+
+Consequences worth keeping straight:
+
+- Every caller supplies a re-entry point for its own post-confirm work:
+  `wt-pick --cleanup <path>` and `git-worktree-done --confirmed <path>
+  <session>`. Neither is a verb, because nothing may reach them without
+  passing the gate first.
+- The `--confirmed` re-entry is TOLD its worktree and session rather than
+  recomputing them. It runs under a menu item's `run-shell -b`, by which point
+  the focused pane is whatever the user is looking at, not necessarily the
+  worktree the menu named.
+- `wt-pick --cleanup` opens a popup when it has no tty. tmux writes
+  `run-shell` output into the focused pane, and a pane on the alternate screen
+  - anything running Claude or vim - eats it whole, so a cleanup that refused
+  a dirty worktree was completely invisible.
+
+`wt-confirm` still renders inline with fzf when it has a tty, and opens its own
+popup when it can draw neither. That branch is load-bearing: `wt-pick` on the
+fzf fallback is already inside the picker's popup, and both a `display-menu`
+and a NESTED `display-popup` asked for over a popup return 0 without drawing.
+On the inline path the gate runs the command itself.
+
+Cancel is the first row, so it is the cursor position and the Enter answer, and
+it carries no command at all. Escape and `q` dismiss a `display-menu` without
+running any item, so they cancel for free.
 
 ### Menus
 
@@ -138,6 +167,23 @@ recorders, since a PATH stub cannot intercept an absolute path.
 `lib/menu.sh` owns every `display-menu` invocation the way `lib/picker.sh`
 owns fzf's. `menu_or_pick` is the single decision point; nothing else should
 be choosing a backend.
+
+**Mnemonic keys.** A `&` in a label marks its key: `&Fetch and prune` binds
+`f`, `Res&pawn this pane` binds `p`. The key lives inside the label so it
+cannot drift from the text it abbreviates, and the format stays two fields.
+Keys are folded to LOWERCASE - labels are title case, so taking the marked
+character as written would bind Shift-F. Only the first marker is stripped, so
+a trailing `&` is left alone and is not a mnemonic.
+
+A label with no marker falls back to its position as a digit, which is what
+the pickers rely on: worktree paths and PR titles have no stable text to be
+mnemonic about. fzf has no key column, so `menu_rows_numbered` strips the
+marker and prefixes the digit for that path only; the same entry is `s`
+natively and `2` in the fallback.
+
+A label beginning with `-` is an information row: tmux draws it dim and
+refuses to select it, ignoring its key entirely. That is what lets the confirm
+menus carry a path, a branch and a risk summary above the choices.
 
 `MENU_CHROME_ROWS` is deliberately generous and must only be lowered against a
 measurement. Too large costs an early fzf fallback; too small means tmux

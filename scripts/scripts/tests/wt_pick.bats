@@ -113,28 +113,73 @@ setup() {
   run "${WT_PICK}" remove
   [ "${status}" -eq 97 ]
   refute_cmd_called git-worktree-cleanup
+  # refute_cmd_called alone is vacuous now that the cleanup is reached through
+  # a popup rather than called directly: it would pass for a removal that DID
+  # happen. The popup is the thing that must not exist.
+  refute_tmux_subcommand display-popup
 }
 
-@test "a confirmed removal cleans up the chosen worktree" {
+# The gate is handed the cleanup as an action rather than asked for an answer:
+# display-menu does not reliably block until its menu is answered, so a status
+# read afterwards always said cancel and the removal never happened.
+@test "the gate is handed the cleanup as its action" {
   stub_cmd wt-confirm "" 0
   stub_cmd git-worktree-cleanup
   export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
   run "${WT_PICK}" remove
   [ "${status}" -eq 0 ]
-  assert_cmd_called git-worktree-cleanup
-  run cmd_call_args git-worktree-cleanup
-  [ "${lines[1]}" = "${WT_A}" ]
+  run cmd_call_args wt-confirm
+  [[ "${output}" == *"--run"* ]]
+  [[ "${output}" == *"wt-pick --cleanup"* ]]
+  [[ "${output}" == *"${WT_A}"* ]]
 }
 
-@test "the gate is asked before the cleanup, not after" {
+# Nothing destructive on the asking pass - only the gate's chosen item runs it.
+@test "asking the gate cleans up nothing by itself" {
   stub_cmd wt-confirm "" 0
   stub_cmd git-worktree-cleanup
   export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
   run "${WT_PICK}" remove
-  [ "$(cmd_call_index wt-confirm)" -lt "$(cmd_call_index git-worktree-cleanup)" ]
+  refute_cmd_called git-worktree-cleanup
+  refute_tmux_subcommand display-popup
 }
+
+# Without a tty the cleanup goes in a popup. tmux writes run-shell output into
+# the focused pane, and a pane on the alternate screen - anything running
+# Claude or vim - eats it, so a refusal was invisible and a confirmed removal
+# looked like a menu that did nothing.
+@test "--cleanup runs the cleanup in a popup" {
+  stub_cmd git-worktree-cleanup
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
+  run "${WT_PICK}" --cleanup "${WT_A}"
+  assert_tmux_subcommand display-popup
+  run tmux_call_args display-popup
+  [[ "${output}" == *"git-worktree-cleanup"* ]]
+  [[ "${output}" == *"${WT_A}"* ]]
+}
+
+# display-popup -E closes the instant its command exits, so without this the
+# refusal this popup exists to show would flash past unread.
+@test "the cleanup popup waits for a key" {
+  stub_cmd git-worktree-cleanup
+  export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
+  run "${WT_PICK}" --cleanup "${WT_A}"
+  run tmux_call_args display-popup
+  [[ "${output}" == *"menu-pause"* ]]
+}
+
+# Nothing may reach the cleanup without a path to clean up.
+@test "--cleanup with no path is a usage error" {
+  run "${WT_PICK}" --cleanup
+  [ "${status}" -eq 2 ]
+}
+
+# The gate-before-cleanup ordering used to be one assertion over a single
+# stub log. It is now split across two, because the gate is a command and the
+# cleanup is a tmux popup, and their call logs cannot be interleaved. The pair
+# above pins the same property: a yes produces the popup, a no produces none.
 
 @test "the gate is told which worktree is at stake" {
   stub_cmd wt-confirm "" 0
@@ -142,8 +187,14 @@ setup() {
   export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   export FZF_STUB_SELECTION="${WT_A}"$'\twt-a  feature-a'
   run "${WT_PICK}" remove
+  # The path is no longer the first argument: --run and its command come
+  # first, so this checks the positional the gate actually describes.
   run cmd_call_args wt-confirm
-  [ "${lines[1]}" = "${WT_A}" ]
+  local pkg
+  pkg="$(cd "$(dirname "${WT_PICK}")" && pwd)"
+  printf '%s\n' "${output}" \
+    | assert_arg_after "--run" "$(printf '%q' "${pkg}/wt-pick") --cleanup $(printf '%q' "${WT_A}")"
+  [[ "${output}" == *"${WT_A}"* ]]
 }
 
 # Nothing may be destroyed by a gate that could not run.
@@ -206,7 +257,8 @@ setup() {
   run "${WT_PICK}" --act remove "${WT_A}"
   [ "${status}" -eq 0 ]
   assert_cmd_called wt-confirm
-  assert_cmd_called git-worktree-cleanup
+  run cmd_call_args wt-confirm
+  [[ "${output}" == *"wt-pick --cleanup"* ]]
 }
 
 @test "--act with an unknown verb is a usage error" {

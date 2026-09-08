@@ -119,8 +119,11 @@ do_switch() {
 #######################################
 # Confirm, then remove a worktree and its tmux session.
 #
-# wt-confirm is called with a tty here (this runs inside the menu's popup), so
-# it renders inline rather than opening a nested popup of its own.
+# wt-confirm picks its own renderer from whether it has a tty, and both cases
+# reach here. On the native path this runs under a menu item's `run-shell`,
+# with no tty and no popup, and wt-confirm asks with a display-menu. On the
+# fzf fallback it runs inside the picker's popup, has a tty, and wt-confirm
+# renders inline - a display-menu would not draw there at all.
 # Arguments:
 #   Worktree path
 #######################################
@@ -134,12 +137,48 @@ do_remove() {
     error "wt-confirm not found or not executable: ${gate}"
     return 1
   fi
-  if ! "${gate}" "${path}" "${session}"; then
+  # The gate is handed the action rather than asked for an answer, because
+  # display-menu does not reliably block until its menu is answered. It runs
+  # --cleanup at whatever point it learns the answer.
+  #
+  # SCRIPT_DIR, not PKG_DIR: this names THIS script for re-entry, and PKG_DIR
+  # is where the tests redirect sibling dispatches to recorders.
+  if ! "${gate}" \
+      --run "$(printf '%q' "${SCRIPT_DIR}/wt-pick") --cleanup $(printf '%q' "${path}")" \
+      "${path}" "${session}"; then
     # Nothing to read, so close the popup rather than making the user dismiss
     # a confirmation they already declined.
     return "${PICKER_QUIET_EXIT}"
   fi
-  "${PKG_DIR}/git-worktree-cleanup" "${path}"
+}
+
+#######################################
+# Run the cleanup for an already-confirmed worktree.
+#
+# Its own entry point because the confirmation gate has to be able to name it
+# as a command, and because the cleanup needs somewhere to be READ. With a tty
+# it already has one - the popup the gate drew in - but reached from a menu
+# item it runs under `run-shell -b`, whose stdout tmux writes into the focused
+# pane. A pane on the alternate screen, which is any pane running Claude or
+# vim, swallows it whole: a cleanup that refused a dirty worktree looked
+# exactly like a confirm that did nothing.
+#
+# The popup is bordered, like git-worktree-done's: this is scrolling command
+# output, and the border separates it from the pane behind. It pauses for a
+# key, because `display-popup -E` closes the moment its command exits and a
+# refusal would otherwise flash past unread.
+# Arguments:
+#   Worktree path
+#######################################
+do_cleanup() {
+  local path="${1}"
+
+  if [ -t 1 ]; then
+    "${PKG_DIR}/git-worktree-cleanup" "${path}"
+    return "${?}"
+  fi
+  tmux display-popup -E -w 80% -h 60% \
+    "$(printf '%q' "${PKG_DIR}/git-worktree-cleanup") $(printf '%q' "${path}"); $(printf '%q' "${PKG_DIR}/menu-pause")"
 }
 
 #######################################
@@ -242,6 +281,17 @@ case "${1:-}" in
   --act)
     shift
     act ${1+"${@}"}
+    exit "${?}"
+    ;;
+  # Invoked by the confirmation gate once the user has said yes. Not a verb:
+  # nothing may reach this without going through the gate first.
+  --cleanup)
+    shift
+    if [ "${#}" -lt 1 ] || [ -z "${1}" ]; then
+      error "missing required argument: worktree path"
+      exit "${PICK_USAGE_ERROR}"
+    fi
+    do_cleanup "${1}"
     exit "${?}"
     ;;
 esac

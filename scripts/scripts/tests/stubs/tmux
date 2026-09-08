@@ -119,6 +119,21 @@ case "${1:-}" in
       printf '%s\n' "${TMUX_STUB_LIST_PANES}"
     fi
     ;;
+  show-environment)
+    # menu_confirm seeds a global, opens the menu, and reads the global back.
+    # The variable is named after the asking process, so a test cannot know it
+    # up front - the stub echoes back whatever name it was asked for, in the
+    # "NAME=value" shape real tmux uses, and TMUX_STUB_CONFIRM supplies the
+    # answer. Default cancel: the safe answer, and the one an unanswered menu
+    # leaves behind.
+    for arg in "${@}"; do
+      case "${arg}" in
+        show-environment|-*) continue ;;
+      esac
+      printf '%s=%s\n' "${arg}" "${TMUX_STUB_CONFIRM:-cancel}"
+      break
+    done
+    ;;
   show-options)
     # Keyed by option name: the toggle asks for two different options and a
     # single canned value would feed an orientation into the size.

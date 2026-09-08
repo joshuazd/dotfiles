@@ -41,6 +41,27 @@ readonly MENU_BORDER_COLS=4
 readonly MENU_BORDER_ROWS=2
 readonly MENU_KEY_COLS=6
 
+# Marks the mnemonic letter in a menu label: "&Fetch and prune" binds `f`.
+#
+# The key lives inside the label rather than in a column of its own so it
+# cannot drift from the text it abbreviates - a mnemonic that is not a letter
+# of its own label is not a mnemonic. It also keeps the .menu format at two
+# fields.
+#
+# The FIRST marker is the mnemonic and the only one stripped, so a label
+# needing a literal ampersand can carry one after it. menus.bats rejects a
+# second marker rather than leaving the reader to work out which one binds.
+readonly MENU_KEY_MARKER='&'
+
+# Keys for the two choices in a confirm menu.
+readonly MENU_CONFIRM_KEY_YES='y'
+readonly MENU_CONFIRM_KEY_NO='n'
+
+# menu_confirm could not draw a native menu and did not ask anything. Distinct
+# from a cancel, which is a real answer: the caller falls back to its own
+# renderer rather than treating silence as "no".
+readonly MENU_CONFIRM_UNDRAWN=2
+
 # Columns to shift the menu from tmux's geometric centre, negative being
 # leftward. Overridable with MENU_X_NUDGE.
 #
@@ -196,15 +217,89 @@ menu_centre_position() {
 }
 
 #######################################
+# The mnemonic key a label asks for, or nothing when it carries no marker.
+#
+# Always LOWERCASE. tmux compares menu keys case-sensitively, and every label
+# here is title case, so taking the marked character as written would bind
+# Shift-F for "&Fetch and prune" - a two-handed chord for a menu whose whole
+# point is one keystroke. Nothing shipped needs an uppercase key, and folding
+# case also means a menu cannot grow a `d`/`D` pair that differ by Shift alone.
+# Arguments:
+#   The label, marker included
+# Outputs:
+#   A single lowercase character to stdout, or nothing
+#######################################
+menu_label_key() {
+  local label="${1}"
+  # A marker with nothing after it is a trailing ampersand, not a mnemonic.
+  case "${label}" in
+    *"${MENU_KEY_MARKER}"?*) ;;
+    *) printf ''; return 0 ;;
+  esac
+  local after="${label#*"${MENU_KEY_MARKER}"}"
+  printf '%s' "${after:0:1}" | tr '[:upper:]' '[:lower:]'
+}
+
+#######################################
+# A label as it should be drawn: the marker removed, if it was one.
+#
+# A label whose only ampersand is trailing keeps it - it asked for no key, so
+# there is nothing to strip and removing it would silently edit the text.
+# Arguments:
+#   The label, marker included
+# Outputs:
+#   The display text to stdout
+#######################################
+menu_label_text() {
+  local label="${1}"
+  if [ -z "$(menu_label_key "${label}")" ]; then
+    printf '%s' "${label}"
+    return 0
+  fi
+  printf '%s' "${label/${MENU_KEY_MARKER}/}"
+}
+
+#######################################
+# Set MENU_POSITION_ARGS to the -x/-y flags that centre a menu on the pane.
+#
+# Returns through a global because bash 3.2 - still /bin/bash on macOS - has
+# no way to return an array, and the two callers both need the flags as argv
+# elements rather than as a string that would resplit.
+#
+# Empty when the pane cannot be measured: tmux's own default placement beats a
+# number computed from nothing.
+# Arguments:
+#   Menu width, menu height
+#######################################
+menu_set_position() {
+  MENU_POSITION_ARGS=()
+  local xy
+  xy="$(menu_centre_position "${1}" "${2}")"
+  [ -n "${xy}" ] || return 0
+  local x y
+  read -r x y <<< "${xy}"
+  MENU_POSITION_ARGS=(-x "${x}" -y "${y}")
+}
+
+#######################################
 # Display a menu of TAB-delimited rows.
 #
 # Item names are NOT numbered: tmux draws the key at the end of the item line
 # itself, so a numbered label shows the number twice - which is exactly how
 # the first attempt at this looked wrong.
 #
+# A label carrying MENU_KEY_MARKER binds that letter; one without falls back
+# to its position as a digit. Both, rather than one or the other, because the
+# static .menu files have fixed labels worth memorising and the pickers'
+# rows - worktrees, PRs, stories - have no stable text to be mnemonic about.
+#
 # A label of "-" becomes a separator: display-menu takes an empty name for
 # that and expects the key and command to be omitted entirely, so a separator
 # contributes ONE argv element where an item contributes three.
+#
+# A label BEGINNING with "-" is an information row: tmux draws it dim and
+# refuses to select it, measured to ignore its key entirely. It still takes
+# three argv slots, with the key and command empty.
 # Arguments:
 #   Menu title
 #   Act prefix - a shell-quoted command that takes one value argument
@@ -218,7 +313,7 @@ menu_show() {
   local act_prefix="${2}"
 
   local -a args=()
-  local row value label key
+  local row value label key text
   local n=0
   local items=0
   local rows_drawn=0
@@ -235,17 +330,23 @@ menu_show() {
       continue
     fi
 
-    n=$((n + 1))
-    items=$((items + 1))
     rows_drawn=$((rows_drawn + 1))
-    [ "${#label}" -gt "${widest}" ] && widest="${#label}"
-    if [ "${n}" -le 9 ]; then
-      key="${n}"
-    else
-      key=""
+    if [ "${label:0:1}" = "-" ]; then
+      args+=("${label}" "" "")
+      [ "${#label}" -gt "${widest}" ] && widest="${#label}"
+      continue
     fi
 
-    args+=("${label}" "${key}" \
+    n=$((n + 1))
+    items=$((items + 1))
+    text="$(menu_label_text "${label}")"
+    key="$(menu_label_key "${label}")"
+    if [ -z "${key}" ] && [ "${n}" -le 9 ]; then
+      key="${n}"
+    fi
+    [ "${#text}" -gt "${widest}" ] && widest="${#text}"
+
+    args+=("${text}" "${key}" \
       "run-shell -b $(menu_tmux_quote "${act_prefix} $(printf '%q' "${value}")")")
   done
 
@@ -259,18 +360,11 @@ menu_show() {
   [ "${title_w}" -gt "${menu_w}" ] && menu_w="${title_w}"
   local menu_h="$((rows_drawn + MENU_BORDER_ROWS))"
 
-  local -a pos=()
-  local xy
-  xy="$(menu_centre_position "${menu_w}" "${menu_h}")"
-  if [ -n "${xy}" ]; then
-    local x y
-    read -r x y <<< "${xy}"
-    pos=(-x "${x}" -y "${y}")
-  fi
+  menu_set_position "${menu_w}" "${menu_h}"
 
   local shown_title="#[align=centre] ${title} "
   if [ -n "${MENU_DEBUG_POS:-}" ]; then
-    shown_title="xy=${xy:-unmeasured} mw=${menu_w} mh=${menu_h}"
+    shown_title="xy=${MENU_POSITION_ARGS[*]:-unmeasured} mw=${menu_w} mh=${menu_h}"
     shown_title="${shown_title} pane=$(menu_pane_geometry)"
   fi
 
@@ -282,7 +376,81 @@ menu_show() {
   tmux display-menu \
     -T "${shown_title}" \
     -b rounded \
-    ${pos+"${pos[@]}"} \
+    ${MENU_POSITION_ARGS+"${MENU_POSITION_ARGS[@]}"} \
+    -- "${args[@]}"
+}
+
+#######################################
+# Offer a destructive action as a native tmux confirm menu.
+#
+# The chosen item RUNS the action. No answer travels back, which is the whole
+# point: `tmux display-menu` cannot be relied on to block until the menu is
+# answered. Measured on this machine, from a menu item's `run-shell -b`, it
+# returned 0 one second after opening while the menu was still on screen and
+# unanswered - so a caller that read an answer variable afterwards always read
+# the seeded default, reported "cancelled", and exited. The keypress then
+# landed on a menu nobody was listening to, and the whole thing looked like a
+# confirm that did nothing. An earlier harness DID see it block, which is
+# exactly why this must not be built on that behaviour.
+#
+# This is also how tmux writes its own confirmations:
+#   display-menu -T "Kill pane?" Yes y { kill-pane } No n { }
+#
+# Cancel is listed first, so it is the resting cursor position and what an
+# accidental Enter picks; it runs nothing. Escape and `q` dismiss the menu
+# without running any item, so they cancel too, for free.
+#
+# It must NOT be called from inside a display-popup: a menu asked for while a
+# popup holds the client's overlay returns 0 without ever drawing, so the user
+# is never asked. Callers gate on having no tty, which is what tells them no
+# popup is in the way.
+# Arguments:
+#   Menu title
+#   Label for the confirming item
+#   Shell command the confirming item runs - already shell-quoted
+#   Remaining arguments become dim information rows above the choices
+# Returns:
+#   0 when the menu was displayed, MENU_CONFIRM_UNDRAWN when it could not be
+#######################################
+menu_confirm() {
+  local title="${1}"
+  local confirm_label="${2}"
+  local on_confirm="${3}"
+  shift 3
+
+  [ -n "${TMUX:-}" ] || return "${MENU_CONFIRM_UNDRAWN}"
+
+  local -a args=()
+  local rows=2
+  local widest="${#confirm_label}"
+  [ "${#title}" -gt "${widest}" ] && widest="${#title}"
+
+  local info
+  for info in ${1+"${@}"}; do
+    [ -n "${info}" ] || continue
+    args+=("-${info}" "" "")
+    rows=$((rows + 1))
+    [ "${#info}" -gt "${widest}" ] && widest="${#info}"
+  done
+  if [ "${#args[@]}" -gt 0 ]; then
+    args+=("")
+    rows=$((rows + 1))
+  fi
+
+  menu_fits "${rows}" || return "${MENU_CONFIRM_UNDRAWN}"
+
+  # An empty command is how tmux's own confirm menus spell "do nothing".
+  args+=("Cancel" "${MENU_CONFIRM_KEY_NO}" "")
+  args+=("${confirm_label}" "${MENU_CONFIRM_KEY_YES}" \
+    "run-shell -b $(menu_tmux_quote "${on_confirm}")")
+
+  menu_set_position "$((widest + MENU_KEY_COLS + MENU_BORDER_COLS))" \
+    "$((rows + MENU_BORDER_ROWS))"
+
+  tmux display-menu \
+    -T "#[align=centre] ${title} " \
+    -b rounded \
+    ${MENU_POSITION_ARGS+"${MENU_POSITION_ARGS[@]}"} \
     -- "${args[@]}"
 }
 

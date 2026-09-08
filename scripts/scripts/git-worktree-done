@@ -64,6 +64,17 @@ USAGE
 main() {
   stamp 'done: main entry'
 
+  # The confirmed re-entry is told which worktree and session it agreed to,
+  # rather than recomputing them. It runs under a menu item's `run-shell -b`,
+  # by which point the focused pane is whatever the user is looking at - which
+  # need not be the worktree the menu named.
+  local confirmed="" agreed_path="" agreed_session=""
+  if [ "${1:-}" = "--confirmed" ]; then
+    confirmed=1
+    agreed_path="${2:-}"
+    agreed_session="${3:-}"
+  fi
+
   # Must be in tmux
   if ! is_in_tmux; then
     error "Not running in tmux"
@@ -86,6 +97,9 @@ main() {
     worktree_path="$(tmux display-message -p '#{session_path}')"
   fi
 
+  [ -n "${agreed_path}" ] && worktree_path="${agreed_path}"
+  [ -n "${agreed_session}" ] && current_session="${agreed_session}"
+
   # Find the most recently used session other than the current one
   target_session="$(tmux list-sessions -F '#{session_last_attached}|#{session_name}' | \
     sort -rn | \
@@ -102,17 +116,28 @@ main() {
   # popup, because git-worktree-cleanup kills the session and moves the
   # worktree aside the moment it starts.
   #
-  # wt-confirm builds its own popup: this script runs under
+  # wt-confirm draws its own menu or popup: this script runs under
   # `bind-key d run-shell -b`, which has no tty to prompt on.
-  local confirm_script="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}/wt-confirm"
-  if [ ! -x "${confirm_script}" ]; then
-    error "wt-confirm not found or not executable: ${confirm_script}"
-    return 1
-  fi
-  if ! "${confirm_script}" "${worktree_path}" "${current_session}"; then
-    # Silent on purpose. This runs under `run-shell -b`, which surfaces stdout
-    # in the pane, so anything printed here outlives the popup the user just
-    # dismissed.
+  #
+  # It is handed the rest of this script as the action rather than asked for
+  # an answer, because `tmux display-menu` does not reliably block until its
+  # menu is answered - a gate read afterwards always reported a cancel. The
+  # re-entry carries --confirmed so it skips the gate rather than asking twice.
+  #
+  # SCRIPT_DIR, not SCRIPTS_PKG_DIR: that override points sibling dispatches at
+  # test recorders, and this names THIS script.
+  if [ -z "${confirmed}" ]; then
+    local confirm_script="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}/wt-confirm"
+    if [ ! -x "${confirm_script}" ]; then
+      error "wt-confirm not found or not executable: ${confirm_script}"
+      return 1
+    fi
+    # Silent on the decline path. This runs under `run-shell -b`, which
+    # surfaces stdout in the pane, so anything printed here outlives the menu
+    # the user just dismissed.
+    "${confirm_script}" \
+      --run "$(printf '%q' "${SCRIPT_DIR}/${0##*/}") --confirmed $(printf '%q' "${worktree_path}") $(printf '%q' "${current_session}")" \
+      "${worktree_path}" "${current_session}" || true
     return 0
   fi
 

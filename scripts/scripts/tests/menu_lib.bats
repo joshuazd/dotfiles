@@ -120,10 +120,79 @@ setup() {
 
 # display-menu treats a leading hyphen as "disabled item", and its own options
 # start with one too, so argv needs a -- terminator.
+# A hyphen is both display-menu's disabled-item marker and the shape of its
+# own flags, so without -- tmux reads the label as an option and the menu never
+# draws. A selectable row rides along because a menu of nothing but information
+# has nothing to pick and returns empty before it gets this far.
 @test "options are terminated so a label may start with a hyphen" {
-  printf 'v1\t-Not selectable\n' | menu_show "T" "act"
+  printf 'v1\t-Not selectable\nv2\tPickable\n' | menu_show "T" "act"
   run tmux_call_args display-menu
   [[ "${output}" == *"--"* ]]
+}
+
+@test "a label starting with a hyphen becomes an information row" {
+  printf 'v1\t-3 uncommitted files\nv2\tPickable\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  [[ "${output}" == *"-3 uncommitted files"* ]]
+  # tmux ignores a disabled row's key and command, and giving it a real one
+  # would spend a digit the pickable rows should have had.
+  printf '%s\n' "${output}" | refute_arg_after "-3 uncommitted files" "1"
+}
+
+@test "an information row does not consume a digit" {
+  printf 'v1\t-context\nv2\tFirst\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "First" "1"
+}
+
+@test "a menu of only information rows has nothing to pick" {
+  run bash -c 'source '"${BATS_TEST_DIRNAME}"'/../lib/menu.sh
+    printf "v1\t-just context\n" | menu_show "T" "act"'
+  [ "${status}" -eq "${PICKER_EMPTY}" ]
+}
+
+@test "a marked label binds its letter instead of a digit" {
+  printf 'v1\t&Fetch and prune\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "Fetch and prune" "f"
+}
+
+@test "the marker is stripped from what tmux draws" {
+  printf 'v1\tRes&pawn this pane\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  [[ "${output}" == *"Respawn this pane"* ]]
+  [[ "${output}" != *"Res&pawn"* ]]
+}
+
+@test "a marker in the middle of a label binds that letter" {
+  printf 'v1\tRes&pawn this pane\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "Respawn this pane" "p"
+}
+
+# The pickers' rows are worktree paths and PR titles: no stable text to be
+# mnemonic about, so they keep the positional digits.
+@test "an unmarked label still gets its position as a key" {
+  printf 'v1\tOne\nv2\tTwo\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "One" "1"
+  printf '%s\n' "${output}" | assert_arg_after "Two" "2"
+}
+
+@test "a trailing ampersand is not a mnemonic" {
+  printf 'v1\tCommit &\n' | menu_show "T" "act"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "Commit &" "1"
+}
+
+@test "only the first marker is stripped" {
+  run menu_label_text 'A&B&C'
+  [ "${output}" = "AB&C" ]
+}
+
+@test "a label with no marker asks for no key" {
+  run menu_label_key 'Plain label'
+  [ -z "${output}" ]
 }
 
 @test "the title goes in -T, not into an item" {
@@ -328,4 +397,123 @@ setup() {
   run tmux_call_args display-menu
   [[ "${output}" != *"-x"* ]]
   [[ "${output}" != *"-y"* ]]
+}
+
+# --- menu_confirm ---------------------------------------------------------
+#
+# The confirming item RUNS the action; nothing is read back. `tmux
+# display-menu` was measured returning 0 one second after opening, with the
+# menu still on screen and unanswered, so every test here asserts on the argv
+# handed to display-menu rather than on an answer that may never arrive.
+
+@test "a displayed menu reports success" {
+  run menu_confirm "Remove?" "Remove it" "true"
+  [ "${status}" -eq 0 ]
+}
+
+@test "outside tmux nothing is asked" {
+  unset TMUX
+  run menu_confirm "Remove?" "Remove it" "true"
+  [ "${status}" -eq "${MENU_CONFIRM_UNDRAWN}" ]
+  refute_tmux_subcommand display-menu
+}
+
+# A menu too tall for the client is not displayed at all - no scroll, no
+# error - so it must report that nothing was asked. A caller that took silence
+# for a cancel would drop the action on the floor; one that took it for a
+# confirm would destroy something nobody agreed to.
+@test "a client too short for the menu asks nothing" {
+  export TMUX_STUB_CLIENT_HEIGHT=1
+  run menu_confirm "Remove?" "Remove it" "true"
+  [ "${status}" -eq "${MENU_CONFIRM_UNDRAWN}" ]
+  refute_tmux_subcommand display-menu
+}
+
+@test "undrawn is distinct from success" {
+  [ "${MENU_CONFIRM_UNDRAWN}" -ne 0 ]
+}
+
+@test "the confirming item runs the action in the background" {
+  menu_confirm "Remove?" "Remove it" "do-the-thing --now"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" \
+    | assert_arg_after "Remove it" "${MENU_CONFIRM_KEY_YES}"
+  [[ "${output}" == *"run-shell -b"* ]]
+  [[ "${output}" == *"do-the-thing --now"* ]]
+}
+
+# Escape and q dismiss without running any item, so cancelling needs no
+# command of its own - and must not be given one.
+@test "cancel runs nothing at all" {
+  menu_confirm "Remove?" "Remove it" "do-the-thing"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" \
+    | assert_arg_after "Cancel" "${MENU_CONFIRM_KEY_NO}"
+  # The argument after the key is the command, and for Cancel it is empty.
+  local after_key=0 line
+  while IFS= read -r line; do
+    if [ "${after_key}" -eq 1 ]; then
+      [ -z "${line}" ]
+      return 0
+    fi
+    [ "${line}" = "${MENU_CONFIRM_KEY_NO}" ] && after_key=1
+  done <<< "${output}"
+  return 1
+}
+
+# Cancel is the first choice, so it is the resting cursor position and what an
+# accidental Enter picks. A destructive default is the bug the gate exists for.
+@test "cancel comes before the confirming choice" {
+  menu_confirm "Remove?" "Remove it" "true"
+  run tmux_call_args display-menu
+  local before_cancel="${output%%Cancel*}"
+  local before_confirm="${output%%Remove it*}"
+  [ "${#before_cancel}" -lt "${#before_confirm}" ]
+}
+
+# An action with a space in a path must reach the shell as one word, and the
+# command crosses tmux's parser before the shell's. Asserting on the plain
+# text would be asserting on the bug.
+@test "the action survives tmux's own parser" {
+  menu_confirm "Remove?" "Remove it" "cleanup '/tmp/two words'"
+  run tmux_call_args display-menu
+  [[ "${output}" == *"two words"* ]]
+}
+
+@test "information rows are disabled and precede the choices" {
+  menu_confirm "Remove?" "Remove it" "true" "~/code/thing" "on main"
+  run tmux_call_args display-menu
+  [[ "${output}" == *"-~/code/thing"* ]]
+  [[ "${output}" == *"-on main"* ]]
+  local before_info="${output%%-on main*}"
+  local before_cancel="${output%%Cancel*}"
+  [ "${#before_info}" -lt "${#before_cancel}" ]
+}
+
+# An empty summary would otherwise draw a blank dim row.
+@test "an empty information row is dropped" {
+  menu_confirm "Remove?" "Remove it" "true" "" "on main"
+  run tmux_call_args display-menu
+  refute_arg_after "-" ""
+  [[ "${output}" == *"-on main"* ]]
+}
+
+@test "the confirm menu is centred like any other" {
+  menu_confirm "Remove?" "Remove it" "true"
+  run tmux_call_args display-menu
+  [[ "${output}" == *"-x"* ]]
+  [[ "${output}" == *"-y"* ]]
+}
+
+@test "the confirm menu carries its title" {
+  menu_confirm "Remove 'thing'?" "Remove it" "true"
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "-T" "#[align=centre] Remove 'thing'? "
+}
+
+# No answer travels back, so nothing may be left in the server environment.
+@test "no answer variable is used at all" {
+  menu_confirm "Remove?" "Remove it" "true"
+  refute_tmux_subcommand set-environment
+  refute_tmux_subcommand show-environment
 }

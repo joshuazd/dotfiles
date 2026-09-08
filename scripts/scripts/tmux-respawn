@@ -8,8 +8,10 @@
 # this setup is routinely a working Claude. This asks first, and names the
 # process it is about to kill.
 #
-# Runs as a BARE menu entry, not @bg: it needs the popup's tty to draw the
-# confirmation inline, the same way wt-pick reaches wt-confirm.
+# Runs as a @quiet menu entry: with no popup holding the client's overlay it
+# can ask with a native display-menu, which is the only place one draws. Under
+# a bare entry it would be inside the popup fzf-menu opens, where display-menu
+# returns 0 without drawing and the answer is lost.
 #
 # Example:
 #   tmux-respawn
@@ -21,8 +23,10 @@ set -o pipefail  # don't hide errors within pipes
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/menu.sh"
 
 readonly RESPAWN_UNAVAILABLE=2
+readonly RESPAWN_LABEL="Kill the process and respawn"
 
 #######################################
 # Print usage information
@@ -59,8 +63,24 @@ main() {
   local detail="${pane_cmd}"
   [ -n "${pane_title}" ] && detail="${pane_cmd} - ${pane_title}"
 
+  # The menu item runs the respawn itself. display-menu does not reliably
+  # block until its menu is answered, so a version that read an answer back
+  # afterwards always saw the default and cancelled.
+  local action
+  action="tmux respawn-pane -k -t $(printf '%q' "${pane_id}")"
+
+  # Native menu first. Runs as @quiet, so there is no popup holding the
+  # client's overlay - the one condition under which display-menu can draw.
+  local native=0
+  menu_confirm "Respawn ${pane_id}?" "${RESPAWN_LABEL}" "${action}" \
+    "running: ${detail}" || native="${?}"
+
+  if [ "${native}" -ne "${MENU_CONFIRM_UNDRAWN}" ]; then
+    return "${PICKER_QUIET_EXIT}"
+  fi
+
   local rows
-  rows="$(printf 'cancel\t1 Cancel\nconfirm\t2 Kill the process and respawn\n')"
+  rows="$(printf 'cancel\t1 Cancel\nconfirm\t2 %s\n' "${RESPAWN_LABEL}")"
 
   local selection status=0
   selection="$(printf '%s\n' "${rows}" \
@@ -78,7 +98,7 @@ main() {
     *) return "${PICKER_QUIET_EXIT}" ;;
   esac
 
-  tmux respawn-pane -k -t "${pane_id}" || warn "respawn-pane failed"
+  eval "${action}" || warn "respawn-pane failed"
   # Nothing on screen to read, and the pane behind the popup has just been
   # replaced, so close without the keypress pause.
   return "${PICKER_QUIET_EXIT}"

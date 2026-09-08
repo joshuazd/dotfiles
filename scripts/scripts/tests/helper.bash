@@ -55,6 +55,12 @@ assert_arg_after() {
   return 1
 }
 
+# The negation of assert_arg_after, for asserting that a flag was NOT given a
+# particular value. Reads the same stdin.
+refute_arg_after() {
+  ! assert_arg_after "${1}" "${2}"
+}
+
 # Like tmux_call_args, but narrowed to the first invocation of the given
 # subcommand whose argv also contains the given substring. Needed when a
 # subcommand is called more than once with different arguments (e.g. two

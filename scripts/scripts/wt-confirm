@@ -2,30 +2,35 @@
 #
 # wt-confirm - Confirm the removal of a git worktree before it happens
 #
-# Usage: wt-confirm <worktree-dir> [session-name]
-#        wt-confirm --inline [--answer-file PATH] <worktree-dir> [session]
-#        wt-confirm --read-answer PATH
+# Usage: wt-confirm --run <command> <worktree-dir> [session-name]
+#        wt-confirm --inline --run <command> <worktree-dir> [session]
 #
 # Arguments:
+#   --run              the command to run if the user confirms
 #   worktree-dir       Path to the worktree that would be removed
 #   session-name       tmux session that would be killed (default: basename)
 #   --inline           Render here rather than opening a popup
-#   --answer-file      Where the inline pass records confirm or cancel
-#   --read-answer      Report an answer already written to a file
 #
-# Exits 0 to proceed with removal, 1 to cancel.
+# The caller hands over the action rather than reading an answer back. That is
+# not a style choice: `tmux display-menu` cannot be relied on to block until
+# the menu is answered. Measured from a menu item's `run-shell -b`, it returned
+# 0 one second after opening, with the menu still on screen and untouched, so
+# a gate that read an answer afterwards always saw the default, reported a
+# cancel, and exited - and the eventual keypress landed on a menu nobody was
+# listening to. Every path here therefore RUNS the command at the point where
+# the answer is known.
 #
 # Where it draws depends on whether it has anywhere to draw. Called under
-# `bind-key d run-shell -b` there is no tty, so it opens a display-popup and
-# re-enters itself with --inline. Called from wt-pick, it is already inside
-# the menu's popup and renders inline: a NESTED display-popup has no client to
-# draw on, fzf exits 0 printing nothing, and the answer is silently lost.
+# `bind-key d run-shell -b` or from a menu item there is no tty and no popup
+# holding the client's overlay, so it asks with a native display-menu. Called
+# from inside a popup it has a tty and renders inline: a display-menu asked
+# for over a popup returns 0 without drawing, and a NESTED display-popup has
+# no client to draw on either.
 #
-# tmux display-popup -E does not hand the popup command's exit status back to
-# its caller, so the inline pass writes to an answer file the outer pass reads.
+# Exits 0 when the question was asked, 1 when the user declined.
 #
 # Example:
-#   wt-confirm ~/code/SC-1234-fix-thing SC-1234-fix-thing
+#   wt-confirm --run 'wt-pick --cleanup ~/code/SC-1234' ~/code/SC-1234 SC-1234
 
 set -o errexit   # abort on nonzero exitstatus
 set -o nounset   # abort on unbound variable
@@ -34,11 +39,13 @@ set -o pipefail  # don't hide errors within pipes
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/menu.sh"
 source "${SCRIPT_DIR}/lib/worktree.sh"
 
 readonly CONFIRM_USAGE_ERROR=2
 readonly CONFIRM_POPUP_WIDTH=76
 readonly CONFIRM_POPUP_HEIGHT=11
+readonly CONFIRM_LABEL="Remove worktree and kill session"
 
 #######################################
 # Print usage information
@@ -47,27 +54,70 @@ readonly CONFIRM_POPUP_HEIGHT=11
 #######################################
 usage() {
   printf '%s\n' \
-    "Usage: ${0##*/} <worktree-dir> [session-name]" \
+    "Usage: ${0##*/} --run <command> <worktree-dir> [session-name]" \
     "" \
-    "Confirm the removal of a git worktree before it happens." \
-    "Exits 0 to proceed, 1 to cancel." \
+    "Confirm the removal of a git worktree, then run the command." \
+    "Exits 0 when the question was asked, 1 when the user declined." \
     "" \
-    "  --inline              render here instead of opening a popup" \
-    "  --answer-file PATH    where the inline pass records its answer" \
-    "  --read-answer PATH    report an answer already written to a file"
+    "  --run COMMAND         what to run if the user confirms" \
+    "  --inline              render here instead of opening a popup"
 }
 
 #######################################
-# Ask, inline, and report the answer.
+# The lines worth reading before answering.
+#
+# Each becomes a dim, unselectable row of its own in the native menu, and one
+# bracketed prompt in the fzf fallback. Separate lines because this is the
+# information that should stop the user, and running it together is how it
+# gets skimmed.
 # Arguments:
 #   Worktree directory
-#   Session name
+# Outputs:
+#   One line per fact
+#######################################
+risk_lines() {
+  local dir="${1}"
+  local branch
+  branch="$(worktree_branch "${dir}")"
+  printf '%s\n' "${dir}"
+  [ -n "${branch}" ] && printf 'on %s\n' "${branch}"
+  worktree_risk_summary "${dir}"
+  printf '\n'
+}
+
+#######################################
+# Ask as a native tmux menu, whose confirming item runs the command itself.
+# Arguments:
+#   Worktree directory, session name, command
+# Returns:
+#   0 when the menu was displayed, MENU_CONFIRM_UNDRAWN when it could not be
+#######################################
+ask_native() {
+  local dir="${1}"
+  local session="${2}"
+  local command="${3}"
+
+  local -a info=()
+  local line
+  while IFS= read -r line; do
+    [ -n "${line}" ] && info+=("${line}")
+  done < <(risk_lines "${dir}")
+
+  menu_confirm "Remove '${session}'?" "${CONFIRM_LABEL}" "${command}" \
+    ${info+"${info[@]}"}
+}
+
+#######################################
+# Ask inline with the picker, and run the command on a yes.
+# Arguments:
+#   Worktree directory, session name, command
 # Returns:
 #   0 to proceed, 1 to cancel
 #######################################
 ask() {
   local dir="${1}"
   local session="${2}"
+  local command="${3}"
 
   local summary
   summary="$(worktree_risk_summary "${dir}")"
@@ -75,7 +125,7 @@ ask() {
   # Cancel first: it is where the cursor starts, so Enter is the safe answer.
   # A destructive default is the bug this script exists to remove.
   local rows
-  rows="$(printf 'cancel\t1 Cancel\nconfirm\t2 Remove worktree and kill session\n')"
+  rows="$(printf 'cancel\t1 Cancel\nconfirm\t2 %s\n' "${CONFIRM_LABEL}")"
 
   # The risk summary rides in the PROMPT rather than the header. It is the one
   # piece of information that should stop the user, so it belongs on the line
@@ -91,9 +141,13 @@ ask() {
 
   [ "${status}" -eq 0 ] || return 1
   case "${selection}" in
-    confirm*) return 0 ;;
+    confirm*) ;;
     *)        return 1 ;;
   esac
+
+  # The command is built by the caller from a %q-escaped script path plus its
+  # own escaped arguments, which is what makes it safe to evaluate here.
+  eval "${command}"
 }
 
 #######################################
@@ -101,33 +155,23 @@ ask() {
 # Arguments:
 #   See usage
 # Returns:
-#   0 to proceed, 1 to cancel, CONFIRM_USAGE_ERROR on a bad invocation
+#   0 when asked, 1 when declined, CONFIRM_USAGE_ERROR on a bad invocation
 #######################################
 main() {
   local inline=""
-  local answer_file=""
+  local command=""
   local dir=""
   local session=""
 
   while [ "${#}" -gt 0 ]; do
     case "${1}" in
       --inline) inline=1; shift ;;
-      --answer-file)
+      --run)
         if [ "${#}" -lt 2 ]; then
-          error "--answer-file requires a value"
+          error "--run requires a value"
           return "${CONFIRM_USAGE_ERROR}"
         fi
-        answer_file="${2}"; shift 2 ;;
-      --read-answer)
-        if [ "${#}" -lt 2 ]; then
-          error "--read-answer requires a value"
-          return "${CONFIRM_USAGE_ERROR}"
-        fi
-        # A file that was never written means the popup died before the user
-        # answered. Treat that as a cancel: the safe reading of silence.
-        [ -f "${2}" ] || return 1
-        [ "$(cat "${2}")" = "confirm" ] || return 1
-        return 0 ;;
+        command="${2}"; shift 2 ;;
       -*)
         error "unknown option: ${1}"
         return "${CONFIRM_USAGE_ERROR}" ;;
@@ -143,38 +187,36 @@ main() {
     usage
     return "${CONFIRM_USAGE_ERROR}"
   fi
+  if [ -z "${command}" ]; then
+    error "missing required argument: --run"
+    printf '\n'
+    usage
+    return "${CONFIRM_USAGE_ERROR}"
+  fi
   [ -n "${session}" ] || session="$(basename "${dir}")"
 
-  # A tty means there is somewhere to draw: render here. Same test
-  # run_action uses for its keypress pause.
+  # A tty means a popup already holds the client's overlay, which is both
+  # somewhere to draw and the one place a native menu cannot be drawn.
   if [ -n "${inline}" ] || [ -t 0 ]; then
-    local answer_status=0
-    ask "${dir}" "${session}" || answer_status="${?}"
-    if [ -n "${answer_file}" ]; then
-      if [ "${answer_status}" -eq 0 ]; then
-        printf 'confirm' > "${answer_file}"
-      else
-        printf 'cancel' > "${answer_file}"
-      fi
-    fi
-    return "${answer_status}"
+    ask "${dir}" "${session}" "${command}"
+    return "${?}"
   fi
 
-  # No tty: build a popup and re-enter inside it.
+  local native=0
+  ask_native "${dir}" "${session}" "${command}" || native="${?}"
+  if [ "${native}" -ne "${MENU_CONFIRM_UNDRAWN}" ]; then
+    return "${native}"
+  fi
+
+  # Nothing to draw a menu on - outside tmux, or a client too short for it.
+  # Build a popup and re-enter inside it.
   # SCRIPT_DIR, not ${0}: the popup starts in the client pane's directory, so
   # a relative invocation path ("./wt-confirm") would not resolve inside it and
   # the popup would die before drawing - which reads as an unexplained cancel.
   local self="${SCRIPT_DIR}/${0##*/}"
 
-  local file
-  file="$(mktemp "${TMPDIR:-/tmp}/wt-confirm.XXXXXX")"
   tmux display-popup -E -B -w "${CONFIRM_POPUP_WIDTH}" -h "${CONFIRM_POPUP_HEIGHT}" \
-    "$(printf '%q' "${self}") --inline --answer-file $(printf '%q' "${file}") $(printf '%q' "${dir}") $(printf '%q' "${session}")"
-
-  local status=0
-  "${self}" --read-answer "${file}" || status="${?}"
-  \rm -f "${file}"
-  return "${status}"
+    "$(printf '%q' "${self}") --inline --run $(printf '%q' "${command}") $(printf '%q' "${dir}") $(printf '%q' "${session}")"
 }
 
 # Check for help flag
