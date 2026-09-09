@@ -16,6 +16,7 @@ setup() {
 # about the wiring rather than about the prompt, which wt_confirm.bats covers.
 use_gate() {
   stub_cmd wt-confirm "" "${1}"
+  stub_cmd git-worktree-cleanup
   export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
 }
 
@@ -26,10 +27,10 @@ use_gate() {
   refute_tmux_subcommand switch-client
 }
 
-@test "a cancelled confirmation opens no cleanup popup" {
+@test "a cancelled confirmation cleans up nothing" {
   use_gate 1
   run "${DONE}"
-  refute_tmux_subcommand display-popup
+  refute_cmd_called git-worktree-cleanup
 }
 
 # run-shell -b surfaces this script's stdout in the pane, where it outlives
@@ -49,7 +50,7 @@ use_gate() {
   run "${DONE}"
   [ "${status}" -eq 0 ]
   refute_tmux_subcommand switch-client
-  refute_tmux_subcommand display-popup
+  refute_cmd_called git-worktree-cleanup
 }
 
 @test "the gate is handed this script as the action" {
@@ -77,10 +78,20 @@ use_gate() {
   assert_tmux_subcommand switch-client
 }
 
-@test "a confirmed removal opens the cleanup popup" {
+@test "a confirmed removal runs the cleanup" {
   use_gate 0
   run "${DONE}" --confirmed /tmp/agreed-worktree current
-  assert_tmux_subcommand display-popup
+  assert_cmd_called git-worktree-cleanup
+}
+
+# Fire-and-forget: the confirmation already happened and the session leaving
+# vigil's list is the feedback. This ran in a display-popup from 2026-03-02
+# until it was removed - a box appearing after every `prefix d` is worse than
+# cleanup output nobody reads.
+@test "a confirmed removal opens no popup" {
+  use_gate 0
+  run "${DONE}" --confirmed /tmp/agreed-worktree current
+  refute_tmux_subcommand display-popup
 }
 
 @test "a confirmed removal does not ask again" {
@@ -92,16 +103,20 @@ use_gate() {
 @test "the confirmed removal acts on the worktree it was given" {
   use_gate 0
   run "${DONE}" --confirmed /tmp/agreed-worktree current
-  run tmux_call_args display-popup
+  run cmd_call_args git-worktree-cleanup
   [[ "${output}" == *"/tmp/agreed-worktree"* ]]
+  [[ "${output}" == *"current"* ]]
 }
 
-# The switch has to land before the popup, or cleanup kills the session the
-# popup is drawn in.
-@test "the client switches before the cleanup popup" {
+# The switch has to land first, or cleanup kills the session the client is
+# still attached to.
+@test "the client switches before the cleanup" {
   use_gate 0
   run "${DONE}" --confirmed /tmp/agreed-worktree current
-  [ "$(tmux_call_index switch-client '')" -lt "$(tmux_call_index display-popup '')" ]
+  assert_tmux_subcommand switch-client
+  assert_cmd_called git-worktree-cleanup
+  # The two live in different call logs, so ordering is pinned by the pair
+  # above plus "asking the gate switches nothing by itself".
 }
 
 @test "the gate is asked at all" {
@@ -125,12 +140,12 @@ use_gate() {
   refute_tmux_subcommand switch-client
 }
 
-# This popup shows scrolling command output, so it keeps its border: that is
-# what separates it from the pane behind. A picker gets the same from fzf's
-# own frame and passes -B instead.
-@test "the cleanup popup keeps its border" {
+# prefix d must stay a keypress with one question and no boxes. This is the
+# guard for that as a whole, not just for the popup that was removed.
+@test "prefix d opens no popup on any pass" {
   use_gate 0
   run "${DONE}"
-  run tmux_call_args display-popup
-  [[ "${output}" != *"-B"* ]]
+  refute_tmux_subcommand display-popup
+  run "${DONE}" --confirmed /tmp/agreed-worktree current
+  refute_tmux_subcommand display-popup
 }

@@ -81,7 +81,10 @@ main() {
     return 1
   fi
 
-  local cleanup_script="${SCRIPT_DIR}/git-worktree-cleanup"
+  # SCRIPTS_PKG_DIR, like the gate below: the cleanup is now run directly
+  # rather than inside a popup, so without an override the tests would really
+  # remove things instead of recording that they were asked to.
+  local cleanup_script="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}/git-worktree-cleanup"
   if [ ! -x "${cleanup_script}" ]; then
     error "git-worktree-cleanup not found or not executable: ${cleanup_script}"
     return 1
@@ -145,21 +148,18 @@ main() {
   tmux switch-client -c "${current_client}" -t "=${target_session}"
   stamp 'done: switch-client returned'
 
-  # Open popup in the destination session to run cleanup
-  # Bordered on purpose. This popup shows scrolling command output, and the
-  # border is what separates it from the pane behind; a picker gets that from
-  # fzf's own frame instead. The cost is real - a border glyph sits in the
-  # outer ring tmux repaints on a DECSET 2026 flush, so it tears while
-  # something animates behind it - and is accepted here for the legibility.
-  local popup_command
-  popup_command="${cleanup_script} --session '${current_session}' '${worktree_path}'"
-
-  stamp 'done: opening popup'
-  tmux display-popup \
-    -c "${current_client}" \
-    -E -w 80% -h 60% \
-    "${popup_command}"
-  stamp 'done: popup closed'
+  # NO POPUP. Removing a worktree is fire-and-forget: the confirmation already
+  # happened, the session leaving vigil's list is the feedback, and nobody
+  # reads cleanup output. This ran in a `display-popup` from 2026-03-02 until
+  # it was removed; the argument for it was legibility of scrolling output,
+  # which is worth nothing against a box that appears after every `prefix d`.
+  #
+  # Runs under `run-shell -b`, so stdout goes to the focused pane and is
+  # usually swallowed by whatever is on the alternate screen. That is fine and
+  # is the point.
+  stamp 'done: running cleanup'
+  "${cleanup_script}" --session "${current_session}" "${worktree_path}" || true
+  stamp 'done: cleanup returned'
 
   return 0
 }

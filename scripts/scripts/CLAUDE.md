@@ -133,12 +133,22 @@ Consequences worth keeping straight:
   recomputing them. It runs under a menu item's `run-shell -b`, by which point
   the focused pane is whatever the user is looking at, not necessarily the
   worktree the menu named.
-- **The cleanup gets no popup and no output surface.** Removing a worktree is
-  fire-and-forget; the session leaving vigil's list is the feedback. A popup
-  was tried and rejected: it was reasoned from "`run-shell` output is invisible
-  behind an alternate screen", which is true and beside the point, and it left
-  a modal to dismiss after every removal. `git-worktree-done`'s cleanup popup
-  predates all of this and is a separate question.
+- **The cleanup gets no popup and no output surface, on either path.**
+  Removing a worktree is fire-and-forget: the confirmation already happened
+  and the session leaving vigil's list is the feedback. `prefix d` must stay
+  one keypress, one question, no boxes.
+
+  Both popups here were removed for this. `wt-pick`'s was added and taken out
+  the same week, reasoned from "`run-shell` output is invisible behind an
+  alternate screen" - true, and beside the point, because nobody reads cleanup
+  output. `git-worktree-done`'s dated to 2026-03-02 and was defended in a
+  comment about the legibility of scrolling output, which is worth nothing
+  against a box appearing after every removal. `tests/git_worktree_done.bats`
+  guards the whole path, not just the line that was deleted.
+
+  The cost is that a cleanup which refuses - a dirty worktree, a missing
+  directory - says so only to a pane that is usually on the alternate screen.
+  That is accepted. Do not "fix" it with a popup.
 
 `wt-confirm` still renders inline with fzf when it has a tty, and opens its own
 popup when it can draw neither. That branch is load-bearing: `wt-pick` on the
