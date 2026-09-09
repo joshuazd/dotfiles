@@ -2,7 +2,9 @@
   "env": {
     "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5[1m]",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5[1m]",
-    "RIPGREP_CONFIG_PATH": ""
+    "RIPGREP_CONFIG_PATH": "",
+    "TERM_PROGRAM": "Apple_Terminal",
+    "CLAUDE_CODE_FORCE_STRIKETHROUGH": "1"
   },
   "permissions": {
     "allow": [
@@ -190,7 +192,10 @@
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "showClearContextOnPlanAccept": true,
+  "skipDangerousModePermissionPrompt": true,
   "theme": "dark-ansi",
+  "editorMode": "normal",
+  "verbose": false,
   "preferredNotifChannel": "terminal_bell",
   "skipAutoPermissionPrompt": true,
   "autoMode": {
@@ -199,5 +204,9 @@
       "Deleting your own prior `@greptileai review` trigger comments via `gh api -X DELETE /repos/{owner}/{repo}/issues/comments/{id}` — used by the watch-pull-request skill to keep PR conversations tidy. Safe because it only removes the user's own trigger comments (filtered by `user.login == me` AND `body == \"@greptileai review\"`)."
     ]
   },
-  "skipDangerousModePermissionPrompt": true
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "xhigh"
+    }
+  }
 }
