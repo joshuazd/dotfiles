@@ -113,10 +113,6 @@ setup() {
   run "${WT_PICK}" remove
   [ "${status}" -eq 97 ]
   refute_cmd_called git-worktree-cleanup
-  # refute_cmd_called alone is vacuous now that the cleanup is reached through
-  # a popup rather than called directly: it would pass for a removal that DID
-  # happen. The popup is the thing that must not exist.
-  refute_tmux_subcommand display-popup
 }
 
 # The gate is handed the cleanup as an action rather than asked for an answer:
@@ -146,28 +142,24 @@ setup() {
   refute_tmux_subcommand display-popup
 }
 
-# Without a tty the cleanup goes in a popup. tmux writes run-shell output into
-# the focused pane, and a pane on the alternate screen - anything running
-# Claude or vim - eats it, so a refusal was invisible and a confirmed removal
-# looked like a menu that did nothing.
-@test "--cleanup runs the cleanup in a popup" {
+@test "--cleanup runs the cleanup on the given worktree" {
   stub_cmd git-worktree-cleanup
   export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   run "${WT_PICK}" --cleanup "${WT_A}"
-  assert_tmux_subcommand display-popup
-  run tmux_call_args display-popup
-  [[ "${output}" == *"git-worktree-cleanup"* ]]
-  [[ "${output}" == *"${WT_A}"* ]]
+  assert_cmd_called git-worktree-cleanup
+  run cmd_call_args git-worktree-cleanup
+  [ "${lines[1]}" = "${WT_A}" ]
 }
 
-# display-popup -E closes the instant its command exits, so without this the
-# refusal this popup exists to show would flash past unread.
-@test "the cleanup popup waits for a key" {
+# Removing a worktree is fire-and-forget: the session leaving vigil is the
+# feedback. A popup here was tried and rejected - it was reasoned from
+# "run-shell output is invisible behind an alternate screen", which is true and
+# beside the point, and it left a modal to dismiss after every removal.
+@test "--cleanup opens no popup" {
   stub_cmd git-worktree-cleanup
   export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
   run "${WT_PICK}" --cleanup "${WT_A}"
-  run tmux_call_args display-popup
-  [[ "${output}" == *"menu-pause"* ]]
+  refute_tmux_subcommand display-popup
 }
 
 # Nothing may reach the cleanup without a path to clean up.
@@ -176,10 +168,10 @@ setup() {
   [ "${status}" -eq 2 ]
 }
 
-# The gate-before-cleanup ordering used to be one assertion over a single
-# stub log. It is now split across two, because the gate is a command and the
-# cleanup is a tmux popup, and their call logs cannot be interleaved. The pair
-# above pins the same property: a yes produces the popup, a no produces none.
+# The gate-before-cleanup ordering is no longer one assertion: the gate is
+# handed the cleanup as a command rather than running it, so there is no
+# second call to order against. "a cancelled gate cleans up nothing" and
+# "asking the gate cleans up nothing by itself" pin the property between them.
 
 @test "the gate is told which worktree is at stake" {
   stub_cmd wt-confirm "" 0

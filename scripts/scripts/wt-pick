@@ -156,29 +156,19 @@ do_remove() {
 # Run the cleanup for an already-confirmed worktree.
 #
 # Its own entry point because the confirmation gate has to be able to name it
-# as a command, and because the cleanup needs somewhere to be READ. With a tty
-# it already has one - the popup the gate drew in - but reached from a menu
-# item it runs under `run-shell -b`, whose stdout tmux writes into the focused
-# pane. A pane on the alternate screen, which is any pane running Claude or
-# vim, swallows it whole: a cleanup that refused a dirty worktree looked
-# exactly like a confirm that did nothing.
+# as a command, not because the cleanup needs any ceremony of its own.
 #
-# The popup is bordered, like git-worktree-done's: this is scrolling command
-# output, and the border separates it from the pane behind. It pauses for a
-# key, because `display-popup -E` closes the moment its command exits and a
-# refusal would otherwise flash past unread.
+# NO POPUP. Removing a worktree is fire-and-forget: the session disappearing
+# from vigil is the feedback, and a modal that has to be dismissed afterwards
+# is worse than the silence it replaces. A popup here was tried and rejected -
+# it was reasoned from "run-shell output is invisible behind an alternate
+# screen", which is true and does not matter, because nobody wants to read
+# cleanup output.
 # Arguments:
 #   Worktree path
 #######################################
 do_cleanup() {
-  local path="${1}"
-
-  if [ -t 1 ]; then
-    "${PKG_DIR}/git-worktree-cleanup" "${path}"
-    return "${?}"
-  fi
-  tmux display-popup -E -w 80% -h 60% \
-    "$(printf '%q' "${PKG_DIR}/git-worktree-cleanup") $(printf '%q' "${path}"); $(printf '%q' "${PKG_DIR}/menu-pause")"
+  "${PKG_DIR}/git-worktree-cleanup" "${1}"
 }
 
 #######################################

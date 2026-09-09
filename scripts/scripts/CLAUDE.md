@@ -133,10 +133,12 @@ Consequences worth keeping straight:
   recomputing them. It runs under a menu item's `run-shell -b`, by which point
   the focused pane is whatever the user is looking at, not necessarily the
   worktree the menu named.
-- `wt-pick --cleanup` opens a popup when it has no tty. tmux writes
-  `run-shell` output into the focused pane, and a pane on the alternate screen
-  - anything running Claude or vim - eats it whole, so a cleanup that refused
-  a dirty worktree was completely invisible.
+- **The cleanup gets no popup and no output surface.** Removing a worktree is
+  fire-and-forget; the session leaving vigil's list is the feedback. A popup
+  was tried and rejected: it was reasoned from "`run-shell` output is invisible
+  behind an alternate screen", which is true and beside the point, and it left
+  a modal to dismiss after every removal. `git-worktree-done`'s cleanup popup
+  predates all of this and is a separate question.
 
 `wt-confirm` still renders inline with fzf when it has a tty, and opens its own
 popup when it can draw neither. That branch is load-bearing: `wt-pick` on the
