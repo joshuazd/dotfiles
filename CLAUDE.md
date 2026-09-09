@@ -142,6 +142,15 @@ script whether the panel actually ended up above the tmux pane. And the
 holds the recorded per-pane `Command`, which is what settles whether a restart
 will really bring a pane back running something.
 
+**The `client-session-changed` hook is what keeps vigil's highlight in step.**
+Which session vigil highlights is resolved by each client and only when a
+snapshot arrives, so it otherwise lags a switch by up to one poll interval. The
+hook runs `vigil poke`, which makes the daemon rebroadcast the snapshot it
+already holds - no extra polling, no `gh`. It is backgrounded with `-b` so a
+switch never waits on the socket, and fail-soft so tmux navigation still works
+with vigil uninstalled. It lives in `.tmux.conf` and **not** in `tmux-hop`,
+which must never reference vigil.
+
 ### Config
 
 - `config/` holds miscellaneous tool configs (`.dir_colors`, etc.)
