@@ -16,7 +16,7 @@ fi
 
 cd "$DOTFILES"
 
-for pkg in vim shell tmux git config scripts claude; do
+for pkg in vim shell tmux git config scripts claude iterm2; do
     if [ -d "$pkg" ]; then
         echo "Stowing $pkg..."
         stow --restow "$pkg"
