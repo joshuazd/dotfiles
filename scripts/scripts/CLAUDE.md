@@ -102,6 +102,16 @@ No other launcher sets the variable, so `shortcut-implement` sessions keep the n
 
 Gets the active Chrome tab URL via osascript, validates it looks like a Shortcut story or GitHub PR, brings a tmux client to the front (attaching one via iTerm2 if none exists, so the job's closing `switch-client` has somewhere to land), then hands the URL straight to `vigil dispatch`, which submits it to vigild. No popup is opened here.
 
+### vigil-iterm
+
+Builds the permanent vigil layout: one iTerm2 window with `vigil --panel` on top and `tmux` below, vigil outside tmux entirely. It is the counterpart to `vigil-panel`, which splits a panel *inside* a tmux window - here the panel survives every session switch instead of being recreated per session, so vigil's own `panel_auto` belongs at `"false"` alongside it or each session gets a second, redundant panel.
+
+**`split horizontally` adds the new pane below the one it splits**, so vigil ends up on top by being the session the window is *created* with, never the one split in. Inverting those two is the failure mode `tests/vigil_iterm.bats` exists to catch. Both binaries are named by absolute path because an iTerm2 session runs its own login shell, whose PATH need not contain either. iTerm2 parses `command` with shell quoting - verified, not assumed - so the single-quoted session name survives the spaces every `SC-<id> <title>` session has, but not a quote character; that is why this is a landing pad and not a session picker.
+
+The script owns the structure only. Geometry and restore-at-launch come from an iTerm2 window arrangement saved off the window it builds, so one layout has one description instead of two; the click-path is in the script's header comment. Re-save the arrangement after changing the script.
+
+A panel outside tmux is a **read-only** board: vigil gates session switching on `insideTmux`, so `enter` does nothing there and `tmux-hop`'s `M-j`/`M-k`/`M-<n>` are how you move. vigil also skips auto-focus for any panel, since auto-focus exists to aim a detail panel a panel does not have.
+
 ### Worktree Removal Is Gated
 
 `git-worktree-done` (bound to `prefix d`) and `wt-pick remove` both destroy a
@@ -146,9 +156,17 @@ Consequences worth keeping straight:
   against a box appearing after every removal. `tests/git_worktree_done.bats`
   guards the whole path, not just the line that was deleted.
 
-  The cost is that a cleanup which refuses - a dirty worktree, a missing
-  directory - says so only to a pane that is usually on the alternate screen.
-  That is accepted. Do not "fix" it with a popup.
+  Output goes to `~/.cache/worktree-cleanup.log` via `worktree_run_cleanup`,
+  not to stdout. `run-shell -b` writes stdout into the focused pane, and after
+  `prefix d` the switch has already landed the user in a DIFFERENT session, so
+  the removal reported itself into a pane with nothing to do with it. Nowhere
+  on screen, but not `/dev/null` either: a refusal has to leave a trace
+  somewhere findable. `WORKTREE_CLEANUP_LOG` overrides the path, which is how
+  the tests read it.
+
+  So a cleanup that refuses - a dirty worktree, a missing directory - is
+  silent at the time and findable afterwards. That is the intended trade.
+  Do not "fix" it with a popup.
 
 `wt-confirm` still renders inline with fzf when it has a tty, and opens its own
 popup when it can draw neither. That branch is load-bearing: `wt-pick` on the

@@ -148,17 +148,19 @@ main() {
   tmux switch-client -c "${current_client}" -t "=${target_session}"
   stamp 'done: switch-client returned'
 
-  # NO POPUP. Removing a worktree is fire-and-forget: the confirmation already
-  # happened, the session leaving vigil's list is the feedback, and nobody
-  # reads cleanup output. This ran in a `display-popup` from 2026-03-02 until
-  # it was removed; the argument for it was legibility of scrolling output,
-  # which is worth nothing against a box that appears after every `prefix d`.
+  # NO POPUP, and nothing printed at the user either. Removing a worktree is
+  # fire-and-forget: the confirmation already happened and the session leaving
+  # vigil's list is the feedback. This ran in a `display-popup` from 2026-03-02
+  # until it was removed; the argument for it was legibility of scrolling
+  # output, which is worth nothing against a box after every `prefix d`.
   #
-  # Runs under `run-shell -b`, so stdout goes to the focused pane and is
-  # usually swallowed by whatever is on the alternate screen. That is fine and
-  # is the point.
+  # The output goes to a log rather than to stdout, because `run-shell -b`
+  # writes stdout into the focused pane - and by this point the switch above
+  # has landed the user in a DIFFERENT session, so the removal would report
+  # itself into a pane with nothing to do with it.
   stamp 'done: running cleanup'
-  "${cleanup_script}" --session "${current_session}" "${worktree_path}" || true
+  worktree_run_cleanup "${cleanup_script}" \
+    --session "${current_session}" "${worktree_path}" || true
   stamp 'done: cleanup returned'
 
   return 0

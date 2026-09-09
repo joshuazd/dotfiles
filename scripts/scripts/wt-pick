@@ -158,17 +158,18 @@ do_remove() {
 # Its own entry point because the confirmation gate has to be able to name it
 # as a command, not because the cleanup needs any ceremony of its own.
 #
-# NO POPUP. Removing a worktree is fire-and-forget: the session disappearing
-# from vigil is the feedback, and a modal that has to be dismissed afterwards
-# is worse than the silence it replaces. A popup here was tried and rejected -
-# it was reasoned from "run-shell output is invisible behind an alternate
-# screen", which is true and does not matter, because nobody wants to read
-# cleanup output.
+# NO POPUP, and nothing printed at the user either. Removing a worktree is
+# fire-and-forget: the session disappearing from vigil is the feedback, and a
+# modal to dismiss afterwards is worse than the silence it replaces. A popup
+# here was tried and rejected.
+#
+# The output goes to a log, not to stdout: this runs under a menu item's
+# `run-shell -b`, whose stdout tmux writes into whatever pane is focused.
 # Arguments:
 #   Worktree path
 #######################################
 do_cleanup() {
-  "${PKG_DIR}/git-worktree-cleanup" "${1}"
+  worktree_run_cleanup "${PKG_DIR}/git-worktree-cleanup" "${1}"
 }
 
 #######################################
