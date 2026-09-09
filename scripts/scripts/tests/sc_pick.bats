@@ -12,6 +12,12 @@ setup() {
   # pipeline are stubbed - short because it is a network call, jq because the
   # short stub emits the finished rows rather than the JSON jq would parse.
   SC_LIST="$(printf 'sc-101\tIn Progress\tFix the thing\nsc-102\tBacklog\tAdd the other')"
+  # Short client by default, so the tests written for the fzf picker keep
+  # exercising it. The native-menu tests raise it explicitly.
+  export TMUX_STUB_CLIENT_HEIGHT=4
+  # bats has no terminal, so the fzf path would otherwise re-enter a popup
+  # instead of running fzf. The popup re-entry has its own test below.
+  export MENU_ASSUME_TTY=1
 }
 
 stub_listing() {
@@ -143,4 +149,41 @@ stub_listing() {
   run "${SC_PICK}" --help
   [ "${status}" -eq 0 ]
   [[ "${output}" == *"Usage:"* ]]
+}
+
+@test "--act implement hands the id to shortcut-implement" {
+  stub_cmd shortcut-implement
+  run "${SC_PICK}" --act implement sc-101
+  [ "${status}" -eq 0 ]
+  run cmd_call_args shortcut-implement
+  [ "${lines[1]}" = "sc-101" ]
+  refute_fzf_called
+}
+
+@test "--act browse still uses the uppercase flag" {
+  stub_cmd short ""
+  run "${SC_PICK}" --act browse sc-101
+  [ "${status}" -eq 0 ]
+  run cmd_calls
+  [[ "${output}" == *"-O"* ]]
+}
+
+@test "--act with an unknown verb is a usage error" {
+  run "${SC_PICK}" --act frobnicate sc-101
+  [ "${status}" -eq 2 ]
+}
+
+@test "--act with no value is a usage error" {
+  run "${SC_PICK}" --act implement
+  [ "${status}" -eq 2 ]
+}
+
+@test "the verb path renders a menu whose items call --act" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  stub_listing
+  stub_cmd shortcut-implement
+  run "${SC_PICK}" implement
+  run tmux_call_args display-menu
+  [[ "${output}" == *"--act implement"* ]]
+  [[ "${output}" == *"sc-101"* ]]
 }

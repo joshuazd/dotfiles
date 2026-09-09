@@ -12,6 +12,7 @@
 #   source "${SCRIPT_DIR}/lib/route.sh"    — classifier + claude_launch_cmd for model/effort routing
 #   source "${SCRIPT_DIR}/lib/rubocop.sh"  - rubocop server teardown for removed worktrees
 #   source "${SCRIPT_DIR}/lib/worktree.sh" - worktree_risk_summary and its counts
+#   source "${SCRIPT_DIR}/lib/menu.sh"     - display-menu rendering and the fit test
 #
 # Usage:
 #   source "${SCRIPT_DIR}/common.sh"
@@ -26,3 +27,4 @@ source "${_COMMON_LIB_DIR}/picker.sh"
 source "${_COMMON_LIB_DIR}/route.sh"
 source "${_COMMON_LIB_DIR}/rubocop.sh"
 source "${_COMMON_LIB_DIR}/worktree.sh"
+source "${_COMMON_LIB_DIR}/menu.sh"

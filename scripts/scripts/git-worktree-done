@@ -64,13 +64,27 @@ USAGE
 main() {
   stamp 'done: main entry'
 
+  # The confirmed re-entry is told which worktree and session it agreed to,
+  # rather than recomputing them. It runs under a menu item's `run-shell -b`,
+  # by which point the focused pane is whatever the user is looking at - which
+  # need not be the worktree the menu named.
+  local confirmed="" agreed_path="" agreed_session=""
+  if [ "${1:-}" = "--confirmed" ]; then
+    confirmed=1
+    agreed_path="${2:-}"
+    agreed_session="${3:-}"
+  fi
+
   # Must be in tmux
   if ! is_in_tmux; then
     error "Not running in tmux"
     return 1
   fi
 
-  local cleanup_script="${SCRIPT_DIR}/git-worktree-cleanup"
+  # SCRIPTS_PKG_DIR, like the gate below: the cleanup is now run directly
+  # rather than inside a popup, so without an override the tests would really
+  # remove things instead of recording that they were asked to.
+  local cleanup_script="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}/git-worktree-cleanup"
   if [ ! -x "${cleanup_script}" ]; then
     error "git-worktree-cleanup not found or not executable: ${cleanup_script}"
     return 1
@@ -85,6 +99,9 @@ main() {
   if [[ ! -d "${worktree_path}" ]]; then
     worktree_path="$(tmux display-message -p '#{session_path}')"
   fi
+
+  [ -n "${agreed_path}" ] && worktree_path="${agreed_path}"
+  [ -n "${agreed_session}" ] && current_session="${agreed_session}"
 
   # Find the most recently used session other than the current one
   target_session="$(tmux list-sessions -F '#{session_last_attached}|#{session_name}' | \
@@ -102,17 +119,28 @@ main() {
   # popup, because git-worktree-cleanup kills the session and moves the
   # worktree aside the moment it starts.
   #
-  # wt-confirm builds its own popup: this script runs under
+  # wt-confirm draws its own menu or popup: this script runs under
   # `bind-key d run-shell -b`, which has no tty to prompt on.
-  local confirm_script="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}/wt-confirm"
-  if [ ! -x "${confirm_script}" ]; then
-    error "wt-confirm not found or not executable: ${confirm_script}"
-    return 1
-  fi
-  if ! "${confirm_script}" "${worktree_path}" "${current_session}"; then
-    # Silent on purpose. This runs under `run-shell -b`, which surfaces stdout
-    # in the pane, so anything printed here outlives the popup the user just
-    # dismissed.
+  #
+  # It is handed the rest of this script as the action rather than asked for
+  # an answer, because `tmux display-menu` does not reliably block until its
+  # menu is answered - a gate read afterwards always reported a cancel. The
+  # re-entry carries --confirmed so it skips the gate rather than asking twice.
+  #
+  # SCRIPT_DIR, not SCRIPTS_PKG_DIR: that override points sibling dispatches at
+  # test recorders, and this names THIS script.
+  if [ -z "${confirmed}" ]; then
+    local confirm_script="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}/wt-confirm"
+    if [ ! -x "${confirm_script}" ]; then
+      error "wt-confirm not found or not executable: ${confirm_script}"
+      return 1
+    fi
+    # Silent on the decline path. This runs under `run-shell -b`, which
+    # surfaces stdout in the pane, so anything printed here outlives the menu
+    # the user just dismissed.
+    "${confirm_script}" \
+      --run "$(printf '%q' "${SCRIPT_DIR}/${0##*/}") --confirmed $(printf '%q' "${worktree_path}") $(printf '%q' "${current_session}")" \
+      "${worktree_path}" "${current_session}" || true
     return 0
   fi
 
@@ -120,21 +148,20 @@ main() {
   tmux switch-client -c "${current_client}" -t "=${target_session}"
   stamp 'done: switch-client returned'
 
-  # Open popup in the destination session to run cleanup
-  # Bordered on purpose. This popup shows scrolling command output, and the
-  # border is what separates it from the pane behind; a picker gets that from
-  # fzf's own frame instead. The cost is real - a border glyph sits in the
-  # outer ring tmux repaints on a DECSET 2026 flush, so it tears while
-  # something animates behind it - and is accepted here for the legibility.
-  local popup_command
-  popup_command="${cleanup_script} --session '${current_session}' '${worktree_path}'"
-
-  stamp 'done: opening popup'
-  tmux display-popup \
-    -c "${current_client}" \
-    -E -w 80% -h 60% \
-    "${popup_command}"
-  stamp 'done: popup closed'
+  # NO POPUP, and nothing printed at the user either. Removing a worktree is
+  # fire-and-forget: the confirmation already happened and the session leaving
+  # vigil's list is the feedback. This ran in a `display-popup` from 2026-03-02
+  # until it was removed; the argument for it was legibility of scrolling
+  # output, which is worth nothing against a box after every `prefix d`.
+  #
+  # The output goes to a log rather than to stdout, because `run-shell -b`
+  # writes stdout into the focused pane - and by this point the switch above
+  # has landed the user in a DIFFERENT session, so the removal would report
+  # itself into a pane with nothing to do with it.
+  stamp 'done: running cleanup'
+  worktree_run_cleanup "${cleanup_script}" \
+    --session "${current_session}" "${worktree_path}" || true
+  stamp 'done: cleanup returned'
 
   return 0
 }

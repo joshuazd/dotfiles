@@ -2,6 +2,7 @@
 #
 # wt-pick - Pick a git worktree and act on it
 #
+#        wt-pick --act <verb> <path>   act on one worktree (used by menu items)
 # Usage: wt-pick <switch|remove>
 #
 # Arguments:
@@ -23,6 +24,7 @@ set -o pipefail  # don't hide errors within pipes
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/menu.sh"
 source "${SCRIPT_DIR}/lib/worktree.sh"
 
 # Where sibling scripts are found. Defaults to this script's own
@@ -117,8 +119,11 @@ do_switch() {
 #######################################
 # Confirm, then remove a worktree and its tmux session.
 #
-# wt-confirm is called with a tty here (this runs inside the menu's popup), so
-# it renders inline rather than opening a nested popup of its own.
+# wt-confirm picks its own renderer from whether it has a tty, and both cases
+# reach here. On the native path this runs under a menu item's `run-shell`,
+# with no tty and no popup, and wt-confirm asks with a display-menu. On the
+# fzf fallback it runs inside the picker's popup, has a tty, and wt-confirm
+# renders inline - a display-menu would not draw there at all.
 # Arguments:
 #   Worktree path
 #######################################
@@ -132,12 +137,94 @@ do_remove() {
     error "wt-confirm not found or not executable: ${gate}"
     return 1
   fi
-  if ! "${gate}" "${path}" "${session}"; then
+  # The gate is handed the action rather than asked for an answer, because
+  # display-menu does not reliably block until its menu is answered. It runs
+  # --cleanup at whatever point it learns the answer.
+  #
+  # SCRIPT_DIR, not PKG_DIR: this names THIS script for re-entry, and PKG_DIR
+  # is where the tests redirect sibling dispatches to recorders.
+  if ! "${gate}" \
+      --run "$(printf '%q' "${SCRIPT_DIR}/wt-pick") --cleanup $(printf '%q' "${path}")" \
+      "${path}" "${session}"; then
     # Nothing to read, so close the popup rather than making the user dismiss
     # a confirmation they already declined.
     return "${PICKER_QUIET_EXIT}"
   fi
-  "${PKG_DIR}/git-worktree-cleanup" "${path}"
+}
+
+#######################################
+# Run the cleanup for an already-confirmed worktree.
+#
+# Its own entry point because the confirmation gate has to be able to name it
+# as a command, not because the cleanup needs any ceremony of its own.
+#
+# NO POPUP, and nothing printed at the user either. Removing a worktree is
+# fire-and-forget: the session disappearing from vigil is the feedback, and a
+# modal to dismiss afterwards is worse than the silence it replaces. A popup
+# here was tried and rejected.
+#
+# The output goes to a log, not to stdout: this runs under a menu item's
+# `run-shell -b`, whose stdout tmux writes into whatever pane is focused.
+# Arguments:
+#   Worktree path
+#######################################
+do_cleanup() {
+  worktree_run_cleanup "${PKG_DIR}/git-worktree-cleanup" "${1}"
+}
+
+#######################################
+# Reject anything that is not a known verb.
+#
+# Both entry points validate, so an --act with a bad verb is a usage error
+# rather than a silent no-op.
+# Arguments:
+#   The verb
+# Returns:
+#   0 when valid, PICK_USAGE_ERROR otherwise
+#######################################
+check_verb() {
+  case "${1}" in
+    switch|remove) return 0 ;;
+    '')
+      error "missing required argument: verb"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+    *)
+      error "unknown verb: ${1}"
+      printf '\n'
+      usage
+      return "${PICK_USAGE_ERROR}"
+      ;;
+  esac
+}
+
+#######################################
+# Act on one already-chosen value.
+#
+# This is what a native menu item invokes: display-menu runs a command rather
+# than handing a selection back. The fzf path reaches the same function, which
+# is what keeps the two backends honest about doing the same thing.
+# Arguments:
+#   The verb, the worktree path
+# Returns:
+#   0 on success, PICK_USAGE_ERROR on a bad invocation
+#######################################
+act() {
+  local verb="${1:-}"
+  local path="${2:-}"
+
+  check_verb "${verb}" || return "${?}"
+  if [ -z "${path}" ]; then
+    error "missing required argument: worktree path"
+    return "${PICK_USAGE_ERROR}"
+  fi
+
+  case "${verb}" in
+    switch) do_switch "${path}" ;;
+    remove) do_remove "${path}" ;;
+  esac
 }
 
 #######################################
@@ -150,49 +237,55 @@ do_remove() {
 main() {
   local verb="${1:-}"
 
-  case "${verb}" in
-    switch|remove) ;;
-    '')
-      error "missing required argument: verb"
-      printf '\n'
-      usage
-      return "${PICK_USAGE_ERROR}"
-      ;;
-    *)
-      error "unknown verb: ${verb}"
-      printf '\n'
-      usage
-      return "${PICK_USAGE_ERROR}"
-      ;;
-  esac
+  check_verb "${verb}" || return "${?}"
 
   if ! git rev-parse --git-dir > /dev/null 2>&1; then
     error "not a git repository"
     return "${PICK_USAGE_ERROR}"
   fi
 
-  local selection status=0
-  selection="$(worktree_rows \
-    | pick_one --size "" --style default --info hidden \
+  local status=0
+  worktree_rows \
+    | menu_or_pick "Worktree to ${verb}" \
+        "$(printf '%q' "${SCRIPT_DIR}/wt-pick") --act ${verb}" \
+        "$(printf '%q' "${SCRIPT_DIR}/wt-pick") ${verb}" \
+        --size "" --style default --info hidden \
         --prompt "Worktree to ${verb}> " \
-        --empty-message "No other worktrees.")" \
+        --empty-message "No other worktrees." \
     || status="${?}"
 
-  # Escape and an empty list are both no-ops, but they close differently.
-  # An empty list has just printed "No other worktrees." and the user needs a moment
-  # to read it, so it returns 0 and fzf-menu pauses. Escape has nothing to
-  # show, so it asks fzf-menu to close the popup without a pause.
-  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return "${PICKER_QUIET_EXIT}"
-  [ "${status}" -eq "${PICKER_EMPTY}" ] && return 0
-  [ "${status}" -eq 0 ] || return "${status}"
-
-  local path="${selection%%$'\t'*}"
-
-  case "${verb}" in
-    switch) do_switch "${path}" ;;
-    remove) do_remove "${path}" ;;
-  esac
+  # An empty list has printed its message and the user needs a moment to read
+  # it, so it reports success and fzf-menu pauses. An escape (QUIET_EXIT)
+  # propagates, so the popup closes without a pause. Same contract the
+  # fzf-only version had.
+  #
+  # Captured with || rather than read afterwards: errexit aborts main on a
+  # nonzero pipeline, so a plain "${?}" on the next line never runs.
+  if [ "${status}" -eq "${PICKER_EMPTY}" ]; then
+    return 0
+  fi
+  return "${status}"
 }
+
+case "${1:-}" in
+  # The act half, invoked by a native menu item.
+  --act)
+    shift
+    act ${1+"${@}"}
+    exit "${?}"
+    ;;
+  # Invoked by the confirmation gate once the user has said yes. Not a verb:
+  # nothing may reach this without going through the gate first.
+  --cleanup)
+    shift
+    if [ "${#}" -lt 1 ] || [ -z "${1}" ]; then
+      error "missing required argument: worktree path"
+      exit "${PICK_USAGE_ERROR}"
+    fi
+    do_cleanup "${1}"
+    exit "${?}"
+    ;;
+esac
 
 # Check for help flag
 # ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and

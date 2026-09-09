@@ -77,6 +77,7 @@ setup() {
         '@window '*) body="${command#@window }" ;;
         '@pane '*)   body="${command#@pane }" ;;
         '@bg '*)     body="${command#@bg }" ;;
+        '@quiet '*)   body="${command#@quiet }" ;;
         '@menu '*)   continue ;;
       esac
       word="${body%% *}"
@@ -96,6 +97,28 @@ setup() {
 
 # menu.menu chains one level. A leaf that also chained would be sized wrong,
 # because menu_max_rows deliberately does not recurse.
+# @bg announces the log file it redirects to, which is right for a long or
+# noisy command whose output would otherwise be unfindable, and pure noise for
+# one that prints nothing. No entry currently shipped needs it: the tmux
+# controls and `gh pr view --web` all moved to @quiet after each was reported
+# as an unwanted "running in background" message.
+#
+# This is a reminder rather than a prohibition. @bg stays supported, and if an
+# entry genuinely wants it, delete this test along with the row it guards -
+# but check first that the command really does produce output worth keeping.
+#
+# Deliberately checks EVERY menu: the first version of this test only looked
+# at tmux.menu, which is exactly why the git.menu row went on reporting it.
+@test "no menu entry announces a background log" {
+  local file
+  for file in "${MENU_DIR}"/*.menu; do
+    if grep -q '	@bg ' "${file}"; then
+      printf 'unexpected @bg in %s\n' "${file}" >&2
+      return 1
+    fi
+  done
+}
+
 @test "only menu.menu carries @menu rows" {
   local file line
   for file in "${MENU_DIR}"/*.menu; do

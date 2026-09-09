@@ -1,6 +1,6 @@
 # Shortcut actions
-Claim a story	sc-pick claim
-Implement a story	sc-pick implement
-Worktree from a story	sc-pick worktree
-Open a story in browser	sc-pick browse
-Story from this branch	short story --from-git
+&Claim a story	@quiet sc-pick claim
+&Implement a story	@quiet sc-pick implement
+&Worktree from a story	@quiet sc-pick worktree
+&Open a story in browser	@quiet sc-pick browse
+&Story from this branch	short story --from-git

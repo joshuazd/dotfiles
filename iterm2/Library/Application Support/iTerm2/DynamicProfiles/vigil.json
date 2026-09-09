@@ -1,0 +1,12 @@
+{
+  "Profiles": [
+    {
+      "Name": "Vigil Panel",
+      "Guid": "vigil-panel-dotfiles",
+      "Dynamic Profile Parent Name": "Default",
+      "Custom Command": "Yes",
+      "Command": "/bin/zsh -c 'vigil --panel; exec /bin/zsh -l'",
+      "Rows": 12
+    }
+  ]
+}

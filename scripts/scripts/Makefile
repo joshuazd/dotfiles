@@ -7,7 +7,7 @@ SHELL_SCRIPTS := common.sh $(wildcard lib/*.sh) \
 	gh-review gh-worktree \
 	git-worktree-cleanup git-worktree-done git-worktree-new git-worktree-session \
 	portal-open pr-pick rubocop-server-prune sc-pick short-story-md shortcut-claim shortcut-implement shortcut-worktree \
-	tmux-respawn ts vigil-panel wt-confirm wt-pick
+	menu-pause tmux-respawn ts vigil-panel wt-confirm wt-pick
 
 # -x plus the source paths lets shellcheck follow the lib/ sources instead of
 # reporting SC1091 on every one. SC2155 is excluded because the

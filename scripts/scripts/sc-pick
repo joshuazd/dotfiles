@@ -2,6 +2,7 @@
 #
 # sc-pick - Pick one of your unfinished Shortcut stories and act on it
 #
+#        sc-pick --act <verb> <sc-ID>   act on one story (used by menu items)
 # Usage: sc-pick <claim|implement|worktree|browse>
 #
 # Arguments:
@@ -23,6 +24,7 @@ set -o pipefail  # don't hide errors within pipes
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/menu.sh"
 
 # Where sibling scripts are found. Defaults to this script's own directory;
 # SCRIPTS_PKG_DIR redirects it, which is how the tests point sibling
@@ -76,17 +78,18 @@ story_rows() {
 }
 
 #######################################
-# Main function
+# Reject anything that is not a known verb.
+#
+# Both entry points validate, so an --act with a bad verb is a usage error
+# rather than a silent no-op.
 # Arguments:
 #   The verb
 # Returns:
-#   0 on success or no selection, PICK_USAGE_ERROR on a bad verb
+#   0 when valid, PICK_USAGE_ERROR otherwise
 #######################################
-main() {
-  local verb="${1:-}"
-
-  case "${verb}" in
-    claim|implement|worktree|browse) ;;
+check_verb() {
+  case "${1}" in
+    claim|implement|worktree|browse) return 0 ;;
     '')
       error "missing required argument: verb"
       printf '\n'
@@ -94,29 +97,34 @@ main() {
       return "${PICK_USAGE_ERROR}"
       ;;
     *)
-      error "unknown verb: ${verb}"
+      error "unknown verb: ${1}"
       printf '\n'
       usage
       return "${PICK_USAGE_ERROR}"
       ;;
   esac
+}
 
-  local selection status=0
-  selection="$(story_rows \
-    | pick_one --size "" --style default --info hidden \
-        --prompt "Story to ${verb}> " \
-        --empty-message "No stories assigned to you.")" \
-    || status="${?}"
+#######################################
+# Act on one already-chosen value.
+#
+# This is what a native menu item invokes: display-menu runs a command rather
+# than handing a selection back. The fzf path reaches the same function, which
+# is what keeps the two backends honest about doing the same thing.
+# Arguments:
+#   The verb, the story id
+# Returns:
+#   0 on success, PICK_USAGE_ERROR on a bad invocation
+#######################################
+act() {
+  local verb="${1:-}"
+  local id="${2:-}"
 
-  # Escape and an empty list are both no-ops, but they close differently.
-  # An empty list has just printed "No stories assigned to you." and the user needs a moment
-  # to read it, so it returns 0 and fzf-menu pauses. Escape has nothing to
-  # show, so it asks fzf-menu to close the popup without a pause.
-  [ "${status}" -eq "${PICKER_NO_SELECTION}" ] && return "${PICKER_QUIET_EXIT}"
-  [ "${status}" -eq "${PICKER_EMPTY}" ] && return 0
-  [ "${status}" -eq 0 ] || return "${status}"
-
-  local id="${selection%%$'\t'*}"
+  check_verb "${verb}" || return "${?}"
+  if [ -z "${id}" ]; then
+    error "missing required argument: story id"
+    return "${PICK_USAGE_ERROR}"
+  fi
 
   case "${verb}" in
     claim)     "${PKG_DIR}/shortcut-claim" "${id}" ;;
@@ -126,6 +134,50 @@ main() {
     browse)    short story "${id}" -O ;;
   esac
 }
+
+#######################################
+# Main function
+# Arguments:
+#   The verb
+# Returns:
+#   0 on success or no selection, PICK_USAGE_ERROR on a bad verb
+#######################################
+main() {
+  local verb="${1:-}"
+
+  check_verb "${verb}" || return "${?}"
+
+  local status=0
+  story_rows \
+    | menu_or_pick "Story to ${verb}" \
+        "$(printf '%q' "${SCRIPT_DIR}/sc-pick") --act ${verb}" \
+        "$(printf '%q' "${SCRIPT_DIR}/sc-pick") ${verb}" \
+        --size "" --style default --info hidden \
+        --prompt "Story to ${verb}> " \
+        --empty-message "No stories assigned to you." \
+    || status="${?}"
+
+  # An empty list has printed its message and the user needs a moment to read
+  # it, so it reports success and fzf-menu pauses. An escape (QUIET_EXIT)
+  # propagates, so the popup closes without a pause. Same contract the
+  # fzf-only version had.
+  #
+  # Captured with || rather than read afterwards: errexit aborts main on a
+  # nonzero pipeline, so a plain "${?}" on the next line never runs.
+  if [ "${status}" -eq "${PICKER_EMPTY}" ]; then
+    return 0
+  fi
+  return "${status}"
+}
+
+case "${1:-}" in
+  # The act half, invoked by a native menu item.
+  --act)
+    shift
+    act ${1+"${@}"}
+    exit "${?}"
+    ;;
+esac
 
 # Check for help flag
 # ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and

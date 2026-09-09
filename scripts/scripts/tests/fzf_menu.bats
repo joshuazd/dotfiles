@@ -14,6 +14,10 @@ setup() {
   MENU="${FZF_MENU_DIR}/demo.menu"
   printf '# Demo actions\nFetch\techo fetch-ran\nStatus\techo hidden-command-ran\n' > "${MENU}"
   FZF_MENU="${BATS_TEST_DIRNAME}/../fzf-menu"
+  # Short client by default, so the tests written for the fzf popup keep
+  # exercising it. The native-menu tests raise it explicitly. With
+  # MENU_CHROME_ROWS at 4, a height of 4 cannot fit even one item.
+  export TMUX_STUB_CLIENT_HEIGHT=4
 }
 
 # The menu file's first line becomes the PROMPT, not a --header: a header
@@ -426,4 +430,170 @@ setup() {
   run "${FZF_MENU}" demo
   run fzf_args
   printf '%s\n' "${output}" | assert_arg_after "--margin" "0"
+}
+
+# A menu item has no popup to write into, so a bare command opens its own.
+@test "--run on a bare command opens a popup" {
+  run "${FZF_MENU}" --run "echo hi"
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand display-popup
+  run tmux_call_args display-popup
+  [[ "${output}" == *"echo hi"* ]]
+}
+
+# Bordered, like the other popups that show command output.
+@test "--run's popup keeps its border" {
+  run "${FZF_MENU}" --run "echo hi"
+  run tmux_call_args display-popup
+  [[ "${output}" != *"-B"* ]]
+}
+
+@test "--run's popup waits for a key so output can be read" {
+  run "${FZF_MENU}" --run "echo hi"
+  run tmux_call_args display-popup
+  [[ "${output}" == *"menu-pause"* ]]
+}
+
+@test "--run honours @window without a popup" {
+  run "${FZF_MENU}" --run "@window vim"
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand new-window
+  refute_tmux_subcommand display-popup
+}
+
+@test "--run honours @pane without a popup" {
+  run "${FZF_MENU}" --run "@pane ls -la"
+  assert_tmux_subcommand send-keys
+  refute_tmux_subcommand display-popup
+}
+
+@test "--run honours @bg without a popup" {
+  run "${FZF_MENU}" --run "@bg true"
+  [ "${status}" -eq 0 ]
+  refute_tmux_subcommand display-popup
+}
+
+@test "--run rejects an unknown sigil" {
+  run "${FZF_MENU}" --run "@nope echo hi"
+  [ "${status}" -eq 2 ]
+  [[ "${output}" == *"unknown sigil"* ]]
+}
+
+@test "--run with no command is a usage error" {
+  run "${FZF_MENU}" --run
+  [ "${status}" -eq 2 ]
+}
+
+@test "--popup renders a native menu when the rows fit" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run "${FZF_MENU}" --popup demo
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand display-menu
+  refute_tmux_subcommand display-popup
+}
+
+# The whole entry travels as ONE argument to --run, so it arrives escaped.
+# Asserting on the unescaped text would be asserting on the bug.
+@test "the native menu's items call --run with the whole entry" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run "${FZF_MENU}" --popup demo
+  run tmux_call_args display-menu
+  [[ "${output}" == *"--run"* ]]
+  [[ "${output}" == *'echo\ fetch-ran'* ]]
+}
+
+# menu_rows numbers labels for fzf's benefit; tmux draws the key itself, so a
+# native menu must not carry the number as well.
+@test "the native menu's labels are not numbered" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run "${FZF_MENU}" --popup demo
+  run tmux_call_args display-menu
+  [[ "${output}" == *"Fetch"* ]]
+  [[ "${output}" != *"1 Fetch"* ]]
+}
+
+@test "--popup falls back to fzf when the rows do not fit" {
+  export TMUX_STUB_CLIENT_HEIGHT=5
+  printf '# Big\n' > "${FZF_MENU_DIR}/big.menu"
+  local i
+  for i in $(seq 1 30); do
+    printf 'Row %s\techo %s\n' "${i}" "${i}" >> "${FZF_MENU_DIR}/big.menu"
+  done
+  run "${FZF_MENU}" --popup big
+  [ "${status}" -eq 0 ]
+  assert_tmux_subcommand display-popup
+  refute_tmux_subcommand display-menu
+}
+
+# A chaining menu has to fit the tallest screen it can reach, not just its own
+# rows, or picking a leaf blanks it.
+@test "--popup measures an @menu target for the fit test too" {
+  printf '# Leaf\n' > "${FZF_MENU_DIR}/leaf.menu"
+  local i
+  for i in $(seq 1 30); do
+    printf 'Row %s\techo %s\n' "${i}" "${i}" >> "${FZF_MENU_DIR}/leaf.menu"
+  done
+  printf '# Top\nLeaf\t@menu leaf\n' > "${FZF_MENU_DIR}/top.menu"
+  export TMUX_STUB_CLIENT_HEIGHT=12
+  run "${FZF_MENU}" --popup top
+  refute_tmux_subcommand display-menu
+  assert_tmux_subcommand display-popup
+}
+
+@test "--popup on a missing menu still exits 2 without rendering" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  run "${FZF_MENU}" --popup nosuch
+  [ "${status}" -eq 2 ]
+  refute_tmux_subcommand display-menu
+  refute_tmux_subcommand display-popup
+}
+
+# @quiet is for commands that draw their own UI or produce no output at all.
+# Wrapping one in a
+# popup is what made "Review PR" open an empty box: a display-menu cannot be
+# drawn while a popup is already up.
+@test "@quiet runs the command without a popup of its own" {
+  run "${FZF_MENU}" --run "@quiet echo picked"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"picked"* ]]
+  refute_tmux_subcommand display-popup
+}
+
+@test "@quiet does not pause for a keypress" {
+  run "${FZF_MENU}" --run "@quiet echo picked"
+  [[ "${output}" != *"Press any key"* ]]
+}
+
+@test "@quiet is not mistaken for an unknown sigil" {
+  run "${FZF_MENU}" --explain "@quiet pr-pick review"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"UNKNOWN SIGIL"* ]]
+  [[ "${output}" == *"pr-pick review"* ]]
+}
+
+@test "a failing @quiet reports it without failing the menu" {
+  run "${FZF_MENU}" --run "@quiet exit 3"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" == *"exited 3"* ]]
+}
+
+# A tmux control command has no output, so announcing a log file for it - which
+# @bg does - was noise. This is the report that prompted the rename.
+@test "@quiet announces nothing" {
+  run "${FZF_MENU}" --run "@quiet true"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"running in background"* ]]
+  [[ "${output}" != *"fzf-menu.log"* ]]
+}
+
+# The pause prompt is what the user reads after a bare command finishes.
+# The pause is a script, not a shell fragment: display-popup runs its command
+# through the user shell, and under zsh read -p reads from a coprocess rather
+# than printing a prompt, so the inline version showed no message and waited
+# for a whole line.
+@test "the bare-command popup pauses via the script, not inline read" {
+  run "${FZF_MENU}" --run "echo hi"
+  run tmux_call_args display-popup
+  [[ "${output}" == *"menu-pause"* ]]
+  [[ "${output}" != *"read -"* ]]
 }

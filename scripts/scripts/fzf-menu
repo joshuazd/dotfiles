@@ -5,6 +5,7 @@
 # Usage: fzf-menu <name>
 #        fzf-menu --popup <name>     size a tmux popup to the menu and run in it
 #        fzf-menu --explain <cmd>    render the fzf preview for one entry
+#        fzf-menu --run <cmd>        run one entry, as a menu item does
 #
 # Loads <menu dir>/<name>.menu, presents its entries with pick_one, and runs
 # the selected command. The menu directory defaults to `menus/` beside this
@@ -25,6 +26,7 @@
 #   @pane     send-keys into the current pane
 #   @bg       detached, output appended to ~/.cache/fzf-menu.log
 #   @menu     another menu, in this same popup
+#   @quiet    run as-is: no popup, no pause, no announcement
 #
 # Example:
 #   fzf-menu git
@@ -36,6 +38,7 @@ set -o pipefail  # don't hide errors within pipes
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/menu.sh"
 
 readonly MENU_DIR="${FZF_MENU_DIR:-${SCRIPT_DIR}/menus}"
 readonly MENU_LOG="${HOME}/.cache/fzf-menu.log"
@@ -76,6 +79,21 @@ readonly POPUP_MAX_ITEMS=15
 # which is a successful no-op.
 readonly MENU_UNAVAILABLE=2
 
+# Geometry for a bare command's own popup, opened from a native menu item.
+# Percentages rather than the menu's fixed width: this holds arbitrary command
+# output, not a list sized to its contents.
+readonly RUN_POPUP_WIDTH="80%"
+readonly RUN_POPUP_HEIGHT="60%"
+
+# What holds the popup open once a bare command has finished.
+#
+# A SCRIPT, not a shell fragment: `display-popup -E` runs its command through
+# the user's own shell, and under zsh `read -p` reads from a coprocess instead
+# of printing a prompt while `-n` is not a character count. The inline bash
+# version therefore showed no message and waited for a whole line, so Escape
+# appeared not to work.
+readonly RUN_POPUP_PAUSE="$(printf '%q' "${SCRIPT_DIR}/menu-pause")"
+
 # How many @menu hops one invocation may make. menu.menu chaining into a leaf
 # is one hop, so anything beyond a handful is a cycle rather than a design.
 readonly MENU_MAX_DEPTH=8
@@ -91,6 +109,7 @@ usage() {
     "Usage: ${0##*/} <name>" \
     "       ${0##*/} --popup <name>   size a tmux popup and run in it" \
     "       ${0##*/} --explain <cmd>  render the preview for one entry" \
+    "       ${0##*/} --run <cmd>      run one entry, as a menu item does" \
     "" \
     "Run a declarative menu of actions through an fzf picker." \
     "" \
@@ -148,6 +167,9 @@ menu_header() {
 # default --with-nth of -1 displays it while the command rides along hidden.
 # A malformed line is warned about and skipped rather than aborting the menu:
 # one bad row must not cost the user the other nine.
+#
+# The label is raw, mnemonic marker included, because that is what the native
+# backend needs; menu_rows_numbered renders it for fzf.
 # Arguments:
 #   Path to the menu file
 # Outputs:
@@ -158,7 +180,6 @@ menu_rows() {
   local base
   base="$(basename "${file}")"
   local lineno=0
-  local emitted=0
   local line label command
 
   while IFS= read -r line || [ -n "${line}" ]; do
@@ -181,13 +202,74 @@ menu_rows() {
       continue
     fi
 
-    emitted=$((emitted + 1))
-    if [ "${emitted}" -le 9 ]; then
-      printf '%s\t%s %s\n' "${command}" "${emitted}" "${label}"
+    printf '%s\t%s\n' "${command}" "${label}"
+  done < "${file}"
+}
+
+#######################################
+# Menu rows rendered for fzf: mnemonic marker stripped, position prefixed.
+#
+# fzf has no key column of its own, so the digit has to be part of the label
+# for the `N:pos(N)+accept` binds to be discoverable. The native backend takes
+# menu_rows directly, because tmux draws the key itself and a numbered label
+# would show a number and a key side by side.
+# Arguments:
+#   Path to the menu file
+# Outputs:
+#   "command<TAB>N label" rows to stdout
+#######################################
+menu_rows_numbered() {
+  local file="${1}"
+  local row command label
+  local n=0
+  while IFS= read -r row; do
+    [ -n "${row}" ] || continue
+    command="${row%$'\t'*}"
+    label="$(menu_label_text "${row##*$'\t'}")"
+    n=$((n + 1))
+    if [ "${n}" -le 9 ]; then
+      printf '%s\t%s %s\n' "${command}" "${n}" "${label}"
     else
       printf '%s\t  %s\n' "${command}" "${label}"
     fi
-  done < "${file}"
+  done < <(menu_rows "${file}")
+}
+
+#######################################
+# Run a bare command in a popup of its own and wait for a keypress.
+#
+# run_action's bare branch assumes it is already inside the fzf popup. A menu
+# item is not: display-menu runs a tmux command with nowhere to write, so the
+# output needs a popup built for it. Bordered, matching the other popups that
+# show command output.
+# Arguments:
+#   The command to run
+#######################################
+run_in_popup() {
+  local body="${1}"
+  tmux display-popup -E -w "${RUN_POPUP_WIDTH}" -h "${RUN_POPUP_HEIGHT}" \
+    -d '#{pane_current_path}' \
+    "${body}; ${RUN_POPUP_PAUSE}" \
+    || warn "display-popup failed"
+}
+
+#######################################
+# Run a menu entry chosen from a native menu.
+#
+# Identical to run_action except for the bare case, which has no popup to
+# write into and so is given one.
+# Arguments:
+#   The command string, sigil included
+# Returns:
+#   0 on success, MENU_UNAVAILABLE on an unknown sigil
+#######################################
+run_action_from_menu() {
+  local command="${1}"
+  if [ -z "$(action_sigil "${command}")" ]; then
+    run_in_popup "$(action_body "${command}")"
+    return 0
+  fi
+  run_action "${command}"
 }
 
 #######################################
@@ -231,6 +313,20 @@ run_action() {
       mkdir -p "$(dirname "${MENU_LOG}")"
       nohup sh -c "${body}" >> "${MENU_LOG}" 2>&1 &
       info "running in background, logging to ${MENU_LOG/#${HOME}/~}"
+      ;;
+    quiet)
+      # Run as-is: no popup, no keypress pause, and nothing announced. Two
+      # kinds of command want this.
+      #
+      # A picker draws its own UI - a native menu when the list fits, its own
+      # popup when it falls back to fzf - and wrapping it in a popup is what
+      # made "Review PR" open an empty box, since a display-menu cannot draw
+      # while a popup is already up.
+      #
+      # A tmux control command (source-file, clear-history, set -w) has no
+      # output at all. Under @bg those announced a log file that would only
+      # ever be empty.
+      sh -c "${body}" || warn "exited ${?}"
       ;;
     menu)
       # Two menus that name each other would exec back and forth forever, and
@@ -301,6 +397,7 @@ action_sigil() {
     '@pane '*)   printf 'pane' ;;
     '@bg '*)     printf 'bg' ;;
     '@menu '*)   printf 'menu' ;;
+    '@quiet '*)   printf 'quiet' ;;
     '@'*)        printf 'unknown' ;;
     *)           printf '' ;;
   esac
@@ -322,6 +419,7 @@ action_body() {
     pane)   printf '%s' "${command#@pane }" ;;
     bg)     printf '%s' "${command#@bg }" ;;
     menu)   printf '%s' "${command#@menu }" ;;
+    quiet)   printf '%s' "${command#@quiet }" ;;
     *)      printf '%s' "${command}" ;;
   esac
 }
@@ -349,6 +447,8 @@ explain_action() {
     printf '%s\nUNKNOWN SIGIL - this entry will not run\n' "${body}"
   elif [ "${sigil}" = "menu" ]; then
     printf 'opens the %s menu\n' "${body}"
+  elif [ "${sigil}" = "quiet" ]; then
+    printf '%s\n' "${body}"
   else
     printf '%s\n' "${body}"
   fi
@@ -390,7 +490,7 @@ menu_max_rows() {
 
   while IFS= read -r row; do
     [ -n "${row}" ] || continue
-    # menu_rows emits "command<TAB>N label"; the label is the last field.
+    # menu_rows emits "command<TAB>label"; the label is the last field.
     command="${row%$'\t'*}"
     [ "$(action_sigil "${command}")" = "menu" ] || continue
     target="$(action_body "${command}")"
@@ -428,6 +528,16 @@ popup() {
 
   local count
   count="$(menu_max_rows "${file}")"
+
+  # A native menu when it will fit. menu_max_rows, not the file's own row
+  # count: a chaining menu has to fit the tallest screen it can reach, or
+  # picking a leaf blanks it.
+  if menu_fits "${count}"; then
+    menu_rows "${file}" \
+      | menu_show "$(menu_header "${file}")" \
+          "$(printf '%q' "${SCRIPT_DIR}/fzf-menu") --run"
+    return "${?}"
+  fi
 
   local shown="${count}"
   [ "${shown}" -gt "${POPUP_MAX_ITEMS}" ] && shown="${POPUP_MAX_ITEMS}"
@@ -471,7 +581,7 @@ main() {
   fi
 
   local rows
-  rows="$(menu_rows "${file}")"
+  rows="$(menu_rows_numbered "${file}")"
 
   # --size "" renders fzf inline rather than in a popup of its own. This menu
   # is always invoked from a `display-popup` binding, and a nested popup has
@@ -556,6 +666,17 @@ case "${1:-}" in
   --popup)
     shift
     popup "${1:-}"
+    exit "${?}"
+    ;;
+  # The act half. Invoked by a display-menu item, which runs a tmux command
+  # rather than handing a selection back.
+  --run)
+    shift
+    if [ "${#}" -lt 1 ] || [ -z "${1}" ]; then
+      error "missing required argument: command"
+      exit "${MENU_UNAVAILABLE}"
+    fi
+    run_action_from_menu "${1}"
     exit "${?}"
     ;;
 esac

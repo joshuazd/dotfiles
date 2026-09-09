@@ -86,3 +86,72 @@ push_to_new_remote() {
   [[ "${output}" == *"uncommitted"* ]]
   [[ "${output}" != *"unpushed"* ]]
 }
+
+# --- worktree_run_cleanup -------------------------------------------------
+#
+# Both callers run under `run-shell -b`, whose stdout tmux writes into the
+# focused pane - which after prefix d is a pane in some other session. A popup
+# was the previous answer and was worse.
+
+@test "the cleanup's output does not reach stdout" {
+  local LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  local script="${BATS_TEST_TMPDIR}/fake-cleanup"
+  printf '#!/bin/sh\necho noisy-output\n' > "${script}"
+  chmod +x "${script}"
+  WORKTREE_CLEANUP_LOG="${LOG}" run worktree_run_cleanup "${script}"
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"noisy-output"* ]]
+}
+
+@test "the cleanup's output lands in the log" {
+  local LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  local script="${BATS_TEST_TMPDIR}/fake-cleanup"
+  printf '#!/bin/sh\necho noisy-output\n' > "${script}"
+  chmod +x "${script}"
+  WORKTREE_CLEANUP_LOG="${LOG}" worktree_run_cleanup "${script}"
+  grep -q 'noisy-output' "${LOG}"
+}
+
+# A refusal is the one thing anyone would ever go looking for.
+@test "a failing cleanup records its complaint" {
+  local LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  local script="${BATS_TEST_TMPDIR}/fake-cleanup"
+  printf '#!/bin/sh\necho "cannot remove: dirty" >&2\nexit 1\n' > "${script}"
+  chmod +x "${script}"
+  WORKTREE_CLEANUP_LOG="${LOG}" run worktree_run_cleanup "${script}"
+  [ "${status}" -eq 1 ]
+  grep -q 'cannot remove: dirty' "${LOG}"
+}
+
+@test "the cleanup is passed its arguments" {
+  local LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  local script="${BATS_TEST_TMPDIR}/fake-cleanup"
+  printf '#!/bin/sh\nprintf "[%%s]" "$@"\n' > "${script}"
+  chmod +x "${script}"
+  WORKTREE_CLEANUP_LOG="${LOG}" worktree_run_cleanup "${script}" --session s "/tmp/a b"
+  grep -q '\[--session\]\[s\]\[/tmp/a b\]' \
+    "${LOG}"
+}
+
+# Appended, not truncated: the previous removal's complaint is often the one
+# worth reading.
+@test "the log accumulates across removals" {
+  local LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  local script="${BATS_TEST_TMPDIR}/fake-cleanup"
+  printf '#!/bin/sh\necho "run $1"\n' > "${script}"
+  chmod +x "${script}"
+  WORKTREE_CLEANUP_LOG="${LOG}" worktree_run_cleanup "${script}" one
+  WORKTREE_CLEANUP_LOG="${LOG}" worktree_run_cleanup "${script}" two
+  grep -q 'run one' "${LOG}"
+  grep -q 'run two' "${LOG}"
+}
+
+@test "each entry says which worktree it was" {
+  local LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  local script="${BATS_TEST_TMPDIR}/fake-cleanup"
+  printf '#!/bin/sh\nexit 0\n' > "${script}"
+  chmod +x "${script}"
+  WORKTREE_CLEANUP_LOG="${LOG}" worktree_run_cleanup "${script}" /tmp/some-worktree
+  grep -q '^=== .*/tmp/some-worktree' \
+    "${LOG}"
+}
