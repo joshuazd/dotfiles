@@ -92,6 +92,36 @@ refute_tmux_subcommand_matching() {
   ! grep -q -e "^${subcommand}${TMUX_STUB_SEP}.*${pattern}" "${TMUX_STUB_LOG}"
 }
 
+# A deadline for a test whose whole point is that the thing under test must
+# NOT run forever.
+#
+# Not timeout(1): that is coreutils, and the macos-latest image ships no
+# Homebrew coreutils, so `run timeout 20 ...` recorded 127 there and the
+# assertion read as a broken guard rather than a missing binary. It passed on
+# Ubuntu and on any Mac with coreutils installed, which is the worst shape a
+# CI-only failure can take.
+#
+# SIGKILL rather than SIGTERM, and 124 rather than the command's own status,
+# both to match timeout(1) - a test asserting a specific status must not see a
+# timeout as that status.
+with_timeout() {
+  local secs="${1}"
+  shift
+  "${@}" &
+  local pid="${!}"
+  local ticks=$((secs * 10))
+  while [ "${ticks}" -gt 0 ] && kill -0 "${pid}" 2>/dev/null; do
+    sleep 0.1
+    ticks=$((ticks - 1))
+  done
+  if kill -0 "${pid}" 2>/dev/null; then
+    kill -9 "${pid}" 2>/dev/null
+    wait "${pid}" 2>/dev/null
+    return 124
+  fi
+  wait "${pid}"
+}
+
 setup_fzf_stub() {
   export FZF_STUB_LOG="${BATS_TEST_TMPDIR}/fzf-calls.log"
   : > "${FZF_STUB_LOG}"
@@ -152,12 +182,19 @@ stub_cmd() {
   # that fails silently and makes a test pass for the wrong reason.
   printf '%s' "${out}" > "${out_file}"
 
+  # The record is assembled in a variable and appended with ONE printf. Two
+  # stubs in a pipeline - `short ... | jq ...` in sc-pick, `gh ... | jq ...` in
+  # pr-pick - run concurrently and append to the same log, so a printf per
+  # argument interleaves their argv into a single garbled line
+  # (`short<US>s<US>-qjq<US>...`). Measured at 55 runs in 60. One O_APPEND
+  # write of the whole record cannot interleave.
   {
     printf '#!/usr/bin/env bash\n'
     printf 'set -o nounset\n'
-    printf 'printf %%s %s >> "${CMD_STUB_LOG}"\n' "$(printf '%q' "${name}")"
-    printf 'for a in ${1+"${@}"}; do printf "\\x1f%%s" "${a}" >> "${CMD_STUB_LOG}"; done\n'
-    printf 'printf "\\n" >> "${CMD_STUB_LOG}"\n'
+    printf "sep=\$'\\\\x1f'\n"
+    printf 'rec=%s\n' "$(printf '%q' "${name}")"
+    printf 'for a in ${1+"${@}"}; do rec="${rec}${sep}${a}"; done\n'
+    printf 'printf "%%s\\n" "${rec}" >> "${CMD_STUB_LOG}"\n'
     printf 'if [ -s %s ]; then cat %s; printf "\\n"; fi\n' \
       "$(printf '%q' "${out_file}")" "$(printf '%q' "${out_file}")"
     printf 'exit %s\n' "${exit_status}"

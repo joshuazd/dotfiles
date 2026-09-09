@@ -312,7 +312,7 @@ setup() {
   printf '# A\nB\t@menu bbb\n' > "${FZF_MENU_DIR}/aaa.menu"
   printf '# B\nA\t@menu aaa\n' > "${FZF_MENU_DIR}/bbb.menu"
   export FZF_STUB_SELECTIONS="$(printf '@menu bbb\t1 B\n@menu aaa\t1 A')"
-  run timeout 20 "${FZF_MENU}" aaa
+  run with_timeout 20 "${FZF_MENU}" aaa
   [ "${status}" -eq 2 ]
   [[ "${output}" == *"too deep"* ]]
 }
