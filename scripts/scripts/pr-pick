@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-# pr-pick - Pick an open pull request and act on it
+# pr-pick - Pick an open pull request awaiting my review and act on it
 #
-#        pr-pick --act <verb> <number>  act on one PR (used by menu items)
+#        pr-pick --act <verb> <pr>  act on one PR by URL or number (used by menu items)
 # Usage: pr-pick <checkout|review|browse|diff>
 #
 # Arguments:
 #   checkout    create a worktree and tmux session for the PR
-#   review      review the PR with Claude
+#   review      dispatch the PR to vigil for a Claude review
 #   browse      open the PR in a browser
 #   diff        show the PR diff
 #
@@ -25,6 +25,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
 source "${SCRIPT_DIR}/lib/menu.sh"
+source "${SCRIPT_DIR}/lib/vigil.sh"
 
 # Where sibling scripts are found. Defaults to this script's own
 # directory; SCRIPTS_PKG_DIR redirects it, which is how the tests point
@@ -34,6 +35,8 @@ readonly PKG_DIR="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}"
 
 readonly PICK_USAGE_ERROR=2
 readonly PR_LIST_LIMIT=50
+readonly PR_LIST_SEARCH="review-requested:@me"
+readonly PR_ROW_JQ="${SCRIPT_DIR}/lib/pr-rows.jq"
 
 #######################################
 # Print usage information
@@ -44,34 +47,40 @@ usage() {
   printf '%s\n' \
     "Usage: ${0##*/} <checkout|review|browse|diff>" \
     "" \
-    "Pick an open pull request and act on it." \
+    "Pick an open pull request awaiting your review and act on it." \
     "" \
     "  checkout    create a worktree and tmux session for the PR" \
-    "  review      review the PR with Claude" \
+    "  review      dispatch the PR to vigil for a Claude review" \
     "  browse      open the PR in a browser" \
     "  diff        show the PR diff"
 }
 
 #######################################
-# Emit one picker row per open pull request.
+# Emit one picker row per open pull request awaiting my review.
 #
-# The number rides in the hidden first field and the human-readable summary is
+# The URL rides in the hidden first field and the human-readable summary is
 # last, which is the package convention pick_one's `--with-nth -1` depends on.
 #
 # A gh failure (no network, not a repo, not authenticated) produces no rows
-# rather than an error: the caller turns that into "No open PRs.", which is a
-# better popup than a stack of gh diagnostics the user cannot act on.
+# rather than an error: the caller turns that into "No PRs awaiting review.",
+# which is a better popup than a stack of gh diagnostics the user cannot act
+# on.
+#
+# The title is cleaned, truncated and padded by lib/pr-rows.jq. jq counts
+# characters rather than bytes: bash 3.2's printf would cut a multibyte title
+# mid-character and pad it short, knocking the author column out of line.
 # Outputs:
-#   "number<TAB>#N  title  [branch]" rows to stdout
+#   "url<TAB>#N  title  author" rows to stdout
 #######################################
 pr_rows() {
-  local number title branch
-  while IFS=$'\t' read -r number title branch; do
-    [ -n "${number}" ] || continue
-    printf '%s\t#%s  %s  [%s]\n' "${number}" "${number}" "${title}" "${branch}"
+  local url number title author
+  while IFS=$'\t' read -r url number title author; do
+    [ -n "${url}" ] || continue
+    printf '%s\t%-7s %s  %s\n' "${url}" "#${number}" "${title}" "${author}"
   done < <(gh pr list --limit "${PR_LIST_LIMIT}" \
-    --json number,title,headRefName \
-    --jq '.[] | "\(.number)\t\(.title)\t\(.headRefName)"' 2>/dev/null || true)
+    --search "${PR_LIST_SEARCH}" \
+    --json url,number,title,author \
+    --jq "$(cat "${PR_ROW_JQ}")" 2>/dev/null || true)
 }
 
 #######################################
@@ -103,31 +112,60 @@ check_verb() {
 }
 
 #######################################
+# Hand a PR to vigild, the same submission dispatch-from-chrome makes.
+#
+# vigild runs the review as a job and teleports the client to the new session
+# when it lands, so nothing here opens a popup or waits on the review. The
+# daemon's dispatch hook only recognises a PR by its URL, so a bare number is
+# resolved to one first.
+#
+# stdout is dropped: a native menu item runs this under `run-shell -b`, which
+# writes output into the focused pane, and the vigil panel already shows the
+# job. stderr is kept so a refusal is still seen.
+# Arguments:
+#   The PR URL or number
+# Returns:
+#   0 once vigild accepts the job, 1 otherwise
+#######################################
+review_pr() {
+  local pr="${1}"
+  local vigil_bin
+  if ! vigil_bin="$(resolve_vigil)"; then
+    error "vigil not found - run 'make install' in the vigil repo"
+    return 1
+  fi
+  if [[ ! "${pr}" =~ ^https?:// ]]; then
+    pr="$(gh pr view "${pr}" --json url --jq .url)" || return 1
+  fi
+  "${vigil_bin}" dispatch --cwd "${PWD}" "${pr}" >/dev/null
+}
+
+#######################################
 # Act on one already-chosen value.
 #
 # This is what a native menu item invokes: display-menu runs a command rather
 # than handing a selection back. The fzf path reaches the same function, which
 # is what keeps the two backends honest about doing the same thing.
 # Arguments:
-#   The verb, the PR number
+#   The verb, the PR URL or number
 # Returns:
 #   0 on success, PICK_USAGE_ERROR on a bad invocation
 #######################################
 act() {
   local verb="${1:-}"
-  local number="${2:-}"
+  local pr="${2:-}"
 
   check_verb "${verb}" || return "${?}"
-  if [ -z "${number}" ]; then
-    error "missing required argument: PR number"
+  if [ -z "${pr}" ]; then
+    error "missing required argument: PR"
     return "${PICK_USAGE_ERROR}"
   fi
 
   case "${verb}" in
-    checkout) "${PKG_DIR}/gh-worktree" "${number}" ;;
-    review)   "${PKG_DIR}/gh-review" "${number}" ;;
-    browse)   gh pr view --web "${number}" ;;
-    diff)     gh pr diff "${number}" ;;
+    checkout) "${PKG_DIR}/gh-worktree" "${pr}" ;;
+    review)   review_pr "${pr}" ;;
+    browse)   gh pr view --web "${pr}" ;;
+    diff)     gh pr diff "${pr}" ;;
   esac
 }
 
@@ -150,7 +188,7 @@ main() {
         "$(printf '%q' "${SCRIPT_DIR}/pr-pick") ${verb}" \
         --size "" --style default --info hidden \
         --prompt "PR to ${verb}> " \
-        --empty-message "No open PRs." \
+        --empty-message "No PRs awaiting review." \
     || status="${?}"
 
   # An empty list has printed its message and the user needs a moment to read

@@ -7,7 +7,7 @@
 #
 # Arguments:
 #   claim       claim ownership of the story
-#   implement   implement the story with Claude
+#   implement   dispatch the story to vigil for Claude to implement
 #   worktree    create a worktree and tmux session for the story
 #   browse      open the story in a browser
 #
@@ -25,6 +25,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/lib/output.sh"
 source "${SCRIPT_DIR}/lib/picker.sh"
 source "${SCRIPT_DIR}/lib/menu.sh"
+source "${SCRIPT_DIR}/lib/vigil.sh"
 
 # Where sibling scripts are found. Defaults to this script's own directory;
 # SCRIPTS_PKG_DIR redirects it, which is how the tests point sibling
@@ -46,7 +47,7 @@ usage() {
     "Pick one of your unfinished Shortcut stories and act on it." \
     "" \
     "  claim       claim ownership of the story" \
-    "  implement   implement the story with Claude" \
+    "  implement   dispatch the story to vigil for Claude to implement" \
     "  worktree    create a worktree and tmux session for the story" \
     "  browse      open the story in a browser"
 }
@@ -106,6 +107,33 @@ check_verb() {
 }
 
 #######################################
+# Hand a story to vigild, the same submission dispatch-from-chrome makes.
+#
+# vigild runs shortcut-implement as a job and teleports the client to the new
+# session when it lands, so nothing here opens a popup or waits on Claude.
+# The daemon's dispatch hook routes an sc-<id> to shortcut-implement as is.
+#
+# The cwd is the repository the worktree is cut from, so it is this process's,
+# which is what shortcut-implement read when it ran here directly.
+#
+# stdout is dropped: a native menu item runs this under `run-shell -b`, which
+# writes output into the focused pane, and the vigil panel already shows the
+# job. stderr is kept so a refusal is still seen.
+# Arguments:
+#   The story id
+# Returns:
+#   0 once vigild accepts the job, 1 otherwise
+#######################################
+implement_story() {
+  local vigil_bin
+  if ! vigil_bin="$(resolve_vigil)"; then
+    error "vigil not found - run 'make install' in the vigil repo"
+    return 1
+  fi
+  "${vigil_bin}" dispatch --cwd "${PWD}" "${1}" >/dev/null
+}
+
+#######################################
 # Act on one already-chosen value.
 #
 # This is what a native menu item invokes: display-menu runs a command rather
@@ -128,7 +156,7 @@ act() {
 
   case "${verb}" in
     claim)     "${PKG_DIR}/shortcut-claim" "${id}" ;;
-    implement) "${PKG_DIR}/shortcut-implement" "${id}" ;;
+    implement) implement_story "${id}" ;;
     worktree)  "${PKG_DIR}/shortcut-worktree" "${id}" ;;
     # -O opens a browser. Lowercase -o would ASSIGN an owner.
     browse)    short story "${id}" -O ;;

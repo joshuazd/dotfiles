@@ -49,6 +49,7 @@ Functions are organized into focused libraries under `lib/`. All scripts source 
 - **`lib/git.sh`** — `is_git_repo`, `get_name_from_branch`, `extract_story_id`, `normalize_pr_input`, `pr_repo_dir`
 - **`lib/shortcut.sh`** — `fetch_story_summary` (returns tab-delimited `title\tbranch` via `short --format`, no JSON parsing)
 - **`lib/tmux.sh`** — `is_in_tmux`, `session_name_from_title`, `setup_secondary_pane`, `create_tmux_session`, `launch_claude_in_pane`, `worktree_prompt_file`, `resolve_session_name`, `resolve_session_script`, `run_worktree_popup`, the `SESSION_EXISTED` status
+- **`lib/vigil.sh`** — `resolve_vigil`, which finds the binary even when `~/.local/bin` is not on PATH (menu bar app, tmux `run-shell`)
 
 Each lib uses a source guard to prevent double-loading. `common.sh` is a thin shim that sources all four.
 
@@ -280,7 +281,7 @@ or reaching for an entry.
 | Entry | Side effects |
 |---|---|
 | Claim a story | **Mutates the story.** Adds you as an owner through the API |
-| Implement a story | Full dispatch: creates a worktree at `../branch-name`, creates a tmux session with `claude` and `server` windows, launches Claude in plan mode seeded with the story, and switches you to it |
+| Implement a story | Submits the `sc-<id>` to `vigil dispatch`, like `dispatch-from-chrome`: vigild runs `shortcut-implement` as a job (worktree at `../branch-name` cut from the current directory's repo, `claude` / `server` session, Claude in plan mode seeded with the story) and switches you there when it lands. No popup |
 | Worktree from a story | Worktree and session as above. No Claude |
 | Open a story in browser | Read-only (`short story <id> -O`) |
 | Story from this branch | Read-only |
@@ -290,7 +291,7 @@ or reaching for an entry.
 | Entry | Side effects |
 |---|---|
 | Checkout PR as worktree | Fetches the branch, creates worktree and session, switches you there |
-| Review PR with Claude | As above, plus Claude with the review prompt under `bypassPermissions` and `CLAUDE_READONLY_REMOTE=1`, so the `block-remote-writes.sh` hook denies pushes |
+| Review PR with Claude | Submits the PR URL to `vigil dispatch`, like `dispatch-from-chrome`: vigild runs `gh-review` as a job (worktree, session, Claude under `bypassPermissions` and `CLAUDE_READONLY_REMOTE=1` so the `block-remote-writes.sh` hook denies pushes) and switches you there when it lands. No popup |
 | Open in browser / Diff a PR / Checks | Read-only |
 | Create PR | New window, interactive `gh pr create`. **Publishes** once you complete it |
 

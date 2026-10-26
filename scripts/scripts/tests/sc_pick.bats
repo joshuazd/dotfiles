@@ -8,6 +8,7 @@ setup() {
   setup_cmd_stubs
   SC_PICK="${BATS_TEST_DIRNAME}/../sc-pick"
   export SCRIPTS_PKG_DIR="${CMD_STUB_BIN}"
+  export VIGIL_BIN="${CMD_STUB_BIN}/vigil"
   # What `short ... | jq -r ...` produces: id, state, name. Both halves of the
   # pipeline are stubbed - short because it is a network call, jq because the
   # short stub emits the finished rows rather than the JSON jq would parse.
@@ -35,14 +36,42 @@ stub_listing() {
   [ "${lines[1]}" = "sc-101" ]
 }
 
-@test "implement hands the id to shortcut-implement" {
+@test "implement dispatches the id to vigil instead of running shortcut-implement" {
   stub_listing
+  stub_cmd vigil "dispatch queued: sc-102"
   stub_cmd shortcut-implement
   export FZF_STUB_SELECTION=$'sc-102\tsc-102  Backlog  Add the other'
   run "${SC_PICK}" implement
   [ "${status}" -eq 0 ]
-  run cmd_call_args shortcut-implement
-  [ "${lines[1]}" = "sc-102" ]
+  run cmd_call_args vigil
+  [ "${lines[1]}" = "dispatch" ]
+  printf '%s\n' "${output}" | assert_arg_after "--cwd" "${PWD}"
+  [ "${lines[${#lines[@]}-1]}" = "sc-102" ]
+  refute_cmd_called shortcut-implement
+}
+
+# A native menu item runs under `run-shell -b`, which writes stdout into the
+# focused pane.
+@test "implement keeps vigil's success line out of the pane" {
+  stub_cmd vigil "dispatch queued: sc-101"
+  run "${SC_PICK}" --act implement sc-101
+  [ "${status}" -eq 0 ]
+  [[ "${output}" != *"dispatch queued"* ]]
+}
+
+@test "implement surfaces a refused dispatch" {
+  stub_cmd vigil "" 1
+  run "${SC_PICK}" --act implement sc-101
+  [ "${status}" -ne 0 ]
+}
+
+@test "implement with no vigil installed says so" {
+  export VIGIL_BIN=""
+  export PATH="/usr/bin:/bin"
+  export HOME="${BATS_TEST_TMPDIR}"
+  run "${SC_PICK}" --act implement sc-101
+  [ "${status}" -eq 1 ]
+  [[ "${output}" == *"vigil not found"* ]]
 }
 
 @test "worktree hands the id to shortcut-worktree" {
@@ -151,12 +180,12 @@ stub_listing() {
   [[ "${output}" == *"Usage:"* ]]
 }
 
-@test "--act implement hands the id to shortcut-implement" {
-  stub_cmd shortcut-implement
+@test "--act implement dispatches the id to vigil" {
+  stub_cmd vigil
   run "${SC_PICK}" --act implement sc-101
   [ "${status}" -eq 0 ]
-  run cmd_call_args shortcut-implement
-  [ "${lines[1]}" = "sc-101" ]
+  run cmd_call_args vigil
+  [ "${lines[${#lines[@]}-1]}" = "sc-101" ]
   refute_fzf_called
 }
 
