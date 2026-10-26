@@ -2,32 +2,35 @@
 #
 # lib/route.sh - Per-invocation model and reasoning routing for dispatch
 #
-# A Haiku 4.5 classifier inspects PR/story signals and picks `model` and
+# A Haiku 5.5 classifier inspects PR/story signals and picks `model` and
 # `reasoning` for the launched `claude` session.
 #
 # Policy (Opus is only ~1.67x Sonnet/token, so EFFORT is the primary dial, not
 # the model — we stay on Opus and ladder effort rather than drop to a weaker
 # model):
-#   - PR review is pure Opus, single pass. Effort ladders on what the changed
-#     *paths* are (production area → peripheral → generated/lockfile/dep-bump),
-#     NOT on file/line counts: xhigh (default) → high → medium → low.
-#   - Story implement always starts in plan mode. Default is opusplan+high
-#     (Opus plans, Sonnet executes the token-heavy middle). Everything else
-#     stays on Opus through execution: opus+xhigh (complex), opus+medium
-#     (well-scoped), opus+low (mechanical). opusplan is locked to high.
-#     Routes description-first; `story_type` is weak/secondary.
+#   - PR review is a single pass. Effort ladders on what the changed *paths*
+#     are (production area → peripheral → generated/lockfile/dep-bump), NOT on
+#     file/line counts: opus+high (default) → opus+medium → opus+low. A PR
+#     spanning several production areas or touching core code goes to
+#     fable+medium, never opus+xhigh.
+#   - Story implement always starts in plan mode. Default is opus+high
+#     (moderate work); opus+medium (well-scoped) and opus+low (mechanical)
+#     ladder effort down. Complex work goes to fable+medium rather than
+#     opus+xhigh: Opus at xhigh ran too long and wandered into unrequested
+#     work, and Fable at medium reasons better with less. No routed tier, PR
+#     or story, runs at xhigh. Routes description-first; `story_type` is
+#     weak/secondary.
 #   - Moving off the default requires enumerated positive evidence; a thin or
 #     ambiguous signal holds at the default (the default is sticky).
 #   - The classifier emits a confidence field. A low-confidence verdict — and
 #     any classifier failure/timeout — falls back to the per-kind default
-#     (`_route_default_json`): pr → opus+xhigh, story → opusplan+high.
-#   - Effort matrix: Opus accepts xhigh|high|medium|low; sonnet/opusplan cap at
-#     high (xhigh is Opus-only) and never run low.
+#     (`_route_default_json`): pr → opus+high, story → opus+high.
+#   - Effort matrix: Opus and Fable accept xhigh|high|medium|low; sonnet/opusplan
+#     cap at high and never run low.
 #
-# Deferred / not active: `opusplan+xhigh` (pending a manual test of whether
-# --effort persists across the opusplan model switch). `opusplan+medium` was
-# considered and rejected — it forces plan-mode ceremony onto work the
-# well-scoped/mechanical tiers handle plan-free on Opus.
+# The classifier never emits sonnet or opusplan: Sonnet execution traded away
+# too much quality for a ~1.67x per-token saving. Both remain reachable only
+# through the manual `--tier` override.
 #
 # THE TIERS LIVE IN ONE PLACE: the `_route_matrix` table. The classifier
 # prompt, JSON enums, per-kind default, and the markdown dump all derive from
@@ -43,7 +46,7 @@ readonly __LIB_ROUTE_LOADED=1
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/output.sh"
 
-readonly _ROUTE_CLASSIFIER_MODEL="claude-haiku-4-5-20251001"
+readonly _ROUTE_CLASSIFIER_MODEL="claude-haiku-5-5"
 readonly _ROUTE_TIMEOUT_SECS=30
 readonly _ROUTE_DEBUG_LOG="${CLAUDE_ROUTE_DEBUG_LOG:-/tmp/route-debug.log}"
 
@@ -61,8 +64,8 @@ readonly _ROUTE_DEBUG_LOG="${CLAUDE_ROUTE_DEBUG_LOG:-/tmp/route-debug.log}"
 #
 # To change routing, edit THIS table. The classifier prompt, the JSON model/
 # effort enums, the per-kind default, and `print-matrix` all derive from it.
-# (The effort *capability ceiling* — opus does all four, sonnet/opusplan cap at
-# high and never run low — lives in manual_route, since it's a fixed property
+# (The effort *capability ceiling* — opus and fable do all four, sonnet/opusplan
+# cap at high and never run low — lives in manual_route, since it's a fixed property
 # of the models, not policy.)
 # Arguments:
 #   kind — "pr" or "story"
@@ -72,16 +75,16 @@ readonly _ROUTE_DEBUG_LOG="${CLAUDE_ROUTE_DEBUG_LOG:-/tmp/route-debug.log}"
 _route_matrix() {
   case "${1}" in
     pr) cat <<'ROWS'
-opus     | xhigh  | default | most reviews
-opus     | high   |         | a single cohesive production area / single-purpose well-scoped change
+fable    | medium |         | rare: the title, body or paths positively show a change whose correctness hinges on a subtle invariant the reviewer must hold across the whole diff - concurrency / locking / transaction boundaries, authn / authz / tenant isolation, a migration or backfill that rewrites production data, or a change to a state machine or status lifecycle
+opus     | high   | default | most reviews, including large or multi-area changes, new classes / modules / data sources that follow an existing pattern, and refactors that move logic between files
 opus     | medium |         | changes confined to peripheral paths (spec/, test/, docs/, config/, CI)
 opus     | low    |         | generated-only, lockfile-only, copy/string-only, or a pure dependency bump (e.g. Dependabot)
 ROWS
       ;;
     story) cat <<'ROWS'
-opus     | xhigh  |         | cross-cutting changes, state-machine / enum / status work, a novel pattern being introduced, or multi-subsystem work that needs Opus reasoning at every execution step
-opusplan | high   | default | moderate or unclear-but-non-trivial work; the catch-all when nothing below clearly applies
-opus     | medium |         | clearly a single-component / UI tweak / config-flag flip / simple migration / isolated bug fix
+fable    | medium |         | rare: the description positively shows work whose correctness hinges on a subtle invariant that must hold across the whole change - concurrency / locking / transaction boundaries, authn / authz / tenant isolation, a migration or backfill that rewrites production data, or a change to a state machine or status lifecycle
+opus     | high   | default | work that still needs real design decisions, or a description too thin to place, including large or multi-subsystem work and new patterns; the catch-all when nothing below clearly applies
+opus     | medium |         | the shape of the work is clear from the description and needs no design decisions, even if it spans several files in one subsystem: single-component change, UI tweak, config/flag flip, straightforward migration, isolated bug fix, adding a field / column / endpoint / spec that follows an existing pattern, or a mechanical edit repeated across files
 opus     | low    |         | clearly a chore / cleanup / spec-only / pure doc-copy edit with no production behavior change
 ROWS
       ;;
@@ -123,12 +126,26 @@ _route_distinct() {
 }
 
 #######################################
+# Succeed when <model>+<effort> is a row of the kind's matrix. The JSON enums
+# list models and efforts independently, so a verdict can pair them into a
+# combination no row allows (e.g. fable+xhigh).
+# Arguments:
+#   kind, model, effort
+#######################################
+_route_has_pair() {
+  _route_matrix "${1}" | awk -F'|' -v m="${2}" -v e="${3}" '
+    { for (i = 1; i <= 2; i++) gsub(/^[ \t]+|[ \t]+$/, "", $i) }
+    $1 == m && $2 == e { found = 1; exit }
+    END { exit !found }'
+}
+
+#######################################
 # Per-kind safe default routing JSON, derived from the matrix `default` row.
 # This is the tier uncertainty resolves toward: classifier failure or a
 # low-confidence verdict lands here, NOT on a cheap downgrade and NOT on a
 # blanket over-escalation. A hardcoded last-resort matches the matrix defaults
-# (pr → opus+xhigh, story → opusplan+high) so the safety net never depends on
-# the table it is protecting against.
+# (opus+high for both kinds) so the safety net never depends on the table it
+# is protecting against.
 # Arguments:
 #   kind      — "pr" or "story"
 #   rationale — optional; defaults to "route-default"
@@ -142,10 +159,8 @@ _route_default_json() {
   IFS=$'\t' read -r model effort < <(_route_default_fields "${kind}")
 
   if [ -z "${model}" ] || [ -z "${effort}" ]; then
-    case "${kind}" in
-      story) model="opusplan"; effort="high" ;;
-      *)     model="opus";     effort="xhigh" ;;
-    esac
+    model="opus"
+    effort="high"
   fi
 
   printf '{"model":"%s","reasoning":"%s","rationale":"%s"}' \
@@ -191,9 +206,10 @@ _route_debug() {
 # Map a tier name to a Claude CLI model argument.
 # Aliases, not pinned IDs, so the CLI always resolves the latest model of each
 # tier. Opus and Sonnet include the 1M context window at standard pricing, so we
-# always opt in via the `[1m]` suffix; Haiku has no 1M variant.
+# always opt in via the `[1m]` suffix; Fable is 1M by default, Haiku has no 1M
+# variant.
 # Arguments:
-#   tier — opus | sonnet | haiku
+#   tier — fable | opus | opusplan | sonnet | haiku
 # Outputs:
 #   Writes the model argument to stdout
 # Returns:
@@ -203,6 +219,7 @@ model_id() {
   local tier="${1}"
 
   case "${tier}" in
+    fable)    printf "fable" ;;
     opus)     printf "opus[1m]" ;;
     opusplan) printf "opusplan" ;;
     sonnet)   printf "sonnet[1m]" ;;
@@ -219,7 +236,7 @@ model_id() {
 # Derives exec_tier as one tier below model (opus→sonnet, sonnet→sonnet, haiku→haiku).
 # Arguments:
 #   tier      — opus | opus-1m | sonnet | haiku
-#   reasoning — xhigh | high | medium | low (default: xhigh)
+#   reasoning — xhigh | high | medium | low (default: per tier)
 # Outputs:
 #   Routing JSON to stdout
 #######################################
@@ -236,10 +253,10 @@ parse_route() {
   local route_json="${1}"
   local parsed=""
   parsed="$(printf '%s' "${route_json}" \
-    | jq -r '[.model // "opus", .reasoning // "xhigh", .rationale // "no-rationale"] | @tsv' 2>/dev/null)" || parsed=""
+    | jq -r '[.model // "opus", .reasoning // "high", .rationale // "no-rationale"] | @tsv' 2>/dev/null)" || parsed=""
   if [ -z "${parsed}" ]; then
     _route_debug "parse_route: invalid JSON, using fallback" "${route_json}"
-    parsed=$'opus\txhigh\tclassifier-fallback'
+    parsed=$'opus\thigh\tclassifier-fallback'
   fi
   printf '%s' "${parsed}"
 }
@@ -250,7 +267,8 @@ manual_route() {
   local default_reasoning
 
   case "${tier}" in
-    opus)     default_reasoning="xhigh" ;;
+    fable)    default_reasoning="medium" ;;
+    opus)     default_reasoning="high" ;;
     opusplan) default_reasoning="high" ;;
     sonnet)   default_reasoning="high" ;;
     haiku)    default_reasoning="medium" ;;
@@ -262,7 +280,7 @@ manual_route() {
 
   [ -z "${reasoning}" ] && reasoning="${default_reasoning}"
 
-  # Clamp to the model's supported effort matrix. Opus accepts the full ladder
+  # Clamp to the model's supported effort matrix. Opus and Fable accept the full ladder
   # (xhigh|high|medium|low). sonnet/opusplan cap at high (xhigh is Opus-only)
   # and never run low.
   case "${tier}" in
@@ -295,15 +313,15 @@ _classifier_system_prompt() {
   case "${kind}" in
     pr)
       task="GitHub PR review"
-      intro="PR review ALWAYS runs on Opus (single model, single pass — there is no plan-then-execute split, so opusplan and sonnet are never used here). You pick the reasoning EFFORT to match the work. Opus is only ~1.67x Sonnet's per-token price, so staying on Opus and laddering effort is both cheaper-per-task at low effort and higher-quality than dropping to a weaker model."
+      intro="PR review is a single pass with no plan-then-execute split, so opusplan and sonnet are never used here. Most reviews run on Opus, and you pick the reasoning EFFORT to match the work. Fable at medium effort is reserved for the rare PR with a specific named risk; it is NOT the next step up from the default."
       signal="Route on WHAT THE CHANGED FILES ARE (the \`file_paths\` signal), not how many there are — there is no file-count or line-count rule. Set confidence=low when the paths don't clearly indicate scope or the title/body is uninformative."
-      constraints="NEVER emit haiku, sonnet, or opusplan — model is always \"opus\". If the changed paths span multiple production areas or touch core/cross-cutting code, stay on the default."
+      constraints="NEVER emit haiku, sonnet, or opusplan. Emit only a model+reasoning pair listed above: fable goes only with medium, and opus never with xhigh. Size, file count, the number of directories or subsystems touched, and new files following an established pattern NEVER qualify for fable on their own. If you cannot name which listed fable risk the PR carries, it is opus+high."
       ;;
     story)
       task="Shortcut story implement"
-      intro="The implement flow ALWAYS starts in plan mode: Opus writes the plan, the user reviews and accepts, then execution proceeds. \`opusplan\` is a built-in alias — Opus while planning, Sonnet auto-takes-over for execution on plan-accept; every other tier stays on Opus through execution. Opus is only ~1.67x Sonnet's per-token price, so the model gap is small and the main dial is reasoning EFFORT."
+      intro="The implement flow ALWAYS starts in plan mode: the model writes the plan, the user reviews and accepts, then the same model executes it. Most stories run on Opus, and you pick the reasoning EFFORT to match the work. Fable at medium effort is reserved for the rare story with a specific named risk; it is NOT the next step up from the default. Weaker models are never used."
       signal="PRIMARY SIGNAL: the story DESCRIPTION. Judge complexity from what the description actually says the work entails. \`story_type\` (feature/bug/chore) is a WEAK, SECONDARY signal — a \"bug\" can be a one-line fix or a deadlock, a \"chore\" can be a rename or a migration. Do NOT route on story_type alone. Set confidence=low when the description is thin/ambiguous and you cannot confidently place the story."
-      constraints="opusplan is locked to \`high\` and xhigh is Opus-only. NEVER emit haiku or sonnet, never opusplan with any effort other than high, never xhigh with anything but opus."
+      constraints="NEVER emit haiku, sonnet, or opusplan. Emit only a model+reasoning pair listed above: fable goes only with medium, and opus never with xhigh. Size, file count, the number of subsystems touched, and introducing a new pattern NEVER qualify for fable on their own; if you cannot name which listed fable risk the story carries, it is not fable. Judge by whether the APPROACH is already settled by the description, not by how many files it touches — breadth alone is not a reason to escalate. Stay on the default when the description leaves real design decisions open."
       ;;
     *)
       error "Unknown classifier kind: ${kind}"
@@ -404,6 +422,15 @@ ${payload}"
     return 0
   fi
 
+  local model effort
+  IFS=$'\t' read -r model effort < <(printf '%s' "${routing}" | jq -r '[.model, .reasoning] | @tsv' 2>/dev/null)
+  if ! _route_has_pair "${kind}" "${model}" "${effort}"; then
+    warn "classifier: ${model}+${effort} is not a ${kind} tier, using default"
+    _route_debug "classifier: off-matrix pair → default (${kind})" "${routing}"
+    _route_default_json "${kind}" "off-matrix → default"
+    return 0
+  fi
+
   _route_debug "classifier final routing (${kind})" "${routing}"
   printf '%s' "${routing}"
 }
@@ -490,7 +517,7 @@ classify_story() {
 # clear, which is why operational guidance for post-plan-accept work
 # belongs here rather than in a session skill.
 # Arguments:
-#   tier               — opus | opusplan | sonnet | haiku
+#   tier               — fable | opus | opusplan | sonnet | haiku
 #   reasoning          — xhigh | high | medium | low
 #   rationale          — one-line classifier reason
 #   slash_command      — e.g. "/review-pr 123" or "/implement 12345"

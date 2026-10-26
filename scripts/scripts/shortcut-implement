@@ -11,7 +11,7 @@
 # Arguments:
 #   --detached, -d      Create session without switching to it (optional)
 #   --non-interactive   Don't wait for user input before closing popup (optional)
-#   --tier T            Force model tier (opus|opusplan|sonnet|haiku). Skips classifier. (optional)
+#   --tier T            Force model tier (fable|opus|opusplan|sonnet|haiku). Skips classifier. (optional)
 #   --reasoning R       Force reasoning effort (xhigh|high|medium|low). (optional)
 #   story-url-or-id     Shortcut story URL, sc-12345, or numeric ID
 #
@@ -44,7 +44,7 @@ Implement a Shortcut story with Claude.
 Arguments:
   --detached, -d      Create session without switching to it (optional)
   --non-interactive   Don't wait for user input before closing popup (optional)
-  --tier T            Force model tier (opus|opusplan|sonnet|haiku). Skips classifier. (optional)
+  --tier T            Force model tier (fable|opus|opusplan|sonnet|haiku). Skips classifier. (optional)
   --reasoning R       Force reasoning effort (xhigh|high|medium|low). (optional)
   story-url-or-id     Shortcut story URL, sc-12345, or numeric ID
 
@@ -200,9 +200,8 @@ main() {
     return "${popup_status}"
   fi
 
-  # Stories always start in plan mode: Opus writes the plan for review before
-  # execution, and the opusplan alias requires plan mode to hand off to Sonnet.
-  # Every routed story tier is opus or opusplan, so this is unconditional.
+  # Stories always start in plan mode: the plan is reviewed before it executes,
+  # at every routed tier.
   local -a extra_flags=("--permission-mode" "plan")
 
   info "Launching Claude in claude window..."

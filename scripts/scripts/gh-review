@@ -12,7 +12,7 @@
 #   --detached          Create session without switching to it (optional)
 #   -d                  Shorthand for --detached (optional)
 #   --non-interactive   Don't wait for user input before closing popup (optional)
-#   --tier T            Force model tier (opus|sonnet|haiku). Skips classifier. (optional)
+#   --tier T            Force model tier (fable|opus|opusplan|sonnet|haiku). Skips classifier. (optional)
 #   --reasoning R       Force reasoning effort (xhigh|high|medium|low). (optional)
 #   pr-number-or-url    PR number (123), #123, or full GitHub PR URL
 #
@@ -45,7 +45,7 @@ Review a GitHub pull request with Claude.
 Arguments:
   --detached, -d      Create session without switching to it (optional)
   --non-interactive   Don't wait for user input before closing popup (optional)
-  --tier T            Force model tier (opus|sonnet|haiku). Skips classifier. (optional)
+  --tier T            Force model tier (fable|opus|opusplan|sonnet|haiku). Skips classifier. (optional)
   --reasoning R       Force reasoning effort (xhigh|high|medium|low). (optional)
   pr-number-or-url    PR number (123), #123, or full GitHub PR URL
 
