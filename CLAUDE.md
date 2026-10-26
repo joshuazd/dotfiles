@@ -168,6 +168,7 @@ Action menus, opened over the focused pane.
 - `scripts/scripts/fzf-menu` — runs a declarative `menus/<name>.menu` file
 - `scripts/scripts/menus/*.menu` — one file per menu, `Label<TAB>command`, tab separated. A leading sigil says where the command runs: none (in the popup), `@window`, `@pane`, `@bg`, `@menu`, `@quiet`. A `&` in the label marks its mnemonic key (`&Fetch` binds `f`), folded to lowercase
 - `scripts/scripts/{wt,pr,sc}-pick` — list-then-act pickers for the entries that need a second choice. Dynamic lists are scripts, not menu syntax
+- `scripts/scripts/wt-new` — same rule for typed input: a `.menu` row is a fixed command string, so an entry needing a branch name has to be a script that asks. It asks on the status bar with `tmux command-prompt` when it has no tty (the `@quiet` menu path) and inline when it does (the fzf fallback), and the answer returns through an `--act` re-entry point
 
 Bindings: `prefix g` git, `w` worktree, `r` pr, `t` tmux, `s` shortcut, `m` all menus. Each has a `C-` variant except `m` (terminals send `C-m` as Enter).
 

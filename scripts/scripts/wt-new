@@ -1,0 +1,398 @@
+#!/usr/bin/env bash
+#
+# wt-new - Ask for a branch name, then create a worktree for it
+#
+# Usage: wt-new [--session] [branch-name]
+#        wt-new --act [--session] <repo-root>   post-prompt re-entry
+#
+# Arguments:
+#   --session     Also create the tmux session and switch to it
+#   branch-name   Branch to create the worktree for; asked for if omitted
+#
+# git-worktree-new and git-worktree-session both take their branch name as an
+# argument, and a menu row is a fixed command string with no way to supply one:
+# menus/worktree.menu ran `@window git-worktree-new` with none, which exits 1 on
+# the missing argument and takes its own tmux window down with the error still
+# in it. This asks.
+#
+# WHERE IT ASKS depends on whether it has a terminal, the same split
+# tmux-respawn makes:
+#
+#   - No tty (a @quiet menu entry, run under `run-shell`): `command-prompt`, so
+#     the question is one line on the status bar. This is the normal menu path.
+#     A bare entry would instead be asking inside fzf-menu's 80%x60% output
+#     popup, which is an enormous box to hold one short question.
+#   - A tty (fzf-menu's fzf fallback, or a plain shell): read it right here.
+#     The fallback path is already inside the picker's popup, where a
+#     `command-prompt` overlay would not draw at all.
+#   - Neither: read stdin, for `printf name | wt-new` and for the tests.
+#
+# `command-prompt` cannot return an answer, only substitute it into a tmux
+# command, so the answer arrives back through `--act`. The branch name travels
+# in a tmux option rather than in that command's text: `%%` is substituted
+# before anything parses it, so a name interpolated into a `run-shell` string
+# would be read by the shell, and there is no escaping it from this side.
+# In the option it is seen by tmux's parser alone.
+#
+# Example:
+#   wt-new feature/add-login
+#   wt-new --session feature/add-login
+
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # don't hide errors within pipes
+
+readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "${SCRIPT_DIR}/lib/output.sh"
+source "${SCRIPT_DIR}/lib/picker.sh"
+source "${SCRIPT_DIR}/lib/menu.sh"
+source "${SCRIPT_DIR}/lib/git.sh"
+source "${SCRIPT_DIR}/lib/tmux.sh"
+
+# Where sibling scripts are found. Defaults to this script's own directory;
+# SCRIPTS_PKG_DIR redirects it, which is how the tests point the dispatch at a
+# recorder. A PATH stub cannot intercept an absolute path.
+readonly PKG_DIR="${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}"
+
+readonly WT_NEW_USAGE_ERROR=2
+
+# Where a command-prompt answer is left for --act to collect.
+readonly BRANCH_OPTION='@wt_new_branch'
+
+readonly PROMPT='New worktree branch: '
+
+# The worktree-only creation prints a handful of lines - the path, the trust
+# line, the cd hint - so its popup is shorter than the session one, which
+# scrolls through session setup as well.
+readonly CREATE_POPUP_WIDTH='80%'
+readonly CREATE_POPUP_HEIGHT='40%'
+
+#######################################
+# Print usage information
+# Outputs:
+#   Writes usage information to stdout
+#######################################
+usage() {
+  printf '%s\n' \
+    "Usage: ${0##*/} [--session] [branch-name]" \
+    "" \
+    "Create a git worktree for a branch, asking for the name if it is" \
+    "not given. The branch may already exist, locally or on origin." \
+    "" \
+    "  --session   also create the tmux session and switch to it"
+}
+
+#######################################
+# Strip leading and trailing whitespace.
+#
+# A prompt is the one input source where a stray space is routine, and git
+# would take " foo" as a branch name of its own.
+# Arguments:
+#   The string
+# Outputs:
+#   The trimmed string to stdout
+#######################################
+trim() {
+  local value="${1}"
+  value="${value#"${value%%[![:space:]]*}"}"
+  value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "${value}"
+}
+
+#######################################
+# Read a branch name from this process's own input.
+#
+# -e only when there is a terminal: readline against a pipe is not editing
+# anything, and the tests feed this from one.
+# Outputs:
+#   The answer to stdout, trimmed
+# Returns:
+#   0 on an answer, PICKER_QUIET_EXIT on an empty one or a closed input
+#######################################
+read_branch() {
+  local answer=""
+  if [ -t 0 ]; then
+    read -r -e -p "${PROMPT}" answer || return "${PICKER_QUIET_EXIT}"
+  else
+    read -r answer || return "${PICKER_QUIET_EXIT}"
+  fi
+
+  answer="$(trim "${answer}")"
+  [ -n "${answer}" ] || return "${PICKER_QUIET_EXIT}"
+  printf '%s' "${answer}"
+}
+
+#######################################
+# Ask on the tmux status bar, and hand the answer to --act.
+#
+# Returns as soon as the prompt is open: command-prompt does not block, and
+# the work happens in the run-shell its answer triggers. Nothing reads an
+# answer back, the same contract wt-confirm has with display-menu.
+# Arguments:
+#   Repository root, "true" if the session is wanted too
+# Returns:
+#   0 once the prompt is open, 1 if tmux refused to open it
+#######################################
+ask_on_status_bar() {
+  local root="${1}"
+  local with_session="${2}"
+
+  # The root is captured now and passed along rather than recomputed in --act:
+  # by the time the answer arrives the focused pane is whatever the user is
+  # looking at, which need not be the repository they asked from. Same reason
+  # git-worktree-done --confirmed is told its worktree.
+  local act="$(printf '%q' "${SCRIPT_DIR}/wt-new") --act"
+  ${with_session} && act="${act} --session"
+  act="${act} $(printf '%q' "${root}")"
+
+  # Two commands, run in order: park the answer where --act can read it, then
+  # start --act. `-b` so the prompt is not waiting on the creation.
+  local template
+  template="set-option -g ${BRANCH_OPTION} '%%'"
+  template="${template} ; run-shell -b $(menu_tmux_quote "${act}")"
+
+  tmux command-prompt -p "${PROMPT}" "${template}"
+}
+
+#######################################
+# Collect a command-prompt answer, and clear it.
+#
+# Cleared on the way out so a later --act cannot act on a stale answer: the
+# option outlives this process, and an empty read is the only safe default.
+# Outputs:
+#   The answer to stdout, trimmed
+#######################################
+take_parked_branch() {
+  local answer
+  answer="$(tmux show-options -gqv "${BRANCH_OPTION}" 2>/dev/null || true)"
+  tmux set-option -gu "${BRANCH_OPTION}" 2>/dev/null || true
+  printf '%s' "$(trim "${answer}")"
+}
+
+#######################################
+# Create the worktree alone.
+#
+# In a popup when there is one to open, which is where its output can be read;
+# inline when this is already inside one (the fzf fallback path), where a
+# nested display-popup would return 0 without drawing.
+# Arguments:
+#   Repository root, branch name, "true" to run inline
+# Returns:
+#   git-worktree-new's own status
+#######################################
+create_worktree() {
+  local root="${1}"
+  local branch="${2}"
+  local inline="${3}"
+
+  local creator="${PKG_DIR}/git-worktree-new"
+  if [ ! -x "${creator}" ]; then
+    error "git-worktree-new not found or not executable: ${creator}"
+    return 1
+  fi
+
+  if ${inline}; then
+    (cd "${root}" && "${creator}" "${branch}")
+    return "${?}"
+  fi
+
+  local command
+  command="cd $(printf '%q' "${root}")"
+  command="${command} && $(printf '%q' "${creator}") $(printf '%q' "${branch}")"
+  command="${command}; $(printf '%q' "${SCRIPT_DIR}/menu-pause")"
+  tmux display-popup -E -w "${CREATE_POPUP_WIDTH}" -h "${CREATE_POPUP_HEIGHT}" \
+    "${command}"
+}
+
+#######################################
+# Create the worktree, its tmux session, and switch there.
+#
+# run_worktree_popup is the whole of it: it creates the session --detached
+# inside its popup and switches the client afterwards, which is the order a
+# session needs - a client cannot be moved onto a session that does not exist
+# yet. DISPATCH_INLINE is how it runs without opening a popup of its own, for
+# the path that is already inside one.
+#
+# SESSION_EXISTED is not passed on. The session already being there is not a
+# failure, the switch is still what was asked for, and this is a leaf: nothing
+# upstream is deciding whether to respawn a Claude over it.
+# Arguments:
+#   Repository root, branch name, "true" to run inline
+# Returns:
+#   0 on success or an existing session, run_worktree_popup's status otherwise
+#######################################
+create_worktree_and_session() {
+  local root="${1}"
+  local branch="${2}"
+  local inline="${3}"
+
+  local session_script
+  session_script="$(resolve_session_script "${PKG_DIR}")" || return 1
+
+  local session
+  session="$(get_name_from_branch "${branch}")"
+
+  local status=0
+  if ${inline}; then
+    # --non-interactive: the surface this is printing into already pauses
+    # before it closes, and two "press a key" prompts is one too many.
+    DISPATCH_INLINE=1 run_worktree_popup --non-interactive \
+      "${root}" "${session_script}" "${branch}" "${session}" || status="${?}"
+  else
+    run_worktree_popup \
+      "${root}" "${session_script}" "${branch}" "${session}" || status="${?}"
+  fi
+
+  if [ "${status}" -eq "${SESSION_EXISTED}" ]; then
+    return 0
+  fi
+  return "${status}"
+}
+
+#######################################
+# Create the worktree, and the session when it was asked for.
+# Arguments:
+#   Repository root, branch name, "true" for a session, "true" to run inline
+#######################################
+create() {
+  local root="${1}"
+  local branch="${2}"
+  local with_session="${3}"
+  local inline="${4}"
+
+  if ${with_session}; then
+    create_worktree_and_session "${root}" "${branch}" "${inline}"
+  else
+    create_worktree "${root}" "${branch}" "${inline}"
+  fi
+}
+
+#######################################
+# Act on an answer the status-bar prompt collected.
+#
+# Its own entry point because command-prompt has to be able to name a command,
+# not because the creation needs any ceremony of its own. Not a verb: it is
+# reached from a prompt, never from a menu row.
+# Arguments:
+#   The flags and the repository root
+# Returns:
+#   0 on success or a cancel, WT_NEW_USAGE_ERROR on a bad invocation
+#######################################
+act() {
+  local with_session=false
+  local root=""
+
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --session) with_session=true; shift ;;
+      *)         root="${1}";       shift ;;
+    esac
+  done
+
+  if [ -z "${root}" ]; then
+    error "missing required argument: repository root"
+    return "${WT_NEW_USAGE_ERROR}"
+  fi
+
+  local branch
+  branch="$(take_parked_branch)"
+  # An empty answer is a cancel: Enter on an empty prompt. Escape does not
+  # reach here at all, because command-prompt then runs nothing.
+  [ -n "${branch}" ] || return 0
+
+  create "${root}" "${branch}" "${with_session}" false
+}
+
+#######################################
+# Main function
+# Arguments:
+#   Optional --session flag and branch name
+# Returns:
+#   0 on success, PICKER_QUIET_EXIT on a cancel, WT_NEW_USAGE_ERROR on a bad
+#   invocation, the creating script's own status otherwise
+#######################################
+main() {
+  local with_session=false
+  local branch=""
+  local seen_branch=false
+
+  while [ "${#}" -gt 0 ]; do
+    case "${1}" in
+      --session)
+        with_session=true
+        shift
+        ;;
+      -*)
+        error "unknown option: ${1}"
+        printf '\n'
+        usage
+        return "${WT_NEW_USAGE_ERROR}"
+        ;;
+      *)
+        # A menu front end takes one branch name. git-worktree-new's other
+        # flags stay on git-worktree-new, which a caller wanting them is
+        # already invoking directly.
+        if ${seen_branch}; then
+          error "too many arguments"
+          printf '\n'
+          usage
+          return "${WT_NEW_USAGE_ERROR}"
+        fi
+        branch="${1}"
+        seen_branch=true
+        shift
+        ;;
+    esac
+  done
+
+  # Resolved before asking: a question whose answer can only be refused is
+  # worse than the refusal on its own, and the root is what the prompt has to
+  # carry to --act.
+  local root
+  if ! root="$(git rev-parse --show-toplevel 2>/dev/null)" || [ -z "${root}" ]; then
+    error "not a git repository"
+    return "${WT_NEW_USAGE_ERROR}"
+  fi
+
+  branch="$(trim "${branch}")"
+  if [ -n "${branch}" ]; then
+    create "${root}" "${branch}" "${with_session}" true
+    return "${?}"
+  fi
+
+  # No tty and a tmux client means a menu entry running under run-shell: ask
+  # on the status bar, where the answer comes back through --act.
+  if [ ! -t 0 ] && is_in_tmux; then
+    ask_on_status_bar "${root}" "${with_session}" \
+      || { error "could not open the tmux prompt"; return 1; }
+    return 0
+  fi
+
+  local status=0
+  branch="$(read_branch)" || status="${?}"
+  [ "${status}" -eq 0 ] || return "${status}"
+
+  create "${root}" "${branch}" "${with_session}" true
+}
+
+case "${1:-}" in
+  # The act half, invoked by the status-bar prompt once it has an answer.
+  --act)
+    shift
+    act ${1+"${@}"}
+    exit "${?}"
+    ;;
+esac
+
+# Check for help flag
+# ${1+...} is for bash 3.2, which is still /bin/bash on a stock macOS and
+# on the macos-latest runner: there "${@}" with no positional parameters is
+# an unbound variable under `set -o nounset` rather than an empty list, so a
+# no-argument run aborted here instead of printing usage.
+if help_wanted ${1+"${@}"}; then
+  usage
+  exit 0
+fi
+
+# Run main function
+main ${1+"${@}"}

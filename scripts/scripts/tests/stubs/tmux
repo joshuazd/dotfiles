@@ -141,6 +141,7 @@ case "${1:-}" in
       case "${arg}" in
         @vigil_panel_orientation) printf '%s\n' "${TMUX_STUB_PANEL_ORIENTATION:-}" ;;
         @vigil_panel_size) printf '%s\n' "${TMUX_STUB_PANEL_SIZE:-}" ;;
+        @wt_new_branch) printf '%s\n' "${TMUX_STUB_WT_NEW_BRANCH:-}" ;;
       esac
     done
     ;;

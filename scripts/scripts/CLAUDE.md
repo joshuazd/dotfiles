@@ -184,6 +184,46 @@ renders inline (`--size ""`), that second picker draws in the same popup as a
 second screen. Keeping pipelines out of the `.menu` files is the whole reason
 the format is worth having.
 
+**Typed input is a script too, for the same reason and one more.** A `.menu`
+row is a fixed command string, so an entry whose command needs a value the user
+has to type cannot be written as one: `@window git-worktree-new` ran the creator
+with no branch name, which exits 1 on the missing argument and takes its own
+window down with the error still in it - a menu entry that visibly does
+nothing. `wt-new` asks instead.
+
+**Where it asks is decided by whether it has a tty**, the same split
+`tmux-respawn` makes for its confirmation:
+
+- **No tty** - a `@quiet` entry under `run-shell`, which is the normal menu
+  path. Ask with `tmux command-prompt`: one line on the status bar, and the
+  only overlay that can draw with no popup up.
+- **A tty** - the fzf fallback, or a plain shell. Read it right there. The
+  fallback path is already inside the picker's popup, where a `command-prompt`
+  would not draw at all.
+- **Neither** - read stdin, for `printf name | wt-new` and for the tests.
+
+A bare entry looks tempting, because the bare case is the one that gets a tty
+on both backends. It is wrong: that tty is fzf-menu's 80%x60% *output* popup,
+which is an enormous box to hold one short question - the first version of this
+shipped that way and the box was the complaint. The output popup is still where
+the creation runs, opened by `--act` once there is output to put in it.
+
+**`command-prompt` cannot return an answer**, only substitute it into a tmux
+command, so the answer comes back through a `--act` re-entry point - the same
+shape `wt-confirm` has with `display-menu`, and for the same reason. Two
+consequences:
+
+- **The answer travels in a tmux option** (`@wt_new_branch`), not in the text of
+  the `run-shell` that `--act` runs. `%%` is substituted before anything parses
+  the template, so a branch name interpolated into that command would be read by
+  the *shell*, with no way to escape it from this side. In an option it is seen
+  by tmux's parser alone. `--act` clears the option as it reads it, so a later
+  one cannot act on a stale answer.
+- **`--act` is told its repository**, resolved when the prompt was opened. By
+  the time an answer arrives the focused pane is whatever the user is looking
+  at, which need not be the repository they asked from. Same reason
+  `git-worktree-done --confirmed` is told its worktree.
+
 Sibling scripts are dispatched by absolute path through `PKG_DIR`, overridable
 with `SCRIPTS_PKG_DIR` — that override is how the tests point them at
 recorders, since a PATH stub cannot intercept an absolute path.
@@ -255,8 +295,17 @@ or reaching for an entry.
 |---|---|
 | Switch worktree | `ts` attaches **or creates** a session and switches you there |
 | Remove a worktree | Gated. Kills the session, moves the directory aside and deletes it, prunes, drops mise tracked-config symlinks, stops the rubocop server |
-| New worktree | Creates `../branch-name`, runs `claude-trust` and the portal / `CLAUDE.local.md` setup. No session |
+| New worktree + session | Asks for a branch name, then `wt-new --session`: the worktree, a `claude` / `server` session, and a switch to it. No Claude |
+| New worktree only | Asks for a branch name, then `wt-new`: creates `../branch-name`, runs `claude-trust` and the portal / `CLAUDE.local.md` setup. No session |
 | Done (this worktree) | Gated. The same destruction, for the worktree you are in |
+
+Both new-worktree rows take the branch name from a status-bar prompt and do
+the creation in a popup afterwards - see **Typed input is a script too** above.
+The `--session` half is `run_worktree_popup`, which creates the session
+`--detached` and switches the client after its popup closes, because a session
+has to exist before a client can be moved onto it. It is the only
+arbitrary-branch worktree+session entry in any menu: every other
+session-creating row is keyed to a story or a PR.
 
 **tmux.menu** is local tmux state and reversible, except: `Clear this pane
 history` discards scrollback, and `Respawn this pane` kills the pane's running
