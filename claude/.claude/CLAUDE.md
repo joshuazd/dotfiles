@@ -37,3 +37,7 @@ Never post replies/comments/messages to humans on PRs, Slack, GitHub issues, or 
 - Propose fixes only after confirmed root cause; plausible ≠ true, and wrong fixes cause real damage
 - When the user pushes back on a hypothesis, treat it as signal to question the hypothesis, not defend it
 
+## Private
+Work-specific instructions live outside this public repo:
+@~/.claude/CLAUDE.private.md
+
