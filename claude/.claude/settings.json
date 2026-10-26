@@ -1,6 +1,6 @@
 {
   "env": {
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5[1m]",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5[1m]",
     "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5[1m]",
     "RIPGREP_CONFIG_PATH": "",
     "TERM_PROGRAM": "Apple_Terminal",
@@ -51,7 +51,6 @@
       "~/"
     ]
   },
-  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -144,7 +143,7 @@
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": false,
     "superpowers@claude-plugins-official": true,
-    "ruby-lsp@claude-plugins-official": true,
+    "ruby-lsp@claude-plugins-official": false,
     "slack@claude-plugins-official": true,
     "nit@nit": false
   },
@@ -189,6 +188,14 @@
     ]
   },
   "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    },
+    "claude-fable-5-1": {
+      "effortLevel": "high"
+    }
+  },
   "promptSuggestionEnabled": false,
   "awaySummaryEnabled": false,
   "showClearContextOnPlanAccept": true,
@@ -202,11 +209,38 @@
     "allow": [
       "$defaults",
       "Deleting your own prior `@greptileai review` trigger comments via `gh api -X DELETE /repos/{owner}/{repo}/issues/comments/{id}` — used by the watch-pull-request skill to keep PR conversations tidy. Safe because it only removes the user's own trigger comments (filtered by `user.login == me` AND `body == \"@greptileai review\"`)."
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Bash(rails runner:*) on scripts whose name says they move or rewrite production data — treat as Production Deploy/Production Reads adjacent",
+      "Writes to config/credentials/production.key or config/credentials/staging.key"
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: the user's employer — the trusted repo below and its GitHub org",
+      "**Cloud provider(s)**: AWS, accessed through aws-vault; private container images in ECR",
+      "**Repository visibility**: the trusted repo is private",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: aws-vault locally; CI secrets live in the CI provider. Any env var named like *_TOKEN, *_KEY, *_SECRET or *_PASSWORD is a secret",
+      "**Default / protected branches**: main is the default and is protected by rulesets",
+      "**CI/CD deploy targets**: CI builds images and updates Kubernetes image tags — CI config and deploy scripts are deploy surfaces",
+      "**Network posture**: None configured",
+      "**Host containment**: None configured — assume Claude Code runs on an ordinary developer machine with open internet",
+      "**Source control**: the trusted repo and its configured remote only",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured beyond the private container registries above",
+      "**Sensitive data locations & audiences**: config/credentials/*.key, .env and its variants, docker/*.env, and the app's credential-handling controllers and models",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, container or script with `prod`/`production` as a whole word or name segment",
+      "**Protected deployment namespaces / environments**: the app's Kubernetes deploy namespace, and any `prod`/`production`-named namespace",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development on the trusted Rails repo, plus these personal dotfiles",
+      "**Trusted repo**: huntresslabs/portal (private) — working directory and its configured remote only",
+      "**Org-specific CLIs**: `short` (Shortcut CLI), `gh` (GitHub CLI), `vigil` (local dispatch daemon) — use `short`/`gh` instead of raw API calls",
+      "**Other repos in the same GitHub org**: routine git/gh operations there are plausible but not pre-cleared"
     ]
-  },
-  "modelSettings": {
-    "claude-opus-5": {
-      "effortLevel": "xhigh"
-    }
   }
 }
