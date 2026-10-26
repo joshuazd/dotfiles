@@ -1,0 +1,97 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# ruby-lsp-vim — launch ruby-lsp for vim-lsc.
+#
+# Prefers `bundle exec` so the server matches the project's locked version, and
+# falls back to a bare `ruby-lsp` when the project bundle can't run it (no
+# Gemfile, ruby-lsp not in the bundle, gems not installed).
+#
+# ruby-lsp sets `$> = $stderr` and logs its startup there, but vim-lsc echoes
+# everything a server writes to stderr as an error and offers no way to say
+# otherwise. So stdin and stdout are proxied untouched and each stderr line is
+# re-emitted as a `window/logMessage` notification, which vim-lsc echoes at the
+# notification's own severity. Writes to stdout are serialized so an injected
+# notification can never land inside a message the server is still writing.
+
+require "json"
+require "open3"
+
+LOG_MESSAGE_INFO = 3
+
+def server_command
+  bundled = system("bundle", "exec", "ruby-lsp", "--version", out: File::NULL, err: File::NULL)
+  bundled ? ["bundle", "exec", "ruby-lsp", *ARGV] : ["ruby-lsp", *ARGV]
+end
+
+def forward_messages(from, to, write_lock)
+  loop do
+    headers = +""
+    content_length = nil
+
+    while (line = from.gets("\r\n"))
+      headers << line
+      break if line == "\r\n"
+
+      content_length = Regexp.last_match(1).to_i if line =~ /\AContent-Length:\s*(\d+)/i
+    end
+    return if content_length.nil?
+
+    body = from.read(content_length)
+    return if body.nil?
+
+    write_lock.synchronize { to.write(headers, body) }
+  end
+end
+
+def log_lines_as_notifications(from, to, write_lock)
+  from.each_line do |line|
+    message = line.chomp
+    next if message.empty?
+
+    notification = JSON.generate(
+      jsonrpc: "2.0",
+      method: "window/logMessage",
+      params: { type: LOG_MESSAGE_INFO, message: },
+    )
+    write_lock.synchronize do
+      to.write("Content-Length: #{notification.bytesize}\r\n\r\n", notification)
+    end
+  end
+end
+
+server_in, server_out, server_err, server = Open3.popen3(*server_command)
+[$stdin, $stdout, server_in, server_out, server_err].each(&:binmode)
+[$stdout, server_in].each { |io| io.sync = true }
+
+%w[TERM INT HUP].each do |signal|
+  trap(signal) do
+    Process.kill(signal, server.pid)
+  rescue Errno::ESRCH
+    nil
+  end
+end
+
+at_exit do
+  Process.kill("TERM", server.pid) if server.alive?
+rescue Errno::ESRCH
+  nil
+end
+
+write_lock = Mutex.new
+
+client = Thread.new do
+  IO.copy_stream($stdin, server_in)
+rescue Errno::EPIPE
+  nil
+ensure
+  server_in.close unless server_in.closed?
+end
+
+[
+  Thread.new { forward_messages(server_out, $stdout, write_lock) },
+  Thread.new { log_lines_as_notifications(server_err, $stdout, write_lock) },
+].each(&:join)
+
+client.kill
+exit(server.value.exitstatus || 1)

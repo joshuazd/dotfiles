@@ -453,7 +453,7 @@ let g:lsc_server_commands = {
       \ 'typescript': 'typescript-language-server --stdio',
       \ 'typescriptreact': 'typescript-language-server --stdio',
       \ 'ruby': {
-        \ 'command': 'ruby-lsp',
+        \ 'command': 'ruby-lsp-vim',
         \ 'suppress_stderr': v:false,
         \ 'message_hooks': {
         \   'initialized': function('<SID>lscStart'),
