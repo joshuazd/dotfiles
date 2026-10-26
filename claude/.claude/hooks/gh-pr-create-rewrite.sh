@@ -3,7 +3,7 @@
 # standard PR creation policy:
 #   - always --draft (unless already present)
 #   - always --label ai-assisted (unless already present)
-#   - always --label "TEAM: SOC" when the working directory belongs to
+#   - always --label "Team: Agentic SOC" when the working directory belongs to
 #     huntresslabs/portal (unless already present)
 
 set -euo pipefail
@@ -31,15 +31,15 @@ if ! echo "$new_cmd" | grep -qE '\-\-label[[:space:]]+("?ai-assisted"?)([[:space
   new_cmd="$(echo "$new_cmd" | sed -E 's/(gh[[:space:]]+pr[[:space:]]+create)/\1 --label ai-assisted/')"
 fi
 
-# 3) When in huntresslabs/portal, also add --label "TEAM: SOC".
+# 3) When in huntresslabs/portal, also add --label "Team: Agentic SOC".
 remote_url=""
 if [ -n "$cwd" ]; then
   remote_url="$(cd "$cwd" 2>/dev/null && git config --get remote.origin.url 2>/dev/null || true)"
 fi
 
 if echo "$remote_url" | grep -qE '[:/]huntresslabs/portal(\.git)?$'; then
-  if ! echo "$new_cmd" | grep -qE '\-\-label[[:space:]]+"TEAM:[[:space:]]*SOC"'; then
-    new_cmd="$(echo "$new_cmd" | sed -E 's/(gh[[:space:]]+pr[[:space:]]+create)/\1 --label "TEAM: SOC"/')"
+  if ! echo "$new_cmd" | grep -qiE '\-\-label[[:space:]]+"Team:[[:space:]]*Agentic[[:space:]]+SOC"'; then
+    new_cmd="$(echo "$new_cmd" | sed -E 's/(gh[[:space:]]+pr[[:space:]]+create)/\1 --label "Team: Agentic SOC"/')"
   fi
 fi
 

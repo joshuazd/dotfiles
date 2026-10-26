@@ -9,6 +9,10 @@ description: Use when writing or drafting a new Shortcut story, or when asked to
 
 Stories communicate **what** to build and **why** — not **how**. Leave implementation decisions to the engineer.
 
+## Scope
+
+Prefer stories that are small and focused and individualized units of work.
+
 ## Story Structure
 
 Every story has three sections:

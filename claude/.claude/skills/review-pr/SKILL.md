@@ -1,7 +1,7 @@
 ---
 description: Review a pull request — focuses on architecture, design, and pattern adherence
 argument-hint: <pr-number-or-url>
-allowed-tools: Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh api:*), Bash(git merge-base:*), Bash(git rev-parse:*), Bash(short story:*), Bash(rg:*), Bash(grep:*)
+allowed-tools: Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh api:*), Bash(gh watch:*), Bash(gh extension install:*), Bash(git merge-base:*), Bash(git rev-parse:*), Bash(git pull:*), Bash(short story:*), Bash(rg:*), Bash(grep:*), Monitor
 ---
 
 You are reviewing a pull request. The expectation is that you are already in a git worktree with this PR's branch checked out. You can read files directly to get additional context beyond the diff.
@@ -36,6 +36,18 @@ Then, for each finding still live from the previous pass, pick one:
 - **Drop it.**
 
 Re-anchoring a finding to a new line number is not re-arguing it. If a commit touched the code a finding rests on, the burden is on the finding to survive, and the author having just changed that code is evidence they thought about it. Say plainly when you withdraw one; a withdrawn finding is a better outcome than a restated one.
+
+### Watch the head after delivering the review
+
+Once the review is posted to the user, arm a watch so new commits reach you without the user relaying them. Use the `gh-watch` extension (`gh extension install justincampbell/gh-watch` if `gh watch --help` fails) through the **Monitor tool**, never Bash in the background:
+
+- `command`: `gh watch branch <headRefName> --interval 60s` (run from the worktree so `gh` resolves the repo; `headRefName` comes from `gh pr view <pr> --json headRefName`)
+- `description`: `New commits on PR #<pr>`
+- `timeout_ms`: `1800000`, the Monitor ceiling. It expires with a notice; re-arm it on each expiry for as long as the review is live.
+
+Events are one JSON line each. The first is `initial-state`; say the SHA once and nothing else. On `new-commit`: `git pull --ff-only` in the worktree, confirm HEAD matches the event's `sha`, then run [Re-review on a new head](#re-review-on-a-new-head) in full. The event is not the user speaking; report what changed and the re-review result as your own update. A `pr-merged` or `pr-closed` event, or the branch vanishing, ends the watch; do not re-arm.
+
+To also hear the author's replies to review threads, arm a second Monitor with `gh watch pr <pr> --interval 60s`; `comment-added` and `review-submitted` are the events to act on (re-fetch the threads, since a reply there changes Gate 1), and the rest are noise for a reviewer.
 
 Review this pull request. Most code you review is Claude-generated — it tends to be correct but often introduces new patterns instead of following existing ones, over-engineers, or doesn't reuse existing utilities.
 

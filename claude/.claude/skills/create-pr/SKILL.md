@@ -101,5 +101,5 @@ rm -f "$pr_body_file"
 - Add a description only — do NOT check any boxes (including Type), fill in any checklists, or modify any other fields
 - Always add the `ai-assisted` label (`--label "ai-assisted"`)
 - If the repo is `huntresslabs/portal` (check with `gh repo view --json nameWithOwner -q .nameWithOwner`):
-  - Always add `--label "TEAM: SOC"`
-  - Add `--label "SOC Agentic"` **only if the work is agentic-related** (touches agent code, agent eval fixtures, agent prompts/tools, or otherwise scoped to agentic features). If unclear from the diff, ask the user.
+  - Always add `--label "Team: Agentic SOC"`
+  - Always add `--label "selective-tests"` (CI runs only the tests related to the changed files)
