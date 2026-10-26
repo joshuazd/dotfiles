@@ -300,9 +300,16 @@ menu_set_position() {
 # A label BEGINNING with "-" is an information row: tmux draws it dim and
 # refuses to select it, measured to ignore its key entirely. It still takes
 # three argv slots, with the key and command empty.
+#
+# Mnemonics are markup for the static .menu files. The pickers' labels are
+# data - a PR titled "haml-rails & haml" bound Space as its key - so
+# `literal` keys every item by position, and doubles `#` so tmux's format
+# expansion of item names prints it as typed. The hyphen rules stay: tmux
+# applies them itself, whatever this passes.
 # Arguments:
 #   Menu title
 #   Act prefix - a shell-quoted command that takes one value argument
+#   Optional "literal"
 # Inputs:
 #   "value<TAB>label" rows on stdin
 # Returns:
@@ -311,6 +318,8 @@ menu_set_position() {
 menu_show() {
   local title="${1}"
   local act_prefix="${2}"
+  local literal=""
+  [ "${3:-}" = "literal" ] && literal=1
 
   local -a args=()
   local row value label key text
@@ -339,12 +348,18 @@ menu_show() {
 
     n=$((n + 1))
     items=$((items + 1))
-    text="$(menu_label_text "${label}")"
-    key="$(menu_label_key "${label}")"
+    if [ -n "${literal}" ]; then
+      text="${label}"
+      key=""
+    else
+      text="$(menu_label_text "${label}")"
+      key="$(menu_label_key "${label}")"
+    fi
     if [ -z "${key}" ] && [ "${n}" -le 9 ]; then
       key="${n}"
     fi
     [ "${#text}" -gt "${widest}" ] && widest="${#text}"
+    [ -n "${literal}" ] && text="${text//#/##}"
 
     args+=("${text}" "${key}" \
       "run-shell -b $(menu_tmux_quote "${act_prefix} $(printf '%q' "${value}")")")
@@ -507,7 +522,7 @@ menu_or_pick() {
   [ -n "${count}" ] || count=0
 
   if menu_fits "${count}"; then
-    printf '%s\n' "${rows}" | menu_show "${title}" "${act_prefix}"
+    printf '%s\n' "${rows}" | menu_show "${title}" "${act_prefix}" literal
     return "${?}"
   fi
 

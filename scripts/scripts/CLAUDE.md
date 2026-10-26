@@ -245,6 +245,11 @@ mnemonic about. fzf has no key column, so `menu_rows_numbered` strips the
 marker and prefixes the digit for that path only; the same entry is `s`
 natively and `2` in the fallback.
 
+**Picker labels are never parsed for markers.** `menu_or_pick` renders its
+rows with `menu_show ... literal`: every item keyed by position, `&` left as
+text, `#` doubled past tmux's format expansion. A PR titled `haml-rails & haml`
+used to bind Space.
+
 A label beginning with `-` is an information row: tmux draws it dim and
 refuses to select it, ignoring its key entirely. That is what lets the confirm
 menus carry a path, a branch and a risk summary above the choices.

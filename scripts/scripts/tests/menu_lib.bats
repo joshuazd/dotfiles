@@ -185,6 +185,21 @@ setup() {
   printf '%s\n' "${output}" | assert_arg_after "Commit &" "1"
 }
 
+# A picker's labels are data. A PR titled "haml-rails & haml" bound Space.
+@test "a picker label's ampersand is text, not a mnemonic" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  printf 'v1\t#1  haml-rails & haml\n' | menu_or_pick "T" "act" ""
+  run tmux_call_args display-menu
+  printf '%s\n' "${output}" | assert_arg_after "##1  haml-rails & haml" "1"
+}
+
+@test "a picker label's hash is doubled past tmux's format expansion" {
+  export TMUX_STUB_CLIENT_HEIGHT=40
+  printf 'v1\tFix #S in titles\n' | menu_or_pick "T" "act" ""
+  run tmux_call_args display-menu
+  [[ "${output}" == *"Fix ##S in titles"* ]]
+}
+
 @test "only the first marker is stripped" {
   run menu_label_text 'A&B&C'
   [ "${output}" = "AB&C" ]
