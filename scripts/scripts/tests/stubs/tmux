@@ -168,6 +168,11 @@ case "${1:-}" in
       exit 1
     fi
     ;;
+  respawn-pane)
+    if [ -n "${TMUX_STUB_RESPAWN_FAILS:-}" ]; then
+      stub_status=1
+    fi
+    ;;
   split-window)
     if [ -n "${TMUX_STUB_SPLIT_FAILS:-}" ]; then
       # Log it before bailing: a test asserting nothing followed the failure

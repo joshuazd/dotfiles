@@ -90,6 +90,10 @@ The multi-line system prompt travels via a file rather than the command line: `w
 
 Re-dispatching a story or PR that already has a session must not relaunch Claude - `respawn-pane -k` would SIGKILL the Claude running there. `create_tmux_session` returns `SESSION_EXISTED`, `git-worktree-session` and `run_worktree_popup` carry that status out through the popup, and both callers skip the launch and just switch to the live session.
 
+**A failed dispatch takes its own worktree with it.** Left behind, it blocks every retry: `git-worktree-new` refuses the directory, a stale registration still holds the branch once the directory is gone, and a surviving session makes the retry report `SESSION_EXISTED` and skip the launch. `worktree_rollback_arm` (`lib/worktree.sh`) sets an EXIT trap that runs `git-worktree-cleanup` on a nonzero exit, and `worktree_rollback_disarm` clears it. It is armed twice, once per process that creates something: `git-worktree-session` arms before `git-worktree-new` and disarms once the session exists, and `gh-review` / `shortcut-implement` arm after a status-0 popup and disarm once Claude is launched. Only ever for what this run created. A directory or session that was already there is someone else's. Rollback output goes to the cleanup log, so the run's real error stays the last line vigil shows.
+
+`create_tmux_session` returns 1 explicitly from `new-session`, `set-option` and `new-window`. Every caller runs it under `||`, which turns errexit off for the whole body, so without the explicit returns a session tmux created under a different name failed every step and still reported success. A title ending in `;` did exactly that, because tmux reads a trailing `;` in argv as a command separator. That is why `session_name_from_title` strips semicolons.
+
 The `claude-trust` script modifies `~/.claude.json` to pre-trust new worktree directories so Claude doesn't prompt for confirmation.
 
 ### Read-Only Review Sessions

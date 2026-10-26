@@ -51,6 +51,35 @@ worktree_run_cleanup() {
 }
 
 #######################################
+# Remove a worktree and session this run created if the run then fails.
+#
+# A dispatch that dies after its worktree exists leaves it behind, and the
+# leftover blocks every retry: git-worktree-new refuses an existing directory,
+# and once that directory is gone the stale registration still holds the
+# branch. So whichever step creates the worktree arms this, and disarms it once
+# the run has got as far as it needs to.
+#
+# Only arm for something this run created. A directory or session that was
+# already there belongs to someone else - a live review, a re-dispatch - and
+# must survive this run failing.
+#
+# Output goes to the cleanup log rather than stderr: the run's own error is the
+# one worth reporting, and vigil shows the last thing a failed job printed.
+# Arguments:
+#   Path to the cleanup script, worktree path, session name
+#######################################
+worktree_rollback_arm() {
+  local cmd
+  cmd="worktree_run_cleanup $(printf '%q' "${1}") --session $(printf '%q' "${3}") $(printf '%q' "${2}")"
+  # shellcheck disable=SC2064 # the arguments are fixed now, deliberately
+  trap "[ \"\${?}\" -eq 0 ] || ${cmd} || true" EXIT
+}
+
+worktree_rollback_disarm() {
+  trap - EXIT
+}
+
+#######################################
 # Count uncommitted changes, staged or not, tracked or not.
 #
 # A directory that is not a git repository counts as clean rather than

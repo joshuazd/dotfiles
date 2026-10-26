@@ -120,3 +120,30 @@ popup_command() {
   run popup_command
   [[ "${output}" == *"cd ${HOME}/portal/wt "* ]]
 }
+
+# A launch that fails after the worktree and session exist has to take them
+# with it: left behind, the next dispatch finds the session, skips the launch,
+# and lands on a pane with no Claude in it.
+@test "gh-review removes the worktree and session it created when the launch fails" {
+  cd "${HOME}/portal/wt"
+  export TMUX_STUB_RESPAWN_FAILS=1
+  export TMUX_STUB_PANE_PATH="${HOME}/pr-205"
+  export WORKTREE_CLEANUP_LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  export SCRIPTS_PKG_DIR="${BATS_TEST_TMPDIR}/pkg"
+  mkdir -p "${SCRIPTS_PKG_DIR}"
+  printf "#!/bin/sh\nprintf \"[%%s]\" \"\$@\"\n" > "${SCRIPTS_PKG_DIR}/git-worktree-cleanup"
+  chmod +x "${SCRIPTS_PKG_DIR}/git-worktree-cleanup"
+
+  run gh_review --detached --non-interactive --tier sonnet 205
+  [ "${status}" -ne 0 ]
+  grep -q "\[--session\]\[PR-205 A review\]\[${HOME}/pr-205\]" "${WORKTREE_CLEANUP_LOG}"
+}
+
+@test "gh-review leaves a launched review alone" {
+  cd "${HOME}/portal/wt"
+  export WORKTREE_CLEANUP_LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+
+  run gh_review --detached --non-interactive --tier sonnet 205
+  [ "${status}" -eq 0 ]
+  [ ! -e "${WORKTREE_CLEANUP_LOG}" ]
+}

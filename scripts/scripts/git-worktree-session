@@ -165,6 +165,11 @@ main() {
       return 1
     fi
 
+    if [ ! -e "${worktree_path}" ]; then
+      worktree_rollback_arm "${SCRIPTS_PKG_DIR:-${SCRIPT_DIR}}/git-worktree-cleanup" \
+        "${worktree_path}" "${session_name}"
+    fi
+
     info "Creating worktree..."
 
     local worktree_args=()
@@ -198,6 +203,9 @@ main() {
   else
     create_tmux_session "${session_name}" "${worktree_path}" "${detached}" \
       || session_status="${?}"
+  fi
+  if [ "${session_status}" -eq 0 ] || [ "${session_status}" -eq "${SESSION_EXISTED}" ]; then
+    worktree_rollback_disarm
   fi
   return "${session_status}"
 }

@@ -13,6 +13,12 @@ setup() {
   [ "${output}" = "SC-12345 Emit metrics for v12 now" ]
 }
 
+@test "session_name_from_title strips semicolons tmux reads as a command separator" {
+  run session_name_from_title "PR" "41318" "Labels read on one recommendation axis; the scorecard scores"
+  [ "${status}" -eq 0 ]
+  [ "${output}" = "PR-41318 Labels read on one recommendation axis" ]
+}
+
 @test "session_name_from_title truncates at a word boundary" {
   run session_name_from_title "SC" "12345" "Refactor the entire authentication subsystem end to end"
   [ "${status}" -eq 0 ]
@@ -230,6 +236,7 @@ _fake_session_script() {
   [ "${status}" -ne 0 ]
   [ "${status}" -ne "${SESSION_EXISTED}" ]
   [[ "${output}" == *"Creating worktree"* ]]
+  [ -d "${BATS_TEST_TMPDIR}/wt2" ]
 }
 
 @test "worktree_prompt_file resolves under the worktree git dir" {
@@ -788,4 +795,57 @@ _fake_session_script() {
   run tmux_reachable
   [ "${status}" -eq 1 ]
   [ "$(grep -cx 'start-server' "${TMUX_STUB_LOG}")" -eq 1 ]
+}
+
+@test "create_tmux_session fails when the session cannot be built" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_NEW_WINDOW_FAILS=1
+  run create_tmux_session "SC-1 demo" "/tmp/wt" true "" "claude --model opus"
+  [ "${status}" -ne 0 ]
+  [ "${status}" -ne "${SESSION_EXISTED}" ]
+  run refute_tmux_subcommand "respawn-pane"
+  [ "${status}" -eq 0 ]
+}
+
+# A worktree left behind by a failed run blocks every retry: the directory is
+# refused, and once it is gone its registration still holds the branch.
+_session_repo() {
+  local repo="${1}"
+  export HOME="${BATS_TEST_TMPDIR}/home"
+  mkdir -p "${HOME}" "${repo}"
+  git -C "${repo}" init --quiet
+  git -C "${repo}" -c user.email=t@example.com -c user.name=Test \
+    commit --quiet --allow-empty -m first
+  git -C "${repo}" branch feature/x
+}
+
+@test "git-worktree-session removes the worktree it created when the session fails" {
+  export TMUX_STUB_HAS_SESSION=1
+  export TMUX_STUB_NEW_WINDOW_FAILS=1
+  export WORKTREE_CLEANUP_LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  local repo="${BATS_TEST_TMPDIR}/repo3"
+  _session_repo "${repo}"
+
+  cd "${repo}"
+  run "${BATS_TEST_DIRNAME}/../git-worktree-session" \
+    --detached --dir-name wt3 --session-name "SC-3 demo" --pane-command "" feature/x
+
+  [ "${status}" -ne 0 ]
+  [ ! -e "${BATS_TEST_TMPDIR}/wt3" ]
+  [ "$(git -C "${repo}" worktree list | wc -l)" -eq 1 ]
+}
+
+@test "git-worktree-session keeps the worktree when the session is created" {
+  export TMUX_STUB_HAS_SESSION=1
+  export WORKTREE_CLEANUP_LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  local repo="${BATS_TEST_TMPDIR}/repo4"
+  _session_repo "${repo}"
+
+  cd "${repo}"
+  run "${BATS_TEST_DIRNAME}/../git-worktree-session" \
+    --detached --dir-name wt4 --session-name "SC-4 demo" --pane-command "" feature/x
+
+  [ "${status}" -eq 0 ]
+  [ -d "${BATS_TEST_TMPDIR}/wt4" ]
+  [ ! -e "${WORKTREE_CLEANUP_LOG}" ]
 }

@@ -92,7 +92,8 @@ teleport_client_to() {
 
 #######################################
 # Build a tmux-safe session name from a prefix, ID, and title
-# Strips colons and periods (break tmux targeting), truncates to ~50 chars
+# Strips colons, periods (break tmux targeting) and semicolons (a trailing one
+# is a tmux command separator), truncates to ~50 chars
 # at a word boundary.
 # Arguments:
 #   prefix — e.g. "SC" or "PR"
@@ -110,6 +111,7 @@ session_name_from_title() {
   title="${title//:/}"
   title="${title//./}"
   title="${title//\'/}"
+  title="${title//;/}"
 
   local head="${prefix}-${id} "
   local max_title_len=$(( 50 - ${#head} ))
@@ -362,11 +364,15 @@ create_tmux_session() {
     size_flags=(-x "${client_width}" -y "${client_height}")
   fi
   tmux new-session -d -s "${session_name}" -n "claude" -c "${session_dir}" \
-    ${size_flags[@]+"${size_flags[@]}"}
+    ${size_flags[@]+"${size_flags[@]}"} || return 1
   # Mark the pane so later targeting does not depend on its index, which
   # shifts when a panel is inserted before it.
-  tmux set-option -p -t "=${session_name}:claude" @vigil_claude 1
-  tmux new-window -t "=${session_name}:2" -n "server" -c "${session_dir}"
+  #
+  # Explicit returns because every caller runs this under ||, which switches
+  # errexit off for the whole body: a session tmux created under some other
+  # name would otherwise fail every step below and still report success.
+  tmux set-option -p -t "=${session_name}:claude" @vigil_claude 1 || return 1
+  tmux new-window -t "=${session_name}:2" -n "server" -c "${session_dir}" || return 1
   # ${VIGIL_BIN:-vigil}, matching add_vigil_panel: a dev build pointed at by
   # VIGIL_BIN must gate the same binary it launches.
   #

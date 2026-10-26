@@ -155,3 +155,49 @@ push_to_new_remote() {
   grep -q '^=== .*/tmp/some-worktree' \
     "${LOG}"
 }
+
+# --- worktree_rollback_arm ------------------------------------------------
+#
+# Driven through a child bash, because the rollback is an EXIT trap and only a
+# real process exit fires it.
+
+rollback_run() {
+  local exit_status="${1}"
+  local disarm="${2-}"
+  local script="${BATS_TEST_TMPDIR}/fake-cleanup"
+  printf "#!/bin/sh\nprintf \"[%%s]\" \"\$@\"\n" > "${script}"
+  chmod +x "${script}"
+  WORKTREE_CLEANUP_LOG="${LOG}" bash -c "
+    source \"${BATS_TEST_DIRNAME}/../lib/worktree.sh\"
+    worktree_rollback_arm \"${script}\" \"/tmp/a b\" \"PR-1 a session\"
+    ${disarm}
+    exit ${exit_status}
+  "
+}
+
+@test "a failing run rolls back the worktree and session it armed" {
+  LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  run rollback_run 1
+  [ "${status}" -eq 1 ]
+  grep -q "\[--session\]\[PR-1 a session\]\[/tmp/a b\]" "${LOG}"
+}
+
+@test "a successful run leaves its worktree alone" {
+  LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  run rollback_run 0
+  [ "${status}" -eq 0 ]
+  [ ! -e "${LOG}" ]
+}
+
+@test "a disarmed run leaves its worktree alone even when it fails" {
+  LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  run rollback_run 3 worktree_rollback_disarm
+  [ "${status}" -eq 3 ]
+  [ ! -e "${LOG}" ]
+}
+
+@test "the rollback says nothing on the run's own output" {
+  LOG="${BATS_TEST_TMPDIR}/cleanup.log"
+  run rollback_run 1
+  [ -z "${output}" ]
+}
